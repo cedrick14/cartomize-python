@@ -72,8 +72,7 @@ Les libellés viennent de `classes={code: (libellé, couleur)}` ou de la balise
 JSON `CARTOMIZE_CLASSES`. Les tables de couleurs raster existantes sont
 utilisées si aucune couleur explicite n’est fournie. À défaut, les noms
 restent « Classe 2 », « Classe 3 », etc. La fenêtre permet de corriger libellés
-et couleurs avant application. Le code 2 ne signifie pas universellement
-« forêt primaire ». L’analyse ne réalise pas une classification supervisée.
+et couleurs avant application. Les libellés des codes dépendent de la nomenclature fournie. L’analyse ne réalise pas une classification supervisée.
 
 ## Limites de performance
 
@@ -81,8 +80,7 @@ Le diagnostic est échantillonné ; l’application et le comptage sont exacts.
 Le masquage connexe lit deux fois les tuiles, puis le comptage des classes
 effectue une lecture supplémentaire. Les identifiants de composantes et les
 informations par tuile occupent de la mémoire. `max_components` borne leur
-nombre ; il ne borne pas la mémoire totale du processus. Aucun gain de vitesse
-mesuré n’est revendiqué pour ce nouveau parcours.
+nombre ; il ne borne pas la mémoire totale du processus. Le temps de traitement dépend du nombre de tuiles, de composantes et de classes, ainsi que des performances du stockage.
 
 La préparation vectorielle propose rôle et étiquettes et réalise l’audit des
 géométries. Elle ne lance pas automatiquement toutes les intersections,

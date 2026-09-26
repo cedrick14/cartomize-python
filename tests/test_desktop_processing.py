@@ -1,4 +1,4 @@
-"""Exercise editable treatment chains and their real Qt worker execution."""
+"""Editable processing chains and Qt worker integration tests."""
 import json
 import time
 import os

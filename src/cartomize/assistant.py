@@ -17,9 +17,9 @@ TOOL_LABELS={'processing':'Chaîne de traitements','classification':'Classificat
 def assess_project(inputs,*,data_kind='layers',goal='general',aoi=None,progress=None,cancel=None):
     """Read-only preflight and ordered proposals; no classification is inferred.
 
-    Each unreadable input becomes an error in the report rather than a false
-    success. Raster metadata are sampled by analyze_project; vector geometry
-    validity is checked in full. Scenarios are recommendations, not execution.
+    Unreadable inputs are recorded as errors. Raster metadata are sampled by
+    analyze_project; vector geometry validity is checked in full. The report
+    contains a processing proposal that can be configured before execution.
     """
     if goal not in GOALS:raise ValueError('Objectif cartographique inconnu.')
     if data_kind not in {'layers','scenes'}:raise ValueError('Choisir des couches ou des scènes.')

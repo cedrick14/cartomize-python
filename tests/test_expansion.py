@@ -1,4 +1,4 @@
-"""Scientific and end-to-end checks for the 0.6 processing paths."""
+"""Scientific reference cases and cartographic workflow integration tests."""
 import json
 import threading
 from pathlib import Path

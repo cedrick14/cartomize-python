@@ -1,4 +1,4 @@
-"""Independent expected results and complete workflows for the completion patch."""
+"""Reference results and integration tests for processing workflows."""
 import hashlib
 import json
 from pathlib import Path

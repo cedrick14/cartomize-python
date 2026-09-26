@@ -1,4 +1,4 @@
-"""Actual Qt state persistence and execution-engine propagation."""
+"""Qt session persistence and execution-engine parameter tests."""
 import os,time,json
 os.environ.setdefault('QT_QPA_PLATFORM','offscreen')
 import numpy as np

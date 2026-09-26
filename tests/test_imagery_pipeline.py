@@ -72,7 +72,7 @@ def test_validation_and_failure_leave_no_partial_production(write_raster, tmp_pa
         cm.process_imagery(source, tmp_path/'none', multiband=False)
     with pytest.raises(ValueError, match='absente'):
         cm.process_imagery(source, tmp_path/'wrong_band', composition=('swir2', 'nir', 'red'), mask_clouds=False)
-    # Failure during display occurs after actual preparation, but publishes nothing.
+    # A display-stage failure must roll back the prepared output directory.
     with pytest.raises(ValueError, match='gamma'):
         cm.process_imagery(source, tmp_path/'failed', composition='natural', gamma=0, mask_clouds=False)
     assert not (tmp_path/'failed').exists()

@@ -64,7 +64,7 @@ Le zoom retrouve les détails présents dans les pixels sources. Au-delà de leu
 
 La vue vectorielle sert à explorer les géométries et les attributs ; elle ne reproduit pas tous les styles natifs d’un logiciel SIG. Elle limite chaque requête à 40 000 entités visibles et signale ce plafond ; zoomer réduit la zone interrogée. Les rapports JSON consultables sont limités à 16 Mio, avec un texte affiché jusqu’à 500 000 caractères. Les fichiers complets sont conservés.
 
-La fluidité dépend du stockage, de la compression, des index spatiaux, des pyramides et du matériel. Les tests utilisent des données synthétiques ; ils ne constituent pas un benchmark universel ou une validation scientifique des cartes. La bibliothèque et la fenêtre restent indépendantes de QGIS et d’ArcGIS.
+La fluidité dépend du stockage, de la compression, des index spatiaux, des pyramides et du matériel. Les tests utilisent des données synthétiques. La mesure des performances et la validation thématique nécessitent des données représentatives de l’étude. La bibliothèque et la fenêtre restent indépendantes de QGIS et d’ArcGIS.
 
 ## Vérifications
 

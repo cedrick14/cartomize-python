@@ -155,8 +155,8 @@ Dans une application possédant déjà un `QApplication`, utiliser
 
 Un notebook local peut ouvrir la fenêtre avec
 `cm.launch()` : Cartomize active automatiquement l’intégration Qt d’IPython.
-La cellule rend la main et la fenêtre reste interactive. Installer les
-composants du notebook dans un noyau Python 3.11 ou supérieur :
+La cellule se termine et la fenêtre reste interactive. Installer les
+composants du notebook dans un noyau Python 3.11 à 3.13 :
 
 ```python
 %pip install "cartomize[notebook]==1.0"
@@ -174,7 +174,7 @@ sans bureau graphique ne peut pas afficher cette fenêtre dans le navigateur ;
 l’API de traitement Python reste utilisable. `block=True` lance explicitement
 la boucle Qt, tandis que `block=False` la laisse à l’application hôte.
 
-Sous Windows Conda, Cartomize charge désormais le moteur XML de Python avant
+Sous Windows Conda, Cartomize charge le moteur XML de Python avant
 les bibliothèques SIG. Aucun import manuel d’Expat n’est nécessaire.
 
 ## Mise en page et atlas

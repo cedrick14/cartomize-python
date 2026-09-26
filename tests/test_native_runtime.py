@@ -1,4 +1,4 @@
-"""Real QGIS integration, activated only with an installed vendor runtime."""
+"""QGIS integration tests requiring an installed QGIS runtime."""
 import hashlib,json,os,subprocess
 from pathlib import Path
 import pytest

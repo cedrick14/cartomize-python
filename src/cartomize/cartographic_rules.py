@@ -1,4 +1,4 @@
-"""Automatic frame extents and thematic tables derived from actual map data."""
+"""Automatic frame extents and thematic tables derived from map layers."""
 from pathlib import Path
 import numpy as np
 import pandas as pd

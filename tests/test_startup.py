@@ -1,4 +1,4 @@
-"""Cold imports and a real Jupyter kernel must work without user setup code."""
+"""Import order, application startup and Jupyter integration tests."""
 import os
 from pathlib import Path
 import subprocess

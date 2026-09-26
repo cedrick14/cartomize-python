@@ -27,7 +27,7 @@ Choisir **Bandes personnalisées : correspondance manuelle** pour des fichiers r
 
 Les fichiers sont initialement rattachés à `scene_1`. Donner le même identifiant aux bandes d’une acquisition, et des identifiants différents aux acquisitions distinctes. Utiliser les mêmes noms spectraux entre scènes. Deux bandes portant le même nom dans la même scène sont refusées. Le numéro indique la bande à lire à l’intérieur du fichier source. Les facteurs de calibration proviennent des métadonnées du fichier, avec les valeurs usuelles 1 et 0 lorsque rien n’est déclaré ; renseigner les facteurs documentés du produit si nécessaire.
 
-Pour les données personnalisées, le masque QA/SCL est désactivé initialement : aucun masque nuageux n’est inventé. Pour fournir des masques et métadonnées explicites, utiliser un manifeste de scènes ou l’API `Scene`/`Band`. Une mosaïque à dates différentes ou inconnues exige l’option explicite correspondante.
+Pour les données personnalisées, le masque QA/SCL est désactivé initialement. Son activation nécessite un masque de qualité compatible. Pour fournir des masques et métadonnées explicites, utiliser un manifeste de scènes ou l’API `Scene`/`Band`. Une mosaïque à dates différentes ou inconnues exige l’option explicite correspondante.
 
 ## Valeurs et contrôles
 

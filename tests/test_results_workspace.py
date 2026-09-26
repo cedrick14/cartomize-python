@@ -1,4 +1,4 @@
-"""Scientific pixel fidelity, responsive rendering and real integrated outputs."""
+"""Pixel fidelity, rendering and integrated result-view tests."""
 import os
 os.environ.setdefault('QT_QPA_PLATFORM','offscreen')
 import json

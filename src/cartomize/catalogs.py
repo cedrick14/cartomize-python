@@ -30,7 +30,8 @@ def search_stac(endpoint,*,bbox=None,datetime_range=None,collections=(),limit=20
     """Search a STAC Item Search endpoint, following GET/POST pagination.
 
     The endpoint and any access to protected collections are supplied by the
-    caller. No account credentials or provider-specific signing are guessed.
+    caller. Authentication and provider-specific URL signing must be configured
+    before requesting protected assets.
     """
     import numpy as np
     if not isinstance(limit,int) or not 1<=limit<=1000:raise ValueError('La limite doit être comprise entre 1 et 1 000 scènes.')

@@ -47,7 +47,7 @@ class InspectionPage(Page):
         super().__init__('Analyse des couches','Contrôle des géométries, des attributs, des systèmes de coordonnées, des bandes et du NoData.')
         self.kind=QComboBox();self.kind.addItem('Couche vectorielle','vector');self.kind.addItem('Raster','raster')
         self.source=PathField(filter=VECTOR_FILTER);self.band=spin();self.report=QPlainTextEdit();self.report.setReadOnly(True)
-        self.report.setMinimumHeight(260);self.report.setPlaceholderText('Le rapport sera affiché ici après analyse.')
+        self.report.setMinimumHeight(260);self.report.setPlaceholderText('Rapport d’analyse des couches.')
         self.form.addRow('Type de données',self.kind);self.form.addRow('Couche',self.source);self.form.addRow('Bande raster',self.band)
         note=QLabel('Les diagnostics raster reposent sur un échantillon. Les valeurs NoData suggérées ne sont pas appliquées aux données.')
         note.setWordWrap(True);self.form.addRow(note);self.form.addRow(self.report)

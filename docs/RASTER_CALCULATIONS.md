@@ -32,7 +32,7 @@ Le prétraitement Landsat/Sentinel assure cette conversion pour les formats
 pris en charge; une réflectance déjà calibrée ne doit pas être recalibrée.
 
 Le NDWI fourni suit McFeeters (vert/PIR). Le NDMI utilise PIR/SWIR1.
-Le NDRE utilise `rededge1`. L'OSAVI suit ici la convention
+Le NDRE utilise `rededge1`. L’OSAVI utilise la formule
 `(nir-red)/(nir+red+0.16)`, sans facteur 1,16; une autre convention peut être
 définie explicitement. Le MSAVI correspond à la formule explicite à racine
 carrée couramment désignée MSAVI2. Aucune valeur n'est arbitrairement limitée
@@ -181,7 +181,7 @@ en compte entre blocs, avant publication du fichier de sortie. Un résultat
 existant est conservé si le traitement échoue ou est interrompu.
 
 Le [rapport de performances](PERFORMANCE.md) décrit les mesures locales.
-La mosaïque conserve son moteur distinct : le parallélisme ajouté ici concerne
+La mosaïque conserve son moteur distinct : le traitement parallèle concerne
 l'algèbre, les indices, les statistiques focales et multirasters.
 
 La calculatrice couvre les expressions décrites dans ce guide. L’hydrologie et la classification utilisent leurs modules spécialisés. La décomposition radar n’est pas prise en charge.

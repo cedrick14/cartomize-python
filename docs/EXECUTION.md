@@ -39,7 +39,7 @@ Sans adresse, Dask crée des processus sur la machine locale. Avec `scheduler_ad
 
 Le nombre de blocs en vol est borné par `workers`. Le budget estime les tableaux, sans plafonner le processus, les bibliothèques natives, le cache GDAL, les copies réseau ou la mémoire GPU. Les marges des blocs sont conservées pour les filtres de voisinage. Les échecs et annulations préservent les sources et empêchent la publication du résultat incomplet.
 
-Les transferts, la création des processus, la compilation CUDA et le stockage peuvent rendre un petit traitement plus lent. Aucun gain universel n’est annoncé. Les mesures historiques CPU ne constituent pas une mesure du GPU ou du calcul distribué.
+Les transferts, la création des processus, la compilation CUDA et le stockage peuvent rendre un petit traitement plus lent. Les performances doivent être mesurées sur les données et le matériel utilisés. Les mesures historiques CPU ne constituent pas une mesure du GPU ou du calcul distribué.
 
 ## Fenêtre et ligne de commande
 

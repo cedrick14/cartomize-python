@@ -1,4 +1,4 @@
-"""Renderer transfer checks: class boundaries, symbol units and real exports."""
+"""Renderer transfer tests for class boundaries, symbol units and exports."""
 import json,xml.etree.ElementTree as ET
 import geopandas as gpd
 import numpy as np

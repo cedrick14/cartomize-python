@@ -1,4 +1,4 @@
-"""Exercise the actual Qt widgets and background processing without a display."""
+"""Qt interface and background-processing integration tests."""
 import os
 os.environ.setdefault("QT_QPA_PLATFORM","offscreen")
 import time
@@ -21,7 +21,7 @@ def application():
 
 
 def finish(window,timeout=15):
-    # Run the real event loop, releasing the GIL for Python work in QThread.
+    # Run the Qt event loop while the worker executes Python code.
     loop=QEventLoop();timer=QTimer();deadline=time.monotonic()+timeout
     timer.timeout.connect(lambda:loop.quit() if window.thread is None or time.monotonic()>deadline else None)
     timer.start(10);loop.exec();timer.stop()

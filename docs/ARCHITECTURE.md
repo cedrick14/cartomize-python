@@ -40,7 +40,7 @@ paquet est 1.0. Les fichiers originaux ne sont pas modifiés.
 - Objets GeoPandas standards, sans nouvelle classe concurrente de GeoDataFrame.
 - CRS explicite, entrées copiées pour les opérations vectorielles.
 - Masques déclarés prioritaires; le diagnostic individuel reste en lecture seule. La préparation du projet applique les fonds périphériques retenus dans des copies réversibles.
-- Écritures raster temporaires puis remplacement atomique de chaque fichier, sources protégées. Les trois fichiers d’un produit multiscène sont remplacés successivement; une panne système pendant cette phase peut interrompre la livraison du groupe.
+- Écritures raster temporaires puis remplacement atomique de chaque fichier, sources protégées. Les trois fichiers d’un produit multiscène sont remplacés successivement; une panne système pendant cette phase peut interrompre l’enregistrement du groupe de fichiers.
 - Les grands calculs NDVI/reclassification et comptages sont lus par fenêtres.
 - Les exports utilisent des images raster rééchantillonnées à 2048 pixels par
   dimension par défaut. `max_raster_size` ajuste cette limite d'affichage.

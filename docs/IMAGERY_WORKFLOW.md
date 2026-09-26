@@ -82,7 +82,7 @@ exigent un CRS cible projeté explicite.
   une mosaïque multitemporelle; ce choix est enregistré dans le rapport.
 - Calibration native avant reprojection. Pour Landsat C2 L2 SR : DN ×
   0,0000275 − 0,2; DN nul exclu. Pour Sentinel L2A : quantification et décalages
-  lus dans les métadonnées, sans supposer un facteur universel.
+  lus dans les métadonnées du produit.
 - QA_PIXEL Landsat : exclusion des pixels de remplissage, nuages, cirrus,
   nuages dilatés, ombres et neige. QA_RADSAT, lorsqu'il existe : exclusion
   conservatrice de toute valeur non nulle. Son absence est visible dans le rapport.
@@ -94,10 +94,10 @@ exigent un CRS cible projeté explicite.
 - Un pixel de sortie exige toutes les bandes valides. `overlap="first"`
   privilégie la première scène de la liste; `"last"` privilégie la dernière.
   L'ordre de découverte est date puis identifiant; il peut être réordonné.
-- Les zones non couvertes restent NoData, sans reconstruction inventée.
+- Les zones non couvertes conservent la valeur NoData.
 - `multibande_source_index.tif` indique la scène retenue : 0 = absent,
   1 = première scène, 2 = deuxième, etc. Le fichier JSON fournit les chemins,
-  dates, paramètres, résolutions, calibration et couverture réelle de la zone.
+  dates, paramètres, résolutions, calibration et couverture de la zone.
 - Les bandes, la mosaïque et le RGBA sont traités par fenêtres. Les bandes
   calibrées utilisent des fichiers temporaires, ce qui demande de l'espace disque.
 
@@ -157,7 +157,7 @@ Les options `color`, `alpha`, `linewidth`, `zorder` et `labels` permettent
 d'ajuster le résultat. `Map(auto_order=False)` conserve l'ordre d'ajout.
 Un polygone thématique opaque peut volontairement masquer l'image : régler
 sa transparence pour une lecture simultanée. Les collisions d'étiquettes
-utilisent le mécanisme simple existant; certaines étiquettes peuvent être omises.
+utilisent un placement automatique; les étiquettes sans emplacement disponible sont omises.
 
 Cette version lit des données, pas les styles ou projets `.qgz`/`.aprx`.
 

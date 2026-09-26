@@ -174,9 +174,9 @@ def import_native_project(project,destination,*,engine=None,python=None,cancel=N
 
 
 def validate_native_runtime(project,destination,*,python,engine=None,layout=None,cancel=None):
-    """Exercise a real installed GIS: inventory, copy and all three map exports.
+    """Validate inventory, project copying and PDF/PNG/SVG export in an installed GIS.
 
-    No mocked runtime counts as validation. The original project is read only.
+    The validation runs in the GIS runtime with a read-only source project.
     The requested layout is required to be unique; all products are published
     together, including engine inventory and source hashes.
     """

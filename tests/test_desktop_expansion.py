@@ -1,4 +1,4 @@
-"""Run the new widgets through actual worker jobs and session reloading."""
+"""Interface execution and session-restoration tests."""
 import os
 os.environ.setdefault('QT_QPA_PLATFORM','offscreen')
 import json,time

@@ -1,4 +1,4 @@
-"""Independent numerical expectations and regressions from the 0.5 audit."""
+"""Numerical reference cases and regression tests for raster processing."""
 import json
 import threading
 import numpy as np

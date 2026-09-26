@@ -1,4 +1,4 @@
-"""Small command line interface for templates, inspection and quick maps."""
+"""Command-line interface for geospatial processing and cartographic production."""
 import argparse
 import json
 from pathlib import Path
@@ -111,7 +111,7 @@ def main(argv=None):
         command.add_argument('--execution',choices=['threads','distributed'],default='threads')
         command.add_argument('--scheduler-address',help='Address of a trusted Dask cluster; omit for local worker processes')
     for command in (calc,index,reduction,operation,execute):command.add_argument('--device',choices=['cpu','cuda'],default='cpu')
-    validation=subs.add_parser('native-validate',help='Run real inventory, copy and PDF/PNG/SVG tests in an installed GIS')
+    validation=subs.add_parser('native-validate',help='Validate inventory, copying and PDF/PNG/SVG exports in an installed GIS')
     validation.add_argument('project');validation.add_argument('destination');validation.add_argument('--python',required=True);validation.add_argument('--layout');validation.add_argument('--engine',choices=['qgis','arcgis'])
     args = parser.parse_args(argv)
     execution={key:getattr(args,key) for key in ('execution','scheduler_address','device') if hasattr(args,key)}
