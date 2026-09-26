@@ -85,6 +85,13 @@ def cartographic_workflow(scenes, destination, *, layers=(), aoi=None,
                                   template=template, crs=target_crs, format=page_format,
                                   orientation=orientation, subtitle=subtitle)
         cartography.add_legend(legend).add_scale_bar(scale_bar).add_north_arrow(north_arrow)
+        from .quality import audit_map
+        from .storage import save_json
+        quality = audit_map(cartography)
+        save_json(quality, work / 'quality.json')
+        if not quality['valid']:
+            raise ValueError('Contrôle cartographique : ' + '; '.join(
+                item['message'] for item in quality['issues'] if item['severity'] == 'error'))
         outputs = []
         for index, fmt in enumerate(formats):
             notify(f"Export cartographique ({fmt.upper()})", 85 + int(13 * index / len(formats)))
@@ -97,6 +104,7 @@ def cartographic_workflow(scenes, destination, *, layers=(), aoi=None,
         from . import __version__
         record = dict(version=__version__, multiband="multibande.tif",
                       composite="composition_coloree.tif", preparation="multibande.json",
+                      quality_report="quality.json",
                       maps=[p.name for p in outputs], composition=composition,
                       title=title, credits=credits, template=template, dpi=dpi,
                       page_format=page_format, orientation=orientation, subtitle=subtitle,

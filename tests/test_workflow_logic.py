@@ -49,6 +49,8 @@ def test_scene_errors_are_caught_before_execution(write_raster):
 def test_direct_workflow_preserves_all_imported_bands(write_raster,tmp_path):
     product=cm.cartographic_workflow(scene(write_raster),tmp_path/'direct',formats=['png'],dpi=72)
     with rasterio.open(product.multiband) as src:assert src.descriptions==('blue','green','red','nir','swir1','swir2')
+    manifest=json.loads(product.manifest.read_text())
+    assert json.loads((product.directory/manifest['quality_report']).read_text())['valid']
 
 
 def test_landcover_assessment_proposes_classification_before_layout(write_raster):

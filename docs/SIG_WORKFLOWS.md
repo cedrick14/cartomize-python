@@ -72,7 +72,7 @@ Les 24 maquettes ne dispensent pas de vérifier le contenu. La qualité de la ca
 | Le transfert depuis l’assistant pouvait choisir un RVB comme entrée de classification et écarter un raster à deux bandes | Sélection d’une entrée scientifique et refus explicite des images d’affichage |
 | Les résultats de préparation alimentaient certains outils sans préremplir la classification | Transmission du multibande à la classification, aux indices et à la composition |
 | La navigation mélangeait préparation, diagnostics et finition | Ordre : objectif et diagnostic, imagerie, analyses, préparation des couches, mise en page, atlas, automatisation et révision |
-| Le plan automatisé exportait sans conserver un rapport technique final distinct | Rapport `quality.json` avant export ; erreurs techniques bloquantes, avertissements conservés |
+| Le plan automatisé et la production directe exportaient sans conserver un rapport technique final distinct | Rapport `quality.json` avant export dans les deux parcours ; erreurs techniques bloquantes, avertissements conservés |
 | Des choix du moteur d’imagerie n’étaient pas exposés dans la fenêtre | Rééchantillonnage spectral, priorité de recouvrement et masque de saturation accessibles |
 
 Les clés des outils et les sessions restent stables malgré le changement d’ordre de navigation. L’icône conserve ses couleurs et l’interface ses contrôles neutres.

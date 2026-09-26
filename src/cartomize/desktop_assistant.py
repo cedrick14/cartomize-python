@@ -70,9 +70,9 @@ class AssistantPage(Page):
         row.addWidget(self.plan_button);row.addWidget(self.execute_button);self.form.addRow(controls)
         self.plan_button.clicked.connect(self.planRequested.emit);self.execute_button.clicked.connect(self.executeRequested.emit)
         self.kind.currentIndexChanged.connect(self.scene_options);self.scene_options()
+        self.layout.addStretch()
     def scene_options(self):
         for widget in (self.spectral_bands,self.composition,self.resolution):widget.setEnabled(self.kind.currentData()=='scenes')
-        self.layout.addStretch()
     def add_files(self):
         paths=QFileDialog.getOpenFileNames(self,'Données géographiques',filter='Données SIG (*.tif *.tiff *.jp2 *.vrt *.img *.gpkg *.shp *.geojson *.json)')[0]
         self.inputs.addItems(paths)

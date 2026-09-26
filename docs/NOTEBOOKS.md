@@ -3,7 +3,7 @@
 Cartomize nécessite Python 3.11 ou plus récent. Dans un notebook utilisant ce Python, installer les dépendances de la fenêtre et du noyau :
 
 ```python
-%pip install --upgrade "cartomize[notebook]==0.8.1a2"
+%pip install --upgrade "cartomize[notebook]==0.8.2a1"
 ```
 
 Après installation ou mise à jour, redémarrer le noyau. Ouvrir ensuite la fenêtre :
