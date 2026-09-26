@@ -8,11 +8,11 @@ par **ONDON NKOUA Cédrick Belmich**.
 Ce dépôt contient la bibliothèque Python autonome Cartomize. Le plugin QGIS est maintenu dans un projet distinct. Le nom du paquet et de son module Python est `cartomize`.
 Le moteur autonome fonctionne sans installation d'ArcGIS Pro, d'ArcPy ou de QGIS.
 
-**Version 0.8.1a1 : prétraitement multispectral à options, choix des canaux RVB et export des bandes séparées.** Elle conserve Dask, le moteur CUDA optionnel, les styles QGIS enrichis et reprend les règles Python
+**Version 0.8.1a2 : démarrage XML anticipé et ouverture depuis un notebook avec intégration Qt automatique.** Elle conserve le prétraitement multispectral à options, le choix des canaux RVB, les exports de bandes séparées, Dask, le moteur CUDA optionnel, les styles QGIS enrichis et les règles Python
 et les 24 maquettes originales. Le rendu autonome et les traitements
 GeoPandas/Rasterio sont nouveaux : cette version ne prétend pas reproduire
 toutes les fonctions de l'extension native. Cette version alpha est disponible
-sur [PyPI](https://pypi.org/project/cartomize/0.8.1a1/).
+sur [PyPI](https://pypi.org/project/cartomize/0.8.1a2/).
 
 ## Installation
 
@@ -21,7 +21,7 @@ Le [guide du prétraitement à options](docs/IMAGERY_SELECTION.md) décrit la s�
 Python 3.11 ou plus récent. Installation depuis PyPI :
 
 ```bash
-python -m pip install "cartomize==0.8.1a1"
+python -m pip install "cartomize==0.8.1a2"
 ```
 
 Pour développer la bibliothèque, depuis une copie de ce dépôt :
@@ -36,7 +36,7 @@ réseau n'est nécessaire pour traiter des fichiers locaux après installation.
 ## Interface graphique
 
 ```bash
-python -m pip install "cartomize[gui]==0.8.1a1"
+python -m pip install "cartomize[gui]==0.8.1a2"
 python -m cartomize gui
 ```
 
@@ -46,6 +46,8 @@ Depuis Python :
 import cartomize as cm
 cm.launch()
 ```
+
+Depuis un notebook local, installer les dépendances avec `%pip install "cartomize[notebook]==0.8.1a2"`, redémarrer le noyau, puis utiliser les deux lignes Python ci-dessus. La cellule se termine et la fenêtre reste réactive. Voir le [guide des notebooks et de la validation Windows Conda](docs/NOTEBOOKS.md).
 
 L’ouverture donne accès à **Assistant cartographique** : objectif, données, zone d’étude et examen initial. Les étapes proposées sont justifiées et ouvrent les outils avec leurs entrées. **Production automatisée** conserve le parcours complet scènes → mosaïque → multibande → masque → composition colorée → export. Les indices,
 la calculatrice et les statistiques restent accessibles comme outils
