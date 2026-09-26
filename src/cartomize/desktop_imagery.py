@@ -66,7 +66,7 @@ class PreparationPage(Page):
         for label, control in [("Canal rouge", self.rgb_red), ("Canal vert", self.rgb_green), ("Canal bleu", self.rgb_blue)]:
             self.form.addRow(label, control)
         self.crs = QLineEdit()
-        self.crs.setPlaceholderText("Automatique · exemple : EPSG:32733")
+        self.crs.setPlaceholderText("Automatique ; exemple : EPSG:32733")
         self.resolution = spin(0, 0, 100000)
         self.resolution.setSpecialValueText("Résolution native la plus grossière")
         self.resampling = QComboBox()
@@ -163,7 +163,7 @@ class PreparationPage(Page):
                         item.setData(Qt.ItemDataRole.UserRole, dict(scene=metadata, nodata=band.nodata, unit=band.unit))
                     self.assets.setItem(row, col, item)
         self.assets.blockSignals(False)
-        self.inventory.setText(f"{len(scenes)} scène(s) · {self.assets.rowCount()} bande(s). Vérifier la sélection.")
+        self.inventory.setText(f"{len(scenes)} scène(s) ; {self.assets.rowCount()} bande(s). Vérifier la sélection.")
         self.refresh_bands()
 
     def refresh_bands(self, *_):

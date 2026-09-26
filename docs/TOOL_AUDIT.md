@@ -1,14 +1,8 @@
-# Audit actualisé des parcours — 0.8.2a1
+# Catalogue des outils
 
-Le [parcours SIG et cartographique](SIG_WORKFLOWS.md) présente les principes, les corrections de connexions et les limites vérifiées le 26 septembre 2026. Le tableau historique ci-dessous décrit les moteurs disponibles ; ses mentions de publication concernent la livraison d’origine.
+Les outils sont accessibles dans l’interface graphique et par l’API Python. Les traitements enregistrés peuvent également être intégrés aux plans et chaînes d’opérations.
 
-# Implémentation des outils — Cartomize 0.8.1a1
-
-23 septembre 2026. Les anciens constats sont conservés dans [l’audit 0.5](TOOL_AUDIT_0.5.md). Cette version raccorde les traitements et ajoute des algorithmes et leurs connexions effectives à l’API, à la fenêtre et à la ligne de commande.
-
-## Outils et connexions
-
-| Rubrique | Exécution réelle et sortie |
+| Rubrique | Algorithmes et produits |
 |---|---|
 | Assistant cartographique | Examen, plan dépendant, variantes de maquettes, exécution jusqu’aux exports et reprise de mise en page |
 | Analyse du projet | Copies masquées, fond périphérique, classes éditables, application à la carte, rétablissement des sources |
@@ -25,36 +19,27 @@ Le [parcours SIG et cartographique](SIG_WORKFLOWS.md) présente les principes, l
 | Statistiques multirasters | Sept réductions pixel par pixel |
 | Mise en page | 24 maquettes, cadres, textes mesurés, étiquettes, tableaux, graphiques, géométrie éditable, aperçu, contrôle et exports |
 | Atlas cartographique | Une carte par entité, paramètres transmis depuis la mise en page |
-| Production automatisée | Parcours direct scènes → multibande → composition → couches → carte |
+| Production automatisée | Préparation des scènes, assemblage multibande, composition colorée, superposition et export |
 | Recettes et production en série | Recettes réutilisables, variables, associations, migration historique, manifestes jusqu’à 5 000 tâches |
 | Projets SIG | Inventaire QGS/QGZ, import des sous-couches et styles pris en charge ; passerelle native optionnelle pour copie et export |
 | Chaîne de traitements | 34 opérateurs, références aux résultats et produits secondaires, paramètres moteur, exécution autonome ou intégrée à la carte |
 | Révision cartographique | Instantanés, empreintes, comparaison, décision nominative et contrôle de la carte |
 
-Les résultats raster/vectoriels sont transférables aux outils compatibles. Le plan et les recettes produisent des fichiers réels ; un bouton qui aboutit seulement à une proposition n’est pas compté comme traitement. Les sources restent protégées. Les nouveaux dossiers complets sont publiés après succès ; un lot peut conserver ses succès seulement si la poursuite sur erreur a été demandée.
+| Visualisation des résultats | Onglets intégrés, zoom, déplacement, valeurs de pixels, légendes, métadonnées, comparaisons, tableaux et graphiques |
 
-## Vérifications ajoutées
+## Connexions entre traitements
 
-Les tests comparent les classes prédites à des populations spectrales connues, vérifient la séparation des références avant échantillonnage, les masques, la classe zéro, les probabilités et la réutilisation du modèle. Les dérivées d’un plan incliné sont comparées à des valeurs analytiques, avec égalité entre tailles de blocs et nombre de travailleurs. Les tests de session suppriment les sources originales après création de l’archive, réouvrent les copies et comparent les paramètres de la fenêtre. Les recettes produisent deux cartes et exercent les erreurs, variables et protections de noms. La révision détecte une modification réelle de fichier.
+Le catalogue des résultats transmet les fichiers aux outils compatibles. Les GeoTIFF scientifiques alimentent la classification, les indices et la composition colorée. Les couches préparées et leur nomenclature sont transmises à la mise en page. La configuration de carte peut être réutilisée pour un atlas.
 
-Les nouveaux parcours graphiques utilisent le vrai travailleur Qt pour la classification, le plan exécuté, les recettes, le terrain, la révision et l’inventaire SIG. Les contrôles historiques, les 24 maquettes, les 18 indices et l’intégrité des ressources d’origine restent testés.
+Les traitements préservent les sources et enregistrent leurs sorties dans les destinations configurées. Les productions dans un nouveau répertoire sont finalisées après réussite. En production par lots, l’option de poursuite sur erreur conserve les tâches terminées.
 
-## Portée et validation externe restante
+## Conditions et limites
 
-- **Passerelle native** : la commande `native-validate` exécute inventaire, copie et exports PDF/PNG/SVG dans le moteur installé. Un travail CI dédié utilise réellement QGIS ; ArcPy nécessite encore une validation sur un poste ArcGIS Pro licencié. La version autonome ne reconstitue pas intégralement tous les objets APRX/QGZ.
-- **Cartographie** : les propositions et placements sont des heuristiques contrôlables. Les débordements textuels sont détectés, les légendes utilisent plusieurs colonnes et les étiquettes évitent les symboles ponctuels ; une lisibilité parfaite, l’exactitude thématique et tous les conflits visuels ne peuvent pas être certifiés automatiquement.
-- **Couverture** : la reconnaissance par noms reste Landsat Collection 2 L2 SR et Sentinel-2 L2A. Les autres produits peuvent être décrits par STAC ou un manifeste de bandes explicite. Aucun catalogue fini ne couvre toutes les opérations raster. Le drainage D8, les bassins, le routage bidirectionnel et le téléchargement HTTP(S) STAC sont implémentés. Les modèles hydrauliques, MFD/D-infinity et les contraintes routières avancées ne sont pas implémentés. Dask exécute les traitements par blocs dans des processus séparés ou sur un cluster explicite. CUDA est implémenté pour l’algèbre, les indices et les réductions, mais nécessite encore une validation matérielle.
-- **Publication** : paquet construit et code disponible sur la branche de travail ; pas de dépôt PyPI/TestPyPI ni fusion effectués par cette livraison.
-- **Terrain** : les tests synthétiques et Qt hors écran ne remplacent pas une campagne sur des scènes réelles volumineuses et une validation manuelle des moteurs natifs.
+- La reconnaissance automatique des scènes couvre Landsat Collection 2 L2 et Sentinel-2 L2A. Les autres produits nécessitent un manifeste ou des correspondances explicites.
+- Les classifications supervisées nécessitent des références représentatives. La validation thématique dépend du plan d’échantillonnage et de l’indépendance des références.
+- Les propositions de rôles, de maquettes et de placement reposent sur des règles et restent modifiables. Le contrôle cartographique détecte des défauts techniques ; la lisibilité et la validité thématique nécessitent un examen adapté à l’étude.
+- L’hydrologie utilise Priority-Flood et D8. Les modèles hydrauliques, MFD et D-infinity ne sont pas pris en charge. Le routage requiert un réseau préparé et ne gère pas toutes les restrictions routières.
+- Dask prend en charge les opérateurs raster documentés. CUDA couvre l’algèbre, les indices et les réductions ; la validation matérielle nécessite un GPU compatible.
+- L’import QGIS transfère les couches et les styles pris en charge. Les expressions, SVG natifs, propriétés définies par les données et certains effets figurent dans le rapport des propriétés non transférées. Le rendu natif nécessite QGIS ou ArcGIS Pro selon le projet. La validation ArcGIS Pro reste à effectuer sur une installation licenciée.
 
-Voir [le guide d’utilisation](AUTOMATION.md) et [la validation](VALIDATION.md).
-
-## Corrections 0.7 vérifiées
-
-Enchaînement terrain → calculatrice → statistiques → carte ; 13 opérateurs vectoriels et six opérateurs raster exécutés via le registre ; sorties secondaires hydrologiques ; import QGIS catégorisé avec sous-couche et groupe masqué ; zéro valide dans une emprise ; code raster rare absent de la nomenclature ; téléchargement STAC avec pagination, empreintes et annulation transactionnelle ; session STAC portable. Les formulaires exécutent les fonctions réelles et conservent les étapes après réouverture.
-
-Voir [PROCESSING](PROCESSING.md) pour les paramètres, hypothèses et limites de chaque algorithme.
-
-## Compléments 0.8
-
-Les réglages d’exécution sont reliés à la CLI, aux outils concernés, à l’assistant et aux sessions. Les catégories masquées, classes graduées, traits, symboles simples et composites, palettes exactes/discrètes/interpolées et contrastes en niveaux de gris sont transférés. Les expressions QGIS, symboles SVG natifs, propriétés définies par les données et certains effets restent signalés comme non transférés ; leur rendu intégral se fait par le moteur QGIS. Le transfert ne revendique pas une reproduction universelle.
+Voir les [méthodes de traitement](PROCESSING.md), les [moteurs de calcul](EXECUTION.md), la [vue des résultats](RESULTS_WORKSPACE.md) et la [validation](VALIDATION.md).

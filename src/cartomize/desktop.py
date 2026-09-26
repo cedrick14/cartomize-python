@@ -78,7 +78,7 @@ class IndicesPage(Page):
         self.source=PathField();self.form.addRow("Raster multispectral",self.source)
         self.selection=QListWidget();self.selection.setMaximumHeight(165)
         for definition in cm.list_indices():
-            item=QListWidgetItem(f"{definition['name']}  ·  {definition['title']}",self.selection)
+            item=QListWidgetItem(f"{definition['name']} : {definition['title']}",self.selection)
             item.setData(Qt.ItemDataRole.UserRole,definition["name"])
             item.setFlags(item.flags()|Qt.ItemFlag.ItemIsUserCheckable)
             item.setCheckState(Qt.CheckState.Checked if definition["name"]=="NDVI" else Qt.CheckState.Unchecked)
@@ -366,8 +366,8 @@ class WorkflowPage(Page):
     def __init__(self):
         super().__init__("Production cartographique automatisée",
             "Des scènes satellites à la carte : traitement multispectral, superposition des couches et mise en page.")
-        sequence=QLabel("01  Scènes satellites     →     02  Mosaïque     →     03  Composite multibande\n"
-                        "04  Extraction par masque     →     05  Composition colorée     →     06  Mise en page")
+        sequence=QLabel("1. Importation des scènes   2. Mosaïque   3. Assemblage multibande\n"
+                        "4. Extraction par masque   5. Composition colorée   6. Mise en page")
         sequence.setObjectName("sequence");sequence.setWordWrap(True);self.form.addRow(sequence)
         tabs=QTabWidget();self.tabs=tabs;self.form.addRow(tabs)
         self.data_tab=QWidget();data=QFormLayout(self.data_tab);tabs.addTab(self.data_tab,"Données")
@@ -375,7 +375,7 @@ class WorkflowPage(Page):
         self.files=[];selection=QWidget();buttons=QHBoxLayout(selection);buttons.setContentsMargins(0,0,0,0)
         select=QPushButton("Sélectionner les bandes…");clear=QPushButton("Utiliser le répertoire")
         buttons.addWidget(select);buttons.addWidget(clear);buttons.addStretch();data.addRow(selection)
-        self.inventory=QLabel("Landsat Collection 2 L2 · Sentinel-2 L2A");self.inventory.setObjectName("muted")
+        self.inventory=QLabel("Landsat Collection 2 L2 ; Sentinel-2 L2A");self.inventory.setObjectName("muted")
         self.inventory.setWordWrap(True);data.addRow(self.inventory)
         select.clicked.connect(self.select_files);clear.clicked.connect(self.clear_files)
         self.aoi=PathField(filter=VECTOR_FILTER);data.addRow("Zone d’étude",self.aoi)
@@ -390,7 +390,7 @@ class WorkflowPage(Page):
         add.clicked.connect(self.browse_layers)
         remove.clicked.connect(lambda:[self.layers.removeRow(i) for i in sorted({x.row() for x in self.layers.selectedIndexes()},reverse=True)])
         prep=QWidget();form=QFormLayout(prep);tabs.addTab(prep,"Prétraitement")
-        self.crs=QLineEdit();self.crs.setPlaceholderText("Automatique selon les scènes · exemple : EPSG:32733")
+        self.crs=QLineEdit();self.crs.setPlaceholderText("Automatique selon les scènes ; exemple : EPSG:32733")
         self.bands=QLineEdit();self.bands.setPlaceholderText('Toutes les bandes, ou noms spectraux séparés par des virgules')
         self.resolution=spin(0,0,100000);self.resolution.setSpecialValueText("Résolution native la plus grossière")
         self.clouds=QCheckBox("Appliquer les masques QA/SCL");self.clouds.setChecked(True)
@@ -401,7 +401,7 @@ class WorkflowPage(Page):
         note.setWordWrap(True);note.setObjectName("muted");form.addRow(note)
         output=QWidget();form=QFormLayout(output);tabs.addTab(output,"Restitution cartographique")
         self.title=QLineEdit();self.subtitle=QLineEdit();self.credits=QLineEdit();self.rgb=QComboBox()
-        for label,value in [("Couleurs naturelles","natural"),("Infrarouge proche — végétation","vegetation"),
+        for label,value in [("Couleurs naturelles","natural"),("Infrarouge proche : végétation","vegetation"),
             ("Infrarouge à ondes courtes","swir"),("Agriculture","agriculture")]:self.rgb.addItem(label,value)
         self.format=QComboBox()
         for label,value in [("PDF et PNG",("pdf","png")),("PDF",("pdf",)),("PNG",("png",)),("SVG",("svg",))]:self.format.addItem(label,value)
@@ -414,16 +414,16 @@ class WorkflowPage(Page):
         note.setWordWrap(True);note.setObjectName("muted");form.addRow(note)
         self.directory=PathField("directory");self.project=QLineEdit("production_cartographique")
         self.form.addRow("Répertoire de sortie",self.directory);self.form.addRow("Nom de la production",self.project)
-        products=QLabel("Produits : GeoTIFF multibande · composition colorée · carte PDF/PNG · rapport de traitement")
+        products=QLabel("Produits : GeoTIFF multibande ; composition colorée ; carte PDF/PNG ; rapport de traitement")
         products.setWordWrap(True);products.setObjectName("muted");self.form.addRow(products)
         self.layout.addStretch()
     def select_files(self):
         paths=QFileDialog.getOpenFileNames(self,"Bandes spectrales et masques de qualité",filter=RASTER_FILTER)[0]
         if paths:
             self.files=paths;self.source.setEnabled(False)
-            self.inventory.setText(f"{len(paths)} fichiers sélectionnés — inclure les bandes et les masques QA/SCL.")
+            self.inventory.setText(f"{len(paths)} fichiers sélectionnés : inclure les bandes et les masques QA/SCL.")
     def clear_files(self):
-        self.files=[];self.source.setEnabled(True);self.inventory.setText("Landsat Collection 2 L2 · Sentinel-2 L2A")
+        self.files=[];self.source.setEnabled(True);self.inventory.setText("Landsat Collection 2 L2 ; Sentinel-2 L2A")
     def browse_layers(self):
         for path in QFileDialog.getOpenFileNames(self,"Couches vectorielles",filter=VECTOR_FILTER)[0]:self.add_layer(path)
     def add_layer(self,path):
@@ -497,8 +497,8 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
         pixmap.setDevicePixelRatio(ratio);self.brand_icon.setPixmap(pixmap);self.brand_icon.setFixedSize(58,58)
         header.addWidget(self.brand_icon);identity=QVBoxLayout();identity.setSpacing(1)
         brand=QLabel("Cartomize");brand.setObjectName("brand");identity.addWidget(brand)
-        subtitle=QLabel("Assistant cartographique intelligent");subtitle.setObjectName("muted");identity.addWidget(subtitle)
-        header.addLayout(identity);header.addStretch();version=QLabel(cm.__version__);version.setObjectName("muted");header.addWidget(version);outer.addLayout(header)
+        subtitle=QLabel("Assistant cartographique");subtitle.setObjectName("muted");identity.addWidget(subtitle)
+        header.addLayout(identity);header.addStretch();version=QLabel(f"Version {cm.__version__}");version.setObjectName("muted");header.addWidget(version);outer.addLayout(header)
         session_bar=QHBoxLayout();self.init_session(session_bar);session_bar.addStretch();outer.addLayout(session_bar)
         self.workspace_splitter=QSplitter(Qt.Orientation.Horizontal);self.workspace_splitter.setChildrenCollapsible(False);outer.addWidget(self.workspace_splitter,1)
         self.controls_panel=QWidget();self.controls_panel.setMinimumWidth(400);controls=QVBoxLayout(self.controls_panel);controls.setContentsMargins(0,0,8,0);controls.setSpacing(7)
@@ -662,16 +662,16 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
         self.results_box.setEnabled(False)
         self.cancel_button.setEnabled(page.cancellable and not preview and not review)
         self.folder_button.setEnabled(False);self.progress.setRange(0,0);self.status.setText("Traitement en cours.")
-        self.workspace.activity.setText('Traitement en cours · les vues existantes restent consultables.')
+        self.workspace.activity.setText('Traitement en cours.')
         self.thread.start()
     @Slot(int,int)
     def show_progress(self,done,total):
         self.progress.setRange(0,max(1,total));self.progress.setValue(done)
-        self.workspace.activity.setText(f'Traitement : {int(done/max(1,total)*100)} % · {self.status.text()}')
+        self.workspace.activity.setText(f'Traitement : {int(done/max(1,total)*100)} % ; {self.status.text()}')
     @Slot(str)
     def completed(self,path):
         self.output_path=path;self.progress.setRange(0,100);self.progress.setValue(100)
-        self.workspace.activity.setText('Traitement terminé · résultat disponible dans la vue intégrée.')
+        self.workspace.activity.setText('Traitement terminé.')
         if self._preview_target is not None:
             self.workspace.open_result(path,title='Aperçu cartographique',refresh=True,transient=True)
             self.status.setText("Aperçu cartographique actualisé.")
@@ -689,7 +689,7 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
     @Slot()
     def cancelled(self):
         self.progress.setRange(0,100);self.progress.setValue(0);self.status.setText("Traitement interrompu.")
-        self.workspace.activity.setText('Traitement interrompu · résultats précédents conservés.')
+        self.workspace.activity.setText('Traitement interrompu.')
     @Slot()
     def cleaned(self):
         self.thread=None;self.worker=None;self.run_button.setEnabled(True);self.navigation.setEnabled(True)

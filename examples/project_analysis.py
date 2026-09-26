@@ -33,7 +33,7 @@ def main():
     layers=create_data(directory/'donnees')
     project=cm.prepare_project(layers,directory/'analyse')
     mapped=project.compose(title='Occupation du sol',subtitle='Données synthétiques de démonstration',
-                          credits='Cartomize · Classes et géométries fictives')
+                          credits='Cartomize ; Classes et géométries fictives')
     for suffix in ['pdf','png']:mapped.export(directory/f'carte.{suffix}',dpi=120)
     print(project.manifest)
 

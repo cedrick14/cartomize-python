@@ -302,8 +302,8 @@ class GeoCanvas(QGraphicsView):
         super().mouseMoveEvent(event)
         p=self.mapToScene(event.position().toPoint())
         if self.info.get('crs'):
-            x,y=self.scene_to_world(p); self.position.emit(f'X {x:.3f}   Y {y:.3f}   ·   {self.info["crs"]}')
-        else: self.position.emit(f'Position {p.x():.1f}, {p.y():.1f} · document sans SCR')
+            x,y=self.scene_to_world(p); self.position.emit(f'X {x:.3f}   Y {y:.3f}   ;   {self.info["crs"]}')
+        else: self.position.emit(f'Position {p.x():.1f}, {p.y():.1f} ; document sans SCR')
 
     def mouseReleaseEvent(self,event):
         super().mouseReleaseEvent(event)
@@ -326,7 +326,7 @@ class GeoCanvas(QGraphicsView):
         _,col,row,bands=token
         parts=[f'{self.info["descriptions"][band-1]} : '+('NoData' if value is None else f'{value:.8g}') for band,value in zip(bands,values)]
         if len(values)==1 and values[0] in self.info.get('classes',{}): parts.append(str(self.info['classes'][values[0]][0]))
-        self.identified.emit(f'Colonne {col} · ligne {row} — '+' ; '.join(parts))
+        self.identified.emit(f'Colonne {col} ; ligne {row} : '+' ; '.join(parts))
 
     def drawForeground(self,painter,rect):
         super().drawForeground(painter,rect)

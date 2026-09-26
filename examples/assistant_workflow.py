@@ -32,7 +32,7 @@ def main():
     directory=Path(args.destination).resolve()
     if directory.exists():raise FileExistsError('Choisir un nouveau répertoire.')
     source,training,layers=create_data(directory/'donnees')
-    plan=cm.plan_cartography([source,*layers],goal='landcover',classification='supervised',training=training,class_column='classe',title='Occupation du sol',credits='Cartomize · Données synthétiques de démonstration')
+    plan=cm.plan_cartography([source,*layers],goal='landcover',classification='supervised',training=training,class_column='classe',title='Occupation du sol',credits='Cartomize ; Données synthétiques de démonstration')
     print(cm.run_plan(plan,directory/'production',workers=2))
 
 

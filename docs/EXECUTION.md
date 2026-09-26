@@ -1,8 +1,8 @@
-# Moteurs de calcul et styles SIG — 0.8
+# Moteurs de calcul et styles SIG
 
 ## Installation
 
-`python -m pip install "cartomize[gui,distributed]"` installe la fenêtre et Dask lorsque le paquet est disponible sur votre index. Pour le wheel livré : `python -m pip install "cartomize-0.8.0a1-py3-none-any.whl[gui,distributed]"`. Aucune publication PyPI n’est effectuée par cette livraison.
+`python -m pip install "cartomize[gui,distributed]==1.0"` installe l’interface graphique et le moteur Dask.
 
 Le moteur GPU est facultatif : extra `gpu`, fondé sur `cupy-cuda12x[ctk]>=14,<15`. Il installe les composants CUDA 12 ; un pilote NVIDIA compatible et un GPU restent indispensables. Une installation CUDA 13 utilise un environnement distinct avec la distribution CuPy appropriée, sans installer simultanément plusieurs distributions CuPy. Exécuter `python -m cartomize engines` pour le diagnostic.
 
@@ -17,7 +17,7 @@ Le moteur GPU est facultatif : extra `gpu`, fondé sur `cupy-cuda12x[ctk]>=14,<1
 | Dérivées du terrain et convolution | Oui | Oui | Non |
 | Préparation des scènes, classification, vecteurs, hydrologie, cartographie | Moteurs existants | Exécution habituelle dans le processus principal | Non |
 
-Les réglages globaux des plans s’appliquent aux familles prises en charge ; les paramètres de chaque étape sont prioritaires. Un réglage CUDA explicite dans une opération incompatible est refusé. Un GPU absent provoque une erreur, jamais un résultat CPU présenté comme un calcul GPU.
+Les réglages globaux des plans s’appliquent aux familles prises en charge ; les paramètres de chaque étape sont prioritaires. Un réglage CUDA explicite dans une opération incompatible est refusé. Un GPU absent provoque une erreur de configuration.
 
 ## API
 
@@ -39,7 +39,7 @@ Sans adresse, Dask crée des processus sur la machine locale. Avec `scheduler_ad
 
 Le nombre de blocs en vol est borné par `workers`. Le budget estime les tableaux, sans plafonner le processus, les bibliothèques natives, le cache GDAL, les copies réseau ou la mémoire GPU. Les marges des blocs sont conservées pour les filtres de voisinage. Les échecs et annulations préservent les sources et empêchent la publication du résultat incomplet.
 
-Les transferts, la création des processus, la compilation CUDA et le stockage peuvent rendre un petit traitement plus lent. Aucun gain universel n’est annoncé. Les mesures historiques CPU de 0.5 ne constituent pas une mesure du GPU ou du calcul distribué.
+Les transferts, la création des processus, la compilation CUDA et le stockage peuvent rendre un petit traitement plus lent. Aucun gain universel n’est annoncé. Les mesures historiques CPU ne constituent pas une mesure du GPU ou du calcul distribué.
 
 ## Fenêtre et ligne de commande
 
@@ -64,7 +64,7 @@ python -m cartomize native-validate projet.qgz validation --python /usr/bin/pyth
 python -m cartomize native-validate projet.aprx validation --python CHEMIN_VERS_PYTHON_ARCGIS --layout Carte
 ```
 
-La procédure ouvre réellement le projet, réalise une copie, exporte PDF/PNG/SVG, vérifie les signatures, puis compare l’empreinte du projet source. Elle produit un rapport ; les objets, mises en page et données de tous les projets possibles ne sont pas pour autant certifiés. QGIS est exercé dans un travail CI dédié. ArcGIS Pro ne peut être validé sans son moteur installé et une licence utilisable.
+La procédure ouvre le projet, réalise une copie, exporte PDF/PNG/SVG, vérifie les signatures, puis compare l’empreinte du projet source. Elle produit un rapport sur les opérations et exports contrôlés. QGIS est exercé dans un travail CI dédié. ArcGIS Pro ne peut être validé sans son moteur installé et une licence utilisable.
 
 ## Références techniques
 

@@ -120,7 +120,7 @@ def process_imagery(scenes, destination, *, aoi=None, mosaic=True, multiband=Tru
             directory = work / ("mosaique" if mosaic else f"scene_{number:03d}")
             directory.mkdir()
             if stage:
-                stage("Prétraitement multispectral" + (" et mosaïque" if mosaic and len(group) > 1 else "") + f" · {number}/{len(groups)}")
+                stage("Prétraitement multispectral" + (" et mosaïque" if mosaic and len(group) > 1 else "") + f" ; {number}/{len(groups)}")
             prepared = prepare_imagery(group, directory / "multibande.tif", aoi=aoi,
                 band_order=band_order, target_crs=target_crs, resolution=resolution,
                 overlap=overlap, resampling=resampling, mask_clouds=mask_clouds,

@@ -1,4 +1,4 @@
-# Espace de travail intégré — Cartomize 0.9.0a1
+# Espace de travail intégré : Cartomize 1.0
 
 La fenêtre principale comprend deux panneaux redimensionnables. Le panneau **Contrôle et traitements**, à gauche, contient le catalogue d’outils, les cartes de paramètres, les options et les commandes d’exécution. Le panneau **Visualisation des résultats**, à droite, rassemble les cartes, couches, tableaux, graphiques et rapports dans des onglets. L’icône conserve les couleurs de Cartomize ; les commandes utilisent une présentation neutre.
 
@@ -60,7 +60,7 @@ Les aperçus et contrôles temporaires ne sont pas des exports persistants ; ils
 
 Le rendu utilise deux travailleurs de lecture, un cache raster/PDF partagé de 64 Mio, des aperçus généraux et une relecture de la zone visible. Une requête de rendu est bornée à huit millions de pixels et 4 096 pixels par dimension. Les demandes devenues obsolètes après un changement de bande ou d’emprise n’écrasent pas la nouvelle vue. Les pyramides existantes peuvent accélérer les lectures raster ; la visionneuse ne modifie pas les fichiers pour en créer.
 
-Le zoom retrouve les détails présents dans les pixels sources. Au-delà de leur résolution native, il agrandit les pixels sans inventer de précision. Les textes et traits vectoriels des cartes PDF/SVG sont rendus au niveau demandé ; leurs images incorporées restent limitées par la résolution choisie lors de l’export. L’aperçu cartographique utilise un SVG avec une résolution de 250 ppp pour les éléments rasterisés.
+Le zoom retrouve les détails présents dans les pixels sources. Au-delà de leur résolution native, il agrandit les pixels sans augmenter la résolution des données. Les textes et traits vectoriels des cartes PDF/SVG sont rendus au niveau demandé ; leurs images incorporées restent limitées par la résolution choisie lors de l’export. L’aperçu cartographique utilise un SVG avec une résolution de 250 ppp pour les éléments rasterisés.
 
 La vue vectorielle sert à explorer les géométries et les attributs ; elle ne reproduit pas tous les styles natifs d’un logiciel SIG. Elle limite chaque requête à 40 000 entités visibles et signale ce plafond ; zoomer réduit la zone interrogée. Les rapports JSON consultables sont limités à 16 Mio, avec un texte affiché jusqu’à 500 000 caractères. Les fichiers complets sont conservés.
 
@@ -70,8 +70,8 @@ La fluidité dépend du stockage, de la compression, des index spatiaux, des pyr
 
 Les lecteurs utilisent des threads Python persistants afin de conserver le contexte local des bibliothèques géospatiales entre deux tâches. Un test répète les lectures vectorielles sur ces travailleurs ; les tâches en attente d’un onglet fermé sont annulées. Les contrôles Python 3.11 et 3.12 sont exécutés sur Windows et Linux avant validation de la version.
 
-Les options d’installation `gui` et `notebook` sélectionnent PySide6 6.9.3–6.9.x. Le scénario de créations et fermetures successives de vues a provoqué un plantage natif avec PySide6 6.11.2 dans l’environnement de développement ; le même scénario passe avec 6.8.3 et 6.9.3. La version 6.9 est retenue pour cette publication. La fermeture d’un onglet pendant une lecture est également vérifiée ; ses scènes sont détachées avant destruction et les réponses tardives ne touchent pas les widgets supprimés. Fermer Cartomize et redémarrer le noyau après mise à jour pour charger les nouvelles bibliothèques Qt.
+Les options `gui` et `notebook` utilisent PySide6 6.9.3 à 6.9.x. Les tests vérifient les ouvertures et fermetures successives, y compris pendant une lecture. Les tâches en attente sont annulées et les réponses obsolètes sont ignorées. Après une mise à jour de Qt, fermer l’application et redémarrer le noyau pour charger les nouvelles bibliothèques.
 
-Les tests couvrent les couleurs des classes et les NoData, les pixels noirs valides d’un RGBA, la lecture d’un détail au zoom, les valeurs originales au clic, les coordonnées liées entre SCR et résolutions différents, les échelles colorimétriques communes, les projets portables après suppression des sources originales, les tableaux paginés et graphiques, les matrices de confusion, le rendu PDF et image par région, la connexion d’un vrai calcul NDVI et le rejet des rendus devenus obsolètes. La suite Windows Conda inclut ces contrôles graphiques.
+Les tests couvrent les couleurs des classes et les NoData, les pixels noirs valides d’un RGBA, la lecture d’un détail au zoom, les valeurs originales au clic, les coordonnées liées entre SCR et résolutions différents, les échelles colorimétriques communes, les projets portables après suppression des sources originales, les tableaux paginés et graphiques, les matrices de confusion, le rendu PDF et image par région, l’affichage du résultat d’un calcul NDVI et le rejet des rendus devenus obsolètes. La suite Windows Conda inclut ces contrôles graphiques.
 
 Références de conception : [Qt Graphics View](https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QGraphicsView.html), [lectures raster par fenêtres](https://rasterio.readthedocs.io/en/stable/topics/windowed-rw.html), [rendu PDFium](https://pypdfium2.readthedocs.io/en/stable/python_api.html).

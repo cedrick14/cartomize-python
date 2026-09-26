@@ -68,7 +68,7 @@ def main(output="output/imagery"):
             {"data":river,"name":"Rivière","linewidth":1.3}]
     carte=cm.compose_map(layers,aoi=aoi,crs=32733,
         title="De deux scènes à une carte",
-        subtitle="Démonstration fictive · mosaïque, bandes, découpage et superposition",
+        subtitle="Démonstration fictive ; mosaïque, bandes, découpage et superposition",
         credits="Données entièrement synthétiques | Cartomize / Cédrick Belmich | WGS 84 / UTM 33S")
     carte.export(out/"carte_automatique.png",dpi=180,overwrite=True)
     carte.export(out/"carte_automatique.pdf",dpi=180,overwrite=True)
@@ -78,9 +78,9 @@ def main(output="output/imagery"):
     from matplotlib.colors import ListedColormap
     fig=Figure(figsize=(12,4.5),dpi=140,facecolor="#f7f8f5");FigureCanvasAgg(fig)
     for i,(filename,title) in enumerate([
-        ("couleurs_naturelles.tif","Couleurs naturelles · R, V, B"),
-        ("fausses_couleurs.tif","Végétation · PIR, R, V"),
-        ("multibande_source_index.tif","Origine des pixels · A / B")],1):
+        ("couleurs_naturelles.tif","Couleurs naturelles ; R, V, B"),
+        ("fausses_couleurs.tif","Végétation ; PIR, R, V"),
+        ("multibande_source_index.tif","Origine des pixels ; A / B")],1):
         ax=fig.add_subplot(1,3,i)
         if i<3:
             rgba,extent,_=cm.read_rgb(out/filename,bands="native")
@@ -90,8 +90,8 @@ def main(output="output/imagery"):
                 ax.imshow(src.read(1,masked=True),cmap=ListedColormap(["#39776a","#c8a45e"]),vmin=1,vmax=2)
         ax.set_title(title,fontsize=10,pad=15,color="#203b36");ax.axis("off")
     fig.suptitle("Un GeoTIFF multibande, plusieurs usages",fontsize=18,x=.5,y=.96,color="#203b36")
-    fig.text(.5,.13,"Données synthétiques — le blanc indique les zones exclues ou sans pixel valide.",ha="center",fontsize=10,color="#52635c")
-    fig.text(.5,.07,f"Résolution commune : 20 m · 5 bandes · couverture valide de la zone : {product.report['coverage_percent']:.1f} %",ha="center",fontsize=10,color="#52635c")
+    fig.text(.5,.13,"Données synthétiques : le blanc indique les zones exclues ou sans pixel valide.",ha="center",fontsize=10,color="#52635c")
+    fig.text(.5,.07,f"Résolution commune : 20 m ; 5 bandes ; couverture valide de la zone : {product.report['coverage_percent']:.1f} %",ha="center",fontsize=10,color="#52635c")
     fig.subplots_adjust(left=.03,right=.97,top=.82,bottom=.22,wspace=.08)
     fig.savefig(out/"comparaison.png",dpi=140)
     print(json.dumps({"output":str(out),"coverage_percent":product.report["coverage_percent"],

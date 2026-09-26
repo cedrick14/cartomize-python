@@ -1,38 +1,52 @@
-# Cartomize dans un notebook local
+# Utilisation dans Jupyter
 
-La bibliothèque Cartomize nécessite Python 3.11 ou plus récent. La fenêtre de cette version utilise Python 3.11 à 3.13 et Qt 6.9. Dans un notebook utilisant ce Python, installer les dépendances de la fenêtre et du noyau :
+## Installation
+
+L’interface graphique de Cartomize 1.0 nécessite un noyau Python 3.11 à 3.13 installé sur un ordinateur disposant d’un bureau graphique.
 
 ```python
-%pip install --upgrade "cartomize[notebook]==0.9.0a1"
+%pip install --upgrade "cartomize[notebook]==1.0"
 ```
 
-Après installation ou mise à jour, redémarrer le noyau. Ouvrir ensuite la fenêtre :
+Redémarrer le noyau après l’installation, puis exécuter :
 
 ```python
 import cartomize as cm
+
 fenetre = cm.launch()
 ```
 
-La fenêtre s'ouvre sur l'ordinateur qui exécute le noyau. Cartomize active l'intégration Qt d'IPython ; la cellule se termine et la fenêtre reste réactive. Aucune commande `%gui` supplémentaire n'est requise. Un noyau distant sans bureau graphique ne peut pas afficher cette fenêtre sur l'ordinateur du navigateur ; les traitements par l'API restent utilisables.
+Cartomize active la boucle d’événements Qt d’IPython. La cellule se termine et la fenêtre reste réactive. Les résultats s’affichent dans le [panneau de visualisation](RESULTS_WORKSPACE.md).
 
-## Démarrage sous Windows avec Conda
+La fenêtre s’ouvre sur l’ordinateur qui exécute le noyau. Un notebook distant sans bureau graphique utilise les traitements par l’API Python ; il ne peut pas afficher la fenêtre dans le navigateur.
 
-La version 0.8.1a2 initialise le module XML standard avant le chargement de GeoPandas et Rasterio. Cette précaution vise les conflits de DLL Expat lors du chargement des bibliothèques SIG. Elle ne remplace pas la réparation d'un environnement où `from xml.parsers import expat` échoue déjà lorsqu'il est exécuté seul.
+## Environnement Conda
 
-L'option d'installation `notebook` fournit également une version de `typing_extensions` compatible avec le paramètre `extra_items` utilisé par les versions récentes de Jupyter Client.
+Depuis l’invite de commandes Conda :
 
-## Validation
+```bash
+conda create -n cartomize python=3.12 pip
+conda run -n cartomize python -m pip install "cartomize[notebook]==1.0"
+conda run -n cartomize python -m ipykernel install --user --name cartomize --display-name "Python (Cartomize)"
+```
 
-La version 0.9.0a1 a passé les [50 contrôles Windows Conda](https://github.com/cedrick14/cartomize-python/actions/runs/36270662681), dont le lancement dans un vrai noyau Jupyter, ainsi que les 340 tests de chacune des configurations Linux/Windows, Python 3.11/3.12. Les résultats s’affichent dans la fenêtre principale ; consulter le [guide des vues](RESULTS_WORKSPACE.md).
+Sélectionner le noyau **Python (Cartomize)** dans Jupyter.
 
-Lors d’une mise à jour qui change Qt, fermer Cartomize et arrêter le noyau qui l’a chargé, puis installer depuis l’invite de commandes de l’environnement. Redémarrer ensuite le noyau. Cela permet à Windows de remplacer les DLL qui étaient chargées.
+## Mise à jour et diagnostic
 
-Historique du correctif de démarrage :
+Sous Windows, fermer Cartomize et arrêter les noyaux qui ont chargé Qt avant une mise à jour des dépendances graphiques. Les DLL chargées doivent être libérées pour permettre leur remplacement.
 
-Le commit `530154823f7ad9f5d78438c7d69003037068ea47` a passé les contrôles suivants :
+L’option `notebook` sélectionne Qt 6.9 et une version compatible de `typing_extensions`. Le démarrage initialise le parseur XML standard avant les bibliothèques géospatiales pour limiter les conflits de chargement Expat.
 
-- Windows, Conda du canal defaults, Python 3.12 et Expat 2.8.5 : import dans un interpréteur neuf, lecture et écriture raster/vectorielle, export de carte et ouverture de la fenêtre.
-- Vrai noyau Jupyter : retour de `cm.launch()` et traitement d'un événement Qt après la fin de la cellule.
-- Suite de tests sur Linux et Windows avec Python 3.11 et 3.12.
+Pour identifier l’environnement du noyau :
 
-Le [contrôle Windows Conda](https://github.com/cedrick14/cartomize-python/actions/runs/36259248384) a également réussi avec la version 0.8.1a1 dans cet environnement neuf. Le conflit signalé sur un poste existant n'a donc pas été reproduit à l'identique ; sa résolution sur ce poste reste à vérifier après mise à jour et redémarrage du noyau. Les contrôles automatiques utilisent Qt en mode hors écran et ne valident pas l'affichage sur chaque configuration de bureau Windows.
+```python
+import sys
+import cartomize as cm
+
+print(sys.executable)
+print(sys.version)
+print(cm.__version__)
+```
+
+La [validation](VALIDATION.md) décrit les contrôles d’importation, de lancement et de réactivité de la fenêtre dans un noyau Jupyter.

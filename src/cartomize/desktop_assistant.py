@@ -1,4 +1,4 @@
-"""Cartographer's starting point: inspect data, explain and open next steps."""
+"""Cartographic assessment and processing plan controls."""
 import json
 from pathlib import Path
 from PySide6.QtCore import Signal,Qt
@@ -17,9 +17,9 @@ class AssistantPage(Page):
         super().__init__('Assistant cartographique','Définir l’objectif, contrôler les données, préparer les images, effectuer les analyses puis composer et vérifier la carte.')
         self.directory=Path(directory);self.assessment=None
         outer_form=self.form
-        sequence=QLabel('Imagerie : scènes et bandes → multibande scientifique → analyses → carte.\n'
-                        'Couches existantes : diagnostic → préparation → composition cartographique → mise en page.\n'
-                        'La composition colorée constitue une branche de visualisation du multibande.')
+        sequence=QLabel('Imagerie : importation, préparation multibande, analyses, cartographie.\n'
+                        'Couches : diagnostic, préparation, superposition, mise en page.\n'
+                        'La composition colorée définit l’affichage des bandes spectrales.')
         sequence.setWordWrap(True);sequence.setObjectName('sequence');outer_form.addRow(sequence)
         self.tabs=QTabWidget();outer_form.addRow(self.tabs)
         project_tab=QWidget();self.form=QFormLayout(project_tab);self.tabs.addTab(project_tab,'Données')
@@ -94,7 +94,7 @@ class AssistantPage(Page):
             self.findings.setText('Production achevée. Les couches et la mise en page sont disponibles dans les résultats.');return
         if document.get('schema')=='cartomize.automation.v1':
             self.execution_plan=document;self.proposals.clear()
-            for item in document['proposals']:self.proposals.addItem(item['name']+' · '+str(item['score']),item['id'])
+            for item in document['proposals']:self.proposals.addItem(item['name']+' ; '+str(item['score']),item['id'])
             self.execute_button.setEnabled(True)
             from copy import deepcopy
             document=deepcopy(document['assessment']);document['steps']=[]

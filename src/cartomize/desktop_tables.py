@@ -81,11 +81,11 @@ class TablePanel(QWidget):
             if result['truncated']: self.status.setText('Texte limité à 500 000 caractères ; le rapport original est conservé intégralement.')
         else:
             self.offset=result['offset']; self.previous.setEnabled(self.offset>0); self.next.setEnabled(result['more']); self.set_frame(result['frame'])
-            self.status.setText(f'Lignes {self.offset+1 if len(self.frame) else 0}–{self.offset+len(self.frame)} · lecture par pages de 2 000 lignes. Tri et filtre sur la page affichée.')
+            self.status.setText(f'Lignes {self.offset+1 if len(self.frame) else 0}–{self.offset+len(self.frame)} ; lecture par pages de 2 000 lignes. Tri et filtre sur la page affichée.')
 
     def select_report(self,*args):
         if self._reports:
-            self.offset=0; self.set_frame(self._reports[self.selection.currentText()]); self.status.setText(f'{len(self.frame)} lignes · {self.selection.currentText()}')
+            self.offset=0; self.set_frame(self._reports[self.selection.currentText()]); self.status.setText(f'{len(self.frame)} lignes ; {self.selection.currentText()}')
 
     def set_frame(self,frame):
         self.frame=frame; old=getattr(self,'model',None); self.model=FrameModel(frame,self.offset,self)
@@ -128,7 +128,7 @@ class TablePanel(QWidget):
                     if kind=='line': ax.plot(x[good],y[good],color='#42644f')
                     else: ax.scatter(x[good],y[good],color='#42644f',s=16)
                 ax.set_xlabel(str(self.frame.columns[xi])); ax.set_ylabel(str(self.frame.columns[yi])); ax.grid(alpha=.15)
-            self.plot_note.setText('Graphique de la page affichée · navigation et export disponibles ci-dessous.')
+            self.plot_note.setText('Graphique de la page affichée ; navigation et export disponibles ci-dessous.')
             self.tabs.setCurrentIndex(1)
         except (ValueError,TypeError) as exc: self.plot_note.setText(str(exc))
         self.canvas.draw_idle()

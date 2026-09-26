@@ -1,6 +1,6 @@
-# Cartomize 0.6 : traitement, session et production
+# Automatisation, sessions et production
 
-Cartomize est un assistant cartographique fondé sur des règles explicables et des algorithmes géospatiaux. Il ne dépend pas d’un service conversationnel. La fenêtre s’ouvre avec `cm.launch()` ou `cartomize gui`.
+Cartomize est un assistant cartographique fondé sur des règles explicables et des algorithmes géospatiaux. La fenêtre s’ouvre avec `cm.launch()` ou `cartomize gui`.
 
 ## Parcours automatisé
 

@@ -184,7 +184,4 @@ Le [rapport de performances](PERFORMANCE.md) décrit les mesures locales.
 La mosaïque conserve son moteur distinct : le parallélisme ajouté ici concerne
 l'algèbre, les indices, les statistiques focales et multirasters.
 
-La calculatrice couvre les opérations exprimables dans cette syntaxe. Elle
-ne prétend pas inclure tous les algorithmes SIG : hydrologie, classification
-apprise, décomposition radar et autres traitements spécialisés nécessitent
-leurs propres implémentations.
+La calculatrice couvre les expressions décrites dans ce guide. L’hydrologie et la classification utilisent leurs modules spécialisés. La décomposition radar n’est pas prise en charge.

@@ -1,4 +1,4 @@
-# Architecture et périmètre 0.5.0a1
+# Architecture
 
 ## Provenance technique
 
@@ -12,17 +12,17 @@ Le dossier `arcgis-build/source` contient l'extension C#/WPF, les services
 natifs Esri et une boîte à outils Python ArcPy. La bibliothèque reprend les
 modules Python indépendants d'ArcPy et les maquettes de cette édition.
 Les dix modules repris sont conservés dans `_core`, à usage interne.
-Leur version interne 10.5.1 exprime leur provenance; la version du nouveau
-paquet est 0.5.0a1. Les fichiers originaux ne sont pas modifiés.
+Leur version interne 10.5.1 exprime leur provenance; la version du
+paquet est 1.0. Les fichiers originaux ne sont pas modifiés.
 
 ## Fonctionnalités
 
-| Composant | Réutilisation et nouveau fonctionnement |
+| Composant | Responsabilités |
 |---|---|
 | Maquettes | 24 JSON originaux, validation et conversion en millimètres conservées |
 | Analyse des champs | Règles de rôle, champ d'étiquette et champ thématique d'ArcGIS Pro, adaptateur GeoPandas |
 | Analyse raster | Profils et inférence originaux, lecture/masque Rasterio |
-| Cartographie | Nouveau rendu Matplotlib, cadres multiples, échelle géodésique locale, nord vrai, légendes |
+| Cartographie | Rendu Matplotlib, cadres multiples, échelle géodésique locale, nord vrai, légendes |
 | Géométrie | GeoPandas/Shapely : clip, overlay, sjoin, dissolve, buffer, réparation et audit |
 | Mesures | Distances en mètres, surfaces m²/ha/km² et conversion des unités projetées |
 | Raster | NDVI/différence normalisée, reclassification, découpage, reprojection, statistiques zonales, surfaces et transitions |
@@ -31,7 +31,7 @@ paquet est 0.5.0a1. Les fichiers originaux ne sont pas modifiés.
 | Algèbre raster | Interpréteur AST sans exécution Python, traitement par blocs, lecture commune et calculs concurrents |
 | Indices spectraux | 18 formules documentées, paramètres et registre extensible |
 | Statistiques | Voisinages avec marges de blocs et synthèse multirasters |
-| Interface graphique | Qt facultatif, assistant cartographique et treize rubriques complémentaires, tâches en arrière-plan, progression et annulation |
+| Interface graphique | Qt facultatif, assistant cartographique et catalogue des outils, tâches en arrière-plan, progression et annulation |
 | Production | Atlas, CLI, wheel, distribution source et procédure PyPI |
 
 ## Choix techniques
@@ -39,7 +39,7 @@ paquet est 0.5.0a1. Les fichiers originaux ne sont pas modifiés.
 - Aucun import `arcpy`, `qgis` ou composant natif Esri à l'exécution.
 - Objets GeoPandas standards, sans nouvelle classe concurrente de GeoDataFrame.
 - CRS explicite, entrées copiées pour les opérations vectorielles.
-- Masques déclarés prioritaires; le diagnostic individuel reste en lecture seule. Le nouveau parcours de projet applique les fonds périphériques retenus dans des copies réversibles.
+- Masques déclarés prioritaires; le diagnostic individuel reste en lecture seule. La préparation du projet applique les fonds périphériques retenus dans des copies réversibles.
 - Écritures raster temporaires puis remplacement atomique de chaque fichier, sources protégées. Les trois fichiers d’un produit multiscène sont remplacés successivement; une panne système pendant cette phase peut interrompre la livraison du groupe.
 - Les grands calculs NDVI/reclassification et comptages sont lus par fenêtres.
 - Les exports utilisent des images raster rééchantillonnées à 2048 pixels par
@@ -49,10 +49,7 @@ paquet est 0.5.0a1. Les fichiers originaux ne sont pas modifiés.
 
 ## Limites explicites
 
-Il s'agit d'une première bibliothèque alpha, et non du port complet de
-l'interface ArcGIS Pro. Elle n'ouvre pas les projets APRX, ne produit pas de
-PAGX, et ne reprend pas les moteurs natifs C# ni toute l’automatisation de choix de maquette de l’extension ; la proposition Python utilise l’objectif et le nombre de cadres. Les 24 maquettes sont accessibles et
-rendus par un nouveau moteur; la parité pixel à pixel avec Esri n'est pas visée.
+Le moteur autonome utilise Matplotlib pour les mises en page. Il ne produit pas de fichiers PAGX et ne reprend pas les composants C# Esri. Les projets APRX sont accessibles par la passerelle ArcGIS Pro facultative. Le rendu et le transfert des styles sont limités aux propriétés documentées.
 
 La suppression de collisions d'étiquettes est une heuristique simple et peut
 masquer des étiquettes dans les zones denses. Les titres longs peuvent exiger
@@ -65,10 +62,7 @@ sur toute une carte à grande étendue. Les statistiques zonales recoupent
 chaque zone indépendamment, sans supprimer les chevauchements.
 
 Les calculs à grande étendue peuvent nécessiter beaucoup de mémoire pour
-les géométries, le découpage raster, ou une zone individuelle. La validation
-locale est réalisée sur Linux/Python 3.12; un workflow fournit une matrice
-Windows/Linux/Python 3.11 et 3.12. Ne pas présenter ces autres exécutions
-comme réussies avant d'avoir consulté leurs résultats.
+les géométries, le découpage raster, ou une zone individuelle. Les configurations et résultats de test sont décrits dans [VALIDATION.md](VALIDATION.md).
 
 ## Références techniques
 
@@ -98,7 +92,7 @@ L'icône originale est distribuée dans `cartomize/assets`.
 `desktop_layout` expose les maquettes, les cadres et les contenus au moteur
 `Map`. `desktop_tools` expose les diagnostics et les traitements existants.
 La page Mise en page et la page Atlas partagent la même configuration.
-Leur aperçu utilise le rendu réel, dans le fil de traitement existant.
+Leur aperçu utilise le moteur de rendu cartographique dans un travailleur en arrière-plan.
 Le [tableau fonctionnel](FUNCTIONAL_COVERAGE.md) distingue la disponibilité
 dans Python des fonctions nécessitant encore un portage natif.
 

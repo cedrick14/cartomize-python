@@ -1,6 +1,6 @@
 # Performances du calcul raster
 
-Mesures locales effectuées le 22 septembre 2026. Elles décrivent ce benchmark,
+Mesures locales effectuées le 22 septembre 2026. Ces mesures historiques précèdent la version 1.0 et décrivent ce benchmark,
 sans garantir le même gain sur tous les rasters et matériels.
 
 ## Protocole
@@ -19,7 +19,7 @@ sans garantir le même gain sur tous les rasters et matériels.
   float32, après canonicalisation des NaN et des zéros signés. Égalité confirmée.
 - Sorties LZW : trois fichiers dans le cas séparé; un fichier multibande dans
   le cas groupé, avec prédicteur flottant. Les modes mesurent les configurations
-  réellement livrées, et pas seulement l'effet isolé du nombre de threads.
+  de calcul et de sortie, plutôt que le seul effet du nombre de threads.
 
 ## Résultats
 
@@ -47,7 +47,7 @@ python examples/benchmark_raster.py --size 2048 --repeats 3
 ```
 
 Le script génère les données fictives, vérifie les sorties et produit un rapport
-JSON. Les résultats de cette livraison sont conservés dans
+JSON. Les résultats de cette mesure historique sont conservés dans
 [BENCHMARK_0.5.0a1.json](BENCHMARK_0.5.0a1.json).
 
 Les méthodes d'optimisation employées sont la vectorisation des calculs,

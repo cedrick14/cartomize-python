@@ -24,8 +24,8 @@ def main():
                        dtype="uint8", crs=crs, transform=from_origin(300000, 9508000, 80, 80), nodata=255) as dst:
         dst.write(data, 1)
     villages.to_file(out/"villages_fictifs.gpkg", driver="GPKG")
-    carte = cm.Map(title="Cartomize Python", subtitle="Occupation du sol · exemple de mise en page automatique",
-                    credits="Données fictives — démonstration | Cartomize / Cédrick Belmich | UTM 33S", crs=crs)
+    carte = cm.Map(title="Cartomize Python", subtitle="Occupation du sol ; exemple de mise en page automatique",
+                    credits="Données fictives : démonstration | Cartomize / Cédrick Belmich | UTM 33S", crs=crs)
     carte.add_layer(raster_path, name="Occupation du sol", classes={1:("Forêt dense", "#24634d"), 2:("Forêt secondaire", "#95bba0"), 3:("Agriculture", "#e1b96c")})
     carte.add_layer(roads, name="Route", color="#b16a3d", linewidth=1.5)
     carte.add_layer(villages, name="Villages", labels="nom", color="#172d38", markersize=30)

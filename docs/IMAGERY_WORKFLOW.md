@@ -1,4 +1,4 @@
-# Des scènes à la carte — Cartomize 0.2.0a1
+# Préparation des scènes et production cartographique
 
 ## Le principe
 
@@ -176,18 +176,10 @@ La démonstration génère **deux scènes entièrement fictives**, cinq bandes �
 GeoTIFF, le NDVI, le rapport, un comparatif PNG et une carte PDF/PNG. Ces
 résultats illustrent le traitement, sans constituer des observations de terrain.
 
-## Ce qui reste à développer
+## Conditions d’utilisation
 
-Une composition colorée ne produit pas une classification d'occupation du
-sol. Il faut un module distinct, des classes définies, des données
-d'apprentissage si nécessaire et une validation indépendante. Les extensions
-suivantes seraient utiles : classification supervisée et matrice de confusion,
-sélection temporelle par score de qualité, harmonisation intercapteurs,
-meilleur placement des étiquettes et import de styles SIG.
+La composition colorée représente les bandes spectrales. La classification utilise un outil distinct et, pour les méthodes supervisées, des données d’apprentissage et de validation. Voir le [guide de classification](AUTOMATION.md).
 
-Cette alpha ne fait ni correction atmosphérique de produits bruts, ni
-égalisation entre scènes, ni téléchargement automatique, ni correction des
-erreurs de géoréférencement. Elle n'a pas encore été éprouvée sur de grandes
-collections satellitaires réelles. Choisir une résolution plus fine ne crée
-pas de détails supplémentaires. Pour des scènes éloignées, sélectionner une
-zone et une projection adaptées au lieu d'une mosaïque mondiale implicite.
+La préparation prend en charge les produits de réflectance documentés. Elle ne réalise pas de correction atmosphérique de produits bruts, d’harmonisation intercapteurs ni de correction générique des erreurs de géoréférencement. La recherche et le téléchargement STAC sont décrits dans [PROCESSING.md](PROCESSING.md).
+
+La résolution de sortie et la projection doivent être adaptées à la zone d’étude. Une résolution plus fine ne crée pas d’information spatiale supplémentaire. Les tests synthétiques doivent être complétés par une validation sur les données de l’étude.

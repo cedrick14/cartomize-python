@@ -1,4 +1,4 @@
-# Chaînes de traitements — Cartomize 0.7
+# Chaînes de traitements
 
 ## Registre et dépendances
 

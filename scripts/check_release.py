@@ -1,4 +1,4 @@
-"""Check the exact two distributions before handing them to PyPI."""
+"""Validate package metadata, contents and checksums before publication."""
 from pathlib import Path
 from email.parser import BytesParser
 from email import policy
@@ -15,7 +15,7 @@ project=tomllib.loads((root/'pyproject.toml').read_text())['project']
 name,version=project['name'],project['version']
 directory=Path(sys.argv[1]) if len(sys.argv)>1 else root/'pypi-dist'
 expected={f'{name}-{version}-py3-none-any.whl',f'{name}-{version}.tar.gz'}
-assert {p.name for p in directory.iterdir() if p.is_file()}==expected, 'Only the current wheel and sdist belong in the upload directory.'
+assert {p.name for p in directory.iterdir() if p.is_file()}==expected, 'The distribution directory must contain only the current wheel and source archive.'
 if os.environ.get('GITHUB_REF_TYPE')=='tag':
     assert os.environ['GITHUB_REF_NAME']==f'python-v{version}', 'Release tag and package version differ.'
 wheel=directory/f'{name}-{version}-py3-none-any.whl'

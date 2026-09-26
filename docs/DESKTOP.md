@@ -1,19 +1,15 @@
-La version 0.9.0a1 organise les traitements et la visualisation en deux panneaux. Voir le [guide de l’espace de travail intégré](RESULTS_WORKSPACE.md).
+# Interface graphique
 
-# Interface 0.6
+L’interface organise les traitements et la visualisation en deux panneaux. Le [guide de l’espace de travail](RESULTS_WORKSPACE.md) décrit les vues intégrées. Le [guide de l’automatisation](AUTOMATION.md) présente les plans, la classification, les sessions et la production en série.
 
-Les nouveautés et leurs contrôles sont décrits dans [AUTOMATION](AUTOMATION.md) : exécution des plans, classification, projets persistants, géométrie des éléments, recettes, révision, terrain et projets SIG.
-
-# Interface graphique Cartomize
-
-Depuis 0.8.1, **Prétraitement multispectral** propose un tableau des bandes par scène, les cases de sélection des opérations, les trois canaux RVB et l’export monobande. Voir [le parcours détaillé](IMAGERY_SELECTION.md).
+**Prétraitement multispectral** propose un tableau des bandes par scène, la sélection des opérations, les canaux RVB et l’export monobande. Voir le [parcours détaillé](IMAGERY_SELECTION.md).
 
 ## Installation et lancement
 
-Depuis le wheel fourni, avec Python 3.11 ou plus récent :
+Avec Python 3.11 à 3.13 :
 
 ```bash
-python -m pip install "cartomize[gui]==0.8.1a2"
+python -m pip install "cartomize[gui]==1.0"
 cartomize-desktop
 ```
 
@@ -27,8 +23,7 @@ cm.launch()
 
 La fenêtre Qt est indépendante d'ArcGIS Pro et de QGIS. Les dépendances
 graphiques sont facultatives pour les scripts. L'importation de `cartomize`
-n'ouvre pas de fenêtre. Cette alpha est distribuée par wheel; aucune
-publication PyPI n'a été effectuée.
+n’ouvre pas de fenêtre.
 
 ## Assistant cartographique et ordre du travail
 
@@ -38,7 +33,7 @@ Après traitement, **Résultats du projet** permet de sélectionner une sortie e
 
 Dans Mise en page, **Contrôler la carte** ouvre le bilan technique ; les erreurs bloquantes sont également vérifiées avant export. **Préparer l’atlas** transmet la configuration complète ; renseigner ensuite l’index et le champ des noms. Les fichiers CSV de statistiques alimentent les tableaux/graphiques par sélection dans Cadres et contenus.
 
-L’assistance suit des règles explicables. Elle ne réalise pas de classification supervisée et ne garantit pas automatiquement la validité scientifique ou la lisibilité finale. Voir [l’audit des outils](TOOL_AUDIT.md).
+L’assistance suit des règles explicables. La classification supervisée utilise les références fournies dans le plan. L’évaluation thématique et l’examen de la lisibilité complètent les contrôles techniques. Voir le [catalogue des outils](TOOL_AUDIT.md).
 
 ## Production cartographique automatisée
 
@@ -158,13 +153,13 @@ existants** avant un remplacement.
 Dans une application possédant déjà un `QApplication`, utiliser
 `cm.launch(block=False)` avec sa boucle Qt.
 
-Depuis la version 0.8.1a2, un notebook local peut ouvrir la fenêtre avec
+Un notebook local peut ouvrir la fenêtre avec
 `cm.launch()` : Cartomize active automatiquement l’intégration Qt d’IPython.
 La cellule rend la main et la fenêtre reste interactive. Installer les
 composants du notebook dans un noyau Python 3.11 ou supérieur :
 
 ```python
-%pip install "cartomize[notebook]==0.8.1a2"
+%pip install "cartomize[notebook]==1.0"
 ```
 
 Après une mise à jour, redémarrer le noyau, puis exécuter :
@@ -203,7 +198,7 @@ les bibliothèques SIG. Aucun import manuel d’Expat n’est nécessaire.
    les couches. Renseigner les emplacements de texte, tableau CSV ou graphique
    présents dans la maquette. Pour un graphique, préciser les colonnes de
    libellés et de valeurs du CSV.
-4. Utiliser **Aperçu cartographique** pour contrôler le rendu réel dans un
+4. Utiliser **Aperçu cartographique** pour contrôler le rendu cartographique dans un
    onglet du panneau de visualisation. L’aperçu s’exécute en arrière-plan, sans demander de nom
    de fichier définitif.
 5. Choisir le fichier de sortie et cliquer sur **Exporter la carte**.
@@ -244,15 +239,9 @@ L’icône originale conserve ses couleurs, sans recoloration.
 Les informations de provenance du code et les attributions sont conservées
 dans les documents techniques.
 
-Les tests utilisent de vrais widgets Qt en mode hors écran sous Linux et de
-véritables traitements. Ils vérifient la chaîne automatisée avec maquette,
-les cadres indépendants, l’aperçu, l’atlas, les diagnostics, les traitements
-vectoriels/raster et les outils de calcul. Un essai manuel Windows reste à
-réaliser. Le [tableau des fonctionnalités](FUNCTIONAL_COVERAGE.md) indique
-précisément ce qui est disponible et les fonctions natives non transposées.
+Les tests graphiques contrôlent les traitements, les maquettes, les cadres, les aperçus et les atlas en mode hors écran. Les environnements et la portée des vérifications figurent dans [VALIDATION.md](VALIDATION.md).
 
-
-## Chaînes de traitements — 0.7
+## Chaînes de traitements
 
 Dans **Assistant cartographique**, ouvrir l’onglet **Chaîne de traitements**.
 Ajouter une étape, choisir son opération et renseigner les paramètres du formulaire.
@@ -267,14 +256,14 @@ sans imposer une carte finale. Choisir le répertoire parent et le nom d’un no
 dossier. Les réglages de travailleurs, blocs et budget mémoire sont transmis aux
 opérations compatibles ; les dérivées hydrologiques utilisent un calcul global.
 
-**Projets SIG → Importer les couches et les styles** crée un nouveau projet Cartomize.
+Dans **Projets SIG**, **Importer les couches et les styles** crée un nouveau projet Cartomize.
 Les éléments non transférables figurent dans le rapport. Une copie ou un export
 natif continue à demander l’interpréteur du logiciel SIG installé.
 
 **Analyse du projet** accepte une **emprise valide** polygonale. Les pixels extérieurs
-sont masqués dans une copie multibande ; les vrais zéros situés à l’intérieur restent
+sont masqués dans une copie multibande ; les zéros valides situés à l’intérieur restent
 valides en l’absence d’une autre règle explicite de masquage.
 
-## Compléments 0.8
+## Moteurs et interopérabilité
 
-Moteurs d’exécution, transfert des styles et validation native : voir [EXECUTION](EXECUTION.md). Les choix Dask/CUDA sont persistés avec la session et transmis aux traitements compatibles. Le calcul distribué utilise des processus réels ; le GPU reste à valider sur le matériel approprié.
+Moteurs d’exécution, transfert des styles et validation native : voir [EXECUTION](EXECUTION.md). Les choix Dask/CUDA sont persistés avec la session et transmis aux traitements compatibles. Le calcul distribué utilise des processus distincts ; le GPU reste à valider sur le matériel approprié.

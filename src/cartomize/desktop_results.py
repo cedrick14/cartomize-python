@@ -56,21 +56,21 @@ class MapDocument(QWidget):
         metadata.setPlainText(json.dumps(self.canvas.info,ensure_ascii=False,indent=2,default=str)); self.info_tabs.addTab(metadata,'Métadonnées')
         self.content.addWidget(self.info_tabs); self.content.setStretchFactor(0,1); self.content.setSizes([800,200])
         self.info_tabs.setVisible(not compact); self.details.toggled.connect(self.info_tabs.setVisible)
-        self.coordinates=QLabel('Molette : zoom · glisser : déplacement · clic : valeurs du pixel'); self.coordinates.setObjectName('muted'); self.coordinates.setWordWrap(True)
+        self.coordinates=QLabel('Molette : zoom ; glisser : déplacement ; clic : valeurs du pixel'); self.coordinates.setObjectName('muted'); self.coordinates.setWordWrap(True)
         self.values=QLabel(''); self.values.setWordWrap(True); self.note=QLabel('Chargement de la vue…'); self.note.setWordWrap(True); self.note.setObjectName('muted')
         layout.addWidget(self.coordinates); layout.addWidget(self.values); layout.addWidget(self.note)
         self.canvas.position.connect(self.coordinates.setText); self.canvas.identified.connect(self.values.setText)
         self.canvas.error.connect(lambda text:self.note.setText('Affichage impossible : '+text)); self.canvas.rendered.connect(self.show_legend)
         self._configure_controls(); self.styles.setVisible(self.canvas.kind in {'raster','pdf'} and not compact)
         self.display_settings.setVisible(self.canvas.kind in {'raster','pdf'}); self.display_settings.toggled.connect(self.styles.setVisible)
-        if self.canvas.kind=='svg': self.note.setText('Document vectoriel · les images incorporées conservent la résolution de l’export.')
+        if self.canvas.kind=='svg': self.note.setText('Document vectoriel ; les images incorporées conservent la résolution de l’export.')
 
     def _configure_controls(self):
         canvas=self.canvas
         if canvas.kind=='raster':
             for i,label in enumerate(canvas.info['descriptions'],1):
-                self.mode.addItem(f'{i} · {label}',i)
-                for channel in self.channels: channel.addItem(f'{i} · {label}',i)
+                self.mode.addItem(f'{i} : {label}',i)
+                for channel in self.channels: channel.addItem(f'{i} : {label}',i)
             if canvas.info['count']>=3: self.mode.addItem('Composition RVB','rgb')
             for channel,band in zip(self.channels,canvas.bands if len(canvas.bands)==3 else (1,2,3)):
                 channel.setCurrentIndex(max(0,channel.findData(band)))
@@ -105,7 +105,7 @@ class MapDocument(QWidget):
     def show_legend(self,result):
         self.legend.clear()
         for label,color,code in result.get('legend',[]):
-            item=QListWidgetItem(str(label)+(' · '+str(code) if color and code is not None else ''))
+            item=QListWidgetItem(str(label)+(' ; '+str(code) if color and code is not None else ''))
             if color:
                 swatch=QPixmap(16,16); swatch.fill(QColor(color)); item.setIcon(QIcon(swatch))
             self.legend.addItem(item)
@@ -117,11 +117,11 @@ class MapDocument(QWidget):
         note=result.get('warning')
         if not note:
             if self.canvas.kind=='raster':
-                note='Valeurs originales conservées · NoData transparents · zoom par lecture de l’emprise visible.'
+                note='NoData transparents. Lecture de l’emprise visible.'
                 if not self.canvas.info.get('classes') and self.canvas.limits is None: note+=' Contraste : percentiles 2–98 % sur échantillon fixe.'
             elif self.canvas.kind=='pdf': note='PDF rendu à la résolution de la vue ; les rasters incorporés gardent leur résolution d’origine.'
-            elif self.canvas.kind=='vector': note='Géométries de l’emprise visible · symbologie d’exploration. L’habillage final appartient à la mise en page.'
-            else: note='Image originale · le zoom au-delà des pixels natifs n’ajoute pas de détail mesuré.'
+            elif self.canvas.kind=='vector': note='Géométries de l’emprise visible. Symbologie d’exploration ; habillage dans l’outil Mise en page.'
+            else: note='Image à résolution native. Agrandissement des pixels au-delà de l’échelle 1:1.'
         self.note.setText(note)
 
     def capture(self): return dict(type='map',path=self.path,options=self.options,view=self.canvas.capture(),details=self.details.isChecked())
@@ -246,7 +246,7 @@ class ResultsWorkspace(QWidget):
         row.addWidget(self.catalog,1); button('Afficher',self.open_selected,row); self.compare_button=button('Comparer',self.compare,row); layout.addLayout(row)
         self.catalog.activated.connect(self.open_selected)
         self.tabs=QTabWidget(); self.tabs.setTabsClosable(True); self.tabs.setMovable(True); self.tabs.tabCloseRequested.connect(self.close_tab)
-        layout.addWidget(self.tabs,1); self.empty=QLabel('Les résultats apparaîtront ici après le traitement.\n\nCartes et rasters · tableaux · graphiques · rapports\n\nOuvrez un résultat existant ou configurez un traitement dans le panneau de gauche.')
+        layout.addWidget(self.tabs,1); self.empty=QLabel('Cartes, rasters, tableaux, graphiques et rapports\n\nOuvrir un fichier ou exécuter un traitement pour afficher un résultat.')
         self.empty.setAlignment(Qt.AlignmentFlag.AlignCenter); self.empty.setWordWrap(True); self.empty.setObjectName('emptyResults'); self.tabs.addTab(self.empty,'Espace de résultats')
         self.activity=QLabel('Aucun traitement en cours.'); self.activity.setObjectName('muted'); self.activity.setWordWrap(True); layout.addWidget(self.activity)
         self.message=QLabel(''); self.message.setWordWrap(True); layout.addWidget(self.message)

@@ -1,4 +1,4 @@
-# Prétraitement multispectral à options — 0.8.1a1
+# Prétraitement multispectral à options : 1.0
 
 La rubrique **Prétraitement multispectral** permet de sélectionner les étapes et les produits. Elle fonctionne avec les dépendances Python de Cartomize, sans QGIS ni ArcGIS Pro.
 
@@ -23,7 +23,7 @@ Au moins un produit doit être demandé : multibande, bandes séparées ou compo
 
 ## Bandes personnalisées
 
-Choisir **Bandes personnalisées : correspondance manuelle** pour des fichiers renommés ou un autre capteur. Cartomize n’invente pas leur identité spectrale. Les noms de bandes et les facteurs inscrits dans les fichiers sont repris lorsqu’ils existent ; les autres noms doivent être corrigés dans le tableau.
+Choisir **Bandes personnalisées : correspondance manuelle** pour des fichiers renommés ou un autre capteur. L’identité spectrale doit être renseignée explicitement. Les noms de bandes et les facteurs inscrits dans les fichiers sont repris lorsqu’ils existent ; les autres noms doivent être corrigés dans le tableau.
 
 Les fichiers sont initialement rattachés à `scene_1`. Donner le même identifiant aux bandes d’une acquisition, et des identifiants différents aux acquisitions distinctes. Utiliser les mêmes noms spectraux entre scènes. Deux bandes portant le même nom dans la même scène sont refusées. Le numéro indique la bande à lire à l’intérieur du fichier source. Les facteurs de calibration proviennent des métadonnées du fichier, avec les valeurs usuelles 1 et 0 lorsque rien n’est déclaré ; renseigner les facteurs documentés du produit si nécessaire.
 

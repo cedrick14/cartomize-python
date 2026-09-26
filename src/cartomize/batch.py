@@ -47,7 +47,7 @@ def atlas(map_object, zones, directory, *, name_column, format="pdf", dpi=300,
         _check_cancel(cancel)
         page = copy.copy(map_object)
         page.frames = copy.deepcopy(map_object.frames)
-        page.title = f"{map_object.title} — {label}" if map_object.title else str(label)
+        page.title = f"{map_object.title} : {label}" if map_object.title else str(label)
         page.set_extent(extent).export(path, dpi=dpi, overwrite=overwrite)
         if progress:progress(number,len(paths))
     _check_cancel(cancel)

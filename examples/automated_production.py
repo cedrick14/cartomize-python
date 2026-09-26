@@ -39,7 +39,7 @@ def main():
     result=cm.cartographic_workflow(scenes,args.directory/"production",
         aoi=args.directory/"donnees/zone_etude.geojson",
         layers=[args.directory/"donnees/routes.geojson",args.directory/"donnees/localites.geojson"],
-        title="Production cartographique — démonstration",credits="Cartomize · Données synthétiques sans valeur géographique réelle",dpi=120)
+        title="Production cartographique : démonstration",credits="Cartomize ; Données synthétiques sans valeur géographique réelle",dpi=120)
     print(result.directory)
 
 

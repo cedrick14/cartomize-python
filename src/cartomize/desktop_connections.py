@@ -83,12 +83,12 @@ class ProjectConnections:
             record=json.loads(path.read_text(encoding='utf-8'))
             for product in record['products']:
                 if product['multiband']:
-                    self.register_result(dict(data=product['multiband'],name='Multibande · '+', '.join(product['scenes'])))
+                    self.register_result(dict(data=product['multiband'],name='Multibande ; '+', '.join(product['scenes'])))
                     self.tool('composite').source.edit.setText(product['multiband'])
                     self.tool('indices').source.edit.setText(product['multiband'])
                     self.tool('classification').source.edit.setText(product['multiband'])
                 if product['composition']:
-                    self.register_result(dict(data=product['composition'],rgb='native',role='background',name='Composition colorée · '+', '.join(product['scenes'])))
+                    self.register_result(dict(data=product['composition'],rgb='native',role='background',name='Composition colorée ; '+', '.join(product['scenes'])))
                 for band in product['bands'].values():
                     self.register_result(dict(data=band['path'],name=band['name']))
         elif path.name=='project.json':

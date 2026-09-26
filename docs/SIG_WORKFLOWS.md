@@ -1,10 +1,10 @@
 # Logique des traitements SIG et de la production cartographique
 
-Audit du 26 septembre 2026. Version étudiée : 0.8.1a2. Corrections implémentées et publiées : [0.8.2a1](https://pypi.org/project/cartomize/0.8.2a1/). Voir les [résultats de validation](VALIDATION.md).
+Ce guide décrit l’ordre des opérations, les contrôles et les hypothèses scientifiques de Cartomize.
 
 ## Principe de fonctionnement
 
-L’assistant part d’un objectif et des données réellement disponibles. Il propose les étapes nécessaires, vérifie leurs entrées et transmet des résultats identifiés. Une carte administrative peut commencer avec des couches vectorielles déjà préparées ; une carte d’occupation du sol peut demander une préparation multispectrale puis une classification. La classification et les indices ne sont pas des étapes obligatoires de toute carte.
+L’assistant part d’un objectif et des données disponibles. Il propose les étapes nécessaires, vérifie leurs entrées et transmet des résultats identifiés. Une carte administrative peut commencer avec des couches vectorielles déjà préparées ; une carte d’occupation du sol peut demander une préparation multispectrale puis une classification. La classification et les indices ne sont pas des étapes obligatoires de toute carte.
 
 Trois opérations doivent conserver des noms distincts :
 
@@ -32,7 +32,7 @@ La composition colorée ne remplace pas les valeurs scientifiques. Les indices e
 
 La grille cible peut être calculée dès que l’emprise est connue afin de limiter la production aux pixels utiles. Cela ne change pas l’ordre scientifique : les masques et la calibration précèdent l’interpolation. Le moteur choisit la même scène pour toutes les bandes d’un pixel de mosaïque afin de préserver sa cohérence spectrale. Les masques catégoriels sont rééchantillonnés au plus proche voisin. Pour les réflectances, le choix du rééchantillonnage est explicite.
 
-Les produits Landsat Collection 2 L2 et Sentinel-2 L2A sont déjà des produits de réflectance de surface corrigés atmosphériquement. Cartomize applique leurs facteurs de quantification ; cette opération n’est pas une nouvelle correction atmosphérique. La reconnaissance utilise les métadonnées disponibles et refuse les correspondances inconnues plutôt que d’inventer des bandes.
+Les produits Landsat Collection 2 L2 et Sentinel-2 L2A sont déjà des produits de réflectance de surface corrigés atmosphériquement. Cartomize applique leurs facteurs de quantification ; cette opération n’est pas une nouvelle correction atmosphérique. La reconnaissance utilise les métadonnées disponibles et signale une erreur en cas de correspondance inconnue.
 
 La résolution par défaut est celle de la bande sélectionnée la plus grossière sur la grille cible. Un rééchantillonnage plus fin n’ajoute aucune information spatiale mesurée. Conserver toutes les bandes peut donc abaisser la résolution commune : les bandes doivent être choisies en fonction de l’analyse.
 
@@ -48,7 +48,7 @@ Les indices, l’algèbre raster, les statistiques focales, les réductions mult
 
 ## Des couches à la carte
 
-La **superposition cartographique** organise l’affichage de rasters et de vecteurs. Les **opérations de superposition vectorielle** — intersection, union, différence — créent de nouvelles géométries et de nouveaux attributs. Elles ont des finalités différentes.
+La **superposition cartographique** organise l’affichage de rasters et de vecteurs. Les **opérations de superposition vectorielle** (intersection, union, différence) créent de nouvelles géométries et de nouveaux attributs. Elles ont des finalités différentes.
 
 1. Importer les couches et vérifier géométries, SCR, attributs et emprises.
 2. Définir le SCR de la carte et l’emprise d’étude. Les mesures de distance et de surface requièrent une méthode adaptée ; une simple reprojection d’affichage n’est pas une validation des mesures.
@@ -60,26 +60,15 @@ La **superposition cartographique** organise l’affichage de rasters et de vect
 
 Les 24 maquettes ne dispensent pas de vérifier le contenu. La qualité de la carte dépend aussi du contraste, de la lisibilité à la taille imprimée, de la hiérarchie visuelle et de l’adéquation à son public.
 
-## Corrections de la logique dans la version 0.8.2a1
+## Transmission des données
 
-| Constat dans le code | Correction |
-|---|---|
-| Le plan de scènes et le parcours direct privilégiaient implicitement quatre bandes | Toutes les bandes importées sont conservées par défaut ; une sélection explicite est respectée |
-| Les incompatibilités QA, dates ou bandes pouvaient apparaître seulement à l’exécution | Le plan vérifie ces prérequis avant de produire des fichiers |
-| La composition naturelle était imposée dans le plan de scènes | Composition sélectionnable ou désactivable ; une analyse rouge/proche infrarouge peut fonctionner sans RVB |
-| L’examen « occupation du sol » ne proposait pas la classification disponible | Proposition explicite de classification à partir des données scientifiques, avant la préparation cartographique |
-| Les champs de validation existaient dans l’outil de classification mais pas dans le plan de l’assistant | Références de validation, libellés et groupes transmis au moteur et à l’outil |
-| Le transfert depuis l’assistant pouvait choisir un RVB comme entrée de classification et écarter un raster à deux bandes | Sélection d’une entrée scientifique et refus explicite des images d’affichage |
-| Les résultats de préparation alimentaient certains outils sans préremplir la classification | Transmission du multibande à la classification, aux indices et à la composition |
-| La navigation mélangeait préparation, diagnostics et finition | Ordre : objectif et diagnostic, imagerie, analyses, préparation des couches, mise en page, atlas, automatisation et révision |
-| Le plan automatisé et la production directe exportaient sans conserver un rapport technique final distinct | Rapport `quality.json` avant export dans les deux parcours ; erreurs techniques bloquantes, avertissements conservés |
-| Des choix du moteur d’imagerie n’étaient pas exposés dans la fenêtre | Rééchantillonnage spectral, priorité de recouvrement et masque de saturation accessibles |
+Le plan conserve les bandes importées par défaut et respecte la sélection explicite. Les prérequis de qualité, de dates et de correspondance spectrale sont contrôlés avant exécution. La composition colorée est facultative.
 
-Les clés des outils et les sessions restent stables malgré le changement d’ordre de navigation. L’icône conserve ses couleurs et l’interface ses contrôles neutres.
+Le multibande scientifique est transmis à la classification, aux indices et à la composition colorée. Les références d’apprentissage, de validation, les libellés et les groupes sont conservés entre le plan et les outils. Les couches et nomenclatures préparées alimentent la mise en page.
+
+La production automatisée enregistre un rapport `quality.json` avant l’export. Les erreurs techniques bloquent la production ; les avertissements sont conservés pour examen.
 
 ## Couverture et limites vérifiables
-
-Le parcours préparation → multibande → visualisation/analyse → couches → carte est implémenté et les corrections ci-dessus font l’objet de tests d’intégration. Cela ne signifie pas que tous les traitements SIG possibles existent.
 
 - La reconnaissance automatique porte sur Landsat C2 L2 et Sentinel-2 L2A. D’autres produits demandent un manifeste explicite. La correction atmosphérique de données brutes L1, l’orthorectification générique et le traitement radar complet ne sont pas implémentés.
 - La mosaïque utilise une priorité première/dernière scène valide. Elle ne réalise pas un équilibrage radiométrique universel ni une harmonisation intercapteurs automatique. Les mélanges incompatibles sont refusés.
@@ -91,12 +80,12 @@ Le parcours préparation → multibande → visualisation/analyse → couches �
 
 ## Références techniques
 
-- [USGS — facteurs d’échelle Landsat L2](https://www.usgs.gov/faqs/how-do-i-use-a-scale-factor-landsat-level-2-science-products)
-- [USGS — bandes de qualité Collection 2](https://www.usgs.gov/landsat-missions/landsat-collection-2-quality-assessment-bands)
-- [Copernicus — produits Sentinel-2 et quantification](https://sentiwiki.copernicus.eu/web/s2-products)
-- [GDAL — mosaïque raster](https://gdal.org/en/stable/programs/gdal_raster_mosaic.html)
-- [GDAL — assemblage multibande](https://gdal.org/en/stable/programs/gdal_raster_stack.html)
-- [scikit-learn — séparation apprentissage/évaluation](https://scikit-learn.org/stable/common_pitfalls.html)
-- [QGIS — production cartographique](https://docs.qgis.org/3.44/en/docs/user_manual/print_layout/index.html)
+- [USGS : facteurs d’échelle Landsat L2](https://www.usgs.gov/faqs/how-do-i-use-a-scale-factor-landsat-level-2-science-products)
+- [USGS : bandes de qualité Collection 2](https://www.usgs.gov/landsat-missions/landsat-collection-2-quality-assessment-bands)
+- [Copernicus : produits Sentinel-2 et quantification](https://sentiwiki.copernicus.eu/web/s2-products)
+- [GDAL : mosaïque raster](https://gdal.org/en/stable/programs/gdal_raster_mosaic.html)
+- [GDAL : assemblage multibande](https://gdal.org/en/stable/programs/gdal_raster_stack.html)
+- [scikit-learn : séparation apprentissage/évaluation](https://scikit-learn.org/stable/common_pitfalls.html)
+- [QGIS : production cartographique](https://docs.qgis.org/3.44/en/docs/user_manual/print_layout/index.html)
 
-Ces références définissent les principes utilisés pour l’audit ; Cartomize exécute ses moteurs Python et n’automatise pas une session de QGIS ou d’ArcGIS.
+Ces références décrivent les principes de traitement ; Cartomize exécute ses moteurs Python et n’automatise pas une session de QGIS ou d’ArcGIS.

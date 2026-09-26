@@ -1,6 +1,6 @@
 # Analyse du projet et préparation du NoData
 
-Version 0.5.0a1. Le projet est une liste de fichiers raster/vectoriels.
+Le projet est une liste de fichiers raster/vectoriels.
 Les projets natifs APRX et QGZ ne sont pas lus.
 
 ## Chaîne effective
@@ -44,7 +44,7 @@ Les copies modifiées sont référencées relativement au plan JSON.
 
 Une classe valide touchant les bords peut satisfaire ces seuils. Contrôler le
 rapport et la carte ; désactiver l’inférence ou renseigner `keep_values` dans
-ce cas. La procédure ne prétend pas reconnaître la signification d’un code.
+ce cas. La signification des codes doit être fournie dans la nomenclature.
 
 ## Conservation et réversibilité
 

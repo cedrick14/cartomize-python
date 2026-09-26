@@ -77,7 +77,7 @@ class LayoutSettings(QWidget):
             size=(210,297) if self.format.currentText()=='A4' else (297,420)
             if self.orientation.currentData()=='landscape':size=size[::-1]
             ids=['main']
-        self.summary.setText(f'{len(cm.list_templates())} maquettes disponibles · {size[0]:g} × {size[1]:g} mm · {len(ids)} cadre(s) cartographique(s)')
+        self.summary.setText(f'{len(cm.list_templates())} maquettes disponibles ; {size[0]:g} × {size[1]:g} mm ; {len(ids)} cadre(s) cartographique(s)')
         old_items={self.items.item(r,0).text():[self.items.item(r,c).text() for c in range(1,8)] for r in range(self.items.rowCount())} if self._item_template==template else {}
         self._item_template=template;self.items.blockSignals(True);self.items.setRowCount(len(plan.items) if plan else 0)
         if plan:
