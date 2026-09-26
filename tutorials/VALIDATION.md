@@ -2,6 +2,20 @@
 
 Le parcours utilise Cartomize 1.0, révision du paquet 1.0.1.
 
+## Résultats du 26 septembre 2026
+
+Commit du parcours : `08d711189b77451f9c79e026063193e06dee6aa6`.
+
+Le [workflow Tutoriels](https://github.com/cedrick14/cartomize-python/actions/runs/36277324209) a réussi sous Python 3.12 :
+
+| Environnement | Parcours exécuté | Résultat |
+|---|---|---|
+| Ubuntu, noyaux Jupyter indépendants | Cours 00 à 10 | 11 notebooks réussis |
+| Windows, noyaux Jupyter indépendants | Cours 00 à 10 | 11 notebooks réussis |
+| Python 3.12 / IPython local, données fournies | Cours 11 et 12 | 2 notebooks réussis |
+
+La construction HTML a réussi sur les deux systèmes. Les deux cas réels ont été contrôlés localement sans redistribution de leurs données ou sorties dans le dépôt. L’exécution autonome utilise le paquet publié `cartomize==1.0.1` ; l’intitulé du parcours reste **Version 1.0**.
+
 ## Vérifications
 
 - Chaque notebook s’exécute dans un noyau indépendant, avec des entrées synthétiques régénérées et un nouveau dossier de sorties.
