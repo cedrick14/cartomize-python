@@ -2,6 +2,8 @@
 
 Paquet : `cartomize`. Version de l’application : **1.0**. Révision du paquet : **1.0.1**. Auteur : ONDON NKOUA Cédrick Belmich.
 
+Publication du 26 septembre 2026 depuis le commit `b97e2193aee630b40740a621b1dafa625937514f`. Le [workflow de publication](https://github.com/cedrick14/cartomize-python/actions/runs/36273414966) et la [matrice de validation](https://github.com/cedrick14/cartomize-python/actions/runs/36273414787) ont réussi.
+
 ## Installation
 
 ```bash
@@ -12,8 +14,10 @@ La bibliothèque requiert Python 3.11 ou une version ultérieure. L’interface 
 
 ## Distributions
 
-- `cartomize-1.0.1-py3-none-any.whl`
-- `cartomize-1.0.1.tar.gz`
+| Fichier | Taille (octets) | SHA256 |
+|---|---:|---|
+| `cartomize-1.0.1-py3-none-any.whl` | 335863 | `1b9db1a5585a68dd698a97f9b8d951539ffe576f720fab192d38d573777af31e` |
+| `cartomize-1.0.1.tar.gz` | 390770 | `46ebc776a01c1a538d298124f8ac79c19253b1f462eba262bca547b5f49f30da` |
 
 Les fichiers et leurs empreintes SHA256 sont disponibles sur [PyPI](https://pypi.org/project/cartomize/1.0.1/#files).
 
