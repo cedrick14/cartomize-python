@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import numpy as np
 import pandas as pd
-from PySide6.QtCore import Qt, QAbstractTableModel, QModelIndex, QSortFilterProxyModel, QThreadPool, Slot
+from PySide6.QtCore import Qt, QAbstractTableModel, QModelIndex, QSortFilterProxyModel, Slot
 from PySide6.QtWidgets import (QWidget,QVBoxLayout,QHBoxLayout,QComboBox,QPushButton,QLabel,
                               QLineEdit,QTableView,QPlainTextEdit,QTabWidget)
 from .desktop_canvas import ReadJob,IO_POOL
@@ -133,7 +133,9 @@ class TablePanel(QWidget):
         except (ValueError,TypeError) as exc: self.plot_note.setText(str(exc))
         self.canvas.draw_idle()
 
-    def dispose(self): self._closed=True; self._serial+=1
+    def dispose(self):
+        self._closed=True; self._serial+=1
+        if self._job.future is not None: self._job.future.cancel()
 
     def closeEvent(self,event):
         self.dispose(); super().closeEvent(event)

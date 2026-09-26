@@ -68,6 +68,8 @@ La fluidité dépend du stockage, de la compression, des index spatiaux, des pyr
 
 ## Vérifications
 
+Les lecteurs utilisent des threads Python persistants afin de conserver le contexte local des bibliothèques géospatiales entre deux tâches. Un test répète les lectures vectorielles sur ces travailleurs ; les tâches en attente d’un onglet fermé sont annulées. Les contrôles Python 3.11 et 3.12 sont exécutés sur Windows et Linux avant validation de la version.
+
 Les options d’installation `gui` et `notebook` sélectionnent PySide6 6.9.3–6.9.x. Le scénario de créations et fermetures successives de vues a provoqué un plantage natif avec PySide6 6.11.2 dans l’environnement de développement ; le même scénario passe avec 6.8.3 et 6.9.3. La version 6.9 est retenue pour cette publication. La fermeture d’un onglet pendant une lecture est également vérifiée ; ses scènes sont détachées avant destruction et les réponses tardives ne touchent pas les widgets supprimés. Fermer Cartomize et redémarrer le noyau après mise à jour pour charger les nouvelles bibliothèques Qt.
 
 Les tests couvrent les couleurs des classes et les NoData, les pixels noirs valides d’un RGBA, la lecture d’un détail au zoom, les valeurs originales au clic, les coordonnées liées entre SCR et résolutions différents, les échelles colorimétriques communes, les projets portables après suppression des sources originales, les tableaux paginés et graphiques, les matrices de confusion, le rendu PDF et image par région, la connexion d’un vrai calcul NDVI et le rejet des rendus devenus obsolètes. La suite Windows Conda inclut ces contrôles graphiques.

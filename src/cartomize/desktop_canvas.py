@@ -1,12 +1,13 @@
 """Embedded geographic canvas with asynchronous, resolution-aware rendering."""
 import math
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
 from affine import Affine
 from pyproj import CRS, Geod, Transformer
 from rasterio.warp import transform_bounds
-from PySide6.QtCore import Qt, QObject, Signal, Slot, QRunnable, QThreadPool, QTimer, QRectF, QRect, QSize, QPointF
+from PySide6.QtCore import Qt, QObject, Signal, Slot, QTimer, QRectF, QRect, QSize, QPointF
 from PySide6.QtGui import QImage, QPixmap, QTransform, QPainter, QPainterPath, QPen, QColor, QImageReader
 from PySide6.QtWidgets import QGraphicsView, QGraphicsScene, QGraphicsPixmapItem
 from PySide6.QtSvgWidgets import QGraphicsSvgItem
@@ -14,20 +15,32 @@ from PySide6.QtSvgWidgets import QGraphicsSvgItem
 from .viewer_data import (RASTERS, VECTORS, IMAGES, raster_info, vector_info, pdf_info,
                           render_raster, render_pdf, pixel_values, bounded_shape)
 
-IO_POOL = QThreadPool()
-IO_POOL.setMaxThreadCount(2)
+class ReadPool:
+    """Python-owned threads preserve geospatial libraries' thread-local state.
+
+    Repeated QRunnable callbacks can recreate CPython thread states on the same
+    native Qt thread. Keep the Python thread alive across successive IO jobs.
+    Qt signals still deliver results to the receiving widget's GUI thread.
+    """
+    def __init__(self):
+        self.executor=ThreadPoolExecutor(max_workers=2,thread_name_prefix='cartomize-view')
+
+    def start(self,job):
+        job.future=self.executor.submit(job.run)
+
+
+IO_POOL = ReadPool()
 
 
 class JobSignals(QObject):
     done = Signal(object, object, str)
 
 
-class ReadJob(QRunnable):
+class ReadJob:
     """No widget or open dataset crosses the worker-thread boundary."""
     def __init__(self, token, function):
-        super().__init__(); self.token = token; self.function = function; self.signals = JobSignals()
+        self.token = token; self.function = function; self.signals = JobSignals(); self.future=None
 
-    @Slot()
     def run(self):
         try: value, error = self.function(), ''
         except Exception as exc: value, error = None, str(exc)
@@ -300,9 +313,10 @@ class GeoCanvas(QGraphicsView):
 
     def identify(self,point):
         if self._closed: return
+        if self._pixel_job is not None and self._pixel_job.future is not None: self._pixel_job.future.cancel()
         self._pixel_serial+=1; path=self.path; col,row=math.floor(point.x()),math.floor(point.y()); bands=tuple(self.bands)
         self._pixel_job=ReadJob((self._pixel_serial,col,row,bands),lambda:pixel_values(path,col,row,bands))
-        self._pixel_job.signals.done.connect(self._identified); IO_POOL.start(self._pixel_job,1)
+        self._pixel_job.signals.done.connect(self._identified); IO_POOL.start(self._pixel_job)
 
     @Slot(object,object,str)
     def _identified(self,token,values,error):
@@ -358,6 +372,8 @@ class GeoCanvas(QGraphicsView):
     def dispose(self):
         if self._closed: return
         self._closed=True; self._generation+=1; self._pixel_serial+=1; self._timer.stop()
+        for job in (self._job,self._pixel_job):
+            if job is not None and job.future is not None: job.future.cancel()
         # Detach and release the scene on the GUI event loop. Python cycles in
         # controls/comparisons must not determine when its native items die.
         self.setScene(None)

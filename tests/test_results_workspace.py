@@ -214,15 +214,16 @@ def test_tab_can_close_during_read_and_next_result_remains_usable(app,write_rast
     from PySide6.QtCore import QCoreApplication,QEvent
     from shiboken6 import isValid
     import cartomize.desktop_canvas as module
-    original=module.render_raster;finished=[]
+    original=module.render_raster;finished=[];started=[]
     first=write_raster('closing.tif',np.ones((100,100),dtype='float32'))
     second=write_raster('next.tif',np.full((100,100),2,dtype='float32'))
     def slow(*args,**kwargs):
+        started.append(str(args[0]))
         if str(args[0])==str(first): time.sleep(.1)
         result=original(*args,**kwargs);finished.append(str(args[0]));return result
     monkeypatch.setattr(module,'render_raster',slow)
     workspace=ResultsWorkspace();workspace.show();document=workspace.open_result(first)
-    wait_for(lambda:document.canvas._busy)
+    wait_for(lambda:str(first) in started)
     workspace.close_tab(workspace.tabs.indexOf(document))
     QCoreApplication.sendPostedEvents(None,QEvent.Type.DeferredDelete)
     assert not isValid(document.canvas)
@@ -230,3 +231,23 @@ def test_tab_can_close_during_read_and_next_result_remains_usable(app,write_rast
     wait_for(lambda:str(first) in finished and following.canvas.last_render is not None)
     assert following.canvas.last_render['ranges']==((2.,2.),)
     workspace.close();app.processEvents()
+
+
+def test_vector_reads_reuse_python_worker_contexts(app,tmp_path):
+    import geopandas as gpd
+    import threading
+    from shapely.geometry import Point
+    from cartomize.desktop_canvas import IO_POOL,ReadJob
+    path=tmp_path/'points.gpkg'
+    gpd.GeoDataFrame({'value':[1]},geometry=[Point(300000,9500000)],crs=32733).to_file(path)
+    def read():
+        frame=gpd.read_file(path)
+        return frame.crs.to_epsg(),threading.current_thread().name
+    for _ in range(12):
+        job=ReadJob(None,read);results=[]
+        job.signals.done.connect(lambda token,value,error:results.append((value,error)))
+        IO_POOL.start(job);job.future.result(timeout=10)
+        app.processEvents()
+        assert results and results[0][1]==''
+        epsg,name=results[0][0]
+        assert epsg==32733 and name.startswith('cartomize-view')
