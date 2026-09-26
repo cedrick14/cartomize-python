@@ -1,0 +1,6 @@
+cartomize==1.0.1
+jupyterlab>=4.3,<5
+nbformat>=5.10,<6
+nbclient>=0.10,<1
+nbconvert>=7,<8
+ipywidgets>=8,<9

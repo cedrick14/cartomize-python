@@ -31,6 +31,12 @@ fenetre = cm.launch()
 
 Dans un notebook local, installer `cartomize[notebook]==1.0.1` avec `%pip`, redémarrer le noyau, puis appeler `cm.launch()`. Voir le [guide Jupyter](docs/NOTEBOOKS.md).
 
+## Tutoriels et projets pratiques
+
+Le [parcours Cartomize](tutorials/README.md) présente 13 notebooks : préparation multispectrale, indices, classification, traitements vectoriels, terrain, cartes, atlas et production automatisée. Les cas Mvouti et réserve à okapis montrent comment analyser des fichiers réels avec leurs métadonnées et limites.
+
+[Produire une première carte](tutorials/notebooks/00_premiere_carte.ipynb) · [Automatiser les livrables](tutorials/notebooks/08_automatisation.ipynb) · [Consulter le parcours complet](tutorials/README.md)
+
 ## Espace de travail
 
 L’interface comprend deux panneaux redimensionnables. Le panneau de contrôle rassemble les outils, leurs paramètres et les commandes d’exécution. Le panneau de visualisation affiche les résultats dans des onglets intégrés : rasters, couches vectorielles, cartes PDF ou SVG, tableaux, graphiques et rapports.

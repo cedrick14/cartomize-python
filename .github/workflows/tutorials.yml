@@ -1,0 +1,43 @@
+name: Tutoriels
+on:
+  push:
+    paths:
+      - 'tutorials/**'
+      - '.github/workflows/tutorials.yml'
+      - '.binder/**'
+  pull_request:
+    paths:
+      - 'tutorials/**'
+      - '.github/workflows/tutorials.yml'
+      - '.binder/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  notebooks:
+    name: Notebooks (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      MPLBACKEND: Agg
+      QT_QPA_PLATFORM: offscreen
+      OMP_NUM_THREADS: '2'
+      OPENBLAS_NUM_THREADS: '2'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: tutorials/requirements.txt
+      - run: python -m pip install -r tutorials/requirements.txt
+      - run: python tutorials/scripts/execute.py
+      - run: python tutorials/scripts/build_site.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cartomize-cours-${{ matrix.os }}
+          path: tutorials/site/execution.json
+          retention-days: 30

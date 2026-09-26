@@ -1,0 +1,80 @@
+[
+  {
+    "slug": "00_premiere_carte",
+    "title": "Une chaîne complète, des bandes à la carte",
+    "real": false,
+    "minutes": 15
+  },
+  {
+    "slug": "01_superposition_vectorielle",
+    "title": "Superposition, proximité et mesures vectorielles",
+    "real": false,
+    "minutes": 35
+  },
+  {
+    "slug": "02_pretraitement_multispectral",
+    "title": "Des scènes au GeoTIFF multibande",
+    "real": false,
+    "minutes": 30
+  },
+  {
+    "slug": "03_indices_algebre",
+    "title": "Indices spectraux et algèbre raster",
+    "real": false,
+    "minutes": 35
+  },
+  {
+    "slug": "04_classification",
+    "title": "Classification et validation des modèles",
+    "real": false,
+    "minutes": 40
+  },
+  {
+    "slug": "05_surfaces_changements",
+    "title": "Surfaces, reclassification et transitions",
+    "real": false,
+    "minutes": 30
+  },
+  {
+    "slug": "06_terrain_reseaux",
+    "title": "Terrain, drainage et itinéraires",
+    "real": false,
+    "minutes": 30
+  },
+  {
+    "slug": "07_mise_en_page_atlas",
+    "title": "Mise en page scientifique et atlas",
+    "real": false,
+    "minutes": 35
+  },
+  {
+    "slug": "08_automatisation",
+    "title": "Plans, recettes et production en série",
+    "real": false,
+    "minutes": 40
+  },
+  {
+    "slug": "09_projets_controle",
+    "title": "NoData, sessions portables et contrôle cartographique",
+    "real": false,
+    "minutes": 30
+  },
+  {
+    "slug": "10_catalogues_execution",
+    "title": "Catalogues STAC et exécution par blocs",
+    "real": false,
+    "minutes": 30
+  },
+  {
+    "slug": "11_mvouti_concessions",
+    "title": "Mvouti : composite, concessions et carte de synthèse",
+    "real": true,
+    "minutes": 50
+  },
+  {
+    "slug": "12_okapis_raster_classe",
+    "title": "Réserve à okapis : audit d’un raster classé",
+    "real": true,
+    "minutes": 35
+  }
+]
