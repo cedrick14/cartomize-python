@@ -14,9 +14,14 @@ class AssistantPage(Page):
     planRequested=Signal()
     executeRequested=Signal()
     def __init__(self,directory):
-        super().__init__('Assistant cartographique','Définir la carte, examiner les données et suivre les étapes adaptées au projet.')
+        super().__init__('Assistant cartographique','Définir l’objectif, contrôler les données, préparer les images, effectuer les analyses puis composer et vérifier la carte.')
         self.directory=Path(directory);self.assessment=None
-        outer_form=self.form;self.tabs=QTabWidget();outer_form.addRow(self.tabs)
+        outer_form=self.form
+        sequence=QLabel('Imagerie : scènes et bandes → multibande scientifique → analyses → carte.\n'
+                        'Couches existantes : diagnostic → préparation → composition cartographique → mise en page.\n'
+                        'La composition colorée constitue une branche de visualisation du multibande.')
+        sequence.setWordWrap(True);sequence.setObjectName('sequence');outer_form.addRow(sequence)
+        self.tabs=QTabWidget();outer_form.addRow(self.tabs)
         project_tab=QWidget();self.form=QFormLayout(project_tab);self.tabs.addTab(project_tab,'Données')
         processing_tab=QWidget();processing_form=QFormLayout(processing_tab);self.tabs.addTab(processing_tab,'Traitements complémentaires')
         plan_tab=QWidget();plan_form=QFormLayout(plan_tab);self.tabs.addTab(plan_tab,'Plan de traitement')
@@ -43,10 +48,15 @@ class AssistantPage(Page):
         self.classification=QComboBox()
         for label,value in [('Sans classification',None),('Classification supervisée','supervised'),('Classification non supervisée','unsupervised')]:self.classification.addItem(label,value)
         self.training=PathField(filter=VECTOR_FILTER);self.class_column=QLineEdit('classe');self.indices=QLineEdit();self.credits=QLineEdit()
+        self.validation=PathField(filter=VECTOR_FILTER);self.label_column=QLineEdit();self.group_column=QLineEdit()
+        self.spectral_bands=QLineEdit();self.spectral_bands.setPlaceholderText('Toutes les bandes disponibles, ou noms séparés par des virgules')
+        self.composition=QComboBox()
+        for text,value in [('Couleurs naturelles','natural'),('Végétation','vegetation'),('Infrarouge à ondes courtes','swir'),('Agriculture','agriculture'),('Sans composition colorée',None)]:self.composition.addItem(text,value)
+        self.resolution=spin(0,0,100000);self.resolution.setSpecialValueText('Résolution native la plus grossière')
         self.extra_layers=QPlainTextEdit();self.extra_layers.setPlaceholderText('Un fichier par ligne : routes, limites, localités…');self.extra_layers.setMaximumHeight(70)
         self.atlas_zones=PathField(filter=VECTOR_FILTER);self.atlas_field=QLineEdit();self.dates=QCheckBox('Autoriser une mosaïque multitemporelle');self.clouds=QCheckBox('Appliquer les masques QA/SCL');self.clouds.setChecked(True)
         self.output=PathField('directory');self.name=QLineEdit('production');self.proposals=QComboBox();self.proposals.setMinimumWidth(360);self.execution_plan=None
-        for label,widget in [('Couches complémentaires',self.extra_layers),('Classification',self.classification),('Échantillons',self.training),('Champ des classes',self.class_column),('Indices spectraux',self.indices),('Sources et crédits',self.credits),('Index de l’atlas',self.atlas_zones),('Nom des pages',self.atlas_field),('Dates',self.dates),('Qualité des scènes',self.clouds)]:self.form.addRow(label,widget)
+        for label,widget in [('Couches complémentaires',self.extra_layers),('Classification',self.classification),('Échantillons',self.training),('Champ des classes',self.class_column),('Champ des libellés',self.label_column),('Groupes de validation',self.group_column),('Échantillons de validation',self.validation),('Bandes à conserver',self.spectral_bands),('Composition colorée',self.composition),('Résolution (m)',self.resolution),('Indices spectraux',self.indices),('Sources et crédits',self.credits),('Index de l’atlas',self.atlas_zones),('Nom des pages',self.atlas_field),('Dates',self.dates),('Qualité des scènes',self.clouds)]:self.form.addRow(label,widget)
         from .desktop_processing import ProcessingSteps
         self.processing_steps=ProcessingSteps();self.tabs.addTab(self.processing_steps,'Chaîne de traitements')
         self.form=outer_form
@@ -59,6 +69,9 @@ class AssistantPage(Page):
         self.plan_button=QPushButton('Établir le plan de traitement');self.execute_button=QPushButton('Exécuter le plan');self.execute_button.setEnabled(False)
         row.addWidget(self.plan_button);row.addWidget(self.execute_button);self.form.addRow(controls)
         self.plan_button.clicked.connect(self.planRequested.emit);self.execute_button.clicked.connect(self.executeRequested.emit)
+        self.kind.currentIndexChanged.connect(self.scene_options);self.scene_options()
+    def scene_options(self):
+        for widget in (self.spectral_bands,self.composition,self.resolution):widget.setEnabled(self.kind.currentData()=='scenes')
         self.layout.addStretch()
     def add_files(self):
         paths=QFileDialog.getOpenFileNames(self,'Données géographiques',filter='Données SIG (*.tif *.tiff *.jp2 *.vrt *.img *.gpkg *.shp *.geojson *.json)')[0]
@@ -109,7 +122,7 @@ class AssistantPage(Page):
         if self.assessment and 0<=row<len(self.assessment['steps']):self.openRequested.emit(self.assessment['steps'][row]['tool'],self.assessment)
 
     def plan_parameters(self):
-        return dict(inputs=[self.inputs.item(i).text() for i in range(self.inputs.count())],goal=self.goal.currentData(),data_kind=self.kind.currentData(),aoi=self.aoi.text() or None,title=self.title.text(),credits=self.credits.text(),classification=self.classification.currentData(),training=self.training.text() or None,class_column=self.class_column.text(),indices=[x.strip().upper() for x in self.indices.text().split(',') if x.strip()],layers=[x.strip() for x in self.extra_layers.toPlainText().splitlines() if x.strip()],atlas_zones=self.atlas_zones.text() or None,atlas_field=self.atlas_field.text() or None,allow_mixed_dates=self.dates.isChecked(),processing_steps=self.processing_steps.records(),mask_clouds=self.clouds.isChecked())
+        return dict(inputs=[self.inputs.item(i).text() for i in range(self.inputs.count())],goal=self.goal.currentData(),data_kind=self.kind.currentData(),aoi=self.aoi.text() or None,title=self.title.text(),credits=self.credits.text(),classification=self.classification.currentData(),training=self.training.text() or None,class_column=self.class_column.text(),indices=[x.strip().upper() for x in self.indices.text().split(',') if x.strip()],layers=[x.strip() for x in self.extra_layers.toPlainText().splitlines() if x.strip()],atlas_zones=self.atlas_zones.text() or None,atlas_field=self.atlas_field.text() or None,allow_mixed_dates=self.dates.isChecked(),processing_steps=self.processing_steps.records(),mask_clouds=self.clouds.isChecked(),band_order=[b.strip() for b in self.spectral_bands.text().split(',') if b.strip()] or None,composition=self.composition.currentData(),resolution=self.resolution.value() or None,validation=self.validation.text() or None,label_column=self.label_column.text() or None,group_column=self.group_column.text() or None)
     def plan_job(self):
         parameters=self.plan_parameters();destination=self.directory/'plan.json'
         def run(progress,cancel):

@@ -57,9 +57,9 @@ class ProjectConnections:
         elif target=='calculator':page.add_raster(path)
         elif target=='temporal':page.sources.addItem(path)
         else:
-            if target=='indices':
+            if target in {'indices','classification'}:
                 with rasterio.open(path) as src:
-                    if src.tags().get('CARTOMIZE_PRODUCT')=='display_rgba':raise ValueError('Utiliser le multibande scientifique pour les indices.')
+                    if src.tags().get('CARTOMIZE_PRODUCT')=='display_rgba':raise ValueError('Utiliser le multibande scientifique pour les indices et la classification.')
             page.source.edit.setText(path)
             if target=='inspect':page.kind.setCurrentIndex(page.kind.findData(layer['kind']))
         self.select_tool(target);self.status.setText('Résultat transmis : '+Path(path).name)
@@ -85,6 +85,7 @@ class ProjectConnections:
                     self.register_result(dict(data=product['multiband'],name='Multibande · '+', '.join(product['scenes'])))
                     self.tool('composite').source.edit.setText(product['multiband'])
                     self.tool('indices').source.edit.setText(product['multiband'])
+                    self.tool('classification').source.edit.setText(product['multiband'])
                 if product['composition']:
                     self.register_result(dict(data=product['composition'],rgb='native',role='background',name='Composition colorée · '+', '.join(product['scenes'])))
                 for band in product['bands'].values():
@@ -139,11 +140,14 @@ class ProjectConnections:
                 if (suffix in RASTERS)==(wanted=='raster'):
                     if target in {'composite','classification'}:
                         with rasterio.open(layer['data']) as src:
-                            if src.count<3:continue
+                            if src.tags().get('CARTOMIZE_PRODUCT')=='display_rgba' or src.count<(3 if target=='composite' else 1):continue
                     page.source.edit.setText(str(layer['data']));break
             if target=='vector' and any(i['code']=='invalid_geometry' for i in report['issues']):
                 page.operation.setCurrentIndex(page.operation.findData('make_valid'))
-        if target=='classification':page.training.edit.setText(assistant.training.text());page.column.setText(assistant.class_column.text())
+        if target=='classification':
+            page.training.edit.setText(assistant.training.text());page.column.setText(assistant.class_column.text())
+            page.validation.edit.setText(assistant.validation.text());page.labels.setText(assistant.label_column.text());page.groups.setText(assistant.group_column.text())
+            page.method.setCurrentIndex(page.method.findData('kmeans' if assistant.classification.currentData()=='unsupervised' else 'random_forest'))
         if hasattr(page,'aoi'):page.aoi.edit.setText(report.get('aoi') or '')
         self.select_tool(target)
     def prepare_atlas(self,config):

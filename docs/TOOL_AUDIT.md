@@ -1,3 +1,7 @@
+# Audit actualisé des parcours — 0.8.2a1
+
+Le [parcours SIG et cartographique](SIG_WORKFLOWS.md) présente les principes, les corrections de connexions et les limites vérifiées le 26 septembre 2026. Le tableau historique ci-dessous décrit les moteurs disponibles ; ses mentions de publication concernent la livraison d’origine.
+
 # Implémentation des outils — Cartomize 0.8.1a1
 
 23 septembre 2026. Les anciens constats sont conservés dans [l’audit 0.5](TOOL_AUDIT_0.5.md). Cette version raccorde les traitements et ajoute des algorithmes et leurs connexions effectives à l’API, à la fenêtre et à la ligne de commande.

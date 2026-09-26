@@ -8,11 +8,13 @@ par **ONDON NKOUA Cédrick Belmich**.
 Ce dépôt contient la bibliothèque Python autonome Cartomize. Le plugin QGIS est maintenu dans un projet distinct. Le nom du paquet et de son module Python est `cartomize`.
 Le moteur autonome fonctionne sans installation d'ArcGIS Pro, d'ArcPy ou de QGIS.
 
-**Version 0.8.1a2 : démarrage XML anticipé et ouverture depuis un notebook avec intégration Qt automatique.** Elle conserve le prétraitement multispectral à options, le choix des canaux RVB, les exports de bandes séparées, Dask, le moteur CUDA optionnel, les styles QGIS enrichis et les règles Python
+**Version 0.8.2a1 : parcours SIG ordonné, conservation des bandes scientifiques et classification reliée à la validation.** Elle conserve le prétraitement multispectral à options, le choix des canaux RVB, les exports de bandes séparées, Dask, le moteur CUDA optionnel, les styles QGIS enrichis et les règles Python
 et les 24 maquettes originales. Le rendu autonome et les traitements
 GeoPandas/Rasterio sont nouveaux : cette version ne prétend pas reproduire
-toutes les fonctions de l'extension native. Cette version alpha est disponible
-sur [PyPI](https://pypi.org/project/cartomize/0.8.1a2/).
+toutes les fonctions de l'extension native. La publication de cette version alpha est en cours de validation
+sur [PyPI](https://pypi.org/project/cartomize/0.8.2a1/).
+
+Le [parcours SIG et l’audit des connexions](docs/SIG_WORKFLOWS.md) décrit les étapes, les corrections et les limites : importation → contrôle → préparation multispectrale → analyses → composition cartographique → mise en page → contrôle et export. La composition colorée est une branche de visualisation ; les analyses conservent les valeurs scientifiques.
 
 ## Installation
 
@@ -21,7 +23,7 @@ Le [guide du prétraitement à options](docs/IMAGERY_SELECTION.md) décrit la s�
 Python 3.11 ou plus récent. Installation depuis PyPI :
 
 ```bash
-python -m pip install "cartomize==0.8.1a2"
+python -m pip install "cartomize==0.8.2a1"
 ```
 
 Pour développer la bibliothèque, depuis une copie de ce dépôt :
@@ -36,7 +38,7 @@ réseau n'est nécessaire pour traiter des fichiers locaux après installation.
 ## Interface graphique
 
 ```bash
-python -m pip install "cartomize[gui]==0.8.1a2"
+python -m pip install "cartomize[gui]==0.8.2a1"
 python -m cartomize gui
 ```
 
@@ -47,7 +49,7 @@ import cartomize as cm
 cm.launch()
 ```
 
-Depuis un notebook local, installer les dépendances avec `%pip install "cartomize[notebook]==0.8.1a2"`, redémarrer le noyau, puis utiliser les deux lignes Python ci-dessus. La cellule se termine et la fenêtre reste réactive. Voir le [guide des notebooks et de la validation Windows Conda](docs/NOTEBOOKS.md).
+Depuis un notebook local, installer les dépendances avec `%pip install "cartomize[notebook]==0.8.2a1"`, redémarrer le noyau, puis utiliser les deux lignes Python ci-dessus. La cellule se termine et la fenêtre reste réactive. Voir le [guide des notebooks et de la validation Windows Conda](docs/NOTEBOOKS.md).
 
 L’ouverture donne accès à **Assistant cartographique** : objectif, données, zone d’étude et examen initial. Les étapes proposées sont justifiées et ouvrent les outils avec leurs entrées. **Production automatisée** conserve le parcours complet scènes → mosaïque → multibande → masque → composition colorée → export. Les indices,
 la calculatrice et les statistiques restent accessibles comme outils
@@ -109,7 +111,7 @@ print(rapport["issues"], rapport["steps"])
 # Pour des scènes : cm.assess_project("scenes", data_kind="scenes")
 ```
 
-**Résultats du projet** transmet les sorties aux outils suivants. **Contrôler la carte** examine les géométries, champs, classes échantillonnées et contenus. **Préparer l’atlas** reprend couches et habillage. Lire l’[audit détaillé de tous les outils](docs/TOOL_AUDIT.md) pour les fonctions complètes dans leur périmètre, partielles ou absentes.
+**Résultats du projet** transmet les sorties aux outils suivants. **Contrôler la carte** examine les géométries, champs, codes de classes par blocs et contenus. **Préparer l’atlas** reprend couches et habillage. Lire l’[audit détaillé de tous les outils](docs/TOOL_AUDIT.md) pour les fonctions complètes dans leur périmètre, partielles ou absentes.
 
 ## Analyse du projet et NoData
 

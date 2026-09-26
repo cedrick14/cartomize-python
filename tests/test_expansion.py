@@ -176,3 +176,18 @@ def test_scenes_plan_discovers_mosaics_and_applies_supplemental_layers(write_ras
     record=json.loads(output.read_text());assert Path(record['outputs'][0]).is_file()
     assert any(layer['data'].endswith('localites.geojson') for layer in record['layers'])
     assert any(node['operation']=='indices' for node in record['steps'])
+
+
+def test_plan_carries_independent_validation_and_class_labels(spectral,tmp_path):
+    path,features=spectral
+    train=tmp_path/'plan-train.gpkg';validation=tmp_path/'plan-validation.gpkg'
+    features.iloc[[0,1,4,5]].to_file(train,driver='GPKG',index=False)
+    features.iloc[[2,3,6,7]].to_file(validation,driver='GPKG',index=False)
+    plan=cm.plan_cartography([path],goal='landcover',classification='supervised',training=train,
+        validation=validation,label_column='nom',title='Classification',credits='Test')
+    report=json.loads(cm.run_plan(plan,tmp_path/'validated-plan',formats=['png'],dpi=72).read_text())
+    node=next(n for n in plan['nodes'] if n['operation']=='classify')
+    result=Path(report['results'][node['id']])
+    validation_report=json.loads((result.parent/'classification.json').read_text())
+    assert validation_report['validation_method']=='independent_features'
+    with rasterio.open(result) as src:assert json.loads(src.tags()['CARTOMIZE_CLASSES'])['0'][0]=='Forêt'

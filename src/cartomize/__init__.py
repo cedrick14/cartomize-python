@@ -29,7 +29,7 @@ from .relations import analyze_relations
 from .automation import plan_cartography,run_plan,propose_layouts
 from .mapops import snapshot_project,compare_snapshots,record_review,verify_review
 
-__version__ = "0.8.1a2"
+__version__ = "0.8.2a1"
 
 
 def launch(*,block=None):

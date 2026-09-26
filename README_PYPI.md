@@ -11,17 +11,17 @@ Optional native project bridges require the corresponding installed GIS software
 
 ## Installation
 
-Python 3.11 or newer is required. Version **0.8.1a2 is an alpha release**.
+Python 3.11 or newer is required. Version **0.8.2a1 is an alpha release**.
 Linux and Windows have been tested with Python 3.11 and 3.12.
 
 ```bash
-python -m pip install "cartomize==0.8.1a2"
+python -m pip install "cartomize==0.8.2a1"
 ```
 
 For the desktop interface and optional Dask execution:
 
 ```bash
-python -m pip install "cartomize[gui,distributed]==0.8.1a2"
+python -m pip install "cartomize[gui,distributed]==0.8.2a1"
 python -m cartomize gui
 ```
 
@@ -39,7 +39,7 @@ Importing the library does not open a window automatically.
 Install the notebook extra in a Python 3.11+ kernel:
 
 ```python
-%pip install "cartomize[notebook]==0.8.1a2"
+%pip install "cartomize[notebook]==0.8.2a1"
 ```
 
 Restart the kernel after upgrading, then run:
@@ -54,7 +54,11 @@ its desktop window remains responsive. The window opens on the computer
 running the kernel; a headless or remote notebook cannot display it in the
 browser. The processing API works without a desktop.
 
-Version 0.8.1a2 initializes Python's XML parser before geospatial DLLs are
+Version 0.8.2a1 preserves selected spectral bands throughout automation, connects classification validation settings, and checks map quality before automated export.
+
+See the [GIS workflow audit](https://github.com/cedrick14/cartomize-python/blob/main/docs/SIG_WORKFLOWS.md) for processing order, verified connections and remaining limitations.
+
+The startup improvements introduced in 0.8.1a2 initialize Python's XML parser before geospatial DLLs are
 loaded, addressing Windows Conda startup conflicts. It also adds the
 `notebook` extra with a compatible `typing_extensions` requirement.
 

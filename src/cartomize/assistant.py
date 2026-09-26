@@ -33,6 +33,7 @@ def assess_project(inputs,*,data_kind='layers',goal='general',aoi=None,progress=
     if data_kind=='scenes':
         try:
             found=discover_scenes(paths)
+            if not found:raise ValueError('Aucune scène reconnue dans les entrées.')
             for i,scene in enumerate(found,1):
                 _check_cancel(cancel)
                 for band in scene.bands.values():
@@ -74,7 +75,13 @@ def assess_project(inputs,*,data_kind='layers',goal='general',aoi=None,progress=
             if zones.empty or not zones.geom_type.isin(['Polygon','MultiPolygon']).all() or not zones.geometry.is_valid.all():
                 issue('error','invalid_aoi','La zone d’étude doit contenir des polygones valides.','vector')
         except (OSError,ValueError) as exc:issue('error','aoi',str(exc))
-    if goal=='landcover':issue('info','classification_scope','Une composition colorée n’est pas une classification. Fournir une couche classifiée et sa nomenclature.','project')
+    if goal=='landcover':
+        scientific = bool(scenes) or any(r['kind']=='raster' and r['diagnostic']['bands']>1 and not r['diagnostic']['native_rgb'] for r in layers)
+        if scientific:
+            step('classification','Classer le multibande scientifique ; fournir des références pour l’apprentissage et la validation.',optional=True)
+            # Classification is an analytical branch, before cartographic preparation.
+            steps.sort(key=lambda s: {'vector':0,'prepare':1,'composite':2,'classification':3,'project':4}.get(s['tool'],5))
+        issue('info','classification_scope','La composition colorée sert à la visualisation. La classification utilise le raster scientifique ; les groupes non supervisés doivent être interprétés.','classification')
     step('mapping','Composer les couches, choisir l’habillage, contrôler la carte et exporter.')
     if goal=='atlas':step('atlas','Définir la couche d’index et produire une page par entité.')
     category={'landcover':'occupation_sol','administrative':'administrative'}.get(goal)
@@ -85,6 +92,6 @@ def assess_project(inputs,*,data_kind='layers',goal='general',aoi=None,progress=
     return dict(schema='cartomize.assistant.v1',data_kind=data_kind,goal=goal,inputs=paths,aoi=str(aoi) if aoi else None,
                 layers=layers,scenes=scenes,issues=issues,steps=steps,ready=not any(i['severity']=='error' for i in issues),
                 recommended_template=recommendation,
-                limitations=['Rule-based recommendations; no LLM or supervised land-cover classifier.',
+                limitations=['Rule-based recommendations; supervised classification requires supplied training references.',
                              'No complete native APRX/QGZ or spatial-relationship audit.',
                              'Scientific correctness and final cartographic design require user review.'])

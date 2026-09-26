@@ -389,7 +389,7 @@ class WorkflowPage(Page):
         remove.clicked.connect(lambda:[self.layers.removeRow(i) for i in sorted({x.row() for x in self.layers.selectedIndexes()},reverse=True)])
         prep=QWidget();form=QFormLayout(prep);tabs.addTab(prep,"Prétraitement")
         self.crs=QLineEdit();self.crs.setPlaceholderText("Automatique selon les scènes · exemple : EPSG:32733")
-        self.bands=QLineEdit("blue, green, red, nir")
+        self.bands=QLineEdit();self.bands.setPlaceholderText('Toutes les bandes, ou noms spectraux séparés par des virgules')
         self.resolution=spin(0,0,100000);self.resolution.setSpecialValueText("Résolution native la plus grossière")
         self.clouds=QCheckBox("Appliquer les masques QA/SCL");self.clouds.setChecked(True)
         self.dates=QCheckBox("Autoriser une mosaïque multitemporelle")
@@ -438,7 +438,7 @@ class WorkflowPage(Page):
         layers=[dict(data=self.layers.item(i,0).text(),role=self.layers.cellWidget(i,1).currentData(),
                      labels=self.layers.item(i,2).text().strip() or None) for i in range(self.layers.rowCount())]
         layout=self.layout_settings.capture()
-        kwargs=dict(layers=layers,aoi=self.aoi.text() or None,band_order=[b.strip() for b in self.bands.text().split(",") if b.strip()],
+        kwargs=dict(layers=layers,aoi=self.aoi.text() or None,band_order=[b.strip() for b in self.bands.text().split(",") if b.strip()] or None,
             target_crs=self.crs.text().strip() or None,resolution=self.resolution.value() or None,
             mask_clouds=self.clouds.isChecked(),allow_mixed_dates=self.dates.isChecked(),composition=self.rgb.currentData(),
             title=self.title.text(),credits=self.credits.text(),formats=self.format.currentData(),dpi=self.dpi.value(),
@@ -515,6 +515,8 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
         self.tool_pages=dict(assistant=AssistantPage(self._preview_directory.name),project=ProjectPage(),inspect=InspectionPage(),
             prepare=PreparationPage(),composite=CompositePage(),classification=ClassificationPage(),vector=VectorPage(),raster=RasterToolsPage(),terrain=TerrainPage(),indices=IndicesPage(),
             calculator=CalculatorPage(),focal=FocalPage(),temporal=TemporalPage(),mapping=MappingPage(),atlas=AtlasPage(),workflow=WorkflowPage(),processing=ProcessingPage(),recipes=RecipesPage(self),native=NativePage(self._preview_directory.name),mapops=MapOpsPage(self))
+        order=('assistant','inspect','prepare','composite','classification','indices','calculator','focal','temporal','terrain','vector','raster','project','mapping','atlas','workflow','processing','recipes','native','mapops')
+        self.tool_pages={key:self.tool_pages[key] for key in order}
         self.pages=list(self.tool_pages.values());titles=['Assistant cartographique' if key=='assistant' else TOOL_LABELS[key] for key in self.tool_pages]
         for title,page in zip(titles,self.pages):
             self.navigation.addItem(title);scroll=QScrollArea();scroll.setWidgetResizable(True);scroll.setWidget(page);self.stack.addWidget(scroll)

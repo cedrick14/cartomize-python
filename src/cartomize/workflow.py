@@ -57,8 +57,13 @@ def cartographic_workflow(scenes, destination, *, layers=(), aoi=None,
         scenes = list(scenes)
         if scenes and not all(isinstance(s, Scene) for s in scenes):
             scenes = discover_scenes(scenes)
-    names = list(dict.fromkeys(band_order or ("blue", "green", "red", "nir")))
-    names += [name for name in COMPOSITIONS[composition] if name not in names]
+    if not scenes:raise ValueError('Sélectionner au moins une scène.')
+    names = list(band_order) if band_order is not None else list(scenes[0].bands)
+    if not names or len(names)!=len(set(names)):raise ValueError('Sélectionner des bandes distinctes.')
+    if band_order is None and any(set(scene.bands)!=set(names) for scene in scenes):
+        raise ValueError('Les scènes ont des bandes différentes : préciser band_order ou préparer les scènes séparément.')
+    missing=set(COMPOSITIONS[composition])-set(names)
+    if missing:raise ValueError('La composition requiert les bandes sélectionnées : '+', '.join(sorted(missing)))
     destination.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix=".cartomize-production-", dir=destination.parent) as temporary:
         work = Path(temporary) / "products"

@@ -89,3 +89,26 @@ def test_manual_bands_and_unchecked_mosaic(application, write_raster, tmp_path):
             assert src.read(1).tolist()==[[expected]*2]*2
             assert src.read_masks(1).min()==255
     window.close()
+
+
+def test_classification_transfer_uses_scientific_product_and_settings(application,write_raster,tmp_path):
+    from cartomize.desktop import CartomizeWindow
+    scientific=write_raster('science.tif',np.ones((2,12,12),dtype='float32'))
+    display=write_raster('display.tif',np.ones((4,12,12),dtype='uint8'),nodata=0)
+    with rasterio.open(display,'r+') as dst:dst.update_tags(CARTOMIZE_PRODUCT='display_rgba')
+    window=CartomizeWindow()
+    assistant=window.tool('assistant');assistant.classification.setCurrentIndex(assistant.classification.findData('unsupervised'))
+    assistant.validation.edit.setText(str(tmp_path/'validation.gpkg'));assistant.label_column.setText('libelle');assistant.group_column.setText('site')
+    window.register_result({'data':str(display)});window.register_result({'data':str(scientific)})
+    report=dict(inputs=[],layers=[],data_kind='scenes',issues=[],aoi=None)
+    window.open_assistant_step('classification',report)
+    page=window.tool('classification')
+    assert page.source.text()==str(scientific)
+    assert page.method.currentData()=='kmeans'
+    assert page.validation.text()==str(tmp_path/'validation.gpkg')
+    with pytest.raises(ValueError,match='scientifique'):window.transfer_result({'data':str(display)},'classification')
+    order=list(window.tool_pages)
+    assert order.index('prepare')<order.index('classification')<order.index('mapping')
+    state=window.capture_session();window.restore_session(state)
+    assert window.tool('assistant').group_column.text()=='site'
+    window.close();application.processEvents()

@@ -65,11 +65,16 @@ class PreparationPage(Page):
         self.crs.setPlaceholderText("Automatique · exemple : EPSG:32733")
         self.resolution = spin(0, 0, 100000)
         self.resolution.setSpecialValueText("Résolution native la plus grossière")
+        self.resampling = QComboBox()
+        for label,value in [('Plus proche voisin','nearest'),('Bilinéaire','bilinear'),('Cubique','cubic'),('Moyenne','average')]:self.resampling.addItem(label,value)
+        self.overlap = QComboBox()
+        self.overlap.addItem('Première scène valide','first');self.overlap.addItem('Dernière scène valide','last')
+        self.saturation = QCheckBox('Appliquer le masque de saturation disponible');self.saturation.setChecked(True)
         self.clouds = QCheckBox("Appliquer les masques QA/SCL")
         self.clouds.setChecked(True)
         self.dates = QCheckBox("Autoriser une mosaïque multitemporelle ou de dates inconnues")
         for label, control in [("Système de coordonnées cible", self.crs), ("Résolution (m)", self.resolution),
-                               ("Masque de qualité", self.clouds), ("Dates d’acquisition", self.dates)]:
+                               ("Rééchantillonnage spectral", self.resampling), ("Recouvrement des scènes", self.overlap), ("Saturation", self.saturation), ("Masque de qualité", self.clouds), ("Dates d’acquisition", self.dates)]:
             self.form.addRow(label, control)
         self.output = PathField("directory")
         self.name = QLineEdit("pretraitement")
@@ -217,6 +222,6 @@ class PreparationPage(Page):
         kwargs = dict(aoi=self.aoi.text() if self.clip.isChecked() else None, mosaic=self.mosaic.isChecked(),
             multiband=self.multiband.isChecked(), separate_bands=self.separate.isChecked(), composition=rgb,
             target_crs=self.crs.text().strip() or None, resolution=self.resolution.value() or None,
-            mask_clouds=self.clouds.isChecked(), allow_mixed_dates=self.dates.isChecked())
+            mask_clouds=self.clouds.isChecked(), mask_saturation=self.saturation.isChecked(), resampling=self.resampling.currentData(), overlap=self.overlap.currentData(), allow_mixed_dates=self.dates.isChecked())
         return lambda progress, cancel, stage: cm.process_imagery(scenes, destination,
             progress=progress, cancel=cancel, stage=stage, **kwargs).manifest

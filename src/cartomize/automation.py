@@ -34,8 +34,15 @@ def propose_layouts(goal='general',*,bounds=None,layer_count=1,classes=0,count=3
 def plan_cartography(inputs,*,goal='general',data_kind='layers',aoi=None,title='',credits='',
                      training=None,class_column='classe',classification=None,indices=(),template=None,
                      target_crs=None,repair=True,relations=True,atlas_zones=None,atlas_field=None,
-                     allow_mixed_dates=False,layers=(),processing_steps=(),mask_clouds=True):
-    """Build a serializable dependency graph without modifying input files."""
+                     allow_mixed_dates=False,layers=(),processing_steps=(),mask_clouds=True,
+                     band_order=None,composition='natural',resolution=None,
+                     validation=None,label_column=None,group_column=None):
+    """Build a serializable dependency graph without modifying input files.
+
+    For ``data_kind='scenes'``, ``band_order=None`` preserves imported bands,
+    ``composition=None`` omits the display branch and ``resolution`` sets the
+    common projected grid spacing. Classification always uses scientific data.
+    """
     if classification not in {None,'supervised','unsupervised'}:raise ValueError('Mode de classification inconnu.')
     assessment=assess_project(inputs,data_kind=data_kind,goal=goal,aoi=aoi)
     errors=[i for i in assessment['issues'] if i['severity']=='error' and not (repair and i['code']=='invalid_geometry')]
@@ -52,9 +59,33 @@ def plan_cartography(inputs,*,goal='general',data_kind='layers',aoi=None,title='
         nodes.append(dict(id=ident,operation=operation,parameters=parameters,requires=list(requires)));return ident
     if data_kind=='scenes':
         from .indices import get_index
-        bands=list(dict.fromkeys(['blue','green','red','nir']+[b for index in indices for b in get_index(index).bands]))
-        scientific=add('prepare',dict(sources=assessment['inputs'],aoi=aoi,crs=target_crs,allow_mixed_dates=allow_mixed_dates,bands=bands,mask_clouds=mask_clouds))
-        rgb=add('composite',dict(source='@'+scientific),[scientific]);layers.append(dict(data='@'+rgb,role='background',rgb='native',name='Image satellite'))
+        from .color import COMPOSITIONS
+        scenes=assessment['scenes']
+        bands=list(band_order) if band_order is not None else list(scenes[0]['bands'])
+        if not bands or len(bands)!=len(set(bands)):
+            raise ValueError('Sélectionner des bandes spectrales distinctes.')
+        for scene in scenes:
+            if band_order is None and set(scene['bands'])!=set(bands):
+                raise ValueError('Les scènes ont des bandes différentes : préciser band_order ou préparer les scènes séparément.')
+            missing=set(bands)-set(scene['bands'])
+            if missing:raise ValueError(f"Bandes absentes de {scene['id']} : {', '.join(sorted(missing))}.")
+            if mask_clouds and not scene['quality']:
+                raise ValueError(f"Masque QA/SCL absent : {scene['id']}. Fournir le masque ou désactiver explicitement mask_clouds.")
+        dates={s['date'] for s in scenes}
+        if not allow_mixed_dates and (len(dates)>1 or (len(scenes)>1 and None in dates)):
+            raise ValueError('Dates différentes ou inconnues : confirmer allow_mixed_dates ou préparer les scènes séparément.')
+        required={b for index in indices for b in get_index(index).bands}
+        if not required<=set(bands):raise ValueError('Bandes requises par les indices : '+', '.join(sorted(required-set(bands))))
+        if resolution is not None and (not np.isfinite(resolution) or resolution<=0):
+            raise ValueError('La résolution doit être positive, en mètres.')
+        channels=COMPOSITIONS.get(composition) if isinstance(composition,str) else composition
+        if composition is not None and (channels is None or len(channels)!=3 or any(not ((isinstance(b,str) and b in bands) or (type(b) is int and 1<=b<=len(bands))) for b in channels)):
+            raise ValueError('La composition nécessite trois bandes disponibles. Choisir une autre composition ou composition=None.')
+        scientific=add('prepare',dict(sources=assessment['inputs'],aoi=aoi,crs=target_crs,allow_mixed_dates=allow_mixed_dates,bands=bands,mask_clouds=mask_clouds,resolution=resolution))
+        if composition is not None:
+            rgb=add('composite',dict(source='@'+scientific,bands=list(channels)),[scientific]);layers.append(dict(data='@'+rgb,role='background',rgb='native',name='Image satellite'))
+        else:
+            layers.append(dict(data='@'+scientific,role='background',name='Multibande scientifique'))
     for record in assessment['layers']:
         item=dict(record['options'],data=record['source'],name=record['name'],kind=record['kind'])
         if record['kind']=='vector' and record['diagnostic']['invalid_geometries']:
@@ -69,7 +100,7 @@ def plan_cartography(inputs,*,goal='general',data_kind='layers',aoi=None,title='
         if scientific is None:raise ValueError('Ajouter un raster multispectral ou des scènes pour la classification.')
         if classification=='supervised' and not training:raise ValueError('La classification supervisée nécessite des échantillons de référence.')
         reference='@'+scientific if scientific.startswith('step_') else scientific
-        node=add('classify' if classification=='supervised' else 'cluster',dict(source=reference,training=str(training) if training else None,class_column=class_column),[scientific] if scientific.startswith('step_') else [])
+        node=add('classify' if classification=='supervised' else 'cluster',dict(source=reference,training=str(training) if training else None,class_column=class_column,validation=str(validation) if validation else None,label_column=label_column,group_column=group_column),[scientific] if scientific.startswith('step_') else [])
         layers.append(dict(data='@'+node,role='landcover',name='Occupation du sol' if classification=='supervised' else 'Groupes spectraux'))
     if indices:
         if scientific is None:raise ValueError('Ajouter un raster scientifique pour les indices.')
@@ -183,19 +214,19 @@ def run_plan(plan,destination,*,dpi=150,formats=('pdf','png'),workers=1,block_si
                 if product['kind'] in {'vector','raster'}:assets.append(dict(data=result,kind=product['kind'],name=spec['label']))
             elif op=='prepare':
                 result=cm.prepare_imagery(cm.discover_scenes(parameters['sources']),work/f'{ident}.tif',aoi=parameters['aoi'],target_crs=parameters['crs'],
-                    band_order=parameters.get('bands',['blue','green','red','nir']),mask_clouds=parameters.get('mask_clouds',True),allow_mixed_dates=parameters['allow_mixed_dates'],progress=callback,cancel=cancel).path
+                    band_order=parameters.get('bands'),resolution=parameters.get('resolution'),mask_clouds=parameters.get('mask_clouds',True),allow_mixed_dates=parameters['allow_mixed_dates'],progress=callback,cancel=cancel).path
                 assets.append(dict(data=result,kind='raster',name='Multibande scientifique'))
             elif op=='repair':
                 result=work/f'{ident}.gpkg';cm.make_valid(parameters['source']).to_file(result,driver='GPKG',index=False)
                 assets.append(dict(data=result,kind='vector'))
             elif op=='composite':
-                result=cm.color_composite(parameters['source'],work/f'{ident}.tif',progress=callback,cancel=cancel)
+                result=cm.color_composite(parameters['source'],work/f'{ident}.tif',bands=parameters.get('bands','natural'),progress=callback,cancel=cancel)
                 assets.append(dict(data=result,kind='raster',rgb='native',role='background'))
             elif op=='indices':
                 result=cm.spectral_indices(parameters['source'],work/f'{ident}.tif',parameters['indices'],workers=workers,block_size=block_size,memory_limit_mb=memory_limit_mb,execution=execution,scheduler_address=scheduler_address,device=device,progress=callback,cancel=cancel)
                 assets.append(dict(data=result,kind='raster'))
             elif op in {'classify','cluster'}:
-                if op=='classify':result=cm.classify_landcover(parameters['source'],parameters['training'],work/ident,class_column=parameters['class_column'],workers=workers,block_size=min(block_size,1024),progress=callback,cancel=cancel)
+                if op=='classify':result=cm.classify_landcover(parameters['source'],parameters['training'],work/ident,class_column=parameters['class_column'],validation=parameters.get('validation'),label_column=parameters.get('label_column'),group_column=parameters.get('group_column'),workers=workers,block_size=min(block_size,1024),progress=callback,cancel=cancel)
                 else:result=cm.cluster_raster(parameters['source'],work/ident,progress=callback,cancel=cancel)
                 assets.append(dict(data=result,kind='raster',role='landcover',report=str(Path(result).parent/('classification.json' if op=='classify' else 'clustering.json')),**({'model':str(Path(result).parent/'model/model.json')} if op=='classify' else {})))
             elif op=='project':
@@ -205,6 +236,9 @@ def run_plan(plan,destination,*,dpi=150,formats=('pdf','png'),workers=1,block_si
             elif op=='map':
                 from .cartographic_rules import complete_map,desktop_map_config
                 mapping=cm.compose_map(**parameters);complete_map(mapping)
+                from .quality import audit_map
+                quality=audit_map(mapping);save_json(quality,work/'quality.json')
+                if not quality['valid']:raise ValueError('Contrôle cartographique : '+'; '.join(i['message'] for i in quality['issues'] if i['severity']=='error'))
                 ui_config=desktop_map_config(mapping,parameters['layers'],work)
                 for fmt in formats:_check_cancel(cancel);mapping.export(work/f'carte.{fmt}',dpi=dpi)
                 result=mapping
@@ -223,7 +257,7 @@ def run_plan(plan,destination,*,dpi=150,formats=('pdf','png'),workers=1,block_si
             from .session import map_document
             document=publish(map_document(mapping));save_json(document,work/'map.json')
         record=publish(dict(schema='cartomize.automation.result.v1',plan=plan,steps=ledger,layers=assets,
-                    results={key:str(value) for key,value in results.items() if isinstance(value,(str,Path))},products=products,map_file=str(work/'map.json') if mapping else None,map_config=ui_config if mapping else None,
+                    results={key:str(value) for key,value in results.items() if isinstance(value,(str,Path))},products=products,map_file=str(work/'map.json') if mapping else None,map_config=ui_config if mapping else None,quality_report=str(work/'quality.json') if mapping else None,
                     outputs=[str(work/f'carte.{fmt}') for fmt in formats] if mapping else []))
         save_json(record,work/'automation.json');_check_cancel(cancel)
     return destination/'automation.json'
