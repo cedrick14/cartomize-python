@@ -1,0 +1,3 @@
+# Keep checkout bytes consistent across platforms for provenance checks.
+* text=auto eol=lf
+*.png binary
