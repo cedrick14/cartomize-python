@@ -498,7 +498,7 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
         header.addWidget(self.brand_icon);identity=QVBoxLayout();identity.setSpacing(1)
         brand=QLabel("Cartomize");brand.setObjectName("brand");identity.addWidget(brand)
         subtitle=QLabel("Assistant cartographique");subtitle.setObjectName("muted");identity.addWidget(subtitle)
-        header.addLayout(identity);header.addStretch();version=QLabel(f"Version {cm.__version__}");version.setObjectName("muted");header.addWidget(version);outer.addLayout(header)
+        header.addLayout(identity);header.addStretch();version=QLabel(f"Version {cm.__display_version__}");version.setObjectName("muted");header.addWidget(version);outer.addLayout(header)
         session_bar=QHBoxLayout();self.init_session(session_bar);session_bar.addStretch();outer.addLayout(session_bar)
         self.workspace_splitter=QSplitter(Qt.Orientation.Horizontal);self.workspace_splitter.setChildrenCollapsible(False);outer.addWidget(self.workspace_splitter,1)
         self.controls_panel=QWidget();self.controls_panel.setMinimumWidth(400);controls=QVBoxLayout(self.controls_panel);controls.setContentsMargins(0,0,8,0);controls.setSpacing(7)

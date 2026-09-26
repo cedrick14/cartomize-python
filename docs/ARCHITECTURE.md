@@ -13,7 +13,7 @@ natifs Esri et une boîte à outils Python ArcPy. La bibliothèque reprend les
 modules Python indépendants d'ArcPy et les maquettes de cette édition.
 Les dix modules repris sont conservés dans `_core`, à usage interne.
 Leur version interne 10.5.1 exprime leur provenance; la version du
-paquet est 1.0. Les fichiers originaux ne sont pas modifiés.
+paquet est 1.0.1. Les fichiers originaux ne sont pas modifiés.
 
 ## Fonctionnalités
 

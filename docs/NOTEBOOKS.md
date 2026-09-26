@@ -5,7 +5,7 @@
 L’interface graphique de Cartomize 1.0 nécessite un noyau Python 3.11 à 3.13 installé sur un ordinateur disposant d’un bureau graphique.
 
 ```python
-%pip install --upgrade "cartomize[notebook]==1.0"
+%pip install --upgrade "cartomize[notebook]==1.0.1"
 ```
 
 Redémarrer le noyau après l’installation, puis exécuter :
@@ -26,7 +26,7 @@ Depuis l’invite de commandes Conda :
 
 ```bash
 conda create -n cartomize python=3.12 pip
-conda run -n cartomize python -m pip install "cartomize[notebook]==1.0"
+conda run -n cartomize python -m pip install "cartomize[notebook]==1.0.1"
 conda run -n cartomize python -m ipykernel install --user --name cartomize --display-name "Python (Cartomize)"
 ```
 

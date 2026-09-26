@@ -11,13 +11,13 @@ The library and desktop application run independently of QGIS and ArcGIS Pro. Op
 The core library requires Python 3.11 or later. The desktop application requires Python 3.11 to 3.13.
 
 ```bash
-python -m pip install "cartomize==1.0"
+python -m pip install "cartomize==1.0.1"
 ```
 
 To install and open the desktop application:
 
 ```bash
-python -m pip install "cartomize[gui]==1.0"
+python -m pip install "cartomize[gui]==1.0.1"
 python -m cartomize gui
 ```
 
@@ -32,7 +32,7 @@ window = cm.launch()
 In a local Jupyter notebook, install the notebook dependencies, restart the kernel and call `cm.launch()`:
 
 ```python
-%pip install "cartomize[notebook]==1.0"
+%pip install "cartomize[notebook]==1.0.1"
 ```
 
 The desktop window opens on the computer running the kernel. Remote notebooks without a graphical desktop can use the processing API.

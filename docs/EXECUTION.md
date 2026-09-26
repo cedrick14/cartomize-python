@@ -2,7 +2,7 @@
 
 ## Installation
 
-`python -m pip install "cartomize[gui,distributed]==1.0"` installe l’interface graphique et le moteur Dask.
+`python -m pip install "cartomize[gui,distributed]==1.0.1"` installe l’interface graphique et le moteur Dask.
 
 Le moteur GPU est facultatif : extra `gpu`, fondé sur `cupy-cuda12x[ctk]>=14,<15`. Il installe les composants CUDA 12 ; un pilote NVIDIA compatible et un GPU restent indispensables. Une installation CUDA 13 utilise un environnement distinct avec la distribution CuPy appropriée, sans installer simultanément plusieurs distributions CuPy. Exécuter `python -m cartomize engines` pour le diagnostic.
 

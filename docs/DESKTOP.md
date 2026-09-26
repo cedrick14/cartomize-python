@@ -9,7 +9,7 @@ L’interface organise les traitements et la visualisation en deux panneaux. Le 
 Avec Python 3.11 à 3.13 :
 
 ```bash
-python -m pip install "cartomize[gui]==1.0"
+python -m pip install "cartomize[gui]==1.0.1"
 cartomize-desktop
 ```
 
@@ -159,7 +159,7 @@ La cellule se termine et la fenêtre reste interactive. Installer les
 composants du notebook dans un noyau Python 3.11 à 3.13 :
 
 ```python
-%pip install "cartomize[notebook]==1.0"
+%pip install "cartomize[notebook]==1.0.1"
 ```
 
 Après une mise à jour, redémarrer le noyau, puis exécuter :

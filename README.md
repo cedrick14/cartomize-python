@@ -11,13 +11,13 @@ La bibliothèque et son interface fonctionnent sans QGIS ni ArcGIS Pro. Les pass
 La bibliothèque nécessite Python 3.11 ou une version ultérieure. L’interface graphique nécessite Python 3.11 à 3.13.
 
 ```bash
-python -m pip install "cartomize==1.0"
+python -m pip install "cartomize==1.0.1"
 ```
 
 Pour installer et ouvrir l’interface graphique :
 
 ```bash
-python -m pip install "cartomize[gui]==1.0"
+python -m pip install "cartomize[gui]==1.0.1"
 python -m cartomize gui
 ```
 
@@ -29,7 +29,7 @@ import cartomize as cm
 fenetre = cm.launch()
 ```
 
-Dans un notebook local, installer `cartomize[notebook]==1.0` avec `%pip`, redémarrer le noyau, puis appeler `cm.launch()`. Voir le [guide Jupyter](docs/NOTEBOOKS.md).
+Dans un notebook local, installer `cartomize[notebook]==1.0.1` avec `%pip`, redémarrer le noyau, puis appeler `cm.launch()`. Voir le [guide Jupyter](docs/NOTEBOOKS.md).
 
 ## Espace de travail
 
