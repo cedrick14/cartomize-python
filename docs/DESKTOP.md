@@ -11,7 +11,7 @@ Depuis 0.8.1, **Prétraitement multispectral** propose un tableau des bandes par
 Depuis le wheel fourni, avec Python 3.11 ou plus récent :
 
 ```bash
-python -m pip install "cartomize-0.8.1a1-py3-none-any.whl[gui]"
+python -m pip install "cartomize[gui]==0.8.1a2"
 cartomize-desktop
 ```
 
@@ -154,9 +154,31 @@ Les outils individuels demandent de cocher **Remplacer les fichiers
 existants** avant un remplacement.
 
 Dans une application possédant déjà un `QApplication`, utiliser
-`cm.launch(block=False)` avec sa boucle Qt. Pour un notebook sans intégration
-Qt, lancer la fenêtre depuis un terminal. Un environnement de bureau est
-nécessaire pour l'affichage normal.
+`cm.launch(block=False)` avec sa boucle Qt.
+
+Depuis la version 0.8.1a2, un notebook local peut ouvrir la fenêtre avec
+`cm.launch()` : Cartomize active automatiquement l’intégration Qt d’IPython.
+La cellule rend la main et la fenêtre reste interactive. Installer les
+composants du notebook dans un noyau Python 3.11 ou supérieur :
+
+```python
+%pip install "cartomize[notebook]==0.8.1a2"
+```
+
+Après une mise à jour, redémarrer le noyau, puis exécuter :
+
+```python
+import cartomize as cm
+fenetre = cm.launch()
+```
+
+La fenêtre apparaît sur l’ordinateur qui exécute le noyau. Un notebook distant
+sans bureau graphique ne peut pas afficher cette fenêtre dans le navigateur ;
+l’API de traitement Python reste utilisable. `block=True` lance explicitement
+la boucle Qt, tandis que `block=False` la laisse à l’application hôte.
+
+Sous Windows Conda, Cartomize charge désormais le moteur XML de Python avant
+les bibliothèques SIG. Aucun import manuel d’Expat n’est nécessaire.
 
 ## Mise en page et atlas
 

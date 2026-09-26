@@ -660,16 +660,38 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
 _windows=[]
 
 
+def _enable_ipython_loop():
+    """Use IPython's Qt integration when running inside an interactive shell."""
+    ipython=sys.modules.get("IPython")
+    shell=ipython.get_ipython() if ipython is not None else None
+    if shell is None or not callable(getattr(shell,"enable_gui",None)):
+        return False
+    # The application uses PySide6, including when another Qt binding is installed.
+    previous=os.environ.get("QT_API")
+    os.environ["QT_API"]="pyside6"
+    try:
+        shell.enable_gui("qt6")
+    finally:
+        if previous is None:os.environ.pop("QT_API",None)
+        else:os.environ["QT_API"]=previous
+    return True
+
+
 def launch(*,block=None):
-    """Open a native window; reuse an existing QApplication when available."""
+    """Open a native window and automatically integrate with local notebooks.
+
+    With block=None, scripts run the Qt loop while IPython keeps its own loop.
+    Explicit block=True/False retains control for embedding applications.
+    """
     application=QApplication.instance();owns_loop=application is None
     if application is None:application=QApplication(["Cartomize"])
+    interactive_loop=_enable_ipython_loop() if block is None else False
     window=CartomizeWindow();_windows.append(window)
     window.destroyed.connect(lambda:_windows.remove(window) if window in _windows else None)
     window.show()
     # Keep the application alive when embedded without a running Qt event loop.
     window._application=application
-    if block is True or (block is None and owns_loop):application.exec()
+    if block is True or (block is None and owns_loop and not interactive_loop):application.exec()
     return window
 
 

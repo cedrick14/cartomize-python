@@ -1,0 +1,39 @@
+name: Windows Conda startup
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  startup:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v4
+        with:
+          activate-environment: cartomize-ci
+          python-version: '3.12'
+          channels: defaults
+          channel-priority: strict
+      - name: Install previous release for the initial comparison
+        if: contains(github.event.head_commit.message, '[compare 0.8.1a1]')
+        run: python -m pip install "cartomize[gui]==0.8.1a1"
+      - name: Observe previous release in a fresh Conda process
+        if: contains(github.event.head_commit.message, '[compare 0.8.1a1]')
+        continue-on-error: true
+        run: python scripts/check_startup.py --gui
+      - name: Install the candidate with notebook dependencies
+        run: python -m pip install ".[dev,notebook,distributed]"
+      - name: Verify installed startup, XML, raster, vector and GUI
+        run: python scripts/check_startup.py --gui
+      - name: Verify notebook event loop and desktop processing
+        run: python -m pytest tests/test_startup.py tests/test_desktop.py tests/test_desktop_imagery.py -v
+        env:
+          QT_QPA_PLATFORM: offscreen

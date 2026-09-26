@@ -11,17 +11,17 @@ Optional native project bridges require the corresponding installed GIS software
 
 ## Installation
 
-Python 3.11 or newer is required. Version **0.8.1a1 is an alpha release**.
+Python 3.11 or newer is required. Version **0.8.1a2 is an alpha release**.
 Linux and Windows have been tested with Python 3.11 and 3.12.
 
 ```bash
-python -m pip install "cartomize==0.8.1a1"
+python -m pip install "cartomize==0.8.1a2"
 ```
 
 For the desktop interface and optional Dask execution:
 
 ```bash
-python -m pip install "cartomize[gui,distributed]==0.8.1a1"
+python -m pip install "cartomize[gui,distributed]==0.8.1a2"
 python -m cartomize gui
 ```
 
@@ -33,6 +33,30 @@ cm.launch()
 ```
 
 Importing the library does not open a window automatically.
+
+### Jupyter notebooks on a local computer
+
+Install the notebook extra in a Python 3.11+ kernel:
+
+```python
+%pip install "cartomize[notebook]==0.8.1a2"
+```
+
+Restart the kernel after upgrading, then run:
+
+```python
+import cartomize as cm
+window = cm.launch()
+```
+
+Cartomize enables the Qt event loop automatically so the cell returns while
+its desktop window remains responsive. The window opens on the computer
+running the kernel; a headless or remote notebook cannot display it in the
+browser. The processing API works without a desktop.
+
+Version 0.8.1a2 initializes Python's XML parser before geospatial DLLs are
+loaded, addressing Windows Conda startup conflicts. It also adds the
+`notebook` extra with a compatible `typing_extensions` requirement.
 
 ## Satellite image preparation
 

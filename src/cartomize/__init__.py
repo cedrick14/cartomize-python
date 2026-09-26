@@ -1,4 +1,11 @@
 """Cartomize: cartography, spatial analysis and automated map production."""
+# Initialize Python's XML runtime before loading GDAL wheels. On Windows,
+# their DLL search directories can otherwise shadow Conda's Expat library.
+from xml.parsers import expat as _expat
+from xml.etree import ElementTree as _element_tree
+_element_tree.XMLParser()
+del _expat, _element_tree
+
 from geopandas import GeoDataFrame, GeoSeries, points_from_xy
 from .mapping import Map, Layer
 from .vector import read_file, from_xy, reproject, clip, overlay, sjoin, nearest, dissolve, buffer, area, length, validate, make_valid
@@ -22,7 +29,7 @@ from .relations import analyze_relations
 from .automation import plan_cartography,run_plan,propose_layouts
 from .mapops import snapshot_project,compare_snapshots,record_review,verify_review
 
-__version__ = "0.8.1a1"
+__version__ = "0.8.1a2"
 
 
 def launch(*,block=None):
