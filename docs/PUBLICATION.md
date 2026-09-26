@@ -1,16 +1,23 @@
 # Publication de Cartomize sur PyPI
 
-Paquet : `cartomize` · Version préparée : `0.8.1a1` · Auteur : ONDON NKOUA Cédrick Belmich.
+Paquet : `cartomize` · Version publiée : `0.8.1a1` · Auteur : ONDON NKOUA Cédrick Belmich.
+
+La version alpha [0.8.1a1](https://pypi.org/project/cartomize/0.8.1a1/) a été publiée le 26 septembre 2026 depuis le commit `9b4a71c4e76a34c69226d04cb1d7706cf1958390`. Le [workflow de publication](https://github.com/cedrick14/cartomize-python/actions/runs/36254383142) a réussi. Les deux fichiers publics correspondent aux empreintes SHA256 des distributions validées :
+
+| Fichier | SHA256 |
+|---|---|
+| `cartomize-0.8.1a1-py3-none-any.whl` | `90df84f98d5bec65dd41cd1e673ba2b4571bdf17d05f5526d9771eb6efeef98e` |
+| `cartomize-0.8.1a1.tar.gz` | `51713a47cefc56c20ac0605933581ea62978584817b3f20d3632c8fa6d30a22d` |
 
 ## Dépôt autonome
 
 La bibliothèque Python utilise son propre dépôt, `cedrick14/cartomize-python`. Le plugin QGIS reste un projet distinct. Ne pas utiliser le dépôt du plugin comme éditeur de confiance du paquet Python.
 
-Le code, `pyproject.toml`, les tests, la documentation et les workflows GitHub Actions sont à la racine de ce dépôt autonome. L’acceptation de la première publication PyPI doit être vérifiée avant de présenter les liens d’installation comme disponibles.
+Le code, `pyproject.toml`, les tests, la documentation et les workflows GitHub Actions sont à la racine de ce dépôt autonome.
 
 ## Éditeur de confiance PyPI
 
-Dans le compte PyPI du fondateur, ouvrir **Édition / Publishing**, puis **GitHub** sous **Ajouter un nouvel éditeur en attente** :
+La première publication a utilisé les paramètres ci-dessous. L’éditeur est désormais associé au projet `cartomize` sur PyPI ; il n’est pas nécessaire d’ajouter un nouvel éditeur en attente pour les versions suivantes.
 
 | Champ PyPI | Valeur |
 |---|---|
