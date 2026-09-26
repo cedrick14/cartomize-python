@@ -1,5 +1,13 @@
 # Tests et validation
 
+## Version 1.0
+
+Validation du 26 septembre 2026 sur le commit `933f9e269ac29ab98e488faa3ac554c3269781cd`.
+
+- [Matrice Linux et Windows, Python 3.11 et 3.12](https://github.com/cedrick14/cartomize-python/actions/runs/36272251506) : **340 tests réussis et 2 ignorés dans chacune des quatre configurations**. Le contrôle natif QGIS réussit dans son environnement dédié.
+- [Publication et environnement Windows Conda](https://github.com/cedrick14/cartomize-python/actions/runs/36272251727) : **50 tests Conda réussis**, dont l’exécution dans un noyau Jupyter. Les 19 contrôles des vues et du prétraitement ont réussi avant la suite complète Linux de publication.
+- Wheel et archive source validés par Twine et `check_release.py`, puis transmis à PyPI.
+
 ## Contrôles automatisés
 
 La suite vérifie les traitements raster et vectoriels, les masques NoData, la calibration, les scènes multispectrales, la classification, les projets, les maquettes et les exports. Les tests d’intégration exercent les connexions entre outils, la sauvegarde des sessions et l’exécution en arrière-plan.
