@@ -1,3 +1,17 @@
+# Validation de l’espace de travail Cartomize 0.9.0a1
+
+26 septembre 2026. La version publiée provient du commit `8cac235ac786b700cbe126a0314fb406ed746077`.
+
+- [Matrice Linux/Windows, Python 3.11/3.12](https://github.com/cedrick14/cartomize-python/actions/runs/36270662493) : **340 réussites et 2 tests ignorés dans chacune des quatre configurations**. Le contrôle QGIS facultatif réussit dans son travail séparé ; le test CUDA matériel reste ignoré sans GPU.
+- [Publication et Windows Conda](https://github.com/cedrick14/cartomize-python/actions/runs/36270662681) : **50 tests Conda réussis**, dont le lancement dans un vrai noyau Jupyter ; **19 contrôles de vues et de prétraitement réussis** avant la suite complète Linux de publication.
+- Wheel et archive source contrôlés par Twine et `check_release.py`. Les deux fichiers publics ont été téléchargés et leurs tailles/SHA256 correspondent aux distributions validées ; voir [PUBLICATION](PUBLICATION.md).
+
+Les seize nouveaux tests vérifient la fidélité des pixels et des classes, les NoData et pixels noirs valides, les lectures au zoom, les valeurs au clic, les comparaisons entre résolutions et SCR différents, les limites colorimétriques communes, les projets portables, les tableaux paginés et graphiques, les PDF et images par région, la connexion d’un vrai calcul NDVI, le catalogue d’onglets et les fermetures pendant une lecture. Les lecteurs vectoriels sont aussi exercés à répétition sur des threads Python persistants.
+
+Deux défauts ont été rencontrés avant publication : un plantage natif de vues avec Qt 6.11.2 dans l’environnement de développement, puis des plantages de lecture vectorielle sous Python 3.11 dans le premier contrôle distant. La livraison retient Qt 6.9 et des travailleurs Python persistants. Le premier workflow a bloqué la publication ; la suite complète est passée après correction sur le commit publié. Aucun test n’a été désactivé pour contourner ces défauts.
+
+Les données sont synthétiques. Les tests ne constituent pas un benchmark de très grandes scènes ni une validation thématique sur le terrain. Le [guide de la vue intégrée](RESULTS_WORKSPACE.md) précise les limites de résolution, de pagination, de mémoire et de comparaison.
+
 # Validation des parcours Cartomize 0.8.2a1
 
 26 septembre 2026. La version publiée provient du commit `e704db4dfdfe6b47f307d768a5f4f82d1eb6a8cc`. Elle a passé la [matrice Linux/Windows, Python 3.11/3.12](https://github.com/cedrick14/cartomize-python/actions/runs/36266211867) et les **34 tests Windows Conda**, avec un vrai noyau Jupyter, dans le [workflow de publication](https://github.com/cedrick14/cartomize-python/actions/runs/36266212081).

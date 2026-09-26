@@ -23,6 +23,12 @@ L'option d'installation `notebook` fournit également une version de `typing_ext
 
 ## Validation
 
+La version 0.9.0a1 a passé les [50 contrôles Windows Conda](https://github.com/cedrick14/cartomize-python/actions/runs/36270662681), dont le lancement dans un vrai noyau Jupyter, ainsi que les 340 tests de chacune des configurations Linux/Windows, Python 3.11/3.12. Les résultats s’affichent dans la fenêtre principale ; consulter le [guide des vues](RESULTS_WORKSPACE.md).
+
+Lors d’une mise à jour qui change Qt, fermer Cartomize et arrêter le noyau qui l’a chargé, puis installer depuis l’invite de commandes de l’environnement. Redémarrer ensuite le noyau. Cela permet à Windows de remplacer les DLL qui étaient chargées.
+
+Historique du correctif de démarrage :
+
 Le commit `530154823f7ad9f5d78438c7d69003037068ea47` a passé les contrôles suivants :
 
 - Windows, Conda du canal defaults, Python 3.12 et Expat 2.8.5 : import dans un interpréteur neuf, lecture et écriture raster/vectorielle, export de carte et ouverture de la fenêtre.

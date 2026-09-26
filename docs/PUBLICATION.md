@@ -1,15 +1,19 @@
 # Publication de Cartomize sur PyPI
 
-Paquet : `cartomize` · Version publiée : `0.8.2a1` · Auteur : ONDON NKOUA Cédrick Belmich.
+Paquet : `cartomize` · Version publiée : `0.9.0a1` · Auteur : ONDON NKOUA Cédrick Belmich.
 
-La version alpha [0.8.2a1](https://pypi.org/project/cartomize/0.8.2a1/) a été publiée le 26 septembre 2026 depuis le commit `e704db4dfdfe6b47f307d768a5f4f82d1eb6a8cc`. Le [workflow de publication](https://github.com/cedrick14/cartomize-python/actions/runs/36266212081) et la [matrice Linux/Windows](https://github.com/cedrick14/cartomize-python/actions/runs/36266211867) ont réussi : 324 tests et 2 ignorés par configuration principale, 34 tests Windows Conda. Les deux fichiers publics ont été téléchargés et leurs SHA256 comparés aux distributions validées :
+La version alpha [0.9.0a1](https://pypi.org/project/cartomize/0.9.0a1/) a été publiée le 26 septembre 2026 depuis le commit `8cac235ac786b700cbe126a0314fb406ed746077`. Le [workflow de publication](https://github.com/cedrick14/cartomize-python/actions/runs/36270662681) et la [matrice Linux/Windows](https://github.com/cedrick14/cartomize-python/actions/runs/36270662493) ont réussi : **340 tests et 2 ignorés** par configuration principale, **50 tests Windows Conda**, avec un vrai noyau Jupyter. Les 19 contrôles des vues et du prétraitement ont aussi réussi avant la suite complète de publication.
 
-| Fichier | SHA256 |
-|---|---|
-| `cartomize-0.8.2a1-py3-none-any.whl` | `e59bd6a5174bad81a637f390a1b067416539ae082c23c7bbd1ae95ce3064c4c7` |
-| `cartomize-0.8.2a1.tar.gz` | `d1fbb44d7a81f6e1dea5a9e4216875fb18954a22ee2b67b1f9be8662128be6e4` |
+Les deux fichiers publics ont été téléchargés et comparés aux distributions validées :
 
-Cette version conserve les bandes scientifiques dans les plans, relie les références de validation à la classification, réordonne les outils et contrôle la carte avant les exports automatisés. L’[audit SIG](SIG_WORKFLOWS.md) décrit les corrections et les limites. Les versions [0.8.1a1](https://pypi.org/project/cartomize/0.8.1a1/) et [0.8.1a2](https://pypi.org/project/cartomize/0.8.1a2/) restent disponibles ; 0.8.1a2 avait introduit les améliorations XML et notebooks.
+| Fichier | Taille | SHA256 |
+|---|---:|---|
+| `cartomize-0.9.0a1-py3-none-any.whl` | 336 969 octets | `890d161bce5775096452af34512130ae2f51eda214cbcc57486da13b50870c4a` |
+| `cartomize-0.9.0a1.tar.gz` | 407 013 octets | `ea82448bf8b2ce0da07412173f6b621d4879110c31300ab15aa15c6e3199689f` |
+
+Cette version ajoute un [espace de travail intégré](RESULTS_WORKSPACE.md) : commandes et paramètres à gauche, résultats explorables à droite, comparaisons géographiques, métadonnées, légendes, tableaux, graphiques et sauvegarde des vues. Les lectures utilisent des travailleurs Python persistants ; les options `gui` et `notebook` sélectionnent la série Qt 6.9 validée. La fenêtre nécessite Python 3.11 à 3.13.
+
+Le premier candidat n’a pas été publié : les contrôles Python 3.11 ont bloqué sa publication après un plantage des lecteurs vectoriels. Le commit indiqué ci-dessus contient la correction et a passé les contrôles complets. Les versions précédentes, dont [0.8.2a1](https://pypi.org/project/cartomize/0.8.2a1/), restent disponibles.
 
 ## Dépôt autonome
 
@@ -40,7 +44,7 @@ Le fichier `.github/workflows/pypi-publish.yml` exécute les tests, construit le
 Un push ordinaire sur `main` effectue la validation sans publier. La publication est autorisée uniquement dans `cedrick14/cartomize-python`, avec l’une des commandes de lancement suivantes :
 
 - Exécution manuelle **Run workflow**, destination `pypi`, après configuration de l’éditeur de confiance.
-- Tag `python-v0.8.2a1`, dont le numéro doit correspondre au `pyproject.toml`.
+- Tag `python-v0.9.0a1`, dont le numéro doit correspondre au `pyproject.toml`.
 - Commit explicite sur `main` dont le message contient `[publish pypi]`.
 
 Utiliser une seule méthode pour une version. La destination manuelle `check` ne publie rien ; `testpypi` utilise l’index de test. Le workflow doit être présent sur la branche par défaut pour proposer l’exécution manuelle.
@@ -60,8 +64,8 @@ python scripts/check_release.py pypi-dist
 
 Les deux fichiers attendus sont :
 
-- `cartomize-0.8.2a1-py3-none-any.whl`
-- `cartomize-0.8.2a1.tar.gz`
+- `cartomize-0.9.0a1-py3-none-any.whl`
+- `cartomize-0.9.0a1.tar.gz`
 
 La description publique provient de `README_PYPI.md`. Les métadonnées de distribution doivent pointer vers le dépôt de la bibliothèque Python. Les références au dépôt historique sont conservées uniquement lorsqu’elles documentent la provenance ou des validations antérieures.
 
@@ -70,7 +74,7 @@ La description publique provient de `README_PYPI.md`. Les métadonnées de distr
 Vérifier la version, les deux fichiers et leurs SHA256 sur PyPI, puis installer depuis l’index public dans un environnement distinct :
 
 ```bash
-python -m pip install "cartomize[gui]==0.8.2a1"
+python -m pip install "cartomize[gui]==0.9.0a1"
 python -m cartomize gui
 ```
 

@@ -11,7 +11,7 @@ Le moteur autonome fonctionne sans installation d'ArcGIS Pro, d'ArcPy ou de QGIS
 **Version 0.9.0a1 : espace de travail intégré, traitements à gauche et résultats explorables à droite.** Elle conserve le prétraitement multispectral à options, le choix des canaux RVB, les exports de bandes séparées, Dask, le moteur CUDA optionnel, les styles QGIS enrichis et les règles Python
 et les 24 maquettes originales. Le rendu autonome et les traitements
 GeoPandas/Rasterio sont nouveaux : cette version ne prétend pas reproduire
-toutes les fonctions de l'extension native. La publication de cette version alpha est en cours de validation
+toutes les fonctions de l'extension native. Cette version alpha est publiée
 sur [PyPI](https://pypi.org/project/cartomize/0.9.0a1/).
 
 Le [parcours SIG et l’audit des connexions](docs/SIG_WORKFLOWS.md) décrit les étapes, les corrections et les limites : importation → contrôle → préparation multispectrale → analyses → composition cartographique → mise en page → contrôle et export. La composition colorée est une branche de visualisation ; les analyses conservent les valeurs scientifiques.
