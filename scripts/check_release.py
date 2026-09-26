@@ -25,7 +25,7 @@ with zipfile.ZipFile(wheel) as z:
     assert metadata['License-Expression']=='GPL-3.0-only'
     assert metadata['Requires-Python']=='>=3.11'
     assert metadata['Description-Content-Type']=='text/markdown'
-    assert {'gui','distributed','gpu'}<=set(metadata.get_all('Provides-Extra'))
+    assert {'gui','notebook','distributed','gpu'}<=set(metadata.get_all('Provides-Extra'))
     assert 'ONDON NKOUA' in metadata['Author']
     urls=dict(value.split(', ',1) for value in metadata.get_all('Project-URL',[]))
     assert urls==project['urls'], 'Distribution project links differ from pyproject.toml.'
@@ -35,7 +35,7 @@ with zipfile.ZipFile(wheel) as z:
     assert 'cartomize/imagery_pipeline.py' in z.namelist()
 with tarfile.open(directory/f'{name}-{version}.tar.gz') as archive:
     names=set(archive.getnames())
-    for file in ('README_PYPI.md','LICENSE','NOTICE.md','pyproject.toml','tests/test_imagery_pipeline.py','scripts/check_release.py'):
+    for file in ('README_PYPI.md','LICENSE','NOTICE.md','pyproject.toml','tests/test_imagery_pipeline.py','tests/test_startup.py','scripts/check_startup.py','scripts/check_release.py'):
         assert f'{name}-{version}/{file}' in names, file
 print(json.dumps({'name':name,'version':version,'files':[
     {'filename':p.name,'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}
