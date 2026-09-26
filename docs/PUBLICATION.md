@@ -1,15 +1,15 @@
 # Publication de Cartomize sur PyPI
 
-Paquet : `cartomize` · Version publiée : `0.8.1a2` · Auteur : ONDON NKOUA Cédrick Belmich.
+Paquet : `cartomize` · Version publiée : `0.8.2a1` · Auteur : ONDON NKOUA Cédrick Belmich.
 
-La version alpha [0.8.1a2](https://pypi.org/project/cartomize/0.8.1a2/) a été publiée le 26 septembre 2026 depuis le commit `4f03cdf1252d92fbf6948e11cbd6690c33da4581`. Le [workflow de publication](https://github.com/cedrick14/cartomize-python/actions/runs/36259622365) a réussi. Les deux fichiers publics correspondent aux empreintes SHA256 des distributions validées :
+La version alpha [0.8.2a1](https://pypi.org/project/cartomize/0.8.2a1/) a été publiée le 26 septembre 2026 depuis le commit `e704db4dfdfe6b47f307d768a5f4f82d1eb6a8cc`. Le [workflow de publication](https://github.com/cedrick14/cartomize-python/actions/runs/36266212081) et la [matrice Linux/Windows](https://github.com/cedrick14/cartomize-python/actions/runs/36266211867) ont réussi : 324 tests et 2 ignorés par configuration principale, 34 tests Windows Conda. Les deux fichiers publics ont été téléchargés et leurs SHA256 comparés aux distributions validées :
 
 | Fichier | SHA256 |
 |---|---|
-| `cartomize-0.8.1a2-py3-none-any.whl` | `5c8633c7375cda4f7c66d0e692a7174653bb17785e94ce809aa39f06324ec593` |
-| `cartomize-0.8.1a2.tar.gz` | `1ee9ee6f8a078965fa8d17279101741a47d2e8fbcbbb4ca649d57f23fb887ed6` |
+| `cartomize-0.8.2a1-py3-none-any.whl` | `e59bd6a5174bad81a637f390a1b067416539ae082c23c7bbd1ae95ce3064c4c7` |
+| `cartomize-0.8.2a1.tar.gz` | `d1fbb44d7a81f6e1dea5a9e4216875fb18954a22ee2b67b1f9be8662128be6e4` |
 
-La première version publique, [0.8.1a1](https://pypi.org/project/cartomize/0.8.1a1/), reste disponible. La version 0.8.1a2 ajoute le chargement anticipé d’XML et l’intégration Qt des notebooks. Voir les [commandes et limites de validation](NOTEBOOKS.md).
+Cette version conserve les bandes scientifiques dans les plans, relie les références de validation à la classification, réordonne les outils et contrôle la carte avant les exports automatisés. L’[audit SIG](SIG_WORKFLOWS.md) décrit les corrections et les limites. Les versions [0.8.1a1](https://pypi.org/project/cartomize/0.8.1a1/) et [0.8.1a2](https://pypi.org/project/cartomize/0.8.1a2/) restent disponibles ; 0.8.1a2 avait introduit les améliorations XML et notebooks.
 
 ## Dépôt autonome
 
@@ -40,7 +40,7 @@ Le fichier `.github/workflows/pypi-publish.yml` exécute les tests, construit le
 Un push ordinaire sur `main` effectue la validation sans publier. La publication est autorisée uniquement dans `cedrick14/cartomize-python`, avec l’une des commandes de lancement suivantes :
 
 - Exécution manuelle **Run workflow**, destination `pypi`, après configuration de l’éditeur de confiance.
-- Tag `python-v0.8.1a2`, dont le numéro doit correspondre au `pyproject.toml`.
+- Tag `python-v0.8.2a1`, dont le numéro doit correspondre au `pyproject.toml`.
 - Commit explicite sur `main` dont le message contient `[publish pypi]`.
 
 Utiliser une seule méthode pour une version. La destination manuelle `check` ne publie rien ; `testpypi` utilise l’index de test. Le workflow doit être présent sur la branche par défaut pour proposer l’exécution manuelle.
@@ -60,8 +60,8 @@ python scripts/check_release.py pypi-dist
 
 Les deux fichiers attendus sont :
 
-- `cartomize-0.8.1a2-py3-none-any.whl`
-- `cartomize-0.8.1a2.tar.gz`
+- `cartomize-0.8.2a1-py3-none-any.whl`
+- `cartomize-0.8.2a1.tar.gz`
 
 La description publique provient de `README_PYPI.md`. Les métadonnées de distribution doivent pointer vers le dépôt de la bibliothèque Python. Les références au dépôt historique sont conservées uniquement lorsqu’elles documentent la provenance ou des validations antérieures.
 
@@ -70,11 +70,11 @@ La description publique provient de `README_PYPI.md`. Les métadonnées de distr
 Vérifier la version, les deux fichiers et leurs SHA256 sur PyPI, puis installer depuis l’index public dans un environnement distinct :
 
 ```bash
-python -m pip install "cartomize[gui]==0.8.1a2"
+python -m pip install "cartomize[gui]==0.8.2a1"
 python -m cartomize gui
 ```
 
-Le suffixe `a2` désigne une version alpha. La présence sur PyPI est une distribution publique, pas une certification scientifique. Les fichiers déjà publiés ne peuvent pas être remplacés sous le même nom.
+Le suffixe `a1` désigne une version alpha. La présence sur PyPI est une distribution publique, pas une certification scientifique. Les fichiers déjà publiés ne peuvent pas être remplacés sous le même nom.
 
 Références officielles :
 

@@ -1,10 +1,10 @@
 # Validation des parcours Cartomize 0.8.2a1
 
-26 septembre 2026. Le candidat `de7011bde040f3043fa837cbe4bd66175fb2b6e8` a passé la [matrice Linux/Windows, Python 3.11/3.12](https://github.com/cedrick14/cartomize-python/actions/runs/36265919955) et le [contrôle Windows Conda avec un vrai noyau Jupyter](https://github.com/cedrick14/cartomize-python/actions/runs/36265920157).
+26 septembre 2026. La version publiée provient du commit `e704db4dfdfe6b47f307d768a5f4f82d1eb6a8cc`. Elle a passé la [matrice Linux/Windows, Python 3.11/3.12](https://github.com/cedrick14/cartomize-python/actions/runs/36266211867) et les **34 tests Windows Conda**, avec un vrai noyau Jupyter, dans le [workflow de publication](https://github.com/cedrick14/cartomize-python/actions/runs/36266212081).
 
 Les sept nouveaux tests couvrent la conservation des bandes SWIR, les canaux RVB choisis, les prérequis détectés avant traitement, une analyse à deux bandes sans RVB, le transfert du raster scientifique vers la classification, les références de validation indépendantes et la production d’une carte avec rapport de contrôle. La suite principale compte **324 réussites et 2 tests ignorés** ; l’interopérabilité QGIS est vérifiée dans un travail séparé. Le test CUDA matériel reste ignoré sans GPU.
 
-Le contrôle cartographique a également été raccordé à la production directe ; les neuf tests des parcours concernés et les cinq tests de fenêtre concernés ont réussi localement après les derniers ajustements. La publication relance la suite complète et le contrôle Conda sur son commit exact.
+Le contrôle cartographique a également été raccordé à la production directe ; les neuf tests des parcours concernés et les cinq tests de fenêtre concernés ont réussi localement après les derniers ajustements. La publication a relancé et validé la suite complète et le contrôle Conda sur son commit exact. Les deux fichiers téléchargés depuis PyPI correspondent aux SHA256 des distributions validées, consignés dans le [compte rendu de publication](PUBLICATION.md).
 
 Les données de ces tests sont synthétiques. Les résultats ne constituent pas une validation thématique sur le terrain ni un benchmark de grandes scènes. L’[audit des parcours](SIG_WORKFLOWS.md) précise la logique et les limites scientifiques. Le compte rendu 0.8.1a1 ci-dessous est historique ; ses déclarations de non-publication concernent cette ancienne livraison.
 

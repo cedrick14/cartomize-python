@@ -1,6 +1,6 @@
 # Logique des traitements SIG et de la production cartographique
 
-Audit du 26 septembre 2026. Version étudiée : 0.8.1a2. Corrections préparées : 0.8.2a1.
+Audit du 26 septembre 2026. Version étudiée : 0.8.1a2. Corrections implémentées et publiées : [0.8.2a1](https://pypi.org/project/cartomize/0.8.2a1/). Voir les [résultats de validation](VALIDATION.md).
 
 ## Principe de fonctionnement
 
