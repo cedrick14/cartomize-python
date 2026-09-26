@@ -8,11 +8,11 @@ par **ONDON NKOUA Cédrick Belmich**.
 Ce dépôt contient la bibliothèque Python autonome Cartomize. Le plugin QGIS est maintenu dans un projet distinct. Le nom du paquet et de son module Python est `cartomize`.
 Le moteur autonome fonctionne sans installation d'ArcGIS Pro, d'ArcPy ou de QGIS.
 
-**Version 0.8.2a1 : parcours SIG ordonné, conservation des bandes scientifiques et classification reliée à la validation.** Elle conserve le prétraitement multispectral à options, le choix des canaux RVB, les exports de bandes séparées, Dask, le moteur CUDA optionnel, les styles QGIS enrichis et les règles Python
+**Version 0.9.0a1 : espace de travail intégré, traitements à gauche et résultats explorables à droite.** Elle conserve le prétraitement multispectral à options, le choix des canaux RVB, les exports de bandes séparées, Dask, le moteur CUDA optionnel, les styles QGIS enrichis et les règles Python
 et les 24 maquettes originales. Le rendu autonome et les traitements
 GeoPandas/Rasterio sont nouveaux : cette version ne prétend pas reproduire
-toutes les fonctions de l'extension native. Cette version alpha est disponible
-sur [PyPI](https://pypi.org/project/cartomize/0.8.2a1/).
+toutes les fonctions de l'extension native. La publication de cette version alpha est en cours de validation
+sur [PyPI](https://pypi.org/project/cartomize/0.9.0a1/).
 
 Le [parcours SIG et l’audit des connexions](docs/SIG_WORKFLOWS.md) décrit les étapes, les corrections et les limites : importation → contrôle → préparation multispectrale → analyses → composition cartographique → mise en page → contrôle et export. La composition colorée est une branche de visualisation ; les analyses conservent les valeurs scientifiques.
 
@@ -23,7 +23,7 @@ Le [guide du prétraitement à options](docs/IMAGERY_SELECTION.md) décrit la s�
 Python 3.11 ou plus récent. Installation depuis PyPI :
 
 ```bash
-python -m pip install "cartomize==0.8.2a1"
+python -m pip install "cartomize==0.9.0a1"
 ```
 
 Pour développer la bibliothèque, depuis une copie de ce dépôt :
@@ -37,8 +37,12 @@ réseau n'est nécessaire pour traiter des fichiers locaux après installation.
 
 ## Interface graphique
 
+La fenêtre de cette version utilise Python 3.11 à 3.13 et la série Qt 6.9 validée. Les options `gui` et `notebook` installent automatiquement cette dépendance ; fermer la fenêtre et redémarrer le noyau après mise à jour.
+
+Le [guide de l’espace de résultats](docs/RESULTS_WORKSPACE.md) décrit les panneaux redimensionnables, les onglets, le zoom par lecture de l’emprise visible, les légendes, les métadonnées, les comparaisons géographiques, les tableaux paginés et les graphiques intégrés. Les aperçus et résultats des traitements s’affichent dans la fenêtre principale.
+
 ```bash
-python -m pip install "cartomize[gui]==0.8.2a1"
+python -m pip install "cartomize[gui]==0.9.0a1"
 python -m cartomize gui
 ```
 
@@ -49,7 +53,7 @@ import cartomize as cm
 cm.launch()
 ```
 
-Depuis un notebook local, installer les dépendances avec `%pip install "cartomize[notebook]==0.8.2a1"`, redémarrer le noyau, puis utiliser les deux lignes Python ci-dessus. La cellule se termine et la fenêtre reste réactive. Voir le [guide des notebooks et de la validation Windows Conda](docs/NOTEBOOKS.md).
+Depuis un notebook local, installer les dépendances avec `%pip install "cartomize[notebook]==0.9.0a1"`, redémarrer le noyau, puis utiliser les deux lignes Python ci-dessus. La cellule se termine et la fenêtre reste réactive. Voir le [guide des notebooks et de la validation Windows Conda](docs/NOTEBOOKS.md).
 
 L’ouverture donne accès à **Assistant cartographique** : objectif, données, zone d’étude et examen initial. Les étapes proposées sont justifiées et ouvrent les outils avec leurs entrées. **Production automatisée** conserve le parcours complet scènes → mosaïque → multibande → masque → composition colorée → export. Les indices,
 la calculatrice et les statistiques restent accessibles comme outils

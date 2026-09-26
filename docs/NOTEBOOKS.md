@@ -1,9 +1,9 @@
 # Cartomize dans un notebook local
 
-Cartomize nécessite Python 3.11 ou plus récent. Dans un notebook utilisant ce Python, installer les dépendances de la fenêtre et du noyau :
+La bibliothèque Cartomize nécessite Python 3.11 ou plus récent. La fenêtre de cette version utilise Python 3.11 à 3.13 et Qt 6.9. Dans un notebook utilisant ce Python, installer les dépendances de la fenêtre et du noyau :
 
 ```python
-%pip install --upgrade "cartomize[notebook]==0.8.2a1"
+%pip install --upgrade "cartomize[notebook]==0.9.0a1"
 ```
 
 Après installation ou mise à jour, redémarrer le noyau. Ouvrir ensuite la fenêtre :

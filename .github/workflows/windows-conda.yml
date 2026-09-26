@@ -34,6 +34,6 @@ jobs:
       - name: Verify installed startup, XML, raster, vector and GUI
         run: python scripts/check_startup.py --gui
       - name: Verify notebook event loop and desktop processing
-        run: python -m pytest tests/test_startup.py tests/test_desktop.py tests/test_desktop_imagery.py -v
+        run: python -m pytest tests/test_results_workspace.py tests/test_startup.py tests/test_desktop.py tests/test_desktop_imagery.py -v
         env:
           QT_QPA_PLATFORM: offscreen

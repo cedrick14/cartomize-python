@@ -101,7 +101,7 @@ class SessionControls:
             if getattr(page,'project',None) is not None and hasattr(page.project,'manifest'):extras['project_manifest']=str(page.project.manifest)
             pages[key]=dict(widgets=capture_widgets(page),extras=extras)
         return json_value(dict(schema='cartomize.desktop.v1',pages=pages,selected=next(k for k,v in self.tool_pages.items() if v is self.pages[self.stack.currentIndex()]),
-            results=self.results,production_config=self.production_config,processing={k:widget_state(getattr(self,k)) for k in ('workers','block_size','memory','overwrite','execution_settings')},
+            results=self.results,production_config=self.production_config,workspace=self.workspace.capture(),splitter=self.workspace_splitter.sizes(),processing={k:widget_state(getattr(self,k)) for k in ('workers','block_size','memory','overwrite','execution_settings')},
             input_directories=[str(Path(page.source.text()).resolve()) for page in self.pages if hasattr(page,'source') and getattr(page.source,'mode',None)=='directory' and page.source.text() and Path(page.source.text()).is_dir()]))
     def restore_session(self,state):
         if state.get('schema')!='cartomize.desktop.v1':raise ValueError('Le document ne contient pas une session de la fenêtre.')
@@ -130,6 +130,8 @@ class SessionControls:
                 if layer.get('classes') and layer.get('kind')=='raster':layer['classes']={float(k):v for k,v in layer['classes'].items()}
                 if Path(layer['data']).is_file():self.register_result(layer)
             self.results_box.setVisible(bool(self.results));self.production_config=state.get('production_config');self.resume_button.setVisible(bool(self.production_config))
+            self.workspace.restore(state.get('workspace',{'records':self.results}))
+            if state.get('splitter'):self.workspace_splitter.setSizes(state['splitter'])
             for key,value in state.get('processing',{}).items():restore_widget(getattr(self,key),value)
             self.select_tool(state.get('selected','assistant'))
         finally:self._restoring=False

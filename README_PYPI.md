@@ -11,17 +11,17 @@ Optional native project bridges require the corresponding installed GIS software
 
 ## Installation
 
-Python 3.11 or newer is required. Version **0.8.2a1 is an alpha release**.
+Python 3.11 or newer is required. Version **0.9.0a1 is an alpha release**.
 Linux and Windows have been tested with Python 3.11 and 3.12.
 
 ```bash
-python -m pip install "cartomize==0.8.2a1"
+python -m pip install "cartomize==0.9.0a1"
 ```
 
-For the desktop interface and optional Dask execution:
+The desktop interface requires Python 3.11–3.13 and selects the tested Qt 6.9 series automatically. For the interface and optional Dask execution:
 
 ```bash
-python -m pip install "cartomize[gui,distributed]==0.8.2a1"
+python -m pip install "cartomize[gui,distributed]==0.9.0a1"
 python -m cartomize gui
 ```
 
@@ -36,10 +36,10 @@ Importing the library does not open a window automatically.
 
 ### Jupyter notebooks on a local computer
 
-Install the notebook extra in a Python 3.11+ kernel:
+Install the notebook extra in a Python 3.11–3.13 kernel:
 
 ```python
-%pip install "cartomize[notebook]==0.8.2a1"
+%pip install "cartomize[notebook]==0.9.0a1"
 ```
 
 Restart the kernel after upgrading, then run:
@@ -54,13 +54,19 @@ its desktop window remains responsive. The window opens on the computer
 running the kernel; a headless or remote notebook cannot display it in the
 browser. The processing API works without a desktop.
 
-Version 0.8.2a1 preserves selected spectral bands throughout automation, connects classification validation settings, and checks map quality before automated export.
+Version 0.9.0a1 preserves selected spectral bands throughout automation, connects classification validation settings, and checks map quality before automated export.
 
 See the [GIS workflow audit](https://github.com/cedrick14/cartomize-python/blob/main/docs/SIG_WORKFLOWS.md) for processing order, verified connections and remaining limitations.
 
 The startup improvements introduced in 0.8.1a2 initialize Python's XML parser before geospatial DLLs are
 loaded, addressing Windows Conda startup conflicts. It also adds the
 `notebook` extra with a compatible `typing_extensions` requirement.
+
+## Integrated results workspace
+
+The desktop now uses two resizable panels: processing controls on the left, results on the right. Raster and vector layers, map PDFs/SVGs, images, tables, reports and plots open in embedded tabs. Raster zoom reads the visible source window at the requested resolution; display settings never rewrite scientific values.
+
+Compare results side by side with linked geographic extents and an optional common colour scale. Inspect band values, legends, coordinates and metadata. CSV and attribute tables are paged; plots use the displayed page. Existing results remain navigable while processing runs. See the [workspace guide](https://github.com/cedrick14/cartomize-python/blob/main/docs/RESULTS_WORKSPACE.md) for controls and limits.
 
 ## Satellite image preparation
 

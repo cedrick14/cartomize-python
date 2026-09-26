@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import rasterio
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QGroupBox,QHBoxLayout,QComboBox,QPushButton,QDialog,QVBoxLayout,QPlainTextEdit
+from PySide6.QtWidgets import QGroupBox,QHBoxLayout,QComboBox,QPushButton,QVBoxLayout
 
 RASTERS={'.tif','.tiff','.jp2','.vrt','.img'}
 VECTORS={'.gpkg','.shp','.geojson'}
@@ -13,18 +13,19 @@ class ProjectConnections:
     def tool(self,key):return self.tool_pages[key]
     def select_tool(self,key):self.navigation.setCurrentRow(self.pages.index(self.tool(key)))
     def init_results(self,outer):
-        self.results=[];self.results_box=QGroupBox('Résultats du projet');row=QHBoxLayout(self.results_box)
-        self.result_choice=QComboBox();self.result_choice.setMinimumContentsLength(25)
+        self.results=[];self.results_box=QGroupBox('Transfert vers un traitement');box=QVBoxLayout(self.results_box);row=QHBoxLayout()
+        self.result_choice=QComboBox();self.result_choice.setMinimumContentsLength(16);self.result_choice.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
         self.result_target=QComboBox();self.transfer_button=QPushButton('Transmettre au traitement')
-        row.addWidget(self.result_choice,1);row.addWidget(self.result_target);row.addWidget(self.transfer_button)
+        box.addWidget(self.result_choice);row.addWidget(self.result_target,1);row.addWidget(self.transfer_button);box.addLayout(row)
         self.production_config=None;self.resume_button=QPushButton('Reprendre la mise en page');self.resume_button.hide()
-        self.resume_button.clicked.connect(self.resume_production);row.addWidget(self.resume_button)
+        self.resume_button.clicked.connect(self.resume_production);box.addWidget(self.resume_button)
         self.result_choice.currentIndexChanged.connect(self.result_targets)
         self.transfer_button.clicked.connect(self.transfer_selected);outer.addWidget(self.results_box);self.results_box.hide()
     def register_result(self,layer):
         layer=dict(layer);path=str(Path(layer['data']).resolve());layer['data']=path
         suffix=Path(path).suffix.lower()
         if suffix not in RASTERS|VECTORS:return
+        self.workspace.register(layer)
         layer.setdefault('kind','raster' if suffix in RASTERS else 'vector')
         # Refresh existing results, including edited class labels.
         for index,old in enumerate(self.results):
@@ -154,13 +155,5 @@ class ProjectConnections:
         self.tool('atlas').load_config(config);self.tool('atlas').dpi.setValue(self.tool('mapping').dpi.value())
         self.select_tool('atlas');self.status.setText('Couches et habillage transmis. Renseigner la couche d’index et le nom des pages.')
     def show_review(self,path):
-        report=json.loads(Path(path).read_text(encoding='utf-8'))
-        dialog=QDialog(self);dialog.setWindowTitle('Contrôle cartographique');dialog.resize(780,460)
-        from PySide6.QtCore import Qt
-        dialog.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose);layout=QVBoxLayout(dialog);view=QPlainTextEdit();view.setReadOnly(True)
-        labels={'error':'À corriger','warning':'À vérifier','info':'Information'}
-        lines=['Contrôles techniques : '+('aucune erreur bloquante.' if report['valid'] else 'corrections nécessaires.')]
-        lines += [labels[i['severity']]+' — '+((i.get('layer') or '')+' : ' if i.get('layer') else '')+i['message'] for i in report['issues']]
-        lines += ['','Le contrôle des rasters repose sur un échantillon. Vérifier aussi l’exactitude thématique, les étiquettes et la lisibilité de l’export.']
-        view.setPlainText('\n'.join(lines));layout.addWidget(view);dialog.show();self.review_dialog=dialog
+        self.workspace.open_result(path,title='Contrôle cartographique',refresh=True,transient=True)
         self.status.setText('Contrôle cartographique terminé.');self.folder_button.setEnabled(True)

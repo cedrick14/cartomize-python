@@ -1,3 +1,5 @@
+La version 0.9.0a1 organise les traitements et la visualisation en deux panneaux. Voir le [guide de l’espace de travail intégré](RESULTS_WORKSPACE.md).
+
 # Interface 0.6
 
 Les nouveautés et leurs contrôles sont décrits dans [AUTOMATION](AUTOMATION.md) : exécution des plans, classification, projets persistants, géométrie des éléments, recettes, révision, terrain et projets SIG.
@@ -201,8 +203,8 @@ les bibliothèques SIG. Aucun import manuel d’Expat n’est nécessaire.
    les couches. Renseigner les emplacements de texte, tableau CSV ou graphique
    présents dans la maquette. Pour un graphique, préciser les colonnes de
    libellés et de valeurs du CSV.
-4. Utiliser **Aperçu cartographique** pour contrôler le rendu réel dans une
-   fenêtre séparée. L’aperçu s’exécute en arrière-plan, sans demander de nom
+4. Utiliser **Aperçu cartographique** pour contrôler le rendu réel dans un
+   onglet du panneau de visualisation. L’aperçu s’exécute en arrière-plan, sans demander de nom
    de fichier définitif.
 5. Choisir le fichier de sortie et cliquer sur **Exporter la carte**.
 

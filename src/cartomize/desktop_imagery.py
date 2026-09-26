@@ -5,7 +5,7 @@ from pathlib import Path
 import rasterio
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFormLayout, QHeaderView,
-    QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem, QFileDialog)
+    QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem, QFileDialog, QWidget, QHBoxLayout)
 
 import cartomize as cm
 from .desktop import Page, PathField, RASTER_FILTER, VECTOR_FILTER, spin
@@ -29,12 +29,13 @@ class PreparationPage(Page):
         clear = QPushButton("Utiliser le répertoire")
         select.clicked.connect(self.select_files)
         clear.clicked.connect(self.clear_files)
-        self.form.addRow(select, clear)
+        selection_controls=QWidget();selection_row=QHBoxLayout(selection_controls);selection_row.setContentsMargins(0,0,0,0)
+        selection_row.addWidget(select);selection_row.addWidget(clear);self.form.addRow(selection_controls)
         inspect = QPushButton("Analyser les bandes")
         inspect.clicked.connect(self.inspect_inputs)
         self.inventory = QLabel("Sélectionner les bandes ou analyser un répertoire.")
         self.inventory.setWordWrap(True)
-        self.form.addRow(inspect, self.inventory)
+        self.form.addRow(inspect);self.form.addRow(self.inventory)
         self.assets = QTableWidget(0, 8)
         self.assets.setHorizontalHeaderLabels(["Inclure", "Scène", "Bande spectrale", "Fichier", "Numéro", "Échelle", "Décalage", "Date"])
         self.assets.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
@@ -49,11 +50,14 @@ class PreparationPage(Page):
         self.form.addRow("Couche de délimitation", self.aoi)
         self.mosaic = QCheckBox("Mosaïque des scènes")
         self.mosaic.setChecked(True)
-        self.multiband = QCheckBox("Assemblage multibande — conserver le GeoTIFF scientifique")
+        self.multiband = QCheckBox("Assemblage multibande")
+        self.multiband.setToolTip('Conserver le GeoTIFF scientifique multibande.')
         self.multiband.setChecked(True)
-        self.clip = QCheckBox("Extraction par masque — couche de délimitation")
-        self.colour = QCheckBox("Composition colorée — GeoTIFF de visualisation séparé")
-        self.separate = QCheckBox("Extraction des bandes — un GeoTIFF par bande")
+        self.clip = QCheckBox("Extraction par masque")
+        self.colour = QCheckBox("Composition colorée")
+        self.colour.setToolTip('Enregistrer la visualisation dans un GeoTIFF séparé des valeurs scientifiques.')
+        self.separate = QCheckBox("Extraction des bandes")
+        self.separate.setToolTip('Enregistrer un GeoTIFF distinct par bande.')
         for control in (self.mosaic, self.multiband, self.clip, self.colour, self.separate):
             self.form.addRow(control)
         self.rgb_red = QComboBox()

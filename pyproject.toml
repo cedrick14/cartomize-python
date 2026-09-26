@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cartomize"
-version = "0.8.2a1"
+version = "0.9.0a1"
 description = "Cartographic layouts, raster analysis and automated geospatial workflows"
 readme = "README_PYPI.md"
 requires-python = ">=3.11"
@@ -21,8 +21,10 @@ classifiers = [
 dependencies = ["geopandas>=1.0,<2", "matplotlib>=3.8,<4", "numpy>=1.26,<3", "pyproj>=3.6,<4", "rasterio>=1.4,<2", "scipy>=1.11,<2", "scikit-learn>=1.5,<2"]
 
 [project.optional-dependencies]
-gui = ["PySide6-Essentials>=6.7,<7"]
-notebook = ["PySide6-Essentials>=6.7,<7", "ipykernel>=6.29,<8", "jupyter-client>=8.6,<9", "typing_extensions>=4.13,<5"]
+# Qt 6.11.2 crashed during repeated Graphics View destruction/creation in our
+# lifecycle regression. Keep the desktop on the tested 6.9 maintenance series.
+gui = ["PySide6-Essentials>=6.9.3,<6.10", "pypdfium2>=4.30,<6"]
+notebook = ["PySide6-Essentials>=6.9.3,<6.10", "pypdfium2>=4.30,<6", "ipykernel>=6.29,<8", "jupyter-client>=8.6,<9", "typing_extensions>=4.13,<5"]
 distributed = ["dask[distributed]>=2024.8,<2027"]
 gpu = ["cupy-cuda12x[ctk]>=14,<15"]
 dev = ["pytest>=8,<10", "build>=1,<2", "twine>=6,<8"]

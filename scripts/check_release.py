@@ -33,9 +33,11 @@ with zipfile.ZipFile(wheel) as z:
     assert '## Installation' in metadata.get_payload()
     assert 'cartomize/desktop_imagery.py' in z.namelist()
     assert 'cartomize/imagery_pipeline.py' in z.namelist()
+    for module in ('viewer_data','desktop_canvas','desktop_tables','desktop_results'):
+        assert f'cartomize/{module}.py' in z.namelist()
 with tarfile.open(directory/f'{name}-{version}.tar.gz') as archive:
     names=set(archive.getnames())
-    for file in ('README_PYPI.md','LICENSE','NOTICE.md','pyproject.toml','tests/test_imagery_pipeline.py','tests/test_startup.py','scripts/check_startup.py','scripts/check_release.py'):
+    for file in ('README_PYPI.md','LICENSE','NOTICE.md','pyproject.toml','tests/test_imagery_pipeline.py','tests/test_startup.py','tests/test_results_workspace.py','docs/RESULTS_WORKSPACE.md','scripts/check_startup.py','scripts/check_release.py'):
         assert f'{name}-{version}/{file}' in names, file
 print(json.dumps({'name':name,'version':version,'files':[
     {'filename':p.name,'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}

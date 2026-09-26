@@ -8,12 +8,12 @@ from .desktop_connections import ProjectConnections
 from .desktop_session import SessionControls
 
 try:
-    from PySide6.QtCore import Qt, QObject, QThread, Signal, Slot, QUrl
+    from PySide6.QtCore import Qt, QObject, QThread, Signal, Slot, QUrl, QSize
     from PySide6.QtGui import QDesktopServices, QIcon, QPixmap, QColor, QPalette
     from PySide6.QtWidgets import (QApplication,QMainWindow,QWidget,QHBoxLayout,QVBoxLayout,
         QFormLayout,QLabel,QLineEdit,QPushButton,QFileDialog,QListWidget,QListWidgetItem,
         QStackedWidget,QComboBox,QSpinBox,QDoubleSpinBox,QCheckBox,QPlainTextEdit,
-        QTableWidget,QTableWidgetItem,QHeaderView,QProgressBar,QMessageBox,QGroupBox,QScrollArea,QTabWidget,QDialog)
+        QTableWidget,QTableWidgetItem,QHeaderView,QProgressBar,QMessageBox,QGroupBox,QScrollArea,QTabWidget,QSplitter,QToolButton,QListView)
 except ImportError as exc:
     raise ImportError('Interface graphique indisponible. Installer : python -m pip install "PySide6-Essentials>=6.7,<7"') from exc
 
@@ -60,8 +60,10 @@ class Page(QWidget):
         heading=QLabel(title);heading.setObjectName("pageTitle")
         detail=QLabel(description);detail.setWordWrap(True);detail.setObjectName("description")
         self.layout.addWidget(heading);self.layout.addWidget(detail)
-        self.form=QFormLayout();self.form.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
-        self.layout.addLayout(self.form)
+        self.parameter_card=QGroupBox('Données et paramètres');self.parameter_card.setObjectName('parameterCard')
+        self.form=QFormLayout(self.parameter_card);self.form.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
+        self.form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.WrapAllRows)
+        self.layout.addWidget(self.parameter_card)
         self.output=PathField("save","GeoTIFF (*.tif)")
     def finish(self):
         self.form.addRow("Fichier de sortie",self.output);self.layout.addStretch()
@@ -329,7 +331,7 @@ class MappingPage(Page):
         return lambda progress,cancel:self.build_map(config).export(destination,dpi=dpi,overwrite=options["overwrite"])
     def preview_job(self,path):
         config=self.capture_map()
-        return lambda progress,cancel:self.build_map(config).export(path,dpi=100,overwrite=True)
+        return lambda progress,cancel:self.build_map(config).export(path,dpi=250,overwrite=True)
 
 
 class AtlasPage(MappingPage):
@@ -477,7 +479,7 @@ class Worker(QThread):
 
 class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
     def __init__(self):
-        super().__init__();self.setWindowTitle("Cartomize");self.resize(1220,940);self.setMinimumSize(980,700)
+        super().__init__();self.setWindowTitle("Cartomize");self.resize(1440,940);self.setMinimumSize(1100,700)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         self.thread=None;self.worker=None;self.cancel_event=None;self.output_path=None
         self._preview_target=None;self._preview_directory=tempfile.TemporaryDirectory(prefix="cartomize-preview-")
@@ -498,9 +500,22 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
         subtitle=QLabel("Assistant cartographique intelligent");subtitle.setObjectName("muted");identity.addWidget(subtitle)
         header.addLayout(identity);header.addStretch();version=QLabel(cm.__version__);version.setObjectName("muted");header.addWidget(version);outer.addLayout(header)
         session_bar=QHBoxLayout();self.init_session(session_bar);session_bar.addStretch();outer.addLayout(session_bar)
-        body=QHBoxLayout();outer.addLayout(body,1)
-        self.navigation=QListWidget();self.navigation.setFixedWidth(245);self.navigation.setObjectName("navigation");body.addWidget(self.navigation)
-        self.stack=QStackedWidget();body.addWidget(self.stack,1)
+        self.workspace_splitter=QSplitter(Qt.Orientation.Horizontal);self.workspace_splitter.setChildrenCollapsible(False);outer.addWidget(self.workspace_splitter,1)
+        self.controls_panel=QWidget();self.controls_panel.setMinimumWidth(400);controls=QVBoxLayout(self.controls_panel);controls.setContentsMargins(0,0,8,0);controls.setSpacing(7)
+        self.workspace_splitter.addWidget(self.controls_panel)
+        from .desktop_results import ResultsWorkspace
+        self.workspace=ResultsWorkspace();self.workspace.setMinimumWidth(500);self.workspace_splitter.addWidget(self.workspace)
+        self.workspace_splitter.setStretchFactor(0,0);self.workspace_splitter.setStretchFactor(1,1);self.workspace_splitter.setSizes([490,910])
+        panel_header=QHBoxLayout();panel_title=QLabel('Contrôle et traitements');panel_title.setObjectName('panelTitle');panel_header.addWidget(panel_title);panel_header.addStretch()
+        self.catalogue_toggle=QToolButton();self.catalogue_toggle.setText('Outils');self.catalogue_toggle.setCheckable(True);self.catalogue_toggle.setChecked(True);panel_header.addWidget(self.catalogue_toggle);controls.addLayout(panel_header)
+        self.catalogue=QWidget();catalogue_layout=QVBoxLayout(self.catalogue);catalogue_layout.setContentsMargins(0,0,0,0);catalogue_layout.setSpacing(4)
+        self.tool_search=QLineEdit();self.tool_search.setPlaceholderText('Rechercher un traitement');catalogue_layout.addWidget(self.tool_search)
+        self.navigation=QListWidget();self.navigation.setObjectName("navigation");self.navigation.setViewMode(QListView.ViewMode.IconMode)
+        self.navigation.setResizeMode(QListView.ResizeMode.Adjust);self.navigation.setMovement(QListView.Movement.Static);self.navigation.setWordWrap(True)
+        self.navigation.setGridSize(QSize(200,56));self.navigation.setMinimumHeight(130);self.navigation.setMaximumHeight(180);catalogue_layout.addWidget(self.navigation)
+        controls.addWidget(self.catalogue);self.catalogue_toggle.toggled.connect(self.catalogue.setVisible)
+        self.tool_search.textChanged.connect(self.filter_tools)
+        self.stack=QStackedWidget();self.stack.setMinimumHeight(170);controls.addWidget(self.stack,1)
         from .desktop_tools import InspectionPage,VectorPage,RasterToolsPage
         from .desktop_project import ProjectPage
         from .desktop_assistant import AssistantPage
@@ -520,6 +535,13 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
         self.pages=list(self.tool_pages.values());titles=['Assistant cartographique' if key=='assistant' else TOOL_LABELS[key] for key in self.tool_pages]
         for title,page in zip(titles,self.pages):
             self.navigation.addItem(title);scroll=QScrollArea();scroll.setWidgetResizable(True);scroll.setWidget(page);self.stack.addWidget(scroll)
+            for form in page.findChildren(QFormLayout):form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.WrapAllRows)
+            for report in page.findChildren(QPlainTextEdit):
+                if report.isReadOnly():
+                    report.hide()
+                    for form in page.findChildren(QFormLayout):
+                        label=form.labelForField(report)
+                        if label is not None:label.hide()
             if isinstance(page,MappingPage):
                 page.previewRequested.connect(lambda:self.start(preview=True));page.reviewRequested.connect(lambda:self.start(review=True))
                 page.atlasRequested.connect(self.prepare_atlas)
@@ -529,37 +551,47 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
         self.tool('assistant').planRequested.connect(lambda:self.start(proposal=True))
         self.tool('assistant').executeRequested.connect(lambda:self.start(execute_plan=True))
         self.navigation.currentRowChanged.connect(self.stack.setCurrentIndex);self.navigation.currentRowChanged.connect(self.page_changed)
-        settings=QGroupBox("Paramètres de traitement");self.settings=settings;row=QHBoxLayout(settings)
+        self.engine_toggle=QToolButton();self.engine_toggle.setText('Paramètres de calcul et de sortie');self.engine_toggle.setCheckable(True);controls.addWidget(self.engine_toggle)
+        self.engine_panel=QWidget();engine_layout=QVBoxLayout(self.engine_panel);engine_layout.setContentsMargins(0,0,0,0);controls.addWidget(self.engine_panel);self.engine_panel.hide()
+        self.engine_toggle.toggled.connect(self.engine_panel.setVisible)
+        settings=QGroupBox("Paramètres de traitement");self.settings=settings;row=QFormLayout(settings)
         self.workers=spin(min(4,os.cpu_count() or 1),1,32);self.block_size=QComboBox();self.block_size.addItems(["256","512","1024","2048"]);self.block_size.setCurrentText("512")
         self.memory=spin(512,16,32768);self.memory.setSuffix(" Mio")
         self.overwrite=QCheckBox("Remplacer les fichiers existants")
         self.engine_labels=[]
         for label,widget in [("Threads de calcul",self.workers),("Bloc (pixels)",self.block_size),("Budget des tableaux",self.memory)]:
-            caption=QLabel(label);self.engine_labels.append(caption);row.addWidget(caption);row.addWidget(widget)
-        row.addWidget(self.overwrite);outer.addWidget(settings)
+            caption=QLabel(label);self.engine_labels.append(caption);row.addRow(caption,widget)
+        row.addRow(self.overwrite);engine_layout.addWidget(settings)
         from .desktop_execution import ExecutionSettings
-        self.execution_settings=ExecutionSettings();outer.addWidget(self.execution_settings)
-        self.init_results(outer)
+        self.execution_settings=ExecutionSettings();engine_layout.addWidget(self.execution_settings)
+        self.init_results(controls)
         bottom=QHBoxLayout();self.run_button=QPushButton("Exécuter");self.run_button.setObjectName("primary")
         self.cancel_button=QPushButton("Annuler");self.cancel_button.setEnabled(False)
         self.folder_button=QPushButton("Ouvrir le répertoire de sortie");self.folder_button.setEnabled(False)
-        bottom.addWidget(self.run_button);bottom.addWidget(self.cancel_button);bottom.addStretch();bottom.addWidget(self.folder_button);outer.addLayout(bottom)
-        self.progress=QProgressBar();self.progress.setValue(0);outer.addWidget(self.progress)
-        self.status=QLabel("Prêt.");self.status.setWordWrap(True);outer.addWidget(self.status)
+        bottom.addWidget(self.run_button);bottom.addWidget(self.cancel_button);bottom.addStretch();session_bar.addWidget(self.folder_button);controls.addLayout(bottom)
+        self.progress=QProgressBar();self.progress.setValue(0);controls.addWidget(self.progress)
+        self.status=QLabel("Prêt.");self.status.setWordWrap(True);self.status.setMaximumHeight(62);controls.addWidget(self.status)
         self.run_button.clicked.connect(self.start);self.cancel_button.clicked.connect(self.cancel)
-        self.folder_button.clicked.connect(lambda:QDesktopServices.openUrl(QUrl.fromLocalFile(str(Path(self.output_path).resolve().parent))))
+        self.folder_button.clicked.connect(lambda:QDesktopServices.openUrl(QUrl.fromLocalFile(str(Path(self.output_path).resolve() if Path(self.output_path).is_dir() else Path(self.output_path).resolve().parent))))
         self.navigation.setCurrentRow(0)
         self.checkpoint()
         self.setStyleSheet("""
             QMainWindow, QWidget { background: #f7f7f7; color: #111111; font-size: 12px; }
             QLabel#brand { color: #000000; font-size: 26px; font-weight: 700; }
+            QLabel#panelTitle { color: #111111; font-size: 16px; font-weight: 600; }
+            QLabel#emptyResults { color: #68716c; background: #f0f2f0; padding: 30px; font-size: 15px; }
+            QGroupBox#parameterCard { background: #ffffff; border: 1px solid #dedfdd; border-radius: 6px; }
+            QSplitter::handle { background: #dedfdd; width: 5px; }
+            QToolButton { border: 1px solid #cccccc; border-radius: 4px; padding: 5px 8px; background: #ffffff; }
             QLabel#pageTitle { color: #000000; font-size: 21px; font-weight: 600; padding-bottom: 4px; }
             QLabel#description { color: #555555; padding-bottom: 8px; }
             QLabel#muted { color: #555555; }
             QLabel#sequence { background: #eeeeee; color: #000000; border: 1px solid #dddddd; border-radius: 4px; padding: 12px; margin-bottom: 8px; line-height: 1.6; }
             QLineEdit,QPlainTextEdit,QTableWidget,QListWidget,QComboBox,QSpinBox,QDoubleSpinBox { background: white; border: 1px solid #cccccc; border-radius: 3px; padding: 5px; selection-background-color: #222222; }
             QLineEdit:focus,QPlainTextEdit:focus { border-color: #222222; }
-            QListWidget#navigation { border: 0; background: #eeeeee; padding: 8px; }
+            QListWidget#navigation { border: 0; background: #f1f2f0; padding: 3px; }
+            QListWidget#navigation::item { background: #ffffff; border: 1px solid #dddfdb; border-radius: 5px; margin: 3px; padding: 6px; }
+            QListWidget#navigation::item:selected { background: #e4e7e2; border: 1px solid #8d968b; color: #111111; }
             QListWidget::item { padding: 10px 6px; }
             QListWidget::item:selected { background: #dddddd; color: #000000; border-radius: 3px; }
             QPushButton { background: white; border: 1px solid #cccccc; border-radius: 4px; padding: 8px 12px; }
@@ -576,6 +608,8 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
             QTabBar::tab:selected { color: #000000; background: #f7f7f7; border-bottom: 2px solid #222222; }
             QHeaderView::section { background: #eeeeee; border: none; border-bottom: 1px solid #cccccc; padding: 6px; }
         """)
+    def filter_tools(self,text):
+        for i in range(self.navigation.count()):self.navigation.item(i).setHidden(text.casefold() not in self.navigation.item(i).text().casefold())
     def page_changed(self,index):
         if index<0:return
         page=self.pages[index]
@@ -586,6 +620,8 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
         from .desktop_project import ProjectPage
         from .desktop_assistant import AssistantPage
         self.settings.setVisible(key not in {'workflow','project','assistant','prepare'})
+        self.engine_toggle.setVisible(key not in {'workflow','project','assistant','prepare'})
+        self.engine_panel.setVisible(self.engine_toggle.isChecked() and self.engine_toggle.isVisible())
         self.settings.setTitle("Paramètres de traitement" if page.engine else "")
         self.settings.setStyleSheet("" if page.engine else "QGroupBox { border: none; margin-top: 0px; padding-top: 0px; }")
         self.run_button.setText("Exécuter la chaîne" if isinstance(page,WorkflowPage) else "Analyser le projet" if isinstance(page,ProjectPage) else "Produire l’atlas" if isinstance(page,AtlasPage) else "Exporter la carte" if isinstance(page,MappingPage) else "Exécuter")
@@ -612,29 +648,32 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
             if proposal:job=page.plan_job()
             elif execute_plan:job=page.execution_job(options)
             elif preview:
-                self._preview_target=Path(self._preview_directory.name)/"apercu.png"
+                self._preview_target=Path(self._preview_directory.name)/"apercu.svg"
                 job=page.preview_job(self._preview_target)
             elif review:job=page.review_job(Path(self._preview_directory.name)/'controle.json')
             else:job=page.job(options)
         except Exception as exc:self.status.setText(str(exc));return
         self.cancel_event=threading.Event();self.worker=Worker(job,self.cancel_event,self,staged=execute_plan or self.pages[self.stack.currentIndex()].staged);self.thread=self.worker
         self.worker.progress.connect(self.show_progress);self.worker.stage.connect(self.status.setText);self.worker.succeeded.connect(self.completed)
+        self.worker.stage.connect(self.workspace.activity.setText)
         self.worker.failed.connect(self.failed);self.worker.cancelled.connect(self.cancelled)
         self.thread.finished.connect(self.cleaned);self.thread.finished.connect(self.thread.deleteLater)
         self.run_button.setEnabled(False);self.navigation.setEnabled(False);self.stack.setEnabled(False);self.settings.setEnabled(False)
         self.results_box.setEnabled(False)
         self.cancel_button.setEnabled(page.cancellable and not preview and not review)
         self.folder_button.setEnabled(False);self.progress.setRange(0,0);self.status.setText("Traitement en cours.")
+        self.workspace.activity.setText('Traitement en cours · les vues existantes restent consultables.')
         self.thread.start()
     @Slot(int,int)
-    def show_progress(self,done,total):self.progress.setRange(0,max(1,total));self.progress.setValue(done)
+    def show_progress(self,done,total):
+        self.progress.setRange(0,max(1,total));self.progress.setValue(done)
+        self.workspace.activity.setText(f'Traitement : {int(done/max(1,total)*100)} % · {self.status.text()}')
     @Slot(str)
     def completed(self,path):
         self.output_path=path;self.progress.setRange(0,100);self.progress.setValue(100)
+        self.workspace.activity.setText('Traitement terminé · résultat disponible dans la vue intégrée.')
         if self._preview_target is not None:
-            dialog=QDialog(self);dialog.setWindowTitle("Aperçu cartographique");layout=QVBoxLayout(dialog);label=QLabel()
-            pixmap=QPixmap(path);label.setPixmap(pixmap.scaled(1050,760,Qt.AspectRatioMode.KeepAspectRatio,Qt.TransformationMode.SmoothTransformation))
-            layout.addWidget(label);dialog.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose);dialog.show();self.preview_dialog=dialog
+            self.workspace.open_result(path,title='Aperçu cartographique',refresh=True,transient=True)
             self.status.setText("Aperçu cartographique actualisé.")
         elif self._reviewing:self.show_review(path)
         else:
@@ -642,10 +681,15 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
             page=self.pages[self.stack.currentIndex()]
             if hasattr(page,"show_result"):page.show_result(path)
             self.collect_result(path)
+            self.workspace.show_output(path)
     @Slot(str)
-    def failed(self,error):self.progress.setRange(0,100);self.progress.setValue(0);self.status.setText("Échec du traitement : "+error)
+    def failed(self,error):
+        self.progress.setRange(0,100);self.progress.setValue(0);self.status.setText("Échec du traitement : "+error)
+        self.workspace.activity.setText('Échec du traitement : '+error)
     @Slot()
-    def cancelled(self):self.progress.setRange(0,100);self.progress.setValue(0);self.status.setText("Traitement interrompu.")
+    def cancelled(self):
+        self.progress.setRange(0,100);self.progress.setValue(0);self.status.setText("Traitement interrompu.")
+        self.workspace.activity.setText('Traitement interrompu · résultats précédents conservés.')
     @Slot()
     def cleaned(self):
         self.thread=None;self.worker=None;self.run_button.setEnabled(True);self.navigation.setEnabled(True)
@@ -656,7 +700,7 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
     def closeEvent(self,event):
         if self.thread is not None:
             self.cancel();self.status.setText("Attendre la fin du traitement avant de fermer la fenêtre.");event.ignore()
-        else:event.accept()
+        else:self.workspace.dispose();event.accept()
 
 
 _windows=[]

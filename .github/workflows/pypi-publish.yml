@@ -37,6 +37,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libegl1 libopengl0
           python -m pip install -e ".[dev,notebook,distributed]"
+      - name: Verify result view lifecycle before desktop processing
+        run: python -m pytest tests/test_results_workspace.py tests/test_desktop_imagery.py -q
+        env:
+          QT_QPA_PLATFORM: offscreen
       - name: Test
         run: python -m pytest
         env:

@@ -185,8 +185,9 @@ def test_layout_template_controls_preview_and_frames(application,tmp_path):
     assert (tmp_path/'layout.pdf').read_bytes().startswith(b'%PDF')
     window.start(preview=True);finish(window,30)
     assert window.status.text()=='Aperçu cartographique actualisé.'
-    assert window.preview_dialog.isVisible()
-    window.preview_dialog.close();window.close();QTest.qWait(10)
+    assert window.workspace.tabs.currentWidget().canvas.kind=='svg'
+    assert not hasattr(window,'preview_dialog')
+    window.close();QTest.qWait(10)
 
 
 def test_atlas_page_exports_one_map_per_zone(application,tmp_path):
@@ -302,8 +303,9 @@ def test_assistant_result_transfers_quality_and_atlas_configuration(application,
     mapping.layout_settings.legend.setChecked(False);mapping.layout_settings.refresh()
     assert mapping.layout_settings.capture()['frames'][0]['extent']==(300000,9500000,301000,9501000)
     window.start(review=True);finish(window)
-    assert window.review_dialog.isVisible()
-    window.review_dialog.close();window.prepare_atlas(mapping.capture_map())
+    assert Path(window.workspace.tabs.currentWidget().path).name=='controle.json'
+    assert not hasattr(window,'review_dialog')
+    window.prepare_atlas(mapping.capture_map())
     atlas=window.tool('atlas');assert atlas.capture_map()==mapping.capture_map()
     scientific=write_raster('science.tif',np.array([np.full((2,2),.2),np.full((2,2),.6)],dtype='float32'))
     with rasterio.open(scientific,'r+') as src:src.descriptions=('red','nir')
