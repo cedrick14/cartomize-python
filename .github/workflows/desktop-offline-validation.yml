@@ -23,13 +23,58 @@ jobs:
           python-version: '3.13'
       - name: Prepare source and desktop dependencies
         run: |
-          mkdir -p validation-environment/wheels
-          git archive --format=zip HEAD -o validation-environment/cartomize-source.zip
-          git rev-parse HEAD > validation-environment/source-commit.txt
-          python -m pip download --only-binary=:all: --dest validation-environment/wheels 'PySide6-Essentials==6.9.3' 'pypdfium2>=4.30,<6' 'build>=1,<2' 'setuptools>=77' wheel 'scikit-learn>=1.5,<2' 'rasterio>=1.4,<2' 'geopandas>=1.0,<2'
+          mkdir -p source dependencies/wheels parts
+          git archive --format=zip HEAD -o source/cartomize-source.zip
+          git rev-parse HEAD > source/source-commit.txt
+          python -m pip download --only-binary=:all: --dest dependencies/wheels 'PySide6-Essentials==6.9.3' 'pypdfium2>=4.30,<6' 'build>=1,<2' 'setuptools>=77' wheel 'scikit-learn>=1.5,<2' 'rasterio>=1.4,<2' 'geopandas>=1.0,<2'
+          tar -cf dependencies.tar -C dependencies .
+          sha256sum dependencies.tar > source/dependencies.sha256
+          split -b 48M -d -a 2 dependencies.tar parts/dependencies.part-
       - uses: actions/upload-artifact@v4
         with:
-          name: cartomize-validation-environment-linux313
-          path: validation-environment/
+          name: cartomize-source
+          path: source/
           if-no-files-found: error
+          retention-days: 3
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cartomize-dependencies-00
+          path: parts/dependencies.part-00
+          compression-level: 0
+          retention-days: 3
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cartomize-dependencies-01
+          path: parts/dependencies.part-01
+          compression-level: 0
+          retention-days: 3
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cartomize-dependencies-02
+          path: parts/dependencies.part-02
+          compression-level: 0
+          retention-days: 3
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cartomize-dependencies-03
+          path: parts/dependencies.part-03
+          compression-level: 0
+          retention-days: 3
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cartomize-dependencies-04
+          path: parts/dependencies.part-04
+          compression-level: 0
+          retention-days: 3
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cartomize-dependencies-05
+          path: parts/dependencies.part-05
+          compression-level: 0
+          retention-days: 3
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cartomize-dependencies-06
+          path: parts/dependencies.part-06
+          compression-level: 0
           retention-days: 3
