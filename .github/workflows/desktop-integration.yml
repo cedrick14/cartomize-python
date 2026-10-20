@@ -1,0 +1,99 @@
+name: Desktop integration and acceptance
+
+on:
+  push:
+    branches: [desktop-ready-20261020]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: desktop-integration-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  integrate:
+    if: github.ref == 'refs/heads/desktop-ready-20261020'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      commit: ${{ steps.commit.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Connect the workbench to the existing application
+        run: |
+          python scripts/integrate_desktop_workbench.py
+          python -m compileall -q src/cartomize
+          git diff --check
+      - name: Record the integrated source on the development branch
+        id: commit
+        run: |
+          if ! git diff --quiet -- src/cartomize/desktop.py; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add src/cartomize/desktop.py
+            git commit -m 'Connect the integrated Cartomize desktop workbench'
+            git push origin HEAD:desktop-ready-20261020
+          fi
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  validate:
+    needs: integrate
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ['3.11', '3.12']
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    env:
+      QT_QPA_PLATFORM: offscreen
+      MPLBACKEND: Agg
+      PYTHONFAULTHANDLER: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.integrate.outputs.commit }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - name: Install native Qt libraries
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libegl1 libopengl0 xvfb libxkbcommon-x11-0 libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxcb-shape0 libxcb-xinerama0 libxcb-image0 libxcb-render-util0
+      - name: Install application with desktop and notebook dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev,notebook,distributed]" pytest-timeout
+          python -m pip check
+      - name: Exercise the integrated interface on real files
+        run: python -m pytest tests/test_desktop_workbench.py tests/test_desktop_shell_smoke.py -ra --timeout=90 --junitxml=reports/workbench.xml
+      - name: Run all algorithms, desktop, notebook and export tests
+        if: '!cancelled()'
+        run: python -m pytest -ra --timeout=120 --junitxml=reports/full-suite.xml
+      - name: Build and validate installation archives
+        if: success()
+        run: |
+          python -m build --outdir dist-validation
+          python -m twine check --strict dist-validation/*
+          python scripts/check_release.py dist-validation
+      - name: Preserve validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: acceptance-${{ matrix.os }}-py${{ matrix.python }}
+          path: |
+            reports/
+            dist-validation/
+          if-no-files-found: warn
+          retention-days: 14
