@@ -52,3 +52,41 @@ def test_project_explorer_opens_local_directory(application, tmp_path):
         assert window.project_explorer.model.rowCount(window.project_explorer.tree.rootIndex()) >= 0
     finally:
         window.close()
+
+
+def test_all_tool_pages_accessible(application):
+    window = CartomizeWindow()
+    try:
+        assert window.navigation.count() == window.stack.count()
+        for row in range(window.navigation.count()):
+            window.navigation.setCurrentRow(row)
+            application.processEvents()
+            assert window.stack.currentIndex() == row
+            assert window.stack.currentWidget() is not None
+        window.tool_search.setText("indices")
+        application.processEvents()
+        assert any(
+            not window.navigation.item(i).isHidden()
+            for i in range(window.navigation.count())
+        )
+        window.tool_search.clear()
+    finally:
+        window.close()
+
+
+def test_explorer_rejects_unsupported_file(application, tmp_path, monkeypatch):
+    from PySide6.QtWidgets import QMessageBox
+    window = CartomizeWindow()
+    try:
+        unknown = tmp_path / "unrecognized.bin"
+        unknown.write_bytes(b"test")
+        messages = []
+        monkeypatch.setattr(
+            QMessageBox, "information",
+            lambda *args: messages.append(args),
+        )
+        window.project_explorer.open_path(unknown)
+        assert messages
+        assert not window.workspace.records
+    finally:
+        window.close()
