@@ -1,0 +1,583 @@
+{
+  "version": "1.1.0",
+  "source_commit": "290773ecaa82a795608782cd9f654344a16885c1",
+  "run_url": "https://github.com/cedrick14/cartomize-python/actions/runs/39503435509",
+  "environments": {
+    "ubuntu-latest-py3.11": {
+      "suite": {
+        "passed": 354,
+        "skipped": 2,
+        "failed": 0,
+        "errors": 0,
+        "skip_reasons": [
+          "No CUDA device/runtime: hardware validation required",
+          "QGIS runtime not configured"
+        ]
+      },
+      "interface": {
+        "passed": 14,
+        "skipped": 0,
+        "failed": 0,
+        "errors": 0,
+        "skip_reasons": []
+      },
+      "installed_package": {
+        "status": "passed",
+        "version": "1.1.0",
+        "python": "3.11.17",
+        "executable": "/tmp/cartomize-install-ku8djzsy/venv/bin/python",
+        "module": "/tmp/cartomize-install-ku8djzsy/venv/lib/python3.11/site-packages/cartomize/__init__.py",
+        "checks": [
+          "installed desktop and 20 tool pages",
+          "light dark and system appearance",
+          "GeoTIFF import and NDVI calculation",
+          "GeoPackage import and 200 m vector buffer",
+          "PDF PNG and SVG map exports",
+          "project save and reopen",
+          "installed Python console kernel"
+        ]
+      },
+      "desktop": {
+        "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+        "python": "3.11.17",
+        "source": "Generated reproducible GIS fixtures",
+        "views": {
+          "light": {
+            "window": [
+              1440,
+              940
+            ],
+            "map": [
+              544,
+              261
+            ],
+            "image": "cartomize-light.png"
+          },
+          "dark": {
+            "window": [
+              1440,
+              940
+            ],
+            "map": [
+              544,
+              261
+            ],
+            "image": "cartomize-dark.png"
+          }
+        },
+        "tools": [
+          "assistant",
+          "inspect",
+          "prepare",
+          "composite",
+          "classification",
+          "indices",
+          "calculator",
+          "focal",
+          "temporal",
+          "terrain",
+          "vector",
+          "raster",
+          "project",
+          "mapping",
+          "atlas",
+          "workflow",
+          "processing",
+          "recipes",
+          "native",
+          "mapops"
+        ],
+        "loaded_files": 2,
+        "status": "passed"
+      },
+      "desktop-native": {
+        "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+        "python": "3.11.17",
+        "source": "Generated reproducible GIS fixtures",
+        "views": {
+          "light": {
+            "window": [
+              1440,
+              940
+            ],
+            "map": [
+              544,
+              261
+            ],
+            "image": "cartomize-light.png"
+          },
+          "dark": {
+            "window": [
+              1440,
+              940
+            ],
+            "map": [
+              544,
+              261
+            ],
+            "image": "cartomize-dark.png"
+          }
+        },
+        "tools": [
+          "assistant",
+          "inspect",
+          "prepare",
+          "composite",
+          "classification",
+          "indices",
+          "calculator",
+          "focal",
+          "temporal",
+          "terrain",
+          "vector",
+          "raster",
+          "project",
+          "mapping",
+          "atlas",
+          "workflow",
+          "processing",
+          "recipes",
+          "native",
+          "mapops"
+        ],
+        "loaded_files": 2,
+        "status": "passed"
+      }
+    },
+    "ubuntu-latest-py3.12": {
+      "suite": {
+        "passed": 354,
+        "skipped": 2,
+        "failed": 0,
+        "errors": 0,
+        "skip_reasons": [
+          "No CUDA device/runtime: hardware validation required",
+          "QGIS runtime not configured"
+        ]
+      },
+      "interface": {
+        "passed": 14,
+        "skipped": 0,
+        "failed": 0,
+        "errors": 0,
+        "skip_reasons": []
+      },
+      "installed_package": {
+        "status": "passed",
+        "version": "1.1.0",
+        "python": "3.12.15",
+        "executable": "/tmp/cartomize-install-6rpj4ozi/venv/bin/python",
+        "module": "/tmp/cartomize-install-6rpj4ozi/venv/lib/python3.12/site-packages/cartomize/__init__.py",
+        "checks": [
+          "installed desktop and 20 tool pages",
+          "light dark and system appearance",
+          "GeoTIFF import and NDVI calculation",
+          "GeoPackage import and 200 m vector buffer",
+          "PDF PNG and SVG map exports",
+          "project save and reopen",
+          "installed Python console kernel"
+        ]
+      },
+      "desktop": {
+        "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+        "python": "3.12.15",
+        "source": "Generated reproducible GIS fixtures",
+        "views": {
+          "light": {
+            "window": [
+              1440,
+              940
+            ],
+            "map": [
+              544,
+              261
+            ],
+            "image": "cartomize-light.png"
+          },
+          "dark": {
+            "window": [
+              1440,
+              940
+            ],
+            "map": [
+              544,
+              261
+            ],
+            "image": "cartomize-dark.png"
+          }
+        },
+        "tools": [
+          "assistant",
+          "inspect",
+          "prepare",
+          "composite",
+          "classification",
+          "indices",
+          "calculator",
+          "focal",
+          "temporal",
+          "terrain",
+          "vector",
+          "raster",
+          "project",
+          "mapping",
+          "atlas",
+          "workflow",
+          "processing",
+          "recipes",
+          "native",
+          "mapops"
+        ],
+        "loaded_files": 2,
+        "status": "passed"
+      },
+      "desktop-native": {
+        "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+        "python": "3.12.15",
+        "source": "Generated reproducible GIS fixtures",
+        "views": {
+          "light": {
+            "window": [
+              1440,
+              940
+            ],
+            "map": [
+              544,
+              261
+            ],
+            "image": "cartomize-light.png"
+          },
+          "dark": {
+            "window": [
+              1440,
+              940
+            ],
+            "map": [
+              544,
+              261
+            ],
+            "image": "cartomize-dark.png"
+          }
+        },
+        "tools": [
+          "assistant",
+          "inspect",
+          "prepare",
+          "composite",
+          "classification",
+          "indices",
+          "calculator",
+          "focal",
+          "temporal",
+          "terrain",
+          "vector",
+          "raster",
+          "project",
+          "mapping",
+          "atlas",
+          "workflow",
+          "processing",
+          "recipes",
+          "native",
+          "mapops"
+        ],
+        "loaded_files": 2,
+        "status": "passed"
+      }
+    },
+    "windows-latest-py3.11": {
+      "suite": {
+        "passed": 354,
+        "skipped": 2,
+        "failed": 0,
+        "errors": 0,
+        "skip_reasons": [
+          "No CUDA device/runtime: hardware validation required",
+          "QGIS runtime not configured"
+        ]
+      },
+      "interface": {
+        "passed": 14,
+        "skipped": 0,
+        "failed": 0,
+        "errors": 0,
+        "skip_reasons": []
+      },
+      "installed_package": {
+        "status": "passed",
+        "version": "1.1.0",
+        "python": "3.11.9",
+        "executable": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\cartomize-install-o84r1vv4\\venv\\Scripts\\python.exe",
+        "module": "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\cartomize-install-o84r1vv4\\venv\\Lib\\site-packages\\cartomize\\__init__.py",
+        "checks": [
+          "installed desktop and 20 tool pages",
+          "light dark and system appearance",
+          "GeoTIFF import and NDVI calculation",
+          "GeoPackage import and 200 m vector buffer",
+          "PDF PNG and SVG map exports",
+          "project save and reopen",
+          "installed Python console kernel"
+        ]
+      },
+      "desktop": {
+        "platform": "Windows-10-10.0.26100-SP0",
+        "python": "3.11.9",
+        "source": "Generated reproducible GIS fixtures",
+        "views": {
+          "light": {
+            "window": [
+              1440,
+              940
+            ],
+            "map": [
+              390,
+              243
+            ],
+            "image": "cartomize-light.png"
+          },
+          "dark": {
+            "window": [
+              1440,
+              940
+            ],
+            "map": [
+              390,
+              243
+            ],
+            "image": "cartomize-dark.png"
+          }
+        },
+        "tools": [
+          "assistant",
+          "inspect",
+          "prepare",
+          "composite",
+          "classification",
+          "indices",
+          "calculator",
+          "focal",
+          "temporal",
+          "terrain",
+          "vector",
+          "raster",
+          "project",
+          "mapping",
+          "atlas",
+          "workflow",
+          "processing",
+          "recipes",
+          "native",
+          "mapops"
+        ],
+        "loaded_files": 2,
+        "status": "passed"
+      },
+      "desktop-native": {
+        "platform": "Windows-10-10.0.26100-SP0",
+        "python": "3.11.9",
+        "source": "Generated reproducible GIS fixtures",
+        "views": {
+          "light": {
+            "window": [
+              1100,
+              749
+            ],
+            "map": [
+              195,
+              120
+            ],
+            "image": "cartomize-light.png"
+          },
+          "dark": {
+            "window": [
+              1100,
+              749
+            ],
+            "map": [
+              195,
+              120
+            ],
+            "image": "cartomize-dark.png"
+          }
+        },
+        "tools": [
+          "assistant",
+          "inspect",
+          "prepare",
+          "composite",
+          "classification",
+          "indices",
+          "calculator",
+          "focal",
+          "temporal",
+          "terrain",
+          "vector",
+          "raster",
+          "project",
+          "mapping",
+          "atlas",
+          "workflow",
+          "processing",
+          "recipes",
+          "native",
+          "mapops"
+        ],
+        "loaded_files": 2,
+        "status": "passed"
+      }
+    },
+    "windows-latest-py3.12": {
+      "suite": {
+        "passed": 354,
+        "skipped": 2,
+        "failed": 0,
+        "errors": 0,
+        "skip_reasons": [
+          "No CUDA device/runtime: hardware validation required",
+          "QGIS runtime not configured"
+        ]
+      },
+      "interface": {
+        "passed": 14,
+        "skipped": 0,
+        "failed": 0,
+        "errors": 0,
+        "skip_reasons": []
+      },
+      "installed_package": {
+        "status": "passed",
+        "version": "1.1.0",
+        "python": "3.12.10",
+        "executable": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\cartomize-install-wnxwh8pn\\venv\\Scripts\\python.exe",
+        "module": "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\cartomize-install-wnxwh8pn\\venv\\Lib\\site-packages\\cartomize\\__init__.py",
+        "checks": [
+          "installed desktop and 20 tool pages",
+          "light dark and system appearance",
+          "GeoTIFF import and NDVI calculation",
+          "GeoPackage import and 200 m vector buffer",
+          "PDF PNG and SVG map exports",
+          "project save and reopen",
+          "installed Python console kernel"
+        ]
+      },
+      "desktop": {
+        "platform": "Windows-2025Server-10.0.26100-SP0",
+        "python": "3.12.10",
+        "source": "Generated reproducible GIS fixtures",
+        "views": {
+          "light": {
+            "window": [
+              1440,
+              940
+            ],
+            "map": [
+              390,
+              243
+            ],
+            "image": "cartomize-light.png"
+          },
+          "dark": {
+            "window": [
+              1440,
+              940
+            ],
+            "map": [
+              390,
+              243
+            ],
+            "image": "cartomize-dark.png"
+          }
+        },
+        "tools": [
+          "assistant",
+          "inspect",
+          "prepare",
+          "composite",
+          "classification",
+          "indices",
+          "calculator",
+          "focal",
+          "temporal",
+          "terrain",
+          "vector",
+          "raster",
+          "project",
+          "mapping",
+          "atlas",
+          "workflow",
+          "processing",
+          "recipes",
+          "native",
+          "mapops"
+        ],
+        "loaded_files": 2,
+        "status": "passed"
+      },
+      "desktop-native": {
+        "platform": "Windows-2025Server-10.0.26100-SP0",
+        "python": "3.12.10",
+        "source": "Generated reproducible GIS fixtures",
+        "views": {
+          "light": {
+            "window": [
+              1100,
+              749
+            ],
+            "map": [
+              195,
+              120
+            ],
+            "image": "cartomize-light.png"
+          },
+          "dark": {
+            "window": [
+              1100,
+              749
+            ],
+            "map": [
+              195,
+              120
+            ],
+            "image": "cartomize-dark.png"
+          }
+        },
+        "tools": [
+          "assistant",
+          "inspect",
+          "prepare",
+          "composite",
+          "classification",
+          "indices",
+          "calculator",
+          "focal",
+          "temporal",
+          "terrain",
+          "vector",
+          "raster",
+          "project",
+          "mapping",
+          "atlas",
+          "workflow",
+          "processing",
+          "recipes",
+          "native",
+          "mapops"
+        ],
+        "loaded_files": 2,
+        "status": "passed"
+      }
+    }
+  },
+  "distribution": [
+    {
+      "filename": "cartomize-1.1.0-py3-none-any.whl",
+      "bytes": 349000,
+      "sha256": "d9169c45d7384a229a90a93378d3d5cee5a62e56f770460c1ff6ae9ca399b3b3"
+    },
+    {
+      "filename": "cartomize-1.1.0.tar.gz",
+      "bytes": 414606,
+      "sha256": "6b1ac199bb9afc7b5085cf9a7e300f931ffd95c8634cd8fe52cb70981786d104"
+    }
+  ]
+}
