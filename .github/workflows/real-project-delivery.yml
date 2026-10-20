@@ -50,7 +50,39 @@ jobs:
           key: real-project-data-v2-${{ runner.os }}-72c7f3168e1e4e257caf84eb7b3fcaa47ade09c0-16371473
       - name: Validate persistence and coordinate precision
         run: python -m pytest tests/test_project_comparisons.py tests/test_tableio.py -q --junitxml=reports/comparison.xml
+      - name: Verify readable interface fonts
+        shell: python
+        env:
+          QT_QPA_PLATFORM: ${{ runner.os == 'Windows' && 'windows' || 'offscreen' }}
+        run: |
+          import json
+          from pathlib import Path
+          import cartomize
+          from PySide6.QtGui import QFontInfo, QFontMetrics
+          from PySide6.QtWidgets import QApplication
+          from cartomize.desktop import CartomizeWindow
+          app = QApplication.instance() or QApplication([])
+          window = CartomizeWindow()
+          try:
+              window.show()
+              app.processEvents()
+              font = window.font()
+              metrics = QFontMetrics(font)
+              sample = 'CartomizeÉèàç0123456789'
+              missing = [char for char in sample if not metrics.inFontUcs4(ord(char))]
+              report = {'platform': app.platformName(), 'font': QFontInfo(font).family(),
+                        'missing_glyphs': missing, 'status': 'passed' if not missing else 'failed'}
+              Path('reports').mkdir(exist_ok=True)
+              Path('reports/interface-fonts.json').write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
+              assert not missing, report
+              assert window.grab().save('reports/interface-fonts.png')
+              print(json.dumps(report, ensure_ascii=False))
+          finally:
+              window.close()
+              app.processEvents()
       - name: Execute real-data analyses and desktop interactions
+        env:
+          QT_QPA_PLATFORM: ${{ runner.os == 'Windows' && 'windows' || 'offscreen' }}
         run: python scripts/validate_real_projects.py --data .real-project-data --output reports/real-projects
       - name: Check complete regression suite
         if: '!cancelled()'
