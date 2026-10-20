@@ -544,12 +544,7 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
         for title,page in zip(titles,self.pages):
             self.navigation.addItem(title);scroll=QScrollArea();scroll.setWidgetResizable(True);scroll.setWidget(page);self.stack.addWidget(scroll)
             for form in page.findChildren(QFormLayout):form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.WrapAllRows)
-            for report in page.findChildren(QPlainTextEdit):
-                if report.isReadOnly():
-                    report.hide()
-                    for form in page.findChildren(QFormLayout):
-                        label=form.labelForField(report)
-                        if label is not None:label.hide()
+            # Read-only diagnostics remain visible within their tool panels.
             if isinstance(page,MappingPage):
                 page.previewRequested.connect(lambda:self.start(preview=True));page.reviewRequested.connect(lambda:self.start(review=True))
                 page.atlasRequested.connect(self.prepare_atlas)
