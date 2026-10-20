@@ -4,10 +4,11 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import pandas as pd
+from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QComboBox, QLineEdit
 
 import cartomize as cm
-from .desktop_tools import VectorPage as BaseVectorPage, write_result
+from .desktop_tools_base import VectorPage as BaseVectorPage, write_result
 from .vector_workflows import (select_attributes, select_location, geometry_operation,
                                spatial_summary, join_attributes, latest_records)
 
@@ -61,18 +62,22 @@ class VectorPage(BaseVectorPage):
             self._extra_widgets[widget] = self.form.labelForField(widget)
         for label,key in self.EXTRA:
             self.operation.addItem(label,key)
-        for predicate in ('covers','covered_by','crosses','disjoint'):
-            if self.predicate.findText(predicate)<0:
-                self.predicate.addItem(predicate)
-        self.source.edit.editingFinished.connect(self.refresh_fields)
-        self.secondary.edit.editingFinished.connect(self.refresh_fields)
+        self._fields_timer = QTimer(self)
+        self._fields_timer.setSingleShot(True)
+        self._fields_timer.setInterval(180)
+        self._fields_timer.timeout.connect(self.refresh_fields)
+        for control in (self.source.edit, self.secondary.edit):
+            control.textChanged.connect(lambda *_: self._fields_timer.start())
+            control.editingFinished.connect(self.refresh_fields)
         self._advanced_ready = True
         self.changed()
 
     def refresh_fields(self):
         import pyogrio
-        for text, controls in [(self.source.text(), (self.attribute,self.left_key,self.order_field)),
-                               (self.secondary.text(), (self.right_key,self.summary_field))]:
+        source_controls = [self.attribute,self.left_key,self.order_field]
+        other_controls = [self.right_key]
+        (source_controls if self.operation.currentData()=='dissolve' else other_controls).append(self.summary_field)
+        for text, controls in [(self.source.text(),source_controls),(self.secondary.text(),other_controls)]:
             if not text or not Path(text).is_file():
                 continue
             try:
@@ -80,7 +85,7 @@ class VectorPage(BaseVectorPage):
                     columns = list(pd.read_csv(text, sep=None, engine='python', nrows=0).columns)
                 else:
                     columns = list(pyogrio.read_info(text)['fields'])
-            except Exception:
+            except (OSError, ValueError, RuntimeError):
                 continue
             for widget in controls:
                 previous = widget.currentText()
@@ -95,13 +100,12 @@ class VectorPage(BaseVectorPage):
         if not self._advanced_ready:
             return
         op = self.operation.currentData()
-        extra = {key for _,key in self.EXTRA}
         def visible(widget, show):
             widget.setVisible(show)
             label = self.form.labelForField(widget)
             if label:
                 label.setVisible(show)
-        if op in extra:
+        if op in {key for _,key in self.EXTRA}:
             for widget in (self.secondary,self.crs,self.distance,self.field,self.maximum,self.predicate,self.join,self.unit):
                 visible(widget, False)
             visible(self.secondary, op in {'select_location','spatial_summary','join_attributes'})
@@ -109,7 +113,7 @@ class VectorPage(BaseVectorPage):
             visible(self.crs, op in {'centroid','simplify','from_xy'})
             visible(self.distance, op == 'simplify')
             visible(self.join, op == 'join_attributes')
-        show = {self.attribute: op=='select_attributes', self.comparison:op=='select_attributes',
+        show = {self.attribute:op=='select_attributes', self.comparison:op=='select_attributes',
                 self.filter_value:op=='select_attributes', self.summary_field:op in {'spatial_summary','dissolve'},
                 self.summary_stat:op=='spatial_summary', self.result_field:op=='spatial_summary',
                 self.left_key:op in {'join_attributes','latest_records'}, self.right_key:op=='join_attributes',
@@ -117,18 +121,25 @@ class VectorPage(BaseVectorPage):
                 self.x_field:op=='from_xy', self.y_field:op=='from_xy'}
         for widget, shown in show.items():
             visible(widget, shown)
+        previous = self.predicate.currentText()
+        predicates = ['within','intersects','covered_by'] if op=='spatial_summary' else ['intersects','within','contains','touches','overlaps','covers','covered_by','crosses']
+        if op=='select_location':
+            predicates.append('disjoint')
+        self.predicate.clear()
+        self.predicate.addItems(predicates)
+        if previous in predicates:
+            self.predicate.setCurrentText(previous)
         vector_filter = 'Données vectorielles (*.gpkg *.shp *.geojson *.json *.zip);;Tous les fichiers (*)'
         table_filter = 'Tableaux (*.csv *.tsv);;Tous les fichiers (*)'
         self.source.filter = table_filter if op=='from_xy' else vector_filter
         self.secondary.filter = table_filter if op=='join_attributes' else vector_filter
-        if op in {'select_location','spatial_summary'} and self.predicate.currentText() not in {'within','intersects','covered_by'}:
-            self.predicate.setCurrentText('intersects')
         self.form.labelForField(self.distance).setText('Tolérance (m)' if op=='simplify' else 'Distance (m)')
         self.form.labelForField(self.crs).setText('SCR des coordonnées XY' if op=='from_xy' else 'Système de coordonnées projeté')
+        self.refresh_fields()
 
     def job(self, options):
         op = self.operation.currentData()
-        if op not in {key for _,key in self.EXTRA} and not (op=='dissolve' and self.aggregation.currentData()!='first'):
+        if op not in {key for _,key in self.EXTRA} and op!='dissolve':
             return super().job(options)
         source, other = self.source.text(), self.secondary.text()
         destination = self.destination()
@@ -137,18 +148,17 @@ class VectorPage(BaseVectorPage):
         needs_other = op in {'select_location','spatial_summary','join_attributes'}
         if needs_other and not other:
             raise ValueError('Sélectionner les données de comparaison.')
-        parameters = dict(attribute=self.attribute.currentText().strip(), comparison=self.comparison.currentData(),
-                          value=self.filter_value.text(), field=self.summary_field.currentText().strip() or None,
-                          statistic=self.summary_stat.currentData(), output_field=self.result_field.text().strip() or None,
-                          predicate=self.predicate.currentText(), left=self.left_key.currentText().strip(),
-                          right=self.right_key.currentText().strip() or None, order=self.order_field.currentText().strip(),
-                          crs=self.crs.text().strip() or None, tolerance=self.distance.value(),
-                          x=self.x_field.text().strip(), y=self.y_field.text().strip(), how=self.join.currentData(),
-                          group=self.field.text().strip() or None, aggregation=self.aggregation.currentData())
+        p = dict(attribute=self.attribute.currentText().strip(), comparison=self.comparison.currentData(),
+                 value=self.filter_value.text(), field=self.summary_field.currentText().strip() or None,
+                 statistic=self.summary_stat.currentData(), output_field=self.result_field.text().strip() or None,
+                 predicate=self.predicate.currentText(), left=self.left_key.currentText().strip(),
+                 right=self.right_key.currentText().strip() or None, order=self.order_field.currentText().strip(),
+                 crs=self.crs.text().strip() or None, tolerance=self.distance.value(),
+                 x=self.x_field.text().strip(), y=self.y_field.text().strip(), how=self.join.currentData(),
+                 group=self.field.text().strip() or None, aggregation=self.aggregation.currentData())
         def run(progress, cancel):
             if cancel.is_set():
                 raise cm.ProcessingCancelled()
-            p = parameters
             if op=='select_attributes':
                 value = p['value']
                 if p['comparison'] not in {'contains','starts_with'}:
@@ -163,8 +173,8 @@ class VectorPage(BaseVectorPage):
                 result = spatial_summary(source,other,field=p['field'],statistic=p['statistic'],
                                          predicate=p['predicate'],output_field=p['output_field'])
             elif op=='join_attributes':
-                table = pd.read_csv(other,sep=None,engine='python')
-                result = join_attributes(source,table,left_on=p['left'],right_on=p['right'],how=p['how'])
+                result = join_attributes(source,pd.read_csv(other,sep=None,engine='python'),
+                                         left_on=p['left'],right_on=p['right'],how=p['how'])
             elif op=='latest_records':
                 result = latest_records(source,group_by=p['left'],order_by=p['order'])
             elif op=='from_xy':
@@ -172,9 +182,10 @@ class VectorPage(BaseVectorPage):
                     raise ValueError('Indiquer le SCR des coordonnées XY.')
                 result = cm.from_xy(pd.read_csv(source,sep=None,engine='python'),x=p['x'],y=p['y'],crs=p['crs'])
             elif op=='dissolve':
-                if not p['field']:
+                if p['aggregation']!='first' and not p['field']:
                     raise ValueError('Indiquer le champ numérique à agréger.')
-                result = cm.dissolve(source,by=p['group'],aggfunc={p['field']:p['aggregation']}).reset_index()
+                aggregate = 'first' if p['aggregation']=='first' else {p['field']:p['aggregation']}
+                result = cm.dissolve(source,by=p['group'],aggfunc=aggregate).reset_index(drop=p['group'] is None)
             else:
                 result = geometry_operation(source,op,metric_crs=p['crs'],tolerance=p['tolerance'])
             if cancel.is_set():

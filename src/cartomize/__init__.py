@@ -29,7 +29,7 @@ from .relations import analyze_relations
 from .automation import plan_cartography,run_plan,propose_layouts
 from .mapops import snapshot_project,compare_snapshots,record_review,verify_review
 
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 __display_version__ = ".".join(__version__.split(".")[:2])
 
 
@@ -57,11 +57,8 @@ __all__ += ['SpectralModel','fit_classifier','load_classifier','classify_landcov
             'propose_layouts','snapshot_project','compare_snapshots','record_review','verify_review']
 
 from .recipes import save_recipe,load_recipe,instantiate_recipe,run_recipe,run_batch
-
 from .native import native_project,inspect_qgis_project
-
 from .terrain import terrain,convolve
-
 __all__ += ["save_recipe","load_recipe","instantiate_recipe","run_recipe","run_batch",
             "native_project","inspect_qgis_project","terrain","convolve"]
 raster.terrain=terrain
@@ -70,18 +67,18 @@ raster.convolve=convolve
 from .processing import operation_catalog,execute_operation
 from .automation import processing_plan,validate_plan
 __all__ += ['operation_catalog','execute_operation','processing_plan','validate_plan']
-
 from .native import import_native_project
 __all__ += ['import_native_project']
-
 from .hydrology import hydrology
 from .routing import shortest_path
 from .catalogs import search_stac,download_stac,scene_from_stac,load_scenes_manifest
 __all__ += ['hydrology','shortest_path','search_stac','download_stac','scene_from_stac','load_scenes_manifest']
-
 from .execution import execution_capabilities
 from .native import validate_native_runtime
 __all__ += ["execution_capabilities", "validate_native_runtime"]
-
 from .imagery_pipeline import ImageryProducts, process_imagery, split_bands
 __all__ += ["ImageryProducts", "process_imagery", "split_bands"]
+from .vector_workflows import (select_attributes, select_location, geometry_operation,
+                               spatial_summary, join_attributes, latest_records)
+__all__ += ['select_attributes', 'select_location', 'geometry_operation',
+            'spatial_summary', 'join_attributes', 'latest_records']
