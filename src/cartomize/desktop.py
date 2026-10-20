@@ -8,12 +8,12 @@ from .desktop_connections import ProjectConnections
 from .desktop_session import SessionControls
 
 try:
-    from PySide6.QtCore import Qt, QObject, QThread, Signal, Slot, QUrl, QSize
+    from PySide6.QtCore import Qt, QObject, QThread, Signal, Slot, QUrl, QSize, QSettings
     from PySide6.QtGui import QDesktopServices, QIcon, QPixmap, QColor, QPalette
     from PySide6.QtWidgets import (QApplication,QMainWindow,QWidget,QHBoxLayout,QVBoxLayout,
         QFormLayout,QLabel,QLineEdit,QPushButton,QFileDialog,QListWidget,QListWidgetItem,
         QStackedWidget,QComboBox,QSpinBox,QDoubleSpinBox,QCheckBox,QPlainTextEdit,
-        QTableWidget,QTableWidgetItem,QHeaderView,QProgressBar,QMessageBox,QGroupBox,QScrollArea,QTabWidget,QSplitter,QToolButton,QListView,QSettings)
+        QTableWidget,QTableWidgetItem,QHeaderView,QProgressBar,QMessageBox,QGroupBox,QScrollArea,QTabWidget,QSplitter,QToolButton,QListView)
 except ImportError as exc:
     raise ImportError('Interface graphique indisponible. Installer : python -m pip install "PySide6-Essentials>=6.7,<7"') from exc
 
