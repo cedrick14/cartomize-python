@@ -484,12 +484,6 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
         self._preferences=QSettings('Cartomize','Cartomize Desktop')
         self.thread=None;self.worker=None;self.cancel_event=None;self.output_path=None
         self._preview_target=None;self._preview_directory=tempfile.TemporaryDirectory(prefix="cartomize-preview-")
-        palette=self.palette()
-        for role,color in [(QPalette.ColorRole.Window,"#f7f7f7"),(QPalette.ColorRole.WindowText,"#111111"),
-            (QPalette.ColorRole.Base,"#ffffff"),(QPalette.ColorRole.Text,"#111111"),(QPalette.ColorRole.ButtonText,"#111111"),
-            (QPalette.ColorRole.Highlight,"#333333"),(QPalette.ColorRole.HighlightedText,"#ffffff"),
-            (QPalette.ColorRole.Link,"#111111"),(QPalette.ColorRole.LinkVisited,"#444444"),(QPalette.ColorRole.Accent,"#333333")]:palette.setColor(role,QColor(color))
-        self.setPalette(palette)
         root=QWidget();self.setCentralWidget(root);outer=QVBoxLayout(root)
         outer.setContentsMargins(20,14,20,14);outer.setSpacing(12)
         header=QHBoxLayout();icon_path=Path(__file__).parent/"assets"/"cartomize.png"
