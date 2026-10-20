@@ -445,4 +445,6 @@ class Workbench(QObject):
 def install_workbench(window):
     if not hasattr(window, '_workbench'):
         window._workbench = Workbench(window)
+        from .desktop_adaptive import install_adaptive_workspace
+        install_adaptive_workspace(window)
     return window._workbench

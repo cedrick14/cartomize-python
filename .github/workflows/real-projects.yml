@@ -1,0 +1,73 @@
+name: Real project acceptance
+
+on:
+  push:
+    branches: [main, real-project-validation]
+    paths:
+      - 'src/cartomize/**'
+      - 'scripts/real_project_data.py'
+      - 'scripts/validate_real_projects.py'
+      - '.github/workflows/real-projects.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  real-projects:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    env:
+      QT_QPA_PLATFORM: offscreen
+      MPLBACKEND: Agg
+      PYTHONUTF8: '1'
+      PYTHONFAULTHANDLER: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install Qt runtime
+        if: runner.os == 'Linux'
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq libegl1 libopengl0
+      - name: Install Cartomize and validation dependencies
+        run: |
+          python -m pip install -q -e ".[dev,notebook,distributed]" pytest-timeout
+          python -m pip check
+      - uses: actions/cache@v4
+        with:
+          path: .real-project-data
+          key: real-project-data-v1-72c7f3168e1e4e257caf84eb7b3fcaa47ade09c0-16371473
+      - name: Execute original-data scenarios and graphical tools
+        run: python scripts/validate_real_projects.py --data .real-project-data --output reports/real-projects
+      - name: Check complete regression suite
+        if: '!cancelled()'
+        run: python -m pytest -q --timeout=180 --junitxml=reports/regressions.xml
+      - name: Build installation archives
+        run: |
+          python -m build --outdir dist-validation > build.log
+          python -m twine check --strict dist-validation/*
+          python scripts/check_release.py dist-validation
+      - name: Preserve reports, maps and installation packages
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: real-projects-${{ matrix.os }}-py3.12
+          path: |
+            reports/**/*.json
+            reports/**/*.csv
+            reports/**/*.md
+            reports/**/*.xml
+            reports/**/*.png
+            reports/**/*.pdf
+            reports/**/*.svg
+            dist-validation/*
+          if-no-files-found: error
+          retention-days: 30

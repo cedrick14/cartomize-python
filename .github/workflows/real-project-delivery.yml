@@ -1,0 +1,118 @@
+name: Real project delivery validation
+
+on:
+  push:
+    branches: [real-project-validation]
+    paths:
+      - 'src/cartomize/**'
+      - 'scripts/project_comparisons.py'
+      - 'scripts/validate_real_projects.py'
+      - 'scripts/real_project_data.py'
+      - 'tests/test_tableio.py'
+      - 'tests/test_project_comparisons.py'
+      - '.github/workflows/real-project-delivery.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    env:
+      QT_QPA_PLATFORM: offscreen
+      MPLBACKEND: Agg
+      PYTHONUTF8: '1'
+      PYTHONFAULTHANDLER: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install Qt runtime
+        if: runner.os == 'Linux'
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq libegl1 libopengl0
+      - name: Install Cartomize and validation dependencies
+        run: |
+          python -m pip install -q -e ".[dev,notebook,distributed]" pytest-timeout
+          python -m pip check
+      - uses: actions/cache@v4
+        with:
+          path: .real-project-data
+          key: real-project-data-v2-${{ runner.os }}-72c7f3168e1e4e257caf84eb7b3fcaa47ade09c0-16371473
+      - name: Validate persistence and coordinate precision
+        run: python -m pytest tests/test_project_comparisons.py tests/test_tableio.py -q --junitxml=reports/comparison.xml
+      - name: Verify readable interface fonts
+        shell: python
+        env:
+          QT_QPA_PLATFORM: ${{ runner.os == 'Windows' && 'windows' || 'offscreen' }}
+        run: |
+          import json
+          from pathlib import Path
+          import cartomize
+          from PySide6.QtGui import QFontInfo, QFontMetrics
+          from PySide6.QtWidgets import QApplication
+          from cartomize.desktop import CartomizeWindow
+          app = QApplication.instance() or QApplication([])
+          window = CartomizeWindow()
+          try:
+              window.show()
+              app.processEvents()
+              font = window.font()
+              metrics = QFontMetrics(font)
+              sample = 'CartomizeÉèàç0123456789'
+              missing = [char for char in sample if not metrics.inFontUcs4(ord(char))]
+              report = {'platform': app.platformName(), 'font': QFontInfo(font).family(),
+                        'missing_glyphs': missing, 'status': 'passed' if not missing else 'failed'}
+              Path('reports').mkdir(exist_ok=True)
+              Path('reports/interface-fonts.json').write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
+              assert not missing, report
+              assert window.grab().save('reports/interface-fonts.png')
+              print(json.dumps(report, ensure_ascii=False))
+          finally:
+              window.close()
+              app.processEvents()
+      - name: Execute real-data analyses and desktop interactions
+        env:
+          QT_QPA_PLATFORM: ${{ runner.os == 'Windows' && 'windows' || 'offscreen' }}
+        run: python scripts/validate_real_projects.py --data .real-project-data --output reports/real-projects
+      - name: Check complete regression suite
+        if: '!cancelled()'
+        run: python -m pytest -q --timeout=180 --junitxml=reports/regressions.xml
+      - name: Build installation archives
+        run: |
+          python -m build --outdir dist-validation > build.log
+          python -m twine check --strict dist-validation/*
+          python scripts/check_release.py dist-validation
+      - name: Verify clean wheel installation
+        shell: python
+        run: |
+          from pathlib import Path
+          import subprocess, sys
+          wheels = list(Path('dist-validation').glob('cartomize-*.whl'))
+          assert len(wheels) == 1, 'Expected a single current distribution'
+          subprocess.run([sys.executable, 'scripts/verify_installed_release.py', '--wheel', str(wheels[0]), '--output', 'reports/installed/installation.json'], check=True)
+      - name: Preserve reports and installable packages
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cartomize-real-projects-${{ matrix.os }}
+          path: |
+            reports/**/*.json
+            reports/**/*.csv
+            reports/**/*.md
+            reports/**/*.xml
+            reports/**/*.png
+            reports/**/*.pdf
+            reports/**/*.svg
+            dist-validation/*
+          if-no-files-found: error
+          retention-days: 30

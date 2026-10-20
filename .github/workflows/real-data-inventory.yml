@@ -1,0 +1,35 @@
+name: Real dataset inventory
+on:
+  push:
+    branches: [real-project-validation]
+    paths:
+      - 'scripts/real_project_data.py'
+      - '.github/workflows/real-data-inventory.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - uses: actions/cache@v4
+        with:
+          path: .real-project-data
+          key: real-project-data-72c7f316-v1
+      - run: python -m pip install -q -e .
+      - name: Download source datasets and inspect their metadata
+        run: python scripts/real_project_data.py .real-project-data
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: real-dataset-inventory
+          path: reports/real-projects/
+          retention-days: 14
