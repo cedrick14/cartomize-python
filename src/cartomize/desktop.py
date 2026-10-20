@@ -581,59 +581,20 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
         self._system_palette=QApplication.instance().palette()
         self.theme_selector.currentIndexChanged.connect(self.apply_theme)
         self.apply_theme()
+        from .desktop_workbench import install_workbench
+        install_workbench(self)
 
     def apply_theme(self,*_):
-        """Apply a consistent application palette without affecting map symbology."""
-        choice=self.theme_selector.currentData() or 'system'
-        self._preferences.setValue('appearance/theme',choice)
-        if choice=='system':
-            dark=self._system_palette.color(QPalette.ColorRole.Window).lightness()<128
-        else:
-            dark=choice=='dark'
-        if dark:
-            bg,panel,field,fg,muted,border,selection,accent=('#19222e','#202c39','#263443','#e6edf5','#9cabbd','#3b4a5c','#173f69','#3993eb')
-        else:
-            bg,panel,field,fg,muted,border,selection,accent=('#f3f6fa','#ffffff','#ffffff','#1e293b','#64748b','#d9e1e9','#e2efff','#1976d2')
-        palette=QPalette(self._system_palette)
-        for role,color in ((QPalette.ColorRole.Window,bg),(QPalette.ColorRole.WindowText,fg),
-                           (QPalette.ColorRole.Base,field),(QPalette.ColorRole.AlternateBase,panel),
-                           (QPalette.ColorRole.Text,fg),(QPalette.ColorRole.Button,panel),
-                           (QPalette.ColorRole.ButtonText,fg),(QPalette.ColorRole.Highlight,accent),
-                           (QPalette.ColorRole.HighlightedText,'#ffffff'),(QPalette.ColorRole.Link,accent)):
-            palette.setColor(role,QColor(color))
-        self.setPalette(palette)
-        self.setStyleSheet(f"""
-            QMainWindow,QWidget {{ background:{bg}; color:{fg}; font-size:12px; }}
-            QLabel#brand {{ font-size:25px; font-weight:700; }}
-            QLabel#panelTitle {{ font-size:16px; font-weight:650; }}
-            QLabel#pageTitle {{ font-size:20px; font-weight:650; }}
-            QLabel#description,QLabel#muted {{ color:{muted}; }}
-            QLabel#emptyResults {{ color:{muted}; background:{panel}; padding:24px; }}
-            QSplitter::handle {{ background:{border}; width:5px; }}
-            QLineEdit,QPlainTextEdit,QTableWidget,QListWidget,QComboBox,QSpinBox,QDoubleSpinBox {{
-                background:{field}; color:{fg}; border:1px solid {border}; border-radius:5px; padding:7px;
-                selection-background-color:{accent}; selection-color:#ffffff; }}
-            QLineEdit:focus,QComboBox:focus,QPlainTextEdit:focus {{ border:1px solid {accent}; }}
-            QListWidget#navigation {{ border:1px solid {border}; background:{panel}; padding:5px; }}
-            QListWidget#navigation::item {{ border:0; border-radius:5px; padding:10px 12px; margin:2px; }}
-            QListWidget#navigation::item:selected {{ background:{selection}; color:{'#e6edf5' if dark else '#174a84'}; font-weight:650; }}
-            QListWidget::item:selected {{ background:{selection}; color:{fg}; }}
-            QPushButton,QToolButton {{ background:{panel}; border:1px solid {border}; border-radius:5px; padding:8px 12px; }}
-            QPushButton:hover,QToolButton:hover {{ border-color:{accent}; }}
-            QPushButton#primary {{ background:{accent}; color:#ffffff; border:0; min-width:135px; font-weight:650; }}
-            QPushButton:disabled {{ color:{muted}; background:{bg}; }}
-            QGroupBox,QGroupBox#parameterCard {{ background:{panel}; border:1px solid {border}; border-radius:6px; margin-top:14px; padding-top:10px; }}
-            QGroupBox::title {{ subcontrol-origin:margin; left:12px; padding:0 5px; }}
-            QProgressBar {{ border:1px solid {border}; background:{field}; text-align:center; min-height:16px; }}
-            QProgressBar::chunk {{ background:{accent}; }}
-            QScrollArea {{ border:0; }}
-            QTabWidget::pane {{ border:1px solid {border}; padding:8px; }}
-            QTabBar::tab {{ background:{panel}; padding:9px 14px; border-bottom:2px solid transparent; }}
-            QTabBar::tab:selected {{ color:{fg}; border-bottom:2px solid {accent}; }}
-            QHeaderView::section {{ background:{panel}; color:{fg}; border:0; border-bottom:1px solid {border}; padding:7px; }}
-        """)
+        from .desktop_theme import apply_theme
+        apply_theme(self)
+
     def filter_tools(self,text):
-        for i in range(self.navigation.count()):self.navigation.item(i).setHidden(text.casefold() not in self.navigation.item(i).text().casefold())
+        if hasattr(self, '_workbench'):
+            self._workbench.filter_tools(text)
+            return
+        for i in range(self.navigation.count()):
+            self.navigation.item(i).setHidden(text.casefold() not in self.navigation.item(i).text().casefold())
+
     def page_changed(self,index):
         if index<0:return
         page=self.pages[index]

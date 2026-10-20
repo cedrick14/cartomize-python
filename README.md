@@ -1,83 +1,72 @@
 # Cartomize
 
-**Version 1.0**
+Cartomize associe une bibliothèque Python, une interface graphique et des commandes pour le traitement géospatial et la production cartographique.
 
-Cartomize est une bibliothèque Python de traitement géospatial et de production cartographique. Elle associe une API, une interface graphique et des commandes pour préparer les images satellitaires, analyser les couches raster et vectorielles, puis produire des cartes et des atlas.
-
-La bibliothèque et son interface fonctionnent sans QGIS ni ArcGIS Pro. Les passerelles vers ces logiciels sont facultatives et nécessitent leur installation pour les opérations natives. Le plugin QGIS est maintenu dans un dépôt distinct.
+La version 1.1 introduit un espace de travail à panneaux : explorateur, catalogue des traitements, carte centrale, paramètres et console Python. Les outils raster, vectoriels, de classification, de terrain et de mise en page restent accessibles par l’API.
 
 ## Installation
 
-La bibliothèque nécessite Python 3.11 ou une version ultérieure. L’interface graphique nécessite Python 3.11 à 3.13.
+Python 3.11 ou 3.12 est recommandé pour l’interface. QGIS et ArcGIS Pro ne sont pas nécessaires au fonctionnement de Cartomize ; seules les passerelles natives les utilisent.
+
+Pour installer les sources de ce dépôt :
 
 ```bash
-python -m pip install "cartomize==1.0.1"
+python -m venv .venv
 ```
 
-Pour installer et ouvrir l’interface graphique :
+Activer l’environnement sous Windows :
+
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+Sous Linux ou macOS :
 
 ```bash
-python -m pip install "cartomize[gui]==1.0.1"
+source .venv/bin/activate
+```
+
+Depuis le répertoire du projet :
+
+```bash
+python -m pip install --upgrade pip
+python -m pip install ".[gui]"
 python -m cartomize gui
 ```
+
+Les versions publiées sont indiquées sur [PyPI](https://pypi.org/project/cartomize/). Une version présente dans le dépôt n’est pas nécessairement déjà publiée sur cet index. Le [guide d’installation](docs/WORKBENCH.md) décrit également l’installation d’un paquet wheel.
 
 Depuis Python :
 
 ```python
 import cartomize as cm
-
 fenetre = cm.launch()
 ```
 
-Dans un notebook local, installer `cartomize[notebook]==1.0.1` avec `%pip`, redémarrer le noyau, puis appeler `cm.launch()`. Voir le [guide Jupyter](docs/NOTEBOOKS.md).
-
-## Tutoriels et projets pratiques
-
-Le [parcours Cartomize](tutorials/README.md) présente 13 notebooks : préparation multispectrale, indices, classification, traitements vectoriels, terrain, cartes, atlas et production automatisée. Les cas Mvouti et réserve à okapis montrent comment analyser des fichiers réels avec leurs métadonnées et limites.
-
-[Produire une première carte](tutorials/notebooks/00_premiere_carte.ipynb) · [Automatiser les livrables](tutorials/notebooks/08_automatisation.ipynb) · [Consulter le parcours complet](tutorials/README.md)
+Dans un notebook local, installer l’option `notebook` à la place de `gui`, redémarrer le noyau et appeler `cm.launch()`. Voir [Jupyter](docs/NOTEBOOKS.md).
 
 ## Espace de travail
 
-L’interface comprend deux panneaux redimensionnables. Le panneau de contrôle rassemble les outils, leurs paramètres et les commandes d’exécution. Le panneau de visualisation affiche les résultats dans des onglets intégrés : rasters, couches vectorielles, cartes PDF ou SVG, tableaux, graphiques et rapports.
+L’explorateur ouvre les fichiers locaux et les projets Cartomize. Le catalogue classe les vingt pages de traitement par domaine et propose une recherche. Les paramètres restent à droite de la carte. Les résultats s’ouvrent dans des onglets intégrés.
 
-Les vues permettent le zoom, le déplacement, la lecture des valeurs de pixels et l’examen des légendes et métadonnées. La comparaison juxtapose deux résultats avec des emprises géographiques liées et une échelle colorimétrique commune facultative. Le rendu relit la zone visible à la résolution adaptée, dans la limite de la résolution des données sources.
+Le panneau inférieur réunit la console Python, les journaux, les données chargées et le diagnostic de l’environnement. La console utilise un processus distinct pour permettre l’interruption du code sans fermer l’application. Les thèmes Clair, Sombre et Système, la taille du texte et la disposition des panneaux sont mémorisés.
+
+Les cartes proposent zoom, déplacement, valeurs de pixels, légendes, métadonnées et comparaison avec emprises liées. Les projets enregistrés dans l’ancienne disposition restent lisibles.
 
 ## Fonctionnalités
 
 | Domaine | Opérations |
 |---|---|
-| Préparation multispectrale | Importation des bandes, calibration, masques QA/SCL, mosaïque, assemblage multibande, extraction par masque, composition colorée, export des bandes séparées |
-| Analyse raster | 18 indices spectraux, algèbre raster, reclassification, statistiques focales et zonales, réductions multirasters, surfaces et matrices de changement |
-| Classification | Forêts aléatoires, arbres extrêmement aléatoires, K-moyennes, validation et export des modèles |
-| Analyse vectorielle | Superposition, jointure spatiale, découpage, zones tampons, dissolution, mesures et réparation géométrique |
-| Terrain et réseaux | Dérivées topographiques, convolution, drainage D8, bassins versants et plus court chemin sur réseau préparé |
-| Cartographie | Superposition des couches, symbologie, étiquettes, 24 maquettes, cadres multiples, légendes, échelles, atlas et exports PDF/PNG/SVG |
-| Automatisation | Plans de traitement, 34 opérateurs chaînables, recettes, production en série et révision cartographique |
-| Projets | Sessions JSON, archives portables CMZ, catalogue des résultats et restauration des vues |
+| Préparation multispectrale | Calibration, masques QA/SCL, mosaïque, assemblage multibande, extraction, composition colorée, export des bandes |
+| Raster | 18 indices spectraux, calculatrice, reclassification, statistiques focales, zonales et multirasters, superficies, transitions |
+| Classification | Forêts aléatoires, arbres extrêmement aléatoires, K-moyennes, validation et modèles enregistrés |
+| Vecteur | Superposition, jointure spatiale, découpage, tampons, dissolution, mesures, reprojection et réparation |
+| Terrain et réseaux | Dérivées topographiques, convolution, drainage D8, bassins versants et plus court chemin |
+| Cartographie | Couches, symbologie, étiquettes, 24 maquettes, cadres, légendes, échelles, atlas, PDF/PNG/SVG |
+| Automatisation | Plans, 34 opérateurs chaînables, recettes et production en série |
+| Projets | Sessions JSON, archives CMZ, catalogue des résultats et restauration des vues |
 
-L’assistant cartographique construit un plan à partir de l’objectif, des données et de la zone d’étude. Il vérifie les prérequis et transmet les résultats aux étapes compatibles. La [logique des traitements](docs/SIG_WORKFLOWS.md) distingue la préparation scientifique, les analyses et la composition cartographique.
-
-## Préparer des images satellitaires
-
-```python
-import cartomize as cm
-
-resultat = cm.process_imagery(
-    ["scene_A", "scene_B"],
-    "resultats/preparation",
-    aoi="zone_etude.shp",
-    mosaic=True,
-    multiband=True,
-    separate_bands=True,
-    composition=("nir", "red", "green"),
-)
-print(resultat.manifest)
-```
-
-Les produits Landsat Collection 2 Level 2 et Sentinel-2 Level 2A sont reconnus à partir de leurs noms et métadonnées. Les autres données nécessitent une correspondance explicite des scènes et bandes. Les valeurs scientifiques du GeoTIFF multibande sont conservées séparément des valeurs étirées pour l’affichage.
-
-## Produire une carte
+## Exemple Python
 
 ```python
 import cartomize as cm
@@ -87,35 +76,31 @@ carte.add_layer("villages.gpkg", name="Villages", labels="nom")
 carte.export("villages.pdf", dpi=300)
 ```
 
-Les [exemples Python](docs/PYTHON_API.md) présentent les indices, traitements, maquettes et atlas. Les objets vectoriels retournés sont des GeoDataFrame ou GeoSeries compatibles avec GeoPandas.
+Les opérations vectorielles utilisent les objets GeoPandas. Les fichiers GeoTIFF conservent leurs valeurs scientifiques séparément des réglages d’affichage.
 
 ## Documentation
 
-- [Interface graphique](docs/DESKTOP.md)
-- [Visualisation des résultats](docs/RESULTS_WORKSPACE.md)
-- [Prétraitement multispectral](docs/IMAGERY_SELECTION.md)
-- [Algèbre et indices raster](docs/RASTER_CALCULATIONS.md)
-- [Chaînes de traitements](docs/PROCESSING.md)
-- [Moteurs de calcul](docs/EXECUTION.md)
-- [Catalogue des outils et limites](docs/TOOL_AUDIT.md)
-- [Architecture](docs/ARCHITECTURE.md)
-- [Tests et validation](docs/VALIDATION.md)
+[Interface 1.1](docs/WORKBENCH.md), [traitements graphiques](docs/DESKTOP.md), [visualisation](docs/RESULTS_WORKSPACE.md), [API Python](docs/PYTHON_API.md), [prétraitement multispectral](docs/IMAGERY_SELECTION.md), [chaînes de traitements](docs/PROCESSING.md), [moteurs de calcul](docs/EXECUTION.md).
 
-## Développement
+Le [parcours de tutoriels](tutorials/README.md) contient les notebooks de préparation multispectrale, d’analyse et de production cartographique. La [note de version](docs/RELEASE_1.1.0.md) présente les modifications de l’interface.
+
+## Développement et validation
 
 ```bash
-python -m pip install -e ".[dev,notebook,distributed]"
+python -m pip install -e ".[dev,notebook,distributed]" pytest-timeout
 python -m pytest
 python -m build
 python -m twine check --strict dist/*
+python scripts/check_release.py dist
+python scripts/verify_installed_release.py --wheel dist/cartomize-1.1.0-py3-none-any.whl --output reports/installed.json
 ```
 
-Les workflows GitHub Actions contrôlent Linux et Windows avec Python 3.11 et 3.12, ainsi qu’un environnement Windows Conda et un noyau Jupyter. La validation CUDA nécessite un GPU compatible ; la passerelle ArcGIS Pro nécessite une installation licenciée. Les tests synthétiques vérifient le comportement des algorithmes sans remplacer la validation thématique des données d’une étude.
-
-Les anomalies peuvent être signalées dans le [suivi des problèmes](https://github.com/cedrick14/cartomize-python/issues), avec la version, l’environnement et un exemple reproductible.
+La validation utilise Windows et Linux avec Python 3.11 et 3.12. Elle couvre les traitements, l’interface, les projets, les exports, la console et une installation isolée du paquet construit. Les essais CUDA et QGIS natif demandent leurs environnements respectifs.
 
 ## Auteur et licence
 
-Cartomize est développé par **ONDON NKOUA Cédrick Belmich**.
+Développé par **ONDON NKOUA Cédrick Belmich**.
 
-Code sous licence **GPL-3.0-only**. Maquettes sous licence **CC BY 4.0**, attribuées à Cartomize / ONDON NKOUA Cédrick Belmich. Voir [LICENSE](LICENSE), [NOTICE.md](NOTICE.md) et la [provenance des composants](docs/PROVENANCE.json).
+Code : **GPL-3.0-only**. Maquettes : **CC BY 4.0**, attribuées à Cartomize / ONDON NKOUA Cédrick Belmich. Voir [LICENSE](LICENSE), [NOTICE.md](NOTICE.md) et [PROVENANCE.json](docs/PROVENANCE.json).
+
+Signaler une anomalie dans le [suivi du projet](https://github.com/cedrick14/cartomize-python/issues), avec la version, l’environnement et un exemple reproductible.

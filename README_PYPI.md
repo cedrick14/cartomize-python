@@ -1,79 +1,58 @@
 # Cartomize
 
-**Version 1.0**
+**Version 1.1**
 
-Cartomize is a Python library for geospatial processing and cartographic production. It provides a Python API, a command-line interface and an optional desktop application for satellite image preparation, raster and vector analysis, map layouts and atlas export.
-
-The library and desktop application run independently of QGIS and ArcGIS Pro. Optional native project bridges require the corresponding GIS installation.
+Cartomize provides a Python API, a command-line interface and a desktop application for geospatial processing and cartographic production. It runs independently of QGIS and ArcGIS Pro. Native project bridges are optional.
 
 ## Installation
 
-The core library requires Python 3.11 or later. The desktop application requires Python 3.11 to 3.13.
+The library requires Python 3.11 or later. Python 3.11 or 3.12 is recommended for the desktop application.
+
+For a published release:
 
 ```bash
-python -m pip install "cartomize==1.0.1"
+python -m pip install "cartomize[gui]==1.1.0"
+python -m cartomize gui
 ```
 
-To install and open the desktop application:
+For a downloaded wheel:
 
 ```bash
-python -m pip install "cartomize[gui]==1.0.1"
-python -m cartomize gui
+python -m pip install "./cartomize-1.1.0-py3-none-any.whl[gui]"
 ```
 
 From Python:
 
 ```python
 import cartomize as cm
-
 window = cm.launch()
 ```
 
-In a local Jupyter notebook, install the notebook dependencies, restart the kernel and call `cm.launch()`:
+Local notebooks use the `notebook` extra. Restart the kernel after installation. The desktop window opens on the machine running Python.
 
-```python
-%pip install "cartomize[notebook]==1.0.1"
-```
+## Desktop workspace
 
-The desktop window opens on the computer running the kernel. Remote notebooks without a graphical desktop can use the processing API.
+The project explorer and categorized tool catalogue occupy the left side, map and result tabs the centre, and processing parameters the right side. The lower panel provides a Python console, logs, loaded data and environment diagnostics.
 
-## Integrated workspace
+Light, dark and system appearance modes, text size and panel positions are saved locally. Map symbology and scientific raster values are independent of interface appearance. The Python console runs in a separate process and can be interrupted without closing the application.
 
-The application has two resizable panels: processing controls and parameters on the left, results on the right. Raster and vector layers, PDF and SVG maps, images, tables, plots and reports open in embedded tabs.
+Imported files are available for viewing and transfer to compatible processing tools. JSON sessions and portable CMZ projects retain tool parameters, data references and result views. Existing sessions remain compatible.
 
-The viewer supports zoom, pan, pixel inspection, legends, metadata and side-by-side comparison with linked geographic extents. Raster rendering reads the visible source window at the appropriate resolution. Display settings preserve source values. An optional common colour scale supports comparison of compatible measurements.
+## Processing
 
-## Capabilities
+| Domain | Operations |
+|---|---|
+| Satellite imagery | Band import, calibration, quality masking, mosaics, multiband assembly, clipping and RGB composition |
+| Raster | Algebra, 18 spectral indices, focal and zonal statistics, reductions, reclassification and change matrices |
+| Vector | Overlay, spatial joins, buffers, clipping, dissolution, reprojection, measurement and geometry repair |
+| Classification | Random forests, extra trees, K-means, validation and saved models |
+| Terrain and networks | Terrain derivatives, convolution, D8 drainage, watersheds and shortest paths |
+| Cartography | 24 templates, symbology, labels, legends, scale bars, multiple frames, atlases and PDF/PNG/SVG export |
+| Automation | Processing plans, reusable recipes, batch production and saved sessions |
 
-- Satellite band import, calibration, quality masking, mosaicking, multiband assembly, clipping and RGB composition.
-- Raster algebra, 18 spectral indices, focal and zonal statistics, multiraster reductions and change matrices.
-- Vector overlay, spatial joins, buffers, clipping, dissolution, measurement and geometry repair.
-- Supervised classification with random forests or extra trees, and unsupervised K-means classification.
-- Terrain derivatives, convolution, D8 drainage, watersheds and shortest paths on prepared networks.
-- Cartographic layouts, labels, legends, scale bars, 24 templates, atlas generation and PDF/PNG/SVG export.
-- Processing plans, reusable recipes, batch production, saved sessions and portable projects.
-- Optional Dask execution for supported raster operators and CUDA execution for algebra, indices and reductions.
+Optional Dask and CUDA execution is available for supported operators. Native GIS bridges and CUDA hardware execution require the corresponding runtime.
 
-## Satellite image preparation
-
-```python
-import cartomize as cm
-
-result = cm.process_imagery(
-    ["scene_A", "scene_B"],
-    "outputs/preparation",
-    aoi="study_area.shp",
-    mosaic=True,
-    multiband=True,
-    separate_bands=True,
-    composition=("nir", "red", "green"),
-)
-print(result.manifest)
-```
-
-Landsat Collection 2 Level 2 and Sentinel-2 Level 2A products are recognized from their original filenames and metadata. Other products require explicit scene and band mappings. Calibration and quality masking precede resampling. Scientific multiband values are stored separately from stretched display values.
-
-## Cartographic output
+## Python example
 
 ```python
 import cartomize as cm
@@ -83,22 +62,16 @@ map_output.add_layer("villages.gpkg", name="Villages", labels="name")
 map_output.export("villages.pdf", dpi=300)
 ```
 
-Vector operations return standard GeoPandas objects. Raster processing uses Rasterio and NumPy. Scientific processing and rendering also use SciPy, scikit-learn and Matplotlib.
+Vector operations use GeoPandas objects. Raster processing uses Rasterio and NumPy; scientific analysis and rendering also use SciPy, scikit-learn and Matplotlib.
 
 ## Documentation and support
 
-- [Source repository](https://github.com/cedrick14/cartomize-python)
-- [Desktop guide](https://github.com/cedrick14/cartomize-python/blob/main/docs/DESKTOP.md)
-- [Results viewer](https://github.com/cedrick14/cartomize-python/blob/main/docs/RESULTS_WORKSPACE.md)
-- [Python examples](https://github.com/cedrick14/cartomize-python/blob/main/docs/PYTHON_API.md)
-- [Processing methods and scope](https://github.com/cedrick14/cartomize-python/blob/main/docs/TOOL_AUDIT.md)
-- [Validation](https://github.com/cedrick14/cartomize-python/blob/main/docs/VALIDATION.md)
-- [Issue tracker](https://github.com/cedrick14/cartomize-python/issues)
+[Desktop workspace](https://github.com/cedrick14/cartomize-python/blob/main/docs/WORKBENCH.md), [processing guide](https://github.com/cedrick14/cartomize-python/blob/main/docs/DESKTOP.md), [Python API](https://github.com/cedrick14/cartomize-python/blob/main/docs/PYTHON_API.md), [result viewer](https://github.com/cedrick14/cartomize-python/blob/main/docs/RESULTS_WORKSPACE.md), [issue tracker](https://github.com/cedrick14/cartomize-python/issues).
 
-Automated checks cover Linux, Windows and Windows Conda, including a Jupyter kernel. CUDA hardware execution and ArcGIS Pro integration require validation on compatible installations. Synthetic tests do not replace thematic validation or performance measurements on representative datasets.
+Validation covers Windows and Linux, Python 3.11 and 3.12, desktop operations on geospatial files, the existing algorithm suite and a clean installation of the built wheel. Hardware-specific CUDA and native GIS checks are separate.
 
 ## Author and license
 
 Developed by **ONDON NKOUA Cédrick Belmich**.
 
-Source code: **GPL-3.0-only**. Original layout templates: **CC BY 4.0**, attributed to Cartomize / ONDON NKOUA Cédrick Belmich. License and provenance notices are included in the distribution.
+Code: **GPL-3.0-only**. Original layout templates: **CC BY 4.0**, attributed to Cartomize / ONDON NKOUA Cédrick Belmich. License and provenance notices are included in the distribution.

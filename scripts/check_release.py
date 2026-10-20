@@ -1,4 +1,4 @@
-"""Validate package metadata, contents and checksums before publication."""
+"""Validate package metadata, complete desktop contents and release checksums."""
 from pathlib import Path
 from email.parser import BytesParser
 from email import policy
@@ -29,16 +29,22 @@ with zipfile.ZipFile(wheel) as z:
     assert 'ONDON NKOUA' in metadata['Author']
     urls=dict(value.split(', ',1) for value in metadata.get_all('Project-URL',[]))
     assert urls==project['urls'], 'Distribution project links differ from pyproject.toml.'
-    assert urls['Repository']=='https://github.com/cedrick14/cartomize-python', 'Python releases belong to their dedicated repository.'
+    assert urls['Repository']=='https://github.com/cedrick14/cartomize-python'
     assert '## Installation' in metadata.get_payload()
-    assert 'cartomize/desktop_imagery.py' in z.namelist()
-    assert 'cartomize/imagery_pipeline.py' in z.namelist()
-    for module in ('viewer_data','desktop_canvas','desktop_tables','desktop_results'):
-        assert f'cartomize/{module}.py' in z.namelist()
+    for module in ('desktop','desktop_imagery','imagery_pipeline','viewer_data','desktop_canvas',
+                   'desktop_tables','desktop_results','desktop_workbench','desktop_theme',
+                   'desktop_console','desktop_kernel','desktop_explorer','desktop_session'):
+        assert f'cartomize/{module}.py' in z.namelist(),module
+    assert 'cartomize/assets/cartomize.png' in z.namelist()
+    source=z.read('cartomize/__init__.py').decode('utf-8')
+    assert f'__version__ = "{version}"' in source, 'Runtime and package versions differ.'
 with tarfile.open(directory/f'{name}-{version}.tar.gz') as archive:
     names=set(archive.getnames())
-    for file in ('README_PYPI.md','LICENSE','NOTICE.md','pyproject.toml','tests/test_imagery_pipeline.py','tests/test_startup.py','tests/test_results_workspace.py','docs/RESULTS_WORKSPACE.md','scripts/check_startup.py','scripts/check_release.py'):
-        assert f'{name}-{version}/{file}' in names, file
+    for file in ('README_PYPI.md','LICENSE','NOTICE.md','pyproject.toml','tests/test_imagery_pipeline.py',
+                 'tests/test_startup.py','tests/test_results_workspace.py','tests/test_desktop_workbench.py',
+                 'tests/test_workbench_viewports.py','docs/RESULTS_WORKSPACE.md','docs/WORKBENCH.md',
+                 'scripts/check_startup.py','scripts/check_release.py','scripts/verify_installed_release.py'):
+        assert f'{name}-{version}/{file}' in names,file
 print(json.dumps({'name':name,'version':version,'files':[
     {'filename':p.name,'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}
     for p in sorted(directory.iterdir()) if p.is_file()]},indent=2))

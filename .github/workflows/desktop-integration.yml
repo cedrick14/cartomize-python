@@ -1,0 +1,119 @@
+name: Desktop integration and acceptance
+
+on:
+  push:
+    branches: [desktop-ready-20261020]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: desktop-integration-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ['3.11', '3.12']
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    env:
+      QT_QPA_PLATFORM: offscreen
+      MPLBACKEND: Agg
+      PYTHONFAULTHANDLER: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - name: Install native Qt libraries
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libegl1 libopengl0 xvfb libxkbcommon-x11-0 libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxcb-shape0 libxcb-xinerama0 libxcb-image0 libxcb-render-util0
+      - name: Install application and dependencies
+        run: |
+          python -m pip install -q --upgrade pip
+          python -m pip install -q -e ".[dev,notebook,distributed]" pytest-timeout
+          python -m pip check
+          python -m compileall -q src/cartomize scripts tests
+      - name: Exercise integrated interface on geospatial files
+        run: python -m pytest tests/test_desktop_workbench.py tests/test_desktop_shell_smoke.py tests/test_workbench_viewports.py -q --timeout=90 --junitxml=reports/workbench.xml
+      - name: Run full algorithm desktop notebook and export suite
+        if: '!cancelled()'
+        run: python -m pytest -q --timeout=120 --junitxml=reports/full-suite.xml
+      - name: Capture actual light and dark desktop windows
+        if: '!cancelled()'
+        run: python scripts/capture_desktop.py --output reports/desktop
+      - name: Exercise X11 desktop rendering
+        if: runner.os == 'Linux' && !cancelled()
+        env:
+          QT_QPA_PLATFORM: xcb
+        run: xvfb-run -a python scripts/capture_desktop.py --output reports/desktop-native
+      - name: Exercise Windows desktop rendering
+        if: runner.os == 'Windows' && !cancelled()
+        env:
+          QT_QPA_PLATFORM: windows
+        run: python scripts/capture_desktop.py --output reports/desktop-native
+      - name: Build and validate installation archives
+        if: success()
+        run: |
+          python -m build --outdir dist-validation > build.log 2>&1
+          python -m twine check --strict dist-validation/*
+          python scripts/check_release.py dist-validation
+      - name: Install wheel into a clean virtual environment and use it
+        if: success()
+        run: python scripts/verify_installed_release.py --wheel dist-validation/cartomize-1.1.0-py3-none-any.whl --output reports/installed.json
+      - name: Preserve validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: acceptance-${{ matrix.os }}-py${{ matrix.python }}
+          path: |
+            reports/
+            dist-validation/
+            build.log
+          if-no-files-found: warn
+          retention-days: 14
+
+  evidence:
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: acceptance-*
+          path: acceptance-artifacts
+      - name: Summarize executed checks and actual captures
+        run: python scripts/collect_desktop_evidence.py --artifacts acceptance-artifacts --output desktop-evidence
+      - name: Publish evidence on a dedicated branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch -c "desktop-evidence-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          git add desktop-evidence
+          git commit -m "Record executed Cartomize 1.1.0 acceptance results"
+          git push origin HEAD
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Cartomize-1.1.0-delivery
+          path: |
+            desktop-evidence/
+            acceptance-artifacts/acceptance-ubuntu-latest-py3.12/dist-validation/
+            docs/WORKBENCH.md
+            docs/RELEASE_1.1.0.md
+          if-no-files-found: error
+          retention-days: 30

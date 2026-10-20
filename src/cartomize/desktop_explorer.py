@@ -1,85 +1,88 @@
-"""File-system project explorer for the Cartomize desktop workspace."""
+"""Local project browser connected to the result viewer and processing inputs."""
 from pathlib import Path
 
-from PySide6.QtCore import Qt, QDir
+from PySide6.QtCore import Qt, QDir, Signal
 from PySide6.QtWidgets import (
-    QDockWidget, QWidget, QVBoxLayout, QHBoxLayout, QLabel,
-    QPushButton, QFileDialog, QFileSystemModel, QTreeView,
-    QLineEdit, QMessageBox,
+    QDockWidget, QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
+    QFileDialog, QFileSystemModel, QTreeView, QLineEdit, QMessageBox,
 )
 
 from .viewer_data import SUPPORTED
 
 
 class ProjectExplorer(QDockWidget):
-    """Dockable local-data browser connected to the existing result viewer."""
+    fileOpened = Signal(str)
+    projectRequested = Signal(str)
 
     def __init__(self, workspace, parent=None):
-        super().__init__("Explorateur de projet", parent)
-        self.setObjectName("projectExplorerDock")
+        super().__init__('Explorateur de projet', parent)
+        self.setObjectName('projectExplorerDock')
         self.setAllowedAreas(Qt.DockWidgetArea.LeftDockWidgetArea |
                              Qt.DockWidgetArea.RightDockWidgetArea)
         self.workspace = workspace
         shell = QWidget(self)
         layout = QVBoxLayout(shell)
-        layout.setContentsMargins(9, 9, 9, 9)
-        layout.setSpacing(8)
-
+        layout.setContentsMargins(8, 8, 8, 8)
+        layout.setSpacing(6)
         row = QHBoxLayout()
-        open_folder = QPushButton("Dossier")
-        open_folder.clicked.connect(self.choose_directory)
-        import_files = QPushButton("Importer")
-        import_files.clicked.connect(self.import_files)
-        row.addWidget(open_folder)
-        row.addWidget(import_files)
+        self.folder_button = QPushButton('Dossier')
+        self.folder_button.clicked.connect(self.choose_directory)
+        self.import_button = QPushButton('Importer')
+        self.import_button.clicked.connect(self.import_files)
+        self.parent_button = QPushButton('Parent')
+        self.parent_button.setToolTip('Dossier parent')
+        self.parent_button.clicked.connect(self.parent_directory)
+        for button in (self.folder_button, self.parent_button, self.import_button):
+            row.addWidget(button)
         layout.addLayout(row)
-
         self.path_label = QLineEdit()
         self.path_label.setReadOnly(True)
-        self.path_label.setToolTip("Répertoire de travail")
+        self.path_label.setAccessibleName('Répertoire de travail')
         layout.addWidget(self.path_label)
-
         self.model = QFileSystemModel(self)
+        self.model.setReadOnly(True)
         self.model.setFilter(QDir.Filter.AllEntries | QDir.Filter.NoDotAndDotDot)
         self.model.setRootPath(str(Path.home()))
         self.tree = QTreeView()
         self.tree.setModel(self.model)
-        self.tree.setHeaderHidden(False)
+        self.tree.setHeaderHidden(True)
         self.tree.setSortingEnabled(True)
         self.tree.setAlternatingRowColors(True)
+        self.tree.setAccessibleName('Fichiers du projet')
         for column in (1, 2, 3):
             self.tree.hideColumn(column)
         self.tree.doubleClicked.connect(self.open_item)
         layout.addWidget(self.tree, 1)
-
-        layout.addWidget(QLabel("Double-cliquer pour ouvrir un fichier ou un dossier."))
         self.setWidget(shell)
-        self.setMinimumWidth(220)
+        self.setMinimumWidth(210)
         self.set_directory(Path.home())
 
     def set_directory(self, directory):
         directory = Path(directory).expanduser().resolve()
         if not directory.is_dir():
-            return
+            return False
+        self.model.setRootPath(str(directory))
         self.path_label.setText(str(directory))
+        self.path_label.setToolTip(str(directory))
         self.tree.setRootIndex(self.model.index(str(directory)))
+        return True
+
+    def parent_directory(self):
+        self.set_directory(Path(self.path_label.text()).parent)
 
     def choose_directory(self):
-        folder = QFileDialog.getExistingDirectory(
-            self, "Répertoire du projet", self.path_label.text()
-        )
+        folder = QFileDialog.getExistingDirectory(self, 'Répertoire du projet', self.path_label.text())
         if folder:
             self.set_directory(folder)
 
     def import_files(self):
         paths, _ = QFileDialog.getOpenFileNames(
-            self, "Importer des données", self.path_label.text(),
-            "Données géospatiales et résultats (*.tif *.tiff *.vrt *.img *.jp2 "
-            "*.gpkg *.shp *.geojson *.png *.jpg *.jpeg *.pdf *.svg "
-            "*.csv *.tsv *.json);;Tous les fichiers (*)",
+            self, 'Importer des données', self.path_label.text(),
+            'Données et projets (*.tif *.tiff *.vrt *.img *.jp2 *.gpkg *.shp *.geojson '
+            '*.png *.jpg *.jpeg *.pdf *.svg *.csv *.tsv *.json *.cmz);;Tous les fichiers (*)',
         )
         for path in paths:
-            self.open_path(Path(path))
+            self.open_path(path)
         if paths:
             self.set_directory(Path(paths[0]).parent)
 
@@ -91,10 +94,18 @@ class ProjectExplorer(QDockWidget):
             self.open_path(path)
 
     def open_path(self, path):
+        path = Path(path).expanduser().resolve()
+        if not path.is_file():
+            QMessageBox.information(self, 'Fichier indisponible', str(path))
+            return None
+        if path.suffix.lower() == '.cmz' or path.name.lower().endswith('.cartomize.json'):
+            self.projectRequested.emit(str(path))
+            return None
         if path.suffix.lower() not in SUPPORTED:
-            QMessageBox.information(
-                self, "Format non pris en charge",
-                "Le visualiseur ne prend pas en charge ce format."
-            )
-            return
-        self.workspace.open_result(str(path))
+            QMessageBox.information(self, 'Format non pris en charge',
+                                    'Le visualiseur ne prend pas en charge ce format.')
+            return None
+        document = self.workspace.open_result(str(path))
+        if document is not None:
+            self.fileOpened.emit(str(path))
+        return document
