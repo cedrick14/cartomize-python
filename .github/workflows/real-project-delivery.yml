@@ -100,7 +100,13 @@ jobs:
           python -m twine check --strict dist-validation/*
           python scripts/check_release.py dist-validation
       - name: Verify clean wheel installation
-        run: python scripts/verify_installed_release.py --dist dist-validation --output reports/installed
+        shell: python
+        run: |
+          from pathlib import Path
+          import subprocess, sys
+          wheels = list(Path('dist-validation').glob('cartomize-*.whl'))
+          assert len(wheels) == 1, 'Expected a single current distribution'
+          subprocess.run([sys.executable, 'scripts/verify_installed_release.py', '--wheel', str(wheels[0]), '--output', 'reports/installed/installation.json'], check=True)
       - name: Preserve reports and installable packages
         if: always()
         uses: actions/upload-artifact@v4
