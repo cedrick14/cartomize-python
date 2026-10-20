@@ -1,0 +1,35 @@
+name: Desktop Ubuntu validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/cartomize/**"
+      - "tests/test_desktop_shell_smoke.py"
+      - ".github/workflows/desktop-ubuntu.yml"
+  workflow_dispatch:
+
+jobs:
+  desktop-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      QT_QPA_PLATFORM: offscreen
+      MPLBACKEND: Agg
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install package and test tools
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[gui,dev]"
+      - name: Compile interface source
+        run: python -m compileall -q src/cartomize
+      - name: Run desktop smoke tests
+        run: python -m pytest -q tests/test_desktop_shell_smoke.py
+      - name: Run full test suite
+        run: python -m pytest -q
