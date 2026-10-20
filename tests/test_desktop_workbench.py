@@ -73,7 +73,7 @@ def test_workbench_layout_catalogue_and_themes(window, application):
         assert window._preferences.value('appearance/theme') == theme
         assert window._effective_theme in COLORS
     workbench.font_size.setValue(14)
-    assert window._preferences.value('appearance/font_size') == 14
+    assert int(window._preferences.value('appearance/font_size')) == 14
     window.tools_dock.hide()
     workbench.reset_layout()
     assert window.tools_dock.isVisible()

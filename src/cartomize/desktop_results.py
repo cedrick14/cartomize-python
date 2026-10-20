@@ -43,8 +43,9 @@ class MapDocument(QWidget):
         styles.addWidget(self.mode,2)
         for channel in self.channels: styles.addWidget(channel,1)
         styles.addWidget(self.palette,1); styles.addWidget(self.resampling,1); layout.addWidget(self.styles)
-        self.content=QSplitter(Qt.Orientation.Horizontal); layout.addWidget(self.content,1)
-        self.views=QTabWidget(); self.views.addTab(self.canvas,'Carte' if self.canvas.info.get('crs') else 'Document'); self.content.addWidget(self.views)
+        self.content=QSplitter(Qt.Orientation.Horizontal); self.content.setChildrenCollapsible(False); layout.addWidget(self.content,1)
+        self.canvas.setMinimumSize(160,120)
+        self.views=QTabWidget(); self.views.setMinimumSize(180,150); self.views.addTab(self.canvas,'Carte' if self.canvas.info.get('crs') else 'Document'); self.content.addWidget(self.views)
         if self.canvas.kind=='vector':
             self._table=TablePanel(path,layer=self.canvas.info.get('layer')); self.views.addTab(self._table,'Attributs')
         self.info_tabs=QTabWidget(); self.info_tabs.setMinimumWidth(160); self.info_tabs.setMaximumWidth(310)
@@ -152,7 +153,7 @@ class Comparison(QWidget):
         self.common_scale=QCheckBox('Échelle colorimétrique commune')
         controls.addWidget(self.link); controls.addWidget(self.common_scale); controls.addStretch(); layout.addLayout(controls)
         self.note=QLabel(''); self.note.setWordWrap(True); layout.addWidget(self.note)
-        self.splitter=QSplitter(Qt.Orientation.Horizontal); layout.addWidget(self.splitter,1); self.choices=[]; self.holders=[]
+        self.splitter=QSplitter(Qt.Orientation.Horizontal); self.splitter.setChildrenCollapsible(False); layout.addWidget(self.splitter,1); self.choices=[]; self.holders=[]
         for side,path in enumerate([left,right]):
             container=QWidget(); box=QVBoxLayout(container); box.setContentsMargins(0,0,0,0)
             choice=QComboBox(); choice.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon); choice.setMinimumContentsLength(16)
