@@ -1,0 +1,35 @@
+name: Desktop reproducible environment
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/desktop-offline-validation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  environment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Prepare source and desktop dependencies
+        run: |
+          mkdir -p validation-environment/wheels
+          git archive --format=zip HEAD -o validation-environment/cartomize-source.zip
+          git rev-parse HEAD > validation-environment/source-commit.txt
+          python -m pip download --only-binary=:all: --dest validation-environment/wheels 'PySide6-Essentials==6.9.3' 'pypdfium2>=4.30,<6' 'build>=1,<2' 'setuptools>=77' wheel 'scikit-learn>=1.5,<2' 'rasterio>=1.4,<2' 'geopandas>=1.0,<2'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cartomize-validation-environment-linux313
+          path: validation-environment/
+          if-no-files-found: error
+          retention-days: 3
