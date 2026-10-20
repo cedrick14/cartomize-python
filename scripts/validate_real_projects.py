@@ -21,7 +21,7 @@ import traceback
 os.environ.setdefault('QT_QPA_PLATFORM', 'offscreen')
 os.environ.setdefault('MPLBACKEND', 'Agg')
 import geopandas as gpd
-from geopandas.testing import assert_geodataframe_equal
+from project_comparisons import same
 import numpy as np
 import pandas as pd
 import rasterio
@@ -120,9 +120,7 @@ class Audit:
         return report['failed']==0 and report['passed']>=57
 
 
-def same(left,right):
-    assert_geodataframe_equal(left.reset_index(drop=True),right.reset_index(drop=True),
-                             check_dtype=False,check_less_precise=True,normalize=True)
+
 
 
 def save(frame,path):
