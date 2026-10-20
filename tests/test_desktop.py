@@ -74,18 +74,28 @@ def test_native_window_indices_and_calculator(application,write_raster,tmp_path)
 
 def test_background_job_keeps_event_loop_responsive_and_cancels(application,tmp_path):
     from cartomize.desktop import CartomizeWindow
-    window=CartomizeWindow();window.show();window.select_tool('workflow');ticks=[];timer=QTimer()
+    window=CartomizeWindow();window.show();window.select_tool('workflow')
+    ticks=[];started=threading.Event();timer=QTimer(window)
+    timer.setTimerType(Qt.TimerType.PreciseTimer)
     timer.timeout.connect(lambda:ticks.append(1));timer.start(5)
     def job(progress,event):
+        started.set()
         while not event.wait(.01):pass
         raise cm.ProcessingCancelled()
     window.tool('workflow').staged=False;window.tool('workflow').job=lambda options:job
-    QTest.mouseClick(window.run_button,Qt.MouseButton.LeftButton)
-    QTest.qWait(80)
-    assert len(ticks)>=3 and window.thread is not None
-    QTest.mouseClick(window.cancel_button,Qt.MouseButton.LeftButton);finish(window)
-    assert window.status.text()=="Traitement interrompu."
-    timer.stop();window.close();QTest.qWait(10)
+    try:
+        QTest.mouseClick(window.run_button,Qt.MouseButton.LeftButton)
+        deadline=time.monotonic()+2
+        while (len(ticks)<3 or not started.is_set()) and time.monotonic()<deadline:
+            QTest.qWait(10)
+        assert started.is_set() and len(ticks)>=3 and window.thread is not None
+        QTest.mouseClick(window.cancel_button,Qt.MouseButton.LeftButton);finish(window)
+        assert window.status.text()=="Traitement interrompu."
+    finally:
+        timer.stop()
+        if window.thread is not None:
+            window.cancel();finish(window)
+        window.close();QTest.qWait(20)
 
 
 def test_preparation_page_progress_and_cancellation(application,write_raster,tmp_path):
