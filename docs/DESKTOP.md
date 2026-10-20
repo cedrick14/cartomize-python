@@ -25,6 +25,16 @@ La fenêtre Qt est indépendante d'ArcGIS Pro et de QGIS. Les dépendances
 graphiques sont facultatives pour les scripts. L'importation de `cartomize`
 n’ouvre pas de fenêtre.
 
+## Organisation de l'espace de travail
+
+La fenêtre Cartomize dispose d'un explorateur de projet indépendant du catalogue de traitements. L'explorateur présente les dossiers locaux et permet d'importer des rasters, des vecteurs, des tableaux et des documents compatibles avec le visualiseur. Un double-clic ouvre un fichier dans l'espace de résultats. Les dossiers s'ouvrent dans l'explorateur.
+
+La navigation des traitements utilise une liste verticale et un champ de recherche. Le panneau de contrôle conserve les paramètres et les commandes d'exécution des outils existants. Le visualiseur reste ouvert pendant les traitements.
+
+Le sélecteur **Thème** propose **Système**, **Clair** et **Sombre**. La préférence est enregistrée dans les paramètres de l'application et réutilisée au prochain lancement. Le thème modifie les contrôles de l'interface, sans modifier les valeurs scientifiques des données ou la symbologie enregistrée dans les projets.
+
+L'explorateur est un panneau Qt repositionnable. Sa présence ne remplace pas l'importation de couches propres à chaque traitement. Les outils et les résultats restent associés au moteur Cartomize existant.
+
 ## Assistant cartographique et ordre du travail
 
 L’écran d’ouverture est **Assistant cartographique**. Définir l’objectif et le type de données, importer les fichiers ou scènes, préciser le titre et la zone d’étude, puis **Examiner les données**. Les recommandations indiquent le motif de chaque étape. **Ouvrir l’étape sélectionnée** transmet les entrées à l’outil. L’examen est en lecture seule ; Analyse du projet applique ensuite les masques dans des copies.
