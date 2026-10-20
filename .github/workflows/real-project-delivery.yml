@@ -3,59 +3,21 @@ name: Real project delivery validation
 on:
   push:
     branches: [real-project-validation]
-    paths: ['.github/workflows/real-project-delivery.yml']
+    paths:
+      - 'src/cartomize/**'
+      - 'scripts/project_comparisons.py'
+      - 'scripts/validate_real_projects.py'
+      - 'scripts/real_project_data.py'
+      - 'tests/test_tableio.py'
+      - 'tests/test_project_comparisons.py'
+      - '.github/workflows/real-project-delivery.yml'
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  integrate:
-    if: github.ref == 'refs/heads/real-project-validation'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    outputs:
-      commit: ${{ steps.commit.outputs.sha }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: real-project-validation
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Connect the strictly tested persistence comparator
-        shell: python
-        run: |
-          import ast
-          from pathlib import Path
-          path = Path('scripts/validate_real_projects.py')
-          text = path.read_text(encoding='utf-8')
-          tree = ast.parse(text)
-          definitions = [node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == 'same']
-          if definitions:
-              assert len(definitions) == 1
-              node = definitions[0]
-              old = ast.get_source_segment(text, node)
-              assert 'assert_geodataframe_equal' in old and 'reset_index' in old, 'Unexpected comparison implementation'
-              text = text.replace(old, '', 1)
-              text = text.replace('from geopandas.testing import assert_geodataframe_equal', 'from project_comparisons import same', 1)
-          assert 'from project_comparisons import same' in text
-          ast.parse(text)
-          path.write_text(text, encoding='utf-8')
-      - name: Record the source revision
-        id: commit
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add scripts/validate_real_projects.py
-          if ! git diff --cached --quiet; then
-            git commit -m 'Compare exported project records with strict attributes and canonical geometry-column position'
-            git push origin HEAD:real-project-validation
-          fi
-          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
   validate:
-    needs: integrate
     strategy:
       fail-fast: false
       matrix:
@@ -70,7 +32,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ needs.integrate.outputs.commit }}
           persist-credentials: false
       - uses: actions/setup-python@v5
         with:
@@ -87,8 +48,8 @@ jobs:
         with:
           path: .real-project-data
           key: real-project-data-v2-${{ runner.os }}-72c7f3168e1e4e257caf84eb7b3fcaa47ade09c0-16371473
-      - name: Validate the comparison rules
-        run: python -m pytest tests/test_project_comparisons.py -q --junitxml=reports/comparison.xml
+      - name: Validate persistence and coordinate precision
+        run: python -m pytest tests/test_project_comparisons.py tests/test_tableio.py -q --junitxml=reports/comparison.xml
       - name: Execute real-data analyses and desktop interactions
         run: python scripts/validate_real_projects.py --data .real-project-data --output reports/real-projects
       - name: Check complete regression suite

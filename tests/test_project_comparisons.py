@@ -4,7 +4,7 @@ from pathlib import Path
 
 import geopandas as gpd
 import pytest
-from shapely.geometry import Point
+from shapely.geometry import Point, MultiPolygon, box
 
 
 @pytest.fixture
@@ -32,6 +32,21 @@ def test_round_trip_geopackage(compare, frame, tmp_path):
     path = tmp_path / 'results.gpkg'
     frame.to_file(path, driver='GPKG', index=False)
     compare(gpd.read_file(path), frame)
+
+
+def test_singleton_multi_promotion_preserves_geometry(compare):
+    polygon = box(0, 0, 10, 10)
+    original = gpd.GeoDataFrame({'id': [1]}, geometry=[polygon], crs=2154)
+    reloaded = original.set_geometry([MultiPolygon([polygon])])
+    compare(reloaded, original)
+
+
+def test_additional_parts_are_never_discarded(compare):
+    polygon = box(0, 0, 10, 10)
+    original = gpd.GeoDataFrame({'id': [1]}, geometry=[polygon], crs=2154)
+    changed = original.set_geometry([MultiPolygon([polygon, box(20, 20, 21, 21)])])
+    with pytest.raises(AssertionError):
+        compare(changed, original)
 
 
 @pytest.mark.parametrize('change', ['value', 'float_value', 'missing_field',

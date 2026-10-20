@@ -3,11 +3,11 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-import pandas as pd
 from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QComboBox, QLineEdit
 
 import cartomize as cm
+from .tableio import read_table
 from .desktop_tools_base import VectorPage as BaseVectorPage, write_result
 from .vector_workflows import (select_attributes, select_location, geometry_operation,
                                spatial_summary, join_attributes, latest_records)
@@ -82,7 +82,7 @@ class VectorPage(BaseVectorPage):
                 continue
             try:
                 if Path(text).suffix.lower() in {'.csv','.tsv'}:
-                    columns = list(pd.read_csv(text, sep=None, engine='python', nrows=0).columns)
+                    columns = list(read_table(text, nrows=0).columns)
                 else:
                     columns = list(pyogrio.read_info(text)['fields'])
             except (OSError, ValueError, RuntimeError):
@@ -173,14 +173,14 @@ class VectorPage(BaseVectorPage):
                 result = spatial_summary(source,other,field=p['field'],statistic=p['statistic'],
                                          predicate=p['predicate'],output_field=p['output_field'])
             elif op=='join_attributes':
-                result = join_attributes(source,pd.read_csv(other,sep=None,engine='python'),
+                result = join_attributes(source,read_table(other),
                                          left_on=p['left'],right_on=p['right'],how=p['how'])
             elif op=='latest_records':
                 result = latest_records(source,group_by=p['left'],order_by=p['order'])
             elif op=='from_xy':
                 if not p['crs']:
                     raise ValueError('Indiquer le SCR des coordonnées XY.')
-                result = cm.from_xy(pd.read_csv(source,sep=None,engine='python'),x=p['x'],y=p['y'],crs=p['crs'])
+                result = cm.from_xy(read_table(source),x=p['x'],y=p['y'],crs=p['crs'])
             elif op=='dissolve':
                 if p['aggregation']!='first' and not p['field']:
                     raise ValueError('Indiquer le champ numérique à agréger.')

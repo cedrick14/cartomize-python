@@ -3,14 +3,22 @@ from geopandas.testing import assert_geodataframe_equal
 import pandas as pd
 
 
-def same(left, right):
-    """Compare records in order while allowing only the geometry column to move.
+def _single_part(geometry):
+    """Undo a driver's single-to-multi promotion, never discard extra parts."""
+    if geometry is not None and geometry.geom_type in {'MultiPoint', 'MultiLineString', 'MultiPolygon'}:
+        if len(geometry.geoms) == 1:
+            return geometry.geoms[0]
+    return geometry
 
-    GDAL vector drivers expose geometry separately from attribute fields and
-    GeoPandas normally appends it when reading a file. Attribute order, field
-    names, row order, active geometry, CRS and values must still agree. The
-    row index is intentionally not compared because GIS output uses index=False.
-    Driver-dependent integer widths and nullable dtypes are not significant.
+
+def same(left, right):
+    """Compare records while normalizing two equivalent GIS representations.
+
+    Geometry-column placement and singleton multi-geometries may change in
+    GDAL drivers. Attribute order, field names, row order, CRS and attribute
+    values must still agree. No numeric tolerance is applied to attributes.
+    Coordinate equality retains the existing small reprojection tolerance.
+    The index is not compared because GIS output is written with index=False.
     """
     assert left.columns.is_unique and right.columns.is_unique, 'Duplicate field names'
     assert left.geometry.name == right.geometry.name, 'Different active geometry'
@@ -19,11 +27,11 @@ def same(left, right):
     right_fields = [name for name in right.columns if name != geometry]
     assert left_fields == right_fields, f'Attribute schema differs: {left_fields!r} != {right_fields!r}'
     fields = left_fields + [geometry]
-    actual = left.loc[:, fields].reset_index(drop=True)
-    expected = right.loc[:, fields].reset_index(drop=True)
-    # Attribute equality remains exact. Geometry coordinates may have the
-    # original comparator's small round-trip projection tolerance.
+    actual = left.loc[:, fields].reset_index(drop=True).copy()
+    expected = right.loc[:, fields].reset_index(drop=True).copy()
     pd.testing.assert_frame_equal(actual[left_fields], expected[left_fields],
                                   check_dtype=False, check_exact=True)
+    actual.geometry = actual.geometry.map(_single_part)
+    expected.geometry = expected.geometry.map(_single_part)
     assert_geodataframe_equal(actual, expected, check_dtype=False,
                               check_less_precise=True, normalize=True)
