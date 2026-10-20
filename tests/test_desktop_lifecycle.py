@@ -6,6 +6,7 @@ import threading
 import time
 
 import pytest
+pytest.importorskip('PySide6.QtWidgets')
 from PySide6.QtCore import QCoreApplication, QEvent, QTimer, Qt
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication
