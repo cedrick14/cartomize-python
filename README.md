@@ -2,7 +2,7 @@
 
 Cartomize associe une bibliothèque Python, une interface graphique et des commandes pour le traitement géospatial et la production cartographique.
 
-La version 1.1 introduit un espace de travail à panneaux : explorateur, catalogue des traitements, carte centrale, paramètres et console Python. Les outils raster, vectoriels, de classification, de terrain et de mise en page restent accessibles par l’API.
+La version 1.2 complète les traitements vectoriels avec les sélections, les synthèses par zone, les jointures attributaires, les relevés datés et les géométries dérivées. L’espace de travail réunit un explorateur, un catalogue de traitements, une carte centrale, les paramètres et une console Python.
 
 ## Installation
 
@@ -60,7 +60,7 @@ Les cartes proposent zoom, déplacement, valeurs de pixels, légendes, métadonn
 | Préparation multispectrale | Calibration, masques QA/SCL, mosaïque, assemblage multibande, extraction, composition colorée, export des bandes |
 | Raster | 18 indices spectraux, calculatrice, reclassification, statistiques focales, zonales et multirasters, superficies, transitions |
 | Classification | Forêts aléatoires, arbres extrêmement aléatoires, K-moyennes, validation et modèles enregistrés |
-| Vecteur | Superposition, jointure spatiale, découpage, tampons, dissolution, mesures, reprojection et réparation |
+| Vecteur | Sélections, superpositions, jointures, synthèses par zone, découpage, tampons, dissolution avec agrégation, mesures, reprojection, réparation, géométries dérivées, coordonnées XY et derniers relevés |
 | Terrain et réseaux | Dérivées topographiques, convolution, drainage D8, bassins versants et plus court chemin |
 | Cartographie | Couches, symbologie, étiquettes, 24 maquettes, cadres, légendes, échelles, atlas, PDF/PNG/SVG |
 | Automatisation | Plans, 34 opérateurs chaînables, recettes et production en série |
@@ -78,11 +78,21 @@ carte.export("villages.pdf", dpi=300)
 
 Les opérations vectorielles utilisent les objets GeoPandas. Les fichiers GeoTIFF conservent leurs valeurs scientifiques séparément des réglages d’affichage.
 
+## Projets réels
+
+La [validation sur projets réels](docs/REAL_PROJECTS.md) reprend des analyses des tutoriels GeoPandas et Earth Lab : équipements et occupation du sol à Paris, sites miniers et aires protégées en RDC, MNT/MNS et hauteur de canopée au Colorado. Elle compare les valeurs, géométries, SCR et masques et exerce également les commandes graphiques sur les données téléchargées.
+
+```bash
+python scripts/validate_real_projects.py --data .real-project-data --output reports/real-projects
+```
+
+Le dossier de sortie contient la correspondance des étapes, les résultats numériques, la provenance des sources, les cartes et les captures de l’interface. Le rapport précise les opérations exécutées et les démonstrations externes non couvertes.
+
 ## Documentation
 
-[Interface 1.1](docs/WORKBENCH.md), [traitements graphiques](docs/DESKTOP.md), [visualisation](docs/RESULTS_WORKSPACE.md), [API Python](docs/PYTHON_API.md), [prétraitement multispectral](docs/IMAGERY_SELECTION.md), [chaînes de traitements](docs/PROCESSING.md), [moteurs de calcul](docs/EXECUTION.md).
+[Interface](docs/WORKBENCH.md), [traitements graphiques](docs/DESKTOP.md), [visualisation](docs/RESULTS_WORKSPACE.md), [API Python](docs/PYTHON_API.md), [prétraitement multispectral](docs/IMAGERY_SELECTION.md), [chaînes de traitements](docs/PROCESSING.md), [moteurs de calcul](docs/EXECUTION.md), [projets réels](docs/REAL_PROJECTS.md).
 
-Le [parcours de tutoriels](tutorials/README.md) contient les notebooks de préparation multispectrale, d’analyse et de production cartographique. La [note de version](docs/RELEASE_1.1.0.md) présente les modifications de l’interface.
+Le [parcours de tutoriels](tutorials/README.md) contient les notebooks de préparation multispectrale, d’analyse et de production cartographique. La [note de version 1.1](docs/RELEASE_1.1.0.md) présente la refonte de l’interface.
 
 ## Développement et validation
 
@@ -92,10 +102,10 @@ python -m pytest
 python -m build
 python -m twine check --strict dist/*
 python scripts/check_release.py dist
-python scripts/verify_installed_release.py --wheel dist/cartomize-1.1.0-py3-none-any.whl --output reports/installed.json
+python scripts/verify_installed_release.py --wheel dist/cartomize-1.2.0-py3-none-any.whl --output reports/installed.json
 ```
 
-La validation utilise Windows et Linux avec Python 3.11 et 3.12. Elle couvre les traitements, l’interface, les projets, les exports, la console et une installation isolée du paquet construit. Les essais CUDA et QGIS natif demandent leurs environnements respectifs.
+La validation automatise les contrôles Windows et Linux, les traitements, l’interface, les projets, les exports, la console et une installation isolée du paquet construit. Les essais CUDA et QGIS natif demandent leurs environnements respectifs. Les résultats sont associés aux versions, aux données et aux commits inscrits dans les rapports.
 
 ## Auteur et licence
 
