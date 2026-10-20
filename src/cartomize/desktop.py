@@ -13,7 +13,7 @@ try:
     from PySide6.QtWidgets import (QApplication,QMainWindow,QWidget,QHBoxLayout,QVBoxLayout,
         QFormLayout,QLabel,QLineEdit,QPushButton,QFileDialog,QListWidget,QListWidgetItem,
         QStackedWidget,QComboBox,QSpinBox,QDoubleSpinBox,QCheckBox,QPlainTextEdit,
-        QTableWidget,QTableWidgetItem,QHeaderView,QProgressBar,QMessageBox,QGroupBox,QScrollArea,QTabWidget,QSplitter,QToolButton,QListView)
+        QTableWidget,QTableWidgetItem,QHeaderView,QProgressBar,QMessageBox,QGroupBox,QScrollArea,QTabWidget,QSplitter,QToolButton,QListView,QSettings)
 except ImportError as exc:
     raise ImportError('Interface graphique indisponible. Installer : python -m pip install "PySide6-Essentials>=6.7,<7"') from exc
 
@@ -481,6 +481,7 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
     def __init__(self):
         super().__init__();self.setWindowTitle("Cartomize");self.resize(1440,940);self.setMinimumSize(1100,700)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
+        self._preferences=QSettings('Cartomize','Cartomize Desktop')
         self.thread=None;self.worker=None;self.cancel_event=None;self.output_path=None
         self._preview_target=None;self._preview_directory=tempfile.TemporaryDirectory(prefix="cartomize-preview-")
         palette=self.palette()
@@ -498,7 +499,15 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
         header.addWidget(self.brand_icon);identity=QVBoxLayout();identity.setSpacing(1)
         brand=QLabel("Cartomize");brand.setObjectName("brand");identity.addWidget(brand)
         subtitle=QLabel("Assistant cartographique");subtitle.setObjectName("muted");identity.addWidget(subtitle)
-        header.addLayout(identity);header.addStretch();version=QLabel(f"Version {cm.__display_version__}");version.setObjectName("muted");header.addWidget(version);outer.addLayout(header)
+        header.addLayout(identity);header.addStretch()
+        theme_label=QLabel('Thème');header.addWidget(theme_label)
+        self.theme_selector=QComboBox();self.theme_selector.setObjectName('themeSelector')
+        self.theme_selector.addItem('Système','system');self.theme_selector.addItem('Clair','light');self.theme_selector.addItem('Sombre','dark')
+        saved_theme=self._preferences.value('appearance/theme','system')
+        index=self.theme_selector.findData(saved_theme)
+        self.theme_selector.setCurrentIndex(index if index>=0 else 0)
+        header.addWidget(self.theme_selector)
+        version=QLabel(f"Version {cm.__display_version__}");version.setObjectName("muted");header.addWidget(version);outer.addLayout(header)
         session_bar=QHBoxLayout();self.init_session(session_bar);session_bar.addStretch();outer.addLayout(session_bar)
         self.workspace_splitter=QSplitter(Qt.Orientation.Horizontal);self.workspace_splitter.setChildrenCollapsible(False);outer.addWidget(self.workspace_splitter,1)
         self.controls_panel=QWidget();self.controls_panel.setMinimumWidth(400);controls=QVBoxLayout(self.controls_panel);controls.setContentsMargins(0,0,8,0);controls.setSpacing(7)
@@ -510,12 +519,12 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
         self.catalogue_toggle=QToolButton();self.catalogue_toggle.setText('Outils');self.catalogue_toggle.setCheckable(True);self.catalogue_toggle.setChecked(True);panel_header.addWidget(self.catalogue_toggle);controls.addLayout(panel_header)
         self.catalogue=QWidget();catalogue_layout=QVBoxLayout(self.catalogue);catalogue_layout.setContentsMargins(0,0,0,0);catalogue_layout.setSpacing(4)
         self.tool_search=QLineEdit();self.tool_search.setPlaceholderText('Rechercher un traitement');catalogue_layout.addWidget(self.tool_search)
-        self.navigation=QListWidget();self.navigation.setObjectName("navigation");self.navigation.setViewMode(QListView.ViewMode.IconMode)
-        self.navigation.setResizeMode(QListView.ResizeMode.Adjust);self.navigation.setMovement(QListView.Movement.Static);self.navigation.setWordWrap(True)
-        self.navigation.setGridSize(QSize(200,56));self.navigation.setMinimumHeight(130);self.navigation.setMaximumHeight(180);catalogue_layout.addWidget(self.navigation)
-        controls.addWidget(self.catalogue);self.catalogue_toggle.toggled.connect(self.catalogue.setVisible)
+        self.navigation=QListWidget();self.navigation.setObjectName("navigation");self.navigation.setViewMode(QListView.ViewMode.ListMode)
+        self.navigation.setResizeMode(QListView.ResizeMode.Adjust);self.navigation.setMovement(QListView.Movement.Static);self.navigation.setWordWrap(False)
+        self.navigation.setMinimumHeight(230);self.navigation.setSpacing(2);catalogue_layout.addWidget(self.navigation,1)
+        controls.addWidget(self.catalogue,1);self.catalogue_toggle.toggled.connect(self.catalogue.setVisible)
         self.tool_search.textChanged.connect(self.filter_tools)
-        self.stack=QStackedWidget();self.stack.setMinimumHeight(170);controls.addWidget(self.stack,1)
+        self.stack=QStackedWidget();self.stack.setMinimumHeight(230);controls.addWidget(self.stack,3)
         from .desktop_tools import InspectionPage,VectorPage,RasterToolsPage
         from .desktop_project import ProjectPage
         from .desktop_assistant import AssistantPage
@@ -575,38 +584,59 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
         self.folder_button.clicked.connect(lambda:QDesktopServices.openUrl(QUrl.fromLocalFile(str(Path(self.output_path).resolve() if Path(self.output_path).is_dir() else Path(self.output_path).resolve().parent))))
         self.navigation.setCurrentRow(0)
         self.checkpoint()
-        self.setStyleSheet("""
-            QMainWindow, QWidget { background: #f7f7f7; color: #111111; font-size: 12px; }
-            QLabel#brand { color: #000000; font-size: 26px; font-weight: 700; }
-            QLabel#panelTitle { color: #111111; font-size: 16px; font-weight: 600; }
-            QLabel#emptyResults { color: #68716c; background: #f0f2f0; padding: 30px; font-size: 15px; }
-            QGroupBox#parameterCard { background: #ffffff; border: 1px solid #dedfdd; border-radius: 6px; }
-            QSplitter::handle { background: #dedfdd; width: 5px; }
-            QToolButton { border: 1px solid #cccccc; border-radius: 4px; padding: 5px 8px; background: #ffffff; }
-            QLabel#pageTitle { color: #000000; font-size: 21px; font-weight: 600; padding-bottom: 4px; }
-            QLabel#description { color: #555555; padding-bottom: 8px; }
-            QLabel#muted { color: #555555; }
-            QLabel#sequence { background: #eeeeee; color: #000000; border: 1px solid #dddddd; border-radius: 4px; padding: 12px; margin-bottom: 8px; line-height: 1.6; }
-            QLineEdit,QPlainTextEdit,QTableWidget,QListWidget,QComboBox,QSpinBox,QDoubleSpinBox { background: white; border: 1px solid #cccccc; border-radius: 3px; padding: 5px; selection-background-color: #222222; }
-            QLineEdit:focus,QPlainTextEdit:focus { border-color: #222222; }
-            QListWidget#navigation { border: 0; background: #f1f2f0; padding: 3px; }
-            QListWidget#navigation::item { background: #ffffff; border: 1px solid #dddfdb; border-radius: 5px; margin: 3px; padding: 6px; }
-            QListWidget#navigation::item:selected { background: #e4e7e2; border: 1px solid #8d968b; color: #111111; }
-            QListWidget::item { padding: 10px 6px; }
-            QListWidget::item:selected { background: #dddddd; color: #000000; border-radius: 3px; }
-            QPushButton { background: white; border: 1px solid #cccccc; border-radius: 4px; padding: 8px 12px; }
-            QPushButton:hover { border-color: #222222; }
-            QPushButton#primary { background: #222222; color: white; border: none; min-width: 150px; font-weight: 600; }
-            QPushButton:disabled { color: #999999; background: #eeeeee; }
-            QGroupBox { border: 1px solid #cccccc; border-radius: 4px; margin-top: 15px; padding-top: 12px; }
-            QGroupBox::title { subcontrol-origin: margin; left: 12px; padding: 0 5px; }
-            QProgressBar { border: 1px solid #cccccc; background: white; text-align: center; min-height: 16px; }
-            QProgressBar::chunk { background: #bbbbbb; }
-            QScrollArea { border: none; }
-            QTabWidget::pane { border: 1px solid #dddddd; padding: 10px; }
-            QTabBar::tab { background: #eeeeee; padding: 10px 14px; border-bottom: 2px solid transparent; }
-            QTabBar::tab:selected { color: #000000; background: #f7f7f7; border-bottom: 2px solid #222222; }
-            QHeaderView::section { background: #eeeeee; border: none; border-bottom: 1px solid #cccccc; padding: 6px; }
+        self._system_palette=QApplication.instance().palette()
+        self.theme_selector.currentIndexChanged.connect(self.apply_theme)
+        self.apply_theme()
+
+    def apply_theme(self,*_):
+        """Apply a consistent application palette without affecting map symbology."""
+        choice=self.theme_selector.currentData() or 'system'
+        self._preferences.setValue('appearance/theme',choice)
+        if choice=='system':
+            dark=self._system_palette.color(QPalette.ColorRole.Window).lightness()<128
+        else:
+            dark=choice=='dark'
+        if dark:
+            bg,panel,field,fg,muted,border,selection,accent=('#19222e','#202c39','#263443','#e6edf5','#9cabbd','#3b4a5c','#173f69','#3993eb')
+        else:
+            bg,panel,field,fg,muted,border,selection,accent=('#f3f6fa','#ffffff','#ffffff','#1e293b','#64748b','#d9e1e9','#e2efff','#1976d2')
+        palette=QPalette(self._system_palette)
+        for role,color in ((QPalette.ColorRole.Window,bg),(QPalette.ColorRole.WindowText,fg),
+                           (QPalette.ColorRole.Base,field),(QPalette.ColorRole.AlternateBase,panel),
+                           (QPalette.ColorRole.Text,fg),(QPalette.ColorRole.Button,panel),
+                           (QPalette.ColorRole.ButtonText,fg),(QPalette.ColorRole.Highlight,accent),
+                           (QPalette.ColorRole.HighlightedText,'#ffffff'),(QPalette.ColorRole.Link,accent)):
+            palette.setColor(role,QColor(color))
+        self.setPalette(palette)
+        self.setStyleSheet(f"""
+            QMainWindow,QWidget {{ background:{bg}; color:{fg}; font-size:12px; }}
+            QLabel#brand {{ font-size:25px; font-weight:700; }}
+            QLabel#panelTitle {{ font-size:16px; font-weight:650; }}
+            QLabel#pageTitle {{ font-size:20px; font-weight:650; }}
+            QLabel#description,QLabel#muted {{ color:{muted}; }}
+            QLabel#emptyResults {{ color:{muted}; background:{panel}; padding:24px; }}
+            QSplitter::handle {{ background:{border}; width:5px; }}
+            QLineEdit,QPlainTextEdit,QTableWidget,QListWidget,QComboBox,QSpinBox,QDoubleSpinBox {{
+                background:{field}; color:{fg}; border:1px solid {border}; border-radius:5px; padding:7px;
+                selection-background-color:{accent}; selection-color:#ffffff; }}
+            QLineEdit:focus,QComboBox:focus,QPlainTextEdit:focus {{ border:1px solid {accent}; }}
+            QListWidget#navigation {{ border:1px solid {border}; background:{panel}; padding:5px; }}
+            QListWidget#navigation::item {{ border:0; border-radius:5px; padding:10px 12px; margin:2px; }}
+            QListWidget#navigation::item:selected {{ background:{selection}; color:{'#e6edf5' if dark else '#174a84'}; font-weight:650; }}
+            QListWidget::item:selected {{ background:{selection}; color:{fg}; }}
+            QPushButton,QToolButton {{ background:{panel}; border:1px solid {border}; border-radius:5px; padding:8px 12px; }}
+            QPushButton:hover,QToolButton:hover {{ border-color:{accent}; }}
+            QPushButton#primary {{ background:{accent}; color:#ffffff; border:0; min-width:135px; font-weight:650; }}
+            QPushButton:disabled {{ color:{muted}; background:{bg}; }}
+            QGroupBox,QGroupBox#parameterCard {{ background:{panel}; border:1px solid {border}; border-radius:6px; margin-top:14px; padding-top:10px; }}
+            QGroupBox::title {{ subcontrol-origin:margin; left:12px; padding:0 5px; }}
+            QProgressBar {{ border:1px solid {border}; background:{field}; text-align:center; min-height:16px; }}
+            QProgressBar::chunk {{ background:{accent}; }}
+            QScrollArea {{ border:0; }}
+            QTabWidget::pane {{ border:1px solid {border}; padding:8px; }}
+            QTabBar::tab {{ background:{panel}; padding:9px 14px; border-bottom:2px solid transparent; }}
+            QTabBar::tab:selected {{ color:{fg}; border-bottom:2px solid {accent}; }}
+            QHeaderView::section {{ background:{panel}; color:{fg}; border:0; border-bottom:1px solid {border}; padding:7px; }}
         """)
     def filter_tools(self,text):
         for i in range(self.navigation.count()):self.navigation.item(i).setHidden(text.casefold() not in self.navigation.item(i).text().casefold())
