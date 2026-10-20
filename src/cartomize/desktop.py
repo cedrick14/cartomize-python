@@ -13,7 +13,7 @@ try:
     from PySide6.QtWidgets import (QApplication,QMainWindow,QWidget,QHBoxLayout,QVBoxLayout,
         QFormLayout,QLabel,QLineEdit,QPushButton,QFileDialog,QListWidget,QListWidgetItem,
         QStackedWidget,QComboBox,QSpinBox,QDoubleSpinBox,QCheckBox,QPlainTextEdit,
-        QTableWidget,QTableWidgetItem,QHeaderView,QProgressBar,QMessageBox,QGroupBox,QScrollArea,QTabWidget,QSplitter,QToolButton,QListView)
+        QTableWidget,QTableWidgetItem,QHeaderView,QProgressBar,QMessageBox,QGroupBox,QScrollArea,QTabWidget,QSplitter,QToolButton,QListView,QDockWidget)
 except ImportError as exc:
     raise ImportError('Interface graphique indisponible. Installer : python -m pip install "PySide6-Essentials>=6.7,<7"') from exc
 
@@ -508,6 +508,11 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
         self.workspace_splitter.addWidget(self.controls_panel)
         from .desktop_results import ResultsWorkspace
         self.workspace=ResultsWorkspace();self.workspace.setMinimumWidth(500);self.workspace_splitter.addWidget(self.workspace)
+        from .desktop_explorer import ProjectExplorer
+        self.project_explorer=ProjectExplorer(self.workspace,self)
+        self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea,self.project_explorer)
+        self.project_explorer.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetMovable | QDockWidget.DockWidgetFeature.DockWidgetFloatable)
+        self.project_explorer.setMinimumWidth(240)
         self.workspace_splitter.setStretchFactor(0,0);self.workspace_splitter.setStretchFactor(1,1);self.workspace_splitter.setSizes([490,910])
         panel_header=QHBoxLayout();panel_title=QLabel('Contrôle et traitements');panel_title.setObjectName('panelTitle');panel_header.addWidget(panel_title);panel_header.addStretch()
         self.catalogue_toggle=QToolButton();self.catalogue_toggle.setText('Outils');self.catalogue_toggle.setCheckable(True);self.catalogue_toggle.setChecked(True);panel_header.addWidget(self.catalogue_toggle);controls.addLayout(panel_header)
