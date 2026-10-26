@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import operator
+from decimal import Decimal, InvalidOperation, ROUND_CEILING, ROUND_FLOOR
 import numpy as np
 import pandas as pd
 import geopandas as gpd
@@ -9,8 +10,63 @@ import geopandas as gpd
 from ._validation import aligned, frame, measurement_frame
 
 
+def _finite_decimal(value):
+    """Parse a numeric filter without rounding an integer identifier to float."""
+    try:
+        number = Decimal(int(value)) if isinstance(value, (int, np.integer)) else Decimal(str(value))
+    except (InvalidOperation, ValueError, TypeError) as exc:
+        raise ValueError('A numeric filter requires a finite value.') from exc
+    if not number.is_finite():
+        raise ValueError('A numeric filter requires a finite value.')
+    return number
+
+
+def _integer_comparison(series, comparison, value):
+    """Compare integer/nullable integer fields with exact decimal thresholds."""
+    number = _finite_decimal(value)
+    present = series.notna()
+    if not present.any():
+        return present
+    # Check the actual range before converting potentially enormous exponents
+    # to Python integers, and before pandas can coerce signed/unsigned types.
+    minimum, maximum = int(series.min()), int(series.max())
+    if number < minimum:
+        return present if comparison in {'ne', 'gt', 'ge'} else present & False
+    if number > maximum:
+        return present if comparison in {'ne', 'lt', 'le'} else present & False
+    integral = number == number.to_integral_value()
+    if comparison in {'eq', 'ne'}:
+        if not integral:
+            return present if comparison == 'ne' else present & False
+        return getattr(series, comparison)(int(number)) & present
+    rounding = ROUND_CEILING if comparison in {'lt', 'ge'} else ROUND_FLOOR
+    threshold = int(number.to_integral_value(rounding=rounding))
+    return getattr(series, comparison)(threshold) & present
+
+
+def _integer_membership(series, values):
+    present = series.notna()
+    minimum = int(series.min()) if present.any() else None
+    maximum = int(series.max()) if present.any() else None
+    normalized = []
+    for value in values:
+        if value is None or value is pd.NA or isinstance(value, (float, np.floating)) and np.isnan(value):
+            # Preserve pandas' explicit missing-value membership convention.
+            normalized.append(value)
+            continue
+        number = _finite_decimal(value)
+        if minimum is not None and minimum <= number <= maximum and number == number.to_integral_value():
+            normalized.append(int(number))
+    return series.isin(normalized)
+
+
 def select_attributes(data, field, comparison, value=None):
-    """Select whole records without evaluating Python, SQL or query expressions."""
+    """Select whole records without evaluating Python, SQL or query expressions.
+
+    Integer identifiers and numeric text are compared exactly, including signed
+    and unsigned nullable 64-bit fields. Decimal thresholds are not rounded to
+    a neighbouring integer before deciding the comparison.
+    """
     result = frame(data)
     if field not in result.columns or field == result.geometry.name:
         raise ValueError('Select an existing attribute field.')
@@ -29,7 +85,10 @@ def select_attributes(data, field, comparison, value=None):
     elif comparison in {'in', 'not_in'}:
         if not isinstance(value, (list, tuple, set)):
             raise ValueError('Membership selection requires a list of values.')
-        mask = series.isin(value)
+        try:
+            mask = _integer_membership(series, value) if pd.api.types.is_integer_dtype(series.dtype) else series.isin(value)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f'Invalid filter value for {field}: {exc}') from exc
         if comparison == 'not_in':
             mask = ~mask & series.notna()
     elif comparison in comparisons:
@@ -39,6 +98,9 @@ def select_attributes(data, field, comparison, value=None):
             if pd.api.types.is_bool_dtype(series.dtype):
                 if not isinstance(value, (bool, np.bool_)):
                     raise ValueError('A Boolean field requires true or false.')
+            elif pd.api.types.is_integer_dtype(series.dtype):
+                mask = _integer_comparison(series, comparison, value)
+                return result.loc[mask.fillna(False)].copy()
             elif pd.api.types.is_numeric_dtype(series.dtype):
                 value = float(value)
                 if not np.isfinite(value):
@@ -106,6 +168,9 @@ def spatial_summary(zones, observations, *, field=None, statistic='count',
     Predicates apply to observations relative to zones. Overlapping zones are
     evaluated independently; a boundary point is excluded with 'within'.
     Count counts records, not distinct sites; callers deduplicate beforehand.
+    A sum is zero for a zone without observations, but remains missing when
+    observations exist and every value is missing. Missing values do not become
+    measured zeros.
     """
     if statistic not in {'count', 'sum', 'mean', 'min', 'max'}:
         raise ValueError('Unsupported summary statistic.')
@@ -126,15 +191,26 @@ def spatial_summary(zones, observations, *, field=None, statistic='count',
     if statistic == 'count':
         values = joined.groupby('_cm_zone').size().reindex(range(len(zones)), fill_value=0).astype('int64')
     else:
-        values = joined.groupby('_cm_zone')['_cm_value'].agg(statistic).reindex(range(len(zones)))
+        grouped = joined.groupby('_cm_zone')['_cm_value']
         if statistic == 'sum':
-            values = values.fillna(0)
+            values = grouped.sum(min_count=1).reindex(range(len(zones)), fill_value=0)
+        else:
+            values = grouped.agg(statistic).reindex(range(len(zones)))
     zones[output_field] = values.to_numpy()
     return zones
 
 
-def join_attributes(data, table, *, left_on, right_on=None, how='left', validate='many_to_one'):
-    """Attach table attributes without an unnoticed many-to-many multiplication."""
+def join_attributes(data, table, *, left_on, right_on=None, how='left', validate='many_to_one',
+                    null_keys='unmatched'):
+    """Attach attributes with explicit cardinality and missing-key semantics.
+
+    ``unmatched`` (default) never joins missing identifiers; a left join keeps
+    their source records without table attributes. Cardinality is checked on
+    nonmissing keys found on both sides. ``match`` explicitly requests pandas'
+    missing-to-missing joins and full-key cardinality checks. ``error`` rejects
+    any missing key. Output follows source order and then table order, retaining
+    all permitted matches rather than selecting an implicit first record.
+    """
     source = frame(data)
     table = pd.DataFrame(table).copy()
     right_on = right_on or left_on
@@ -142,11 +218,27 @@ def join_attributes(data, table, *, left_on, right_on=None, how='left', validate
         raise ValueError('Attribute joins support left or inner joins.')
     if validate not in {'one_to_one', 'one_to_many', 'many_to_one', 'many_to_many'}:
         raise ValueError('Unsupported join cardinality.')
+    if null_keys not in {'unmatched', 'match', 'error'}:
+        raise ValueError('null_keys must be unmatched, match or error.')
     if left_on not in source or right_on not in table:
         raise ValueError('Join fields do not exist.')
     if source.geometry.name in table:
         raise ValueError('The joined table must not contain a geometry column.')
-    return source.merge(table, left_on=left_on, right_on=right_on, how=how, validate=validate)
+    if null_keys == 'match':
+        return source.merge(table, left_on=left_on, right_on=right_on, how=how, validate=validate, sort=False)
+    left_missing, right_missing = source[left_on].isna(), table[right_on].isna()
+    if null_keys == 'error' and (left_missing.any() or right_missing.any()):
+        raise ValueError('Join keys contain missing values; choose null_keys=unmatched or match explicitly.')
+    table = table.loc[~right_missing].copy()
+    left_keys = source.loc[~left_missing, left_on]
+    right_keys = table[right_on]
+    matched_left = left_keys.loc[left_keys.isin(right_keys)]
+    matched_right = right_keys.loc[right_keys.isin(left_keys)]
+    if validate in {'one_to_one', 'one_to_many'} and matched_left.duplicated().any():
+        raise pd.errors.MergeError(f'Matching keys are not unique in the left dataset for {validate}.')
+    if validate in {'one_to_one', 'many_to_one'} and matched_right.duplicated().any():
+        raise pd.errors.MergeError(f'Matching keys are not unique in the right dataset for {validate}.')
+    return source.merge(table, left_on=left_on, right_on=right_on, how=how, sort=False)
 
 
 def latest_records(data, *, group_by, order_by):

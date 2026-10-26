@@ -1,4 +1,5 @@
-cartomize==1.0.1
+# Run from the repository root: install the exact sources used by these lessons.
+-e .
 jupyterlab>=4.3,<5
 nbformat>=5.10,<6
 nbclient>=0.10,<1

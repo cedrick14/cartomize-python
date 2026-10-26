@@ -3,8 +3,9 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from pandas.api.types import is_string_dtype
 from PySide6.QtCore import QTimer
-from PySide6.QtWidgets import QComboBox, QLineEdit
+from PySide6.QtWidgets import QComboBox, QLineEdit, QLabel
 
 import cartomize as cm
 from .tableio import read_table
@@ -45,6 +46,20 @@ class VectorPage(BaseVectorPage):
         self.result_field = QLineEdit()
         self.left_key = field()
         self.right_key = field()
+        self.join_cardinality = QComboBox()
+        for label, key in [('Plusieurs vers un (N:1)', 'many_to_one'), ('Un vers un (1:1)', 'one_to_one'),
+                           ('Un vers plusieurs (1:N)', 'one_to_many'), ('Plusieurs vers plusieurs (N:N)', 'many_to_many')]:
+            self.join_cardinality.addItem(label, key)
+        self.join_null_keys = QComboBox()
+        for label, key in [('Ne pas apparier (par défaut)', 'unmatched'),
+                           ('Apparier les valeurs manquantes', 'match'),
+                           ('Refuser les valeurs manquantes', 'error')]:
+            self.join_null_keys.addItem(label, key)
+        self.join_policy_note = QLabel(
+            'Une clé manquante ne correspond à aucune autre par défaut. « Apparier » relie aussi les clés manquantes ; '
+            '« Refuser » interrompt le traitement. N:1 exige une seule ligne du tableau pour chaque clé appariée ; '
+            '1:N et N:N peuvent produire plusieurs lignes par entité. Les identifiants textuels du tableau conservent leurs zéros initiaux.')
+        self.join_policy_note.setWordWrap(True)
         self.order_field = field()
         self.x_field = QLineEdit('longitude')
         self.y_field = QLineEdit('latitude')
@@ -55,11 +70,13 @@ class VectorPage(BaseVectorPage):
                           ('Valeur', self.filter_value), ('Champ numérique', self.summary_field),
                           ('Statistique', self.summary_stat), ('Champ de sortie', self.result_field),
                           ('Identifiant source', self.left_key), ('Identifiant de jointure', self.right_key),
+                          ('Cardinalité de la jointure', self.join_cardinality), ('Clés manquantes', self.join_null_keys),
                           ('Champ de date', self.order_field), ('Agrégation des attributs', self.aggregation),
                           ('Champ X', self.x_field), ('Champ Y', self.y_field)]
         for label, widget in specifications:
             self.form.insertRow(self.form.rowCount()-1, label, widget)
             self._extra_widgets[widget] = self.form.labelForField(widget)
+        self.form.insertRow(self.form.rowCount()-1, self.join_policy_note)
         for label,key in self.EXTRA:
             self.operation.addItem(label,key)
         self._fields_timer = QTimer(self)
@@ -117,6 +134,8 @@ class VectorPage(BaseVectorPage):
                 self.filter_value:op=='select_attributes', self.summary_field:op in {'spatial_summary','dissolve'},
                 self.summary_stat:op=='spatial_summary', self.result_field:op=='spatial_summary',
                 self.left_key:op in {'join_attributes','latest_records'}, self.right_key:op=='join_attributes',
+                self.join_cardinality:op=='join_attributes', self.join_null_keys:op=='join_attributes',
+                self.join_policy_note:op=='join_attributes',
                 self.order_field:op=='latest_records', self.aggregation:op=='dissolve',
                 self.x_field:op=='from_xy', self.y_field:op=='from_xy'}
         for widget, shown in show.items():
@@ -155,6 +174,7 @@ class VectorPage(BaseVectorPage):
                  right=self.right_key.currentText().strip() or None, order=self.order_field.currentText().strip(),
                  crs=self.crs.text().strip() or None, tolerance=self.distance.value(),
                  x=self.x_field.text().strip(), y=self.y_field.text().strip(), how=self.join.currentData(),
+                 join_cardinality=self.join_cardinality.currentData(), null_keys=self.join_null_keys.currentData(),
                  group=self.field.text().strip() or None, aggregation=self.aggregation.currentData())
         def run(progress, cancel):
             if cancel.is_set():
@@ -173,8 +193,14 @@ class VectorPage(BaseVectorPage):
                 result = spatial_summary(source,other,field=p['field'],statistic=p['statistic'],
                                          predicate=p['predicate'],output_field=p['output_field'])
             elif op=='join_attributes':
-                result = join_attributes(source,read_table(other),
-                                         left_on=p['left'],right_on=p['right'],how=p['how'])
+                data = cm.read_file(source)
+                if p['left'] not in data:
+                    raise ValueError('Le champ de jointure source est absent : '+p['left'])
+                table_key = p['right'] or p['left']
+                dtype = {table_key: 'string'} if is_string_dtype(data[p['left']].dtype) else None
+                result = join_attributes(data,read_table(other, dtype=dtype),
+                                         left_on=p['left'],right_on=p['right'],how=p['how'],
+                                         validate=p['join_cardinality'],null_keys=p['null_keys'])
             elif op=='latest_records':
                 result = latest_records(source,group_by=p['left'],order_by=p['order'])
             elif op=='from_xy':

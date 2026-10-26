@@ -62,6 +62,56 @@ Les 24 maquettes ne dispensent pas de vérifier le contenu. La qualité de la ca
 
 ## Transmission des données
 
+### Sélections et tableaux dans les chaînes automatiques
+
+Les opérations `vector.from_xy`, `vector.select_attributes`, `vector.select_location`,
+`vector.geometry_operation`, `vector.latest_records`, `vector.join_attributes`,
+`vector.spatial_summary` et `vector.validate` sont disponibles dans le registre commun.
+Elles peuvent donc être appelées dans Python, dans une chaîne JSON, avec
+`cartomize process`, ou depuis **Chaîne de traitements** dans la fenêtre.
+Les sorties d’une étape sont référencées par `@identifiant` dans la suivante.
+
+```python
+import cartomize as cm
+
+plan = cm.processing_plan([
+    {"id": "points", "operation": "vector.from_xy", "parameters": {
+        "data": "observations.csv", "x": "longitude", "y": "latitude",
+        "crs": "EPSG:4326", "table_dtypes": {"code": "string"}}},
+    {"id": "releves", "operation": "vector.latest_records", "parameters": {
+        "data": "@points", "group_by": "code", "order_by": "date"}},
+    {"id": "attributs", "operation": "vector.join_attributes", "parameters": {
+        "data": "@releves", "table": "mesures.csv", "left_on": "code",
+        "table_dtypes": {"code": "string"}, "null_keys": "unmatched"}},
+    {"id": "bilan", "operation": "vector.spatial_summary", "parameters": {
+        "zones": "communes.gpkg", "observations": "@attributs",
+        "field": "mesure", "statistic": "sum"}},
+])
+rapport = cm.run_plan(plan, "resultats/nouvelle_execution")
+```
+
+Les tableaux CSV/TSV sont lus avec détection du séparateur ; `delimiter` et
+`encoding` permettent de préciser le format. `table_dtypes={"code": "string"}`
+conserve les zéros initiaux des identifiants, par exemple `001`. Pour l’API directe,
+passer un tableau pandas correctement typé à `cm.from_xy` ou `cm.join_attributes`.
+
+Les comparaisons de champs entiers, y compris les identifiants 64 bits, conservent
+leur précision. Il faut transmettre un grand identifiant comme entier Python ou
+comme texte ; une valeur déjà arrondie par un tableur ou un nombre flottant ne peut
+pas être reconstruite par Cartomize.
+
+Une jointure conserve par défaut les clés manquantes sans leur attribuer les
+données d’une autre clé manquante (`null_keys="unmatched"`). `"match"` autorise
+explicitement leur appariement, et `"error"` refuse toute clé absente. La cardinalité
+par défaut est `many_to_one` ; en mode `unmatched`, elle est contrôlée sur les clés
+renseignées qui ont effectivement un correspondant. Une relation plusieurs à
+plusieurs doit être demandée explicitement avec `validate="many_to_many"`.
+
+Pour une synthèse par somme, une zone sans observation reçoit zéro. Une zone avec
+des observations dont toutes les mesures sont manquantes reste manquante. Un zéro
+mesuré est conservé. Les zones se recouvrant sont évaluées séparément ; le prédicat
+spatial choisi détermine l’inclusion des observations situées sur leur limite.
+
 Le plan conserve les bandes importées par défaut et respecte la sélection explicite. Les prérequis de qualité, de dates et de correspondance spectrale sont contrôlés avant exécution. La composition colorée est facultative.
 
 Le multibande scientifique est transmis à la classification, aux indices et à la composition colorée. Les références d’apprentissage, de validation, les libellés et les groupes sont conservés entre le plan et les outils. Les couches et nomenclatures préparées alimentent la mise en page.

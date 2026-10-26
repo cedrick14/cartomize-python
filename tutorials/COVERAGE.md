@@ -1,6 +1,6 @@
 # Couverture des outils
 
-Cette matrice relie les 34 opérateurs enregistrés aux cours qui exécutent leurs fonctions publiques. Elle décrit la couverture pédagogique des familles, sans prétendre tester toutes les combinaisons de paramètres. Le cours 08 montre leur insertion dans des plans.
+Le registre comprend 43 opérateurs. Cette matrice relie 35 d’entre eux aux cours qui exécutent leurs fonctions publiques. Les huit opérateurs vectoriels ajoutés en 1.3 sont documentés dans le guide SIG et vérifiés par les tests d’intégration ; un cours dédié reste à rédiger. Elle décrit la couverture pédagogique des familles, sans prétendre tester toutes les combinaisons de paramètres. Le cours 08 montre leur insertion dans des plans.
 
 | Opérateur | Fonction | Cours |
 |---|---|---|
@@ -20,7 +20,7 @@ Cette matrice relie les 34 opérateurs enregistrés aux cours qui exécutent leu
 | `raster.clip` | Extraction par masque | [05](notebooks/05_surfaces_changements.ipynb) |
 | `raster.reproject` | Reprojection raster | [05](notebooks/05_surfaces_changements.ipynb) |
 | `raster.reclassify` | Reclassification | [05](notebooks/05_surfaces_changements.ipynb) |
-| `raster.zonal_stats` | Statistiques zonales | [03](notebooks/03_indices_algebre.ipynb) |
+| `raster.zonal_stats` | Statistiques zonales et couverture | [03](notebooks/03_indices_algebre.ipynb), [13](notebooks/13_diagnostic_automatique.ipynb) |
 | `raster.class_areas` | Superficies par classe | [05](notebooks/05_surfaces_changements.ipynb) |
 | `raster.change_matrix` | Matrice de transition | [05](notebooks/05_surfaces_changements.ipynb) |
 | `calculate` | Algèbre raster | [03](notebooks/03_indices_algebre.ipynb) |
@@ -39,11 +39,15 @@ Cette matrice relie les 34 opérateurs enregistrés aux cours qui exécutent leu
 | `stac.search` | Recherche de scènes STAC | [10](notebooks/10_catalogues_execution.ipynb) |
 | `stac.download` | Téléchargement des scènes STAC | [10](notebooks/10_catalogues_execution.ipynb) |
 
+| `imagery.audit` | Diagnostic de couverture et de lacunes | [13](notebooks/13_diagnostic_automatique.ipynb) |
+
+Les opérations `vector.select_attributes`, `vector.select_location`, `vector.geometry_operation`, `vector.spatial_summary`, `vector.join_attributes`, `vector.latest_records`, `vector.from_xy` et `vector.validate` sont décrites dans [SIG_WORKFLOWS.md](../docs/SIG_WORKFLOWS.md). Leur chaîne est exercée dans [test_vector_registry.py](../tests/test_vector_registry.py).
+
 ## Fonctions complémentaires
 
 | Famille | Contenu | Référence |
 |---|---|---|
-| Préparation | Scènes, correspondances, masques, bandes séparées, composition et couverture | Cours 00 et 02 |
+| Préparation | Scènes, correspondances, masques, bandes séparées, composition et couverture | Cours 00, 02 et 13 |
 | Indices | 18 indices, registre extensible, 7 statistiques focales et 7 réductions | Cours 03 |
 | Classification | K-moyennes, forêt aléatoire, Extra Trees, confiance, modèle sauvegardé et validation | Cours 04 |
 | Cartographie | Superposition, classes, étiquettes, catalogue de 24 maquettes, cadres, tableaux, graphiques, atlas et exports | Cours 01 et 07 |

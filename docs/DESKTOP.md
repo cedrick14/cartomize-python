@@ -1,19 +1,19 @@
 # Interface graphique
 
-L’interface organise les traitements et la visualisation en deux panneaux. Le [guide de l’espace de travail](RESULTS_WORKSPACE.md) décrit les vues intégrées. Le [guide de l’automatisation](AUTOMATION.md) présente les plans, la classification, les sessions et la production en série.
+L’interface réunit l’explorateur, le catalogue, les paramètres, les résultats et la console dans des panneaux repositionnables. Le [guide de l’espace de travail](RESULTS_WORKSPACE.md) décrit les vues intégrées. Le [guide de l’automatisation](AUTOMATION.md) présente les plans, la classification, les sessions et la production en série.
 
 **Prétraitement multispectral** propose un tableau des bandes par scène, la sélection des opérations, les canaux RVB et l’export monobande. Voir le [parcours détaillé](IMAGERY_SELECTION.md).
 
 ## Installation et lancement
 
-Avec Python 3.11 à 3.13 :
+Depuis la racine des sources, avec Python 3.11 ou 3.12 :
 
 ```bash
-python -m pip install "cartomize[gui]==1.0.1"
+python -m pip install -e ".[gui]"
 cartomize-desktop
 ```
 
-Depuis les sources : `python -m pip install ".[gui]"`, puis `cartomize gui`.
+La commande `python -m cartomize gui` ouvre la même fenêtre.
 Depuis Python :
 
 ```python
@@ -166,10 +166,10 @@ Dans une application possédant déjà un `QApplication`, utiliser
 Un notebook local peut ouvrir la fenêtre avec
 `cm.launch()` : Cartomize active automatiquement l’intégration Qt d’IPython.
 La cellule se termine et la fenêtre reste interactive. Installer les
-composants du notebook dans un noyau Python 3.11 à 3.13 :
+composants du notebook dans un noyau Python 3.11 ou 3.12, en adaptant le chemin de la copie locale :
 
 ```python
-%pip install "cartomize[notebook]==1.0.1"
+%pip install -e "C:/Projets/cartomize-python[notebook]"
 ```
 
 Après une mise à jour, redémarrer le noyau, puis exécuter :

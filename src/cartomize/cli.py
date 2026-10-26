@@ -67,6 +67,20 @@ def main(argv=None):
     mapping.add_argument("--rgb", choices=list(COMPOSITIONS)+["native"])
     discovery = subs.add_parser("scenes", help="Discover standard local Landsat/Sentinel scenes")
     discovery.add_argument("source")
+    audit = subs.add_parser("audit-imagery", help="Diagnose AOI coverage and recommend spectral scene preparation")
+    audit.add_argument("source", help="Scene directory or scene manifest")
+    audit.add_argument("destination", help="New directory for coverage maps and report")
+    audit.add_argument("--aoi", required=True)
+    audit.add_argument("--bands", help="Comma-separated semantic band names")
+    audit.add_argument("--crs")
+    audit.add_argument("--resolution", type=float, help="Diagnostic and preparation pixel size in metres")
+    audit.add_argument("--resampling", choices=["nearest", "bilinear", "cubic", "average"], default="nearest")
+    audit.add_argument("--without-cloud-mask", action="store_true")
+    audit.add_argument("--without-saturation-mask", action="store_true")
+    audit.add_argument("--allow-mixed-dates", action="store_true")
+    audit.add_argument("--all-touched", action="store_true")
+    audit.add_argument("--max-pixels", type=int, default=250_000_000)
+    audit.add_argument("--coverage-threshold", type=float, default=100.)
     prepare = subs.add_parser("prepare", help="Mosaic, calibrate, stack and clip spectral scenes")
     prepare.add_argument("source"); prepare.add_argument("destination")
     prepare.add_argument("--bands", required=True, help="Comma-separated semantic names: blue,green,red,nir")
@@ -76,6 +90,9 @@ def main(argv=None):
     prepare.add_argument("--resampling", choices=["nearest","bilinear","cubic","average"], default="nearest")
     prepare.add_argument("--allow-mixed-dates", action="store_true")
     prepare.add_argument("--without-cloud-mask", action="store_true")
+    prepare.add_argument("--without-saturation-mask", action="store_true")
+    prepare.add_argument("--all-touched", action="store_true")
+    prepare.add_argument("--max-pixels", type=int, default=250_000_000)
     prepare.add_argument("--overwrite", action="store_true")
     composite = subs.add_parser("composite", help="Export a natural/false-colour RGBA GeoTIFF")
     composite.add_argument("source"); composite.add_argument("destination")
@@ -170,11 +187,23 @@ def main(argv=None):
             result = [{"id":s.scene_id,"sensor":s.sensor,"date":s.acquired,"level":s.level,
                        "bands":list(s.bands),"quality_mask":str(s.quality) if s.quality else None}
                       for s in discover_scenes(args.source)]
+        elif args.command == "audit-imagery":
+            from .imagery_audit import audit_imagery
+            product = audit_imagery(args.source, args.destination, aoi=args.aoi,
+                band_order=[b.strip() for b in args.bands.split(",")] if args.bands else None,
+                target_crs=args.crs, resolution=args.resolution, resampling=args.resampling,
+                mask_clouds=not args.without_cloud_mask,
+                mask_saturation=not args.without_saturation_mask,
+                allow_mixed_dates=args.allow_mixed_dates, all_touched=args.all_touched,
+                max_pixels=args.max_pixels, coverage_threshold=args.coverage_threshold)
+            result = product.report
         elif args.command == "prepare":
             product = prepare_imagery(args.source,args.destination,aoi=args.aoi,
                       band_order=[b.strip() for b in args.bands.split(",")],target_crs=args.crs,
                       resolution=args.resolution,overlap=args.overlap,resampling=args.resampling,
                       allow_mixed_dates=args.allow_mixed_dates,mask_clouds=not args.without_cloud_mask,
+                      mask_saturation=not args.without_saturation_mask,
+                      all_touched=args.all_touched,max_pixels=args.max_pixels,
                       overwrite=args.overwrite)
             result = product.report
         elif args.command == "composite":

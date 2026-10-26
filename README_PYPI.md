@@ -1,6 +1,6 @@
 # Cartomize
 
-**Version 1.1**
+**Version 1.3.0**
 
 Cartomize provides a Python API, a command-line interface and a desktop application for geospatial processing and cartographic production. It runs independently of QGIS and ArcGIS Pro. Native project bridges are optional.
 
@@ -8,27 +8,38 @@ Cartomize provides a Python API, a command-line interface and a desktop applicat
 
 The library requires Python 3.11 or later. Python 3.11 or 3.12 is recommended for the desktop application.
 
-For a published release:
+For the latest release available on PyPI:
 
 ```bash
-python -m pip install "cartomize[gui]==1.1.0"
+python -m pip install "cartomize[gui]"
 python -m cartomize gui
 ```
 
 For a downloaded wheel:
 
 ```bash
-python -m pip install "./cartomize-1.1.0-py3-none-any.whl[gui]"
+python -m pip install "./cartomize-1.3.0-py3-none-any.whl[gui]"
 ```
 
-From Python:
+For the current GitHub sources:
+
+```bash
+git clone https://github.com/cedrick14/cartomize-python.git
+cd cartomize-python
+python -m pip install -e ".[gui]"
+python -m cartomize gui
+```
+
+A version in the repository is not necessarily published on PyPI yet. The API alone can be installed with `python -m pip install -e .`, without Qt. To install Jupyter and the executable course from these same sources, run `python -m pip install -r tutorials/requirements.txt` from the repository root.
+
+From Python, after installing the GUI extra:
 
 ```python
 import cartomize as cm
 window = cm.launch()
 ```
 
-Local notebooks use the `notebook` extra. Restart the kernel after installation. The desktop window opens on the machine running Python.
+Notebook cells can call processing functions directly without Qt. To open the desktop window from a local notebook, install the `notebook` extra and restart the kernel. The window opens on the machine running Python.
 
 ## Desktop workspace
 
@@ -42,15 +53,17 @@ Imported files are available for viewing and transfer to compatible processing t
 
 | Domain | Operations |
 |---|---|
-| Satellite imagery | Band import, calibration, quality masking, mosaics, multiband assembly, clipping and RGB composition |
+| Satellite imagery | Exact grid coverage diagnostics, scene recommendations, band import, calibration, quality masking, mosaics, multiband assembly, clipping and RGB composition |
 | Raster | Algebra, 18 spectral indices, focal and zonal statistics, reductions, reclassification and change matrices |
 | Vector | Overlay, spatial joins, buffers, clipping, dissolution, reprojection, measurement and geometry repair |
 | Classification | Random forests, extra trees, K-means, validation and saved models |
 | Terrain and networks | Terrain derivatives, convolution, D8 drainage, watersheds and shortest paths |
 | Cartography | 24 templates, symbology, labels, legends, scale bars, multiple frames, atlases and PDF/PNG/SVG export |
-| Automation | Processing plans, reusable recipes, batch production and saved sessions |
+| Automation | 43 registered operators, processing plans, reusable recipes, batch production and saved sessions |
 
 Optional Dask and CUDA execution is available for supported operators. Native GIS bridges and CUDA hardware execution require the corresponding runtime.
+
+Version 1.3.0 also preserves large integer vector keys and typed classification labels, applies raster scale/offset in zonal statistics by default, and attaches route endpoints to the nearest segment by default. Explicit raw-value and vertex-snapping modes remain available. See the [release and migration notes](https://github.com/cedrick14/cartomize-python/blob/main/docs/RELEASE_1.3.0.md).
 
 ## Python example
 

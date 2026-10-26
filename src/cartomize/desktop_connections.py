@@ -7,6 +7,7 @@ from PySide6.QtWidgets import QGroupBox,QHBoxLayout,QComboBox,QPushButton,QVBoxL
 
 RASTERS={'.tif','.tiff','.jp2','.vrt','.img'}
 VECTORS={'.gpkg','.shp','.geojson'}
+NON_SPECTRAL_PRODUCTS={'display_rgba','imagery_coverage','imagery_gaps','source_index'}
 
 
 class ProjectConnections:
@@ -41,7 +42,7 @@ class ProjectConnections:
         else:
             targets+=['raster','calculator','focal','temporal','terrain']
             with rasterio.open(layer['data']) as src:
-                if src.tags().get('CARTOMIZE_PRODUCT')!='display_rgba':
+                if src.tags().get('CARTOMIZE_PRODUCT') not in NON_SPECTRAL_PRODUCTS and layer.get('purpose')!='diagnostic':
                     targets+=['indices','classification']
                     if src.count>=3:targets+=['composite']
         from .assistant import TOOL_LABELS
@@ -60,7 +61,7 @@ class ProjectConnections:
         else:
             if target in {'indices','classification'}:
                 with rasterio.open(path) as src:
-                    if src.tags().get('CARTOMIZE_PRODUCT')=='display_rgba':raise ValueError('Utiliser le multibande scientifique pour les indices et la classification.')
+                    if src.tags().get('CARTOMIZE_PRODUCT') in NON_SPECTRAL_PRODUCTS or layer.get('purpose')=='diagnostic':raise ValueError('Utiliser le multibande scientifique pour les indices et la classification.')
             page.source.edit.setText(path)
             if target=='inspect':page.kind.setCurrentIndex(page.kind.findData(layer['kind']))
         self.select_tool(target);self.status.setText('Résultat transmis : '+Path(path).name)
@@ -91,6 +92,18 @@ class ProjectConnections:
                     self.register_result(dict(data=product['composition'],rgb='native',role='background',name='Composition colorée ; '+', '.join(product['scenes'])))
                 for band in product['bands'].values():
                     self.register_result(dict(data=band['path'],name=band['name']))
+                if product.get('source_index'):
+                    self.register_result(dict(data=product['source_index'],purpose='diagnostic',
+                                              name='Origine des pixels ; '+', '.join(product['scenes'])))
+                if product.get('report'):
+                    self.workspace.register(dict(data=product['report'],name='Rapport de préparation ; '+', '.join(product['scenes'])))
+        elif path.name=='report.json':
+            record=json.loads(path.read_text(encoding='utf-8'))
+            if record.get('schema')=='cartomize.imagery.audit.v1':
+                self.workspace.register(dict(data=str(path),name='Diagnostic de couverture'))
+                for key,label in [('coverage','Couverture : emprise, données et qualité'),('gaps','Lacunes de couverture utile')]:
+                    if record.get(key):
+                        self.register_result(dict(data=record[key],purpose='diagnostic',name=label))
         elif path.name=='project.json':
             import cartomize as cm
             for layer in cm.load_project(path).layers:self.register_result(layer)
@@ -117,7 +130,7 @@ class ProjectConnections:
     def open_assistant_step(self,target,report):
         page=self.tool(target);assistant=self.tool('assistant');paths=report['inputs']
         layers=[dict(r.get('options',{}),data=r['source']) for r in report['layers']]
-        if report['data_kind']=='scenes':layers=list(self.results)
+        if report['data_kind']=='scenes':layers=[layer for layer in self.results if layer.get('purpose')!='diagnostic']
         if target=='prepare':
             page.invalidate_inputs()
             if len(paths)==1 and Path(paths[0]).is_dir():
@@ -141,7 +154,7 @@ class ProjectConnections:
                 if (suffix in RASTERS)==(wanted=='raster'):
                     if target in {'composite','classification'}:
                         with rasterio.open(layer['data']) as src:
-                            if src.tags().get('CARTOMIZE_PRODUCT')=='display_rgba' or src.count<(3 if target=='composite' else 1):continue
+                            if src.tags().get('CARTOMIZE_PRODUCT') in NON_SPECTRAL_PRODUCTS or src.count<(3 if target=='composite' else 1):continue
                     page.source.edit.setText(str(layer['data']));break
             if target=='vector' and any(i['code']=='invalid_geometry' for i in report['issues']):
                 page.operation.setCurrentIndex(page.operation.findData('make_valid'))

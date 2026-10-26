@@ -76,5 +76,11 @@
     "title": "Réserve à okapis : audit d’un raster classé",
     "real": true,
     "minutes": 35
+  },
+  {
+    "slug": "13_diagnostic_automatique",
+    "title": "Diagnostic et préparation automatiques",
+    "real": false,
+    "minutes": 25
   }
 ]

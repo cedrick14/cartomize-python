@@ -16,6 +16,65 @@ import zipfile
 from email.parser import BytesParser
 
 
+def _analysis_checks(cm, root):
+    """Exercise coverage and calibration using one small shared raster fixture."""
+    import numpy as np
+    import geopandas as gpd
+    import rasterio
+    from rasterio.transform import from_origin
+    from shapely.geometry import box
+
+    source=root/'quantized.tif'
+    values=np.array([[0,1000,-9999],[2000,3000,4000]],dtype='int16')
+    scale,offset=.001,-.5
+    with rasterio.open(source,'w',driver='GTiff',width=3,height=2,count=1,dtype='int16',
+                       crs=32733,transform=from_origin(300000,9500000,10,10),nodata=-9999) as dst:
+        dst.write(values,1);dst.scales=(scale,);dst.offsets=(offset,)
+        dst.set_band_unit(1,'reflectance')
+    zones=gpd.GeoDataFrame({'zone':['partly_outside']},
+        geometry=[box(300000,9499980,300040,9500000)],crs=32733)
+    scene=cm.Scene('installed-probe',{'red':cm.Band(source,scale=scale,offset=offset,unit='reflectance')},sensor='custom')
+    # The diagnostic requires a new directory. A temporary workspace also lets
+    # the installed probe be rerun without stale diagnostic products.
+    with tempfile.TemporaryDirectory(prefix='coverage-probe-',dir=root) as temporary:
+        audit=cm.audit_imagery([scene],Path(temporary)/'audit',aoi=zones,
+                              mask_clouds=False,mask_saturation=False,max_pixels=8)
+        assert isinstance(audit,cm.ImageryAudit)
+        assert all(path.is_file() for path in (audit.manifest,audit.coverage,audit.gaps))
+        report=json.loads(audit.manifest.read_text(encoding='utf-8'))
+        assert report['schema']=='cartomize.imagery.audit.v1'
+        assert report['version']==cm.__version__
+        assert report['aoi_pixels']==8
+        assert report['footprint_pixels']==6
+        assert report['present_pixels']==report['usable_pixels']==5
+        assert report['footprint_percent']==75
+        assert report['present_percent']==report['usable_percent']==62.5
+        assert report['coverage_status']=='partial'
+        assert report['recommended_action']=='additional_scenes'
+        assert report['recommended_scene_ids']==['installed-probe']
+        footprint=np.array([[1,1,1,0],[1,1,1,0]],dtype='uint8')
+        present=np.array([[1,1,0,0],[1,1,1,0]],dtype='uint8')
+        with rasterio.open(audit.coverage) as src:
+            assert src.count==3 and src.descriptions==('footprint','present','usable')
+            np.testing.assert_array_equal(src.read(),np.stack((footprint,present,present)))
+        with rasterio.open(audit.gaps) as src:
+            np.testing.assert_array_equal(src.read(1),[[0,0,2,1],[0,0,0,1]])
+
+    statistics=cm.raster.zonal_stats(source,zones,value_mode='physical',include_coverage=True,
+                                    block_size=1,max_zone_pixels=8)
+    row=statistics.iloc[0]
+    assert row['count']==5 and row['zone_pixels']==8 and row['raster_pixels']==6
+    assert row['coverage_percent']==62.5
+    np.testing.assert_allclose([row[name] for name in ('min','max','mean','sum','std')],
+                               [-.5,3.5,1.5,7.5,np.sqrt(2)])
+    metadata=statistics.attrs['cartomize']
+    assert metadata['schema']=='cartomize.zonal_stats.v1' and metadata['value_mode']=='physical'
+    assert metadata['applied_scale']==scale and metadata['applied_offset']==offset
+    assert metadata['unit']=='reflectance'
+    return ['installed imagery coverage audit: 5 usable pixels of 8, gap rasters and recommendation',
+            'calibrated zonal statistics: mean 1.5, sum 7.5 and observed coverage 62.5%']
+
+
 def probe(output, expected):
     import cartomize as cm
     import numpy as np
@@ -27,7 +86,9 @@ def probe(output, expected):
     from PySide6.QtWidgets import QApplication
 
     output=Path(output).resolve();output.parent.mkdir(parents=True,exist_ok=True)
-    root=output.parent/'installed-data';root.mkdir(exist_ok=True)
+    # Keep each probe's products separate so validation can be repeated with
+    # the same report path without overwriting an earlier run's exports.
+    root=Path(tempfile.mkdtemp(prefix='installed-data-',dir=output.parent))
     installed=Path(cm.__file__).resolve()
     assert Path(sys.prefix).resolve() in installed.parents, installed
     assert cm.__version__==expected, (cm.__version__,expected)
@@ -67,6 +128,7 @@ def probe(output, expected):
         assert ndvi.is_file(),window.status.text()
         with rasterio.open(ndvi) as src:np.testing.assert_allclose(src.read(1),.5,atol=1e-6)
         checks.append('GeoTIFF import and NDVI calculation')
+        checks.extend(_analysis_checks(cm,root))
         points=root/'points.gpkg'
         gpd.GeoDataFrame({'nom':['Site A']},geometry=[Point(300300,9499700)],crs=32733).to_file(points)
         assert window.project_explorer.open_path(points) is not None

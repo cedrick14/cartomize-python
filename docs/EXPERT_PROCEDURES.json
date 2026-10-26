@@ -1,0 +1,4274 @@
+{
+  "schema": "cartomize.expert_procedures.v1",
+  "date": "2026-10-26",
+  "source_version": "1.3.0",
+  "source_state": "reviewed_source",
+  "baseline_commit": "ad4d1d7a89557e347b9a322f73c32205807c077a",
+  "inventory": {
+    "procedures": 123,
+    "sources": 88,
+    "sha256": "4d682eb9020b3049ee8ea3914afbacca9cc2bd75b109a3aca771829de565a6ae",
+    "id_ranges": [
+      "G01-G28",
+      "RS01-RS34",
+      "TH01-TH30",
+      "SA01-SA28",
+      "EC01-EC03"
+    ]
+  },
+  "scope": [
+    "Correspondance de l’inventaire expert du 2026-10-26 avec les fichiers sources examinés de Cartomize 1.3.0 ; modules M01 à M06 implémentés.",
+    "baseline_commit identifie le point de départ du dépôt avant les compléments ; il ne désigne pas un commit final de publication de la version 1.3.0.",
+    "M06 est validé localement pour l’installation isolée, l’API/Jupyter et la fenêtre ; résultats dans VALIDATION_1.3.0.json. La publication GitHub et les contrôles distants sont des étapes séparées.",
+    "Une ligne représente une procédure experte, pas un nombre de fonctions ni une promesse de parité QGIS/ArcGIS.",
+    "Les références externes définissent les procédures ; les capacités Cartomize sont attestées par les symboles et chemins du dépôt.",
+    "Une formule générique, une mise en page thématique ou une possibilité offerte par une dépendance non exposée ne suffit pas à déclarer une méthode disponible.",
+    "Les noms API indiquent le module de définition ; plusieurs fonctions sont aussi exportées directement par cartomize.",
+    "Un statut disponible reste limité aux conditions indiquées et ne certifie pas l’exactitude d’une étude sans références métier."
+  ],
+  "status_definitions": {
+    "available": "Le cœur de la procédure est réalisable avec les opérations présentes dans le périmètre explicite ; aucun bloc analytique nécessaire à ce périmètre n’est identifié comme manquant.",
+    "partial": "Une ou plusieurs étapes analytiques réelles sont présentes, mais les compléments listés sont nécessaires au workflow expert complet ou à sa fiabilité.",
+    "absent": "Aucun moteur dédié ni enchaînement suffisamment spécifique ne réalise la méthode ; les seuls outils génériques ne sont pas comptés comme une implémentation."
+  },
+  "counts": {
+    "total": 123,
+    "available": 11,
+    "partial": 48,
+    "absent": 64,
+    "by_domain": {
+      "Socle SIG et LiDAR": {
+        "available": 7,
+        "partial": 10,
+        "absent": 11
+      },
+      "Télédétection et images": {
+        "available": 3,
+        "partial": 13,
+        "absent": 18
+      },
+      "Terrain, eau, sols et climat": {
+        "available": 1,
+        "partial": 16,
+        "absent": 13
+      },
+      "Territoires et analyse spatiale": {
+        "available": 0,
+        "partial": 8,
+        "absent": 20
+      },
+      "Habitat et prospective": {
+        "available": 0,
+        "partial": 1,
+        "absent": 2
+      }
+    }
+  },
+  "implementation_order": [
+    {
+      "id": "M01",
+      "order": 1,
+      "status": "implemented",
+      "title": "Diagnostic de couverture multispectrale",
+      "scope": "Emprises, données présentes, qualité, lacunes et recommandation ; résolution affine des images tournées et dates vides contrôlées ; API, CLI, chaînes et fenêtre."
+    },
+    {
+      "id": "M02",
+      "order": 2,
+      "status": "implemented",
+      "title": "Intégrité et automatisation vectorielles",
+      "scope": "Entiers exacts, sommes manquantes, clés nulles explicites et huit workflows au registre commun."
+    },
+    {
+      "id": "M03",
+      "order": 3,
+      "status": "implemented",
+      "title": "Statistiques physiques et emprises raster",
+      "scope": "Valeurs physiques/brutes, couverture, préfixes et frontière polygonale stable entre blocs ; emprises affines réelles et protection du fichier valid_footprint."
+    },
+    {
+      "id": "M04",
+      "order": 4,
+      "status": "implemented",
+      "title": "Identité des classes et échantillonnage affine",
+      "scope": "Identités numériques cohérentes sans arrondi des grands entiers ; textes et booléens distincts ; échantillonnage correct sur rasters tournés."
+    },
+    {
+      "id": "M05",
+      "order": 5,
+      "status": "implemented",
+      "title": "Raccordement des itinéraires",
+      "scope": "Projection sur arêtes ou sommets, respect de la topologie choisie, distances de raccordement distinctes et Point valide pour un trajet nul."
+    },
+    {
+      "id": "M06",
+      "order": 6,
+      "status": "implemented",
+      "title": "Installation et parcours Python/Jupyter/fenêtre",
+      "scope": "Installation commune depuis les sources ; API sans Qt, fenêtre et noyaux Jupyter vérifiés ; paramètres restaurés sans perte, cours13 et paquet installé isolément. Résultats : VALIDATION_1.3.0.json."
+    },
+    {
+      "id": "E01",
+      "order": 7,
+      "status": "proposed",
+      "title": "Socle de géotraitement et échanges raster-vecteur",
+      "scope": "Rapports qualité, doublons, tables et lots ; grilles, échantillonnage raster aux points, rasterisation et polygonisation."
+    },
+    {
+      "id": "E02",
+      "order": 8,
+      "status": "proposed",
+      "title": "Qualité thématique et analyses raster usuelles",
+      "scope": "Échantillonnage de référence, évaluation externe, unités minimales, transitions, prédicteurs et changements continus."
+    },
+    {
+      "id": "E03",
+      "order": 9,
+      "status": "proposed",
+      "title": "Séries temporelles et profils optiques",
+      "scope": "Calendrier, masques, provenance, composites, lissage ; puis phénologie, tendances et profils forêt/eau/cultures/feux."
+    },
+    {
+      "id": "E04",
+      "order": 10,
+      "status": "proposed",
+      "title": "Terrain et hydrologie explicites",
+      "scope": "Conventions de relief ; surfaces contributives, exutoires, chenaux, bassins, ordres, HAND/TWI/LS et morphométrie."
+    },
+    {
+      "id": "E05",
+      "order": 11,
+      "status": "proposed",
+      "title": "Indicateurs territoriaux et statistiques spatiales",
+      "scope": "Supports et dénominateurs, exposition, carroyage ; puis densités, autocorrélation, interpolation et régressions."
+    },
+    {
+      "id": "E06",
+      "order": 12,
+      "status": "proposed",
+      "title": "Réseaux, multicritère et paysage",
+      "scope": "Coûts réseau et accessibilité ; critères et sensibilité ; composantes, taches et connectivité."
+    },
+    {
+      "id": "E07",
+      "order": 13,
+      "status": "proposed",
+      "title": "Modules spécialisés avec validation propre",
+      "scope": "LiDAR, géoréférencement, correction atmosphérique, SAR/InSAR, apprentissage profond, hydraulique et modèles écologiques/pédoclimatiques."
+    }
+  ],
+  "cross_cutting_findings": [
+    {
+      "id": "raster_affine_footprints",
+      "status": "implemented",
+      "module": "M03",
+      "path": "src/cartomize/relations.py",
+      "symbol": "analyze_relations",
+      "finding": "L’analyse de relations emploie les quatre coins affines des rasters, y compris les grilles tournées.",
+      "scope": "Il s’agit de l’emprise totale du raster, pas de l’emprise de ses seuls pixels valides ; audit_imagery distingue séparément présence et qualité."
+    },
+    {
+      "id": "valid_footprint_source_protection",
+      "status": "implemented",
+      "module": "M03",
+      "path": "src/cartomize/nodata.py",
+      "symbol": "mask_background",
+      "finding": "Le chemin valid_footprint fait partie des sources protégées contre l’écrasement par la sortie, même si overwrite=True."
+    },
+    {
+      "id": "interface_scope",
+      "status": "documented_condition",
+      "paths": [
+        "src/cartomize/__init__.py",
+        "src/cartomize/processing.py"
+      ],
+      "finding": "L’API Python expose davantage de fonctions que le registre ; les opérateurs listés dans capabilities sont la voie commune aux plans, à cartomize process et aux chaînes dans la fenêtre."
+    }
+  ],
+  "capabilities": {
+    "cartomize.algebra.calculate": {
+      "path": "src/cartomize/algebra.py",
+      "symbol": "calculate",
+      "operators": [
+        "calculate"
+      ]
+    },
+    "cartomize.algebra.reduce_rasters": {
+      "path": "src/cartomize/algebra.py",
+      "symbol": "reduce_rasters",
+      "operators": [
+        "reduce"
+      ]
+    },
+    "cartomize.automation.processing_plan": {
+      "path": "src/cartomize/automation.py",
+      "symbol": "processing_plan",
+      "operators": []
+    },
+    "cartomize.automation.run_plan": {
+      "path": "src/cartomize/automation.py",
+      "symbol": "run_plan",
+      "operators": []
+    },
+    "cartomize.automation.validate_plan": {
+      "path": "src/cartomize/automation.py",
+      "symbol": "validate_plan",
+      "operators": []
+    },
+    "cartomize.batch.atlas": {
+      "path": "src/cartomize/batch.py",
+      "symbol": "atlas",
+      "operators": []
+    },
+    "cartomize.classification.classify_landcover": {
+      "path": "src/cartomize/classification.py",
+      "symbol": "classify_landcover",
+      "operators": [
+        "classify"
+      ]
+    },
+    "cartomize.classification.cluster_raster": {
+      "path": "src/cartomize/classification.py",
+      "symbol": "cluster_raster",
+      "operators": [
+        "cluster"
+      ]
+    },
+    "cartomize.classification.fit_classifier": {
+      "path": "src/cartomize/classification.py",
+      "symbol": "fit_classifier",
+      "operators": []
+    },
+    "cartomize.classification.load_classifier": {
+      "path": "src/cartomize/classification.py",
+      "symbol": "load_classifier",
+      "operators": []
+    },
+    "cartomize.focal.focal": {
+      "path": "src/cartomize/focal.py",
+      "symbol": "focal",
+      "operators": [
+        "focal"
+      ]
+    },
+    "cartomize.hydrology.hydrology": {
+      "path": "src/cartomize/hydrology.py",
+      "symbol": "hydrology",
+      "operators": [
+        "hydrology"
+      ]
+    },
+    "cartomize.imagery.prepare_imagery": {
+      "path": "src/cartomize/imagery.py",
+      "symbol": "prepare_imagery",
+      "operators": [
+        "prepare"
+      ]
+    },
+    "cartomize.imagery_audit.audit_imagery": {
+      "path": "src/cartomize/imagery_audit.py",
+      "symbol": "audit_imagery",
+      "operators": [
+        "imagery.audit"
+      ]
+    },
+    "cartomize.imagery_pipeline.process_imagery": {
+      "path": "src/cartomize/imagery_pipeline.py",
+      "symbol": "process_imagery",
+      "operators": []
+    },
+    "cartomize.imagery_pipeline.split_bands": {
+      "path": "src/cartomize/imagery_pipeline.py",
+      "symbol": "split_bands",
+      "operators": []
+    },
+    "cartomize.indices.register_index": {
+      "path": "src/cartomize/indices.py",
+      "symbol": "register_index",
+      "operators": []
+    },
+    "cartomize.indices.spectral_indices": {
+      "path": "src/cartomize/indices.py",
+      "symbol": "spectral_indices",
+      "operators": [
+        "indices"
+      ]
+    },
+    "cartomize.processing.execute_operation": {
+      "path": "src/cartomize/processing.py",
+      "symbol": "execute_operation",
+      "operators": []
+    },
+    "cartomize.processing.operation_catalog": {
+      "path": "src/cartomize/processing.py",
+      "symbol": "operation_catalog",
+      "operators": []
+    },
+    "cartomize.raster.change_matrix": {
+      "path": "src/cartomize/raster.py",
+      "symbol": "change_matrix",
+      "operators": [
+        "raster.change_matrix"
+      ]
+    },
+    "cartomize.raster.class_areas": {
+      "path": "src/cartomize/raster.py",
+      "symbol": "class_areas",
+      "operators": [
+        "raster.class_areas"
+      ]
+    },
+    "cartomize.raster.clip": {
+      "path": "src/cartomize/raster.py",
+      "symbol": "clip",
+      "operators": [
+        "raster.clip"
+      ]
+    },
+    "cartomize.raster.reclassify": {
+      "path": "src/cartomize/raster.py",
+      "symbol": "reclassify",
+      "operators": [
+        "raster.reclassify"
+      ]
+    },
+    "cartomize.raster.reproject": {
+      "path": "src/cartomize/raster.py",
+      "symbol": "reproject",
+      "operators": [
+        "raster.reproject"
+      ]
+    },
+    "cartomize.raster.zonal_stats": {
+      "path": "src/cartomize/raster.py",
+      "symbol": "zonal_stats",
+      "operators": [
+        "raster.zonal_stats"
+      ]
+    },
+    "cartomize.recipes.run_batch": {
+      "path": "src/cartomize/recipes.py",
+      "symbol": "run_batch",
+      "operators": []
+    },
+    "cartomize.routing.shortest_path": {
+      "path": "src/cartomize/routing.py",
+      "symbol": "shortest_path",
+      "operators": [
+        "routing"
+      ]
+    },
+    "cartomize.scenes.discover_scenes": {
+      "path": "src/cartomize/scenes.py",
+      "symbol": "discover_scenes",
+      "operators": []
+    },
+    "cartomize.tableio.read_table": {
+      "path": "src/cartomize/tableio.py",
+      "symbol": "read_table",
+      "operators": []
+    },
+    "cartomize.terrain.terrain": {
+      "path": "src/cartomize/terrain.py",
+      "symbol": "terrain",
+      "operators": [
+        "terrain"
+      ]
+    },
+    "cartomize.vector.area": {
+      "path": "src/cartomize/vector.py",
+      "symbol": "area",
+      "operators": [
+        "vector.area"
+      ]
+    },
+    "cartomize.vector.buffer": {
+      "path": "src/cartomize/vector.py",
+      "symbol": "buffer",
+      "operators": [
+        "vector.buffer"
+      ]
+    },
+    "cartomize.vector.clip": {
+      "path": "src/cartomize/vector.py",
+      "symbol": "clip",
+      "operators": [
+        "vector.clip"
+      ]
+    },
+    "cartomize.vector.dissolve": {
+      "path": "src/cartomize/vector.py",
+      "symbol": "dissolve",
+      "operators": [
+        "vector.dissolve"
+      ]
+    },
+    "cartomize.vector.from_xy": {
+      "path": "src/cartomize/vector.py",
+      "symbol": "from_xy",
+      "operators": [
+        "vector.from_xy"
+      ]
+    },
+    "cartomize.vector.length": {
+      "path": "src/cartomize/vector.py",
+      "symbol": "length",
+      "operators": [
+        "vector.length"
+      ]
+    },
+    "cartomize.vector.make_valid": {
+      "path": "src/cartomize/vector.py",
+      "symbol": "make_valid",
+      "operators": [
+        "vector.make_valid"
+      ]
+    },
+    "cartomize.vector.overlay": {
+      "path": "src/cartomize/vector.py",
+      "symbol": "overlay",
+      "operators": [
+        "vector.intersection",
+        "vector.union",
+        "vector.difference",
+        "vector.symmetric_difference"
+      ]
+    },
+    "cartomize.vector.read_file": {
+      "path": "src/cartomize/vector.py",
+      "symbol": "read_file",
+      "operators": []
+    },
+    "cartomize.vector.reproject": {
+      "path": "src/cartomize/vector.py",
+      "symbol": "reproject",
+      "operators": [
+        "vector.reproject"
+      ]
+    },
+    "cartomize.vector.sjoin": {
+      "path": "src/cartomize/vector.py",
+      "symbol": "sjoin",
+      "operators": [
+        "vector.sjoin"
+      ]
+    },
+    "cartomize.vector.validate": {
+      "path": "src/cartomize/vector.py",
+      "symbol": "validate",
+      "operators": [
+        "vector.validate"
+      ]
+    },
+    "cartomize.vector_workflows.join_attributes": {
+      "path": "src/cartomize/vector_workflows.py",
+      "symbol": "join_attributes",
+      "operators": [
+        "vector.join_attributes"
+      ]
+    },
+    "cartomize.vector_workflows.latest_records": {
+      "path": "src/cartomize/vector_workflows.py",
+      "symbol": "latest_records",
+      "operators": [
+        "vector.latest_records"
+      ]
+    },
+    "cartomize.vector_workflows.select_attributes": {
+      "path": "src/cartomize/vector_workflows.py",
+      "symbol": "select_attributes",
+      "operators": [
+        "vector.select_attributes"
+      ]
+    },
+    "cartomize.vector_workflows.select_location": {
+      "path": "src/cartomize/vector_workflows.py",
+      "symbol": "select_location",
+      "operators": [
+        "vector.select_location"
+      ]
+    },
+    "cartomize.vector_workflows.spatial_summary": {
+      "path": "src/cartomize/vector_workflows.py",
+      "symbol": "spatial_summary",
+      "operators": [
+        "vector.spatial_summary"
+      ]
+    }
+  },
+  "procedures": [
+    {
+      "id": "G01",
+      "procedure": "Contrôle et réparation des géométries",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "Qualité des données",
+      "status": "partial",
+      "api": [
+        "cartomize.vector.validate",
+        "cartomize.vector.make_valid"
+      ],
+      "implemented": "Comptage complet des géométries absentes, vides, invalides et exactement dupliquées ; réparation GEOS.",
+      "missing": [
+        "Table des erreurs par identifiant",
+        "Rapport des changements avant et après réparation et choix des règles de traitement."
+      ],
+      "conditions": [
+        "Les doublons sont comparés par WKB exact ; la réparation peut changer le type géométrique."
+      ],
+      "next_module": "E01",
+      "planned_fixes": [],
+      "references": [
+        "R001",
+        "R013"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "G02",
+      "procedure": "Contrôle topologique d’une couverture",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "Qualité des données",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun contrôleur topologique de couverture ou de réseau.",
+      "missing": [
+        "Règles de chevauchement, lacunes, raccordement et tolérance",
+        "Géométries et table des violations."
+      ],
+      "conditions": [
+        "La validité individuelle et le comptage de doublons de G01 ne contrôlent pas ces relations."
+      ],
+      "next_module": "E01",
+      "planned_fixes": [],
+      "references": [
+        "R004"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "G03",
+      "procedure": "Détection et traitement des doublons",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "Qualité des données",
+      "status": "partial",
+      "api": [
+        "cartomize.vector.validate",
+        "cartomize.vector_workflows.latest_records"
+      ],
+      "implemented": "Comptage des géométries exactement répétées ; conservation du dernier relevé complet par identifiant et date.",
+      "missing": [
+        "Déduplication générale selon plusieurs clés et règles",
+        "Export des groupes supprimés et journal des décisions."
+      ],
+      "conditions": [
+        "latest_records exige identifiants et dates renseignés ; à date égale, le dernier enregistrement dans l’ordre source est conservé."
+      ],
+      "next_module": "E01",
+      "planned_fixes": [],
+      "references": [
+        "R002"
+      ],
+      "completed_modules": [
+        "M02"
+      ]
+    },
+    {
+      "id": "G04",
+      "procedure": "Reprojection vectorielle par lot",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "Coordonnées et formats",
+      "status": "partial",
+      "api": [
+        "cartomize.vector.reproject",
+        "cartomize.automation.processing_plan",
+        "cartomize.automation.run_plan"
+      ],
+      "implemented": "Reprojection d’une couche et répétition possible dans un plan explicite.",
+      "missing": [
+        "Construction automatique du lot",
+        "Choix et traçabilité de la transformation géodésique et bilan des emprises par couche."
+      ],
+      "conditions": [
+        "Le SCR source doit être correctement déclaré."
+      ],
+      "next_module": "E01",
+      "planned_fixes": [],
+      "references": [
+        "R014",
+        "R002"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "G05",
+      "procedure": "Harmonisation et fusion de couches",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "Coordonnées et formats",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune opération dédiée d’harmonisation et de fusion de plusieurs schémas vectoriels.",
+      "missing": [
+        "Correspondance des champs et types",
+        "Politique de conversion et de valeurs manquantes",
+        "Fusion avec provenance."
+      ],
+      "conditions": [
+        "Une union géométrique ne remplace pas une concaténation de couches harmonisées."
+      ],
+      "next_module": "E01",
+      "planned_fixes": [],
+      "references": [
+        "R016"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "G06",
+      "procedure": "Conversion et conditionnement des données",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "Coordonnées et formats",
+      "status": "partial",
+      "api": [
+        "cartomize.vector.read_file",
+        "cartomize.tableio.read_table",
+        "cartomize.processing.execute_operation"
+      ],
+      "implemented": "Lecture vectorielle, lecture CSV/TSV avec types et encodage explicites, export des résultats des opérateurs.",
+      "missing": [
+        "Recette de conversion avec choix du format et des couches",
+        "Rapport de pertes éventuelles et relecture comparative."
+      ],
+      "conditions": [
+        "Les formats vectoriels dépendent des pilotes disponibles ; read_table ne lit pas les classeurs Excel."
+      ],
+      "next_module": "E01",
+      "planned_fixes": [],
+      "references": [
+        "R009",
+        "R005"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "G07",
+      "procedure": "Extraction attributaire et spatiale",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "Opérations vectorielles",
+      "status": "partial",
+      "api": [
+        "cartomize.vector_workflows.select_attributes",
+        "cartomize.vector_workflows.select_location"
+      ],
+      "implemented": "Sélections attributaires et spatiales ; comparaisons entières 64 bits exactes, booléens et dates pris en charge.",
+      "missing": [
+        "Sortie explicite des exclus avec motif et bilan des sélections combinées."
+      ],
+      "conditions": [
+        "Le prédicat spatial porte sur la réunion des géométries du masque ; les attributs et l’ordre source sont conservés."
+      ],
+      "next_module": "E01",
+      "planned_fixes": [],
+      "references": [
+        "R008"
+      ],
+      "completed_modules": [
+        "M02"
+      ]
+    },
+    {
+      "id": "G08",
+      "procedure": "Découpage vectoriel d’un territoire",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "Opérations vectorielles",
+      "status": "available",
+      "api": [
+        "cartomize.vector.validate",
+        "cartomize.vector.clip",
+        "cartomize.vector.area",
+        "cartomize.vector.length"
+      ],
+      "implemented": "Contrôle des géométries, découpage avec alignement des SCR et recalcul explicite des mesures.",
+      "missing": [],
+      "conditions": [
+        "Géométries valides ou réparées au préalable",
+        "Mesures planes dans un SCR projeté adapté ; metric_crs explicite si nécessaire."
+      ],
+      "next_module": null,
+      "planned_fixes": [],
+      "references": [
+        "R003"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "G09",
+      "procedure": "Croisement de zonages et occupation du sol",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "Opérations vectorielles",
+      "status": "partial",
+      "api": [
+        "cartomize.vector.overlay",
+        "cartomize.vector.area",
+        "cartomize.vector.dissolve"
+      ],
+      "implemented": "Intersection/union, mesures et agrégation par catégorie disponibles comme étapes composables.",
+      "missing": [
+        "Table croisée prête à l’emploi",
+        "Contrôle des catégories, recouvrements et bilans de surface."
+      ],
+      "conditions": [
+        "La mesure est plane et dépend de la projection ; les règles de double comptage restent à définir."
+      ],
+      "next_module": "E01",
+      "planned_fixes": [],
+      "references": [
+        "R003",
+        "R020"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "G10",
+      "procedure": "Exclusion de zones contraintes",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "Opérations vectorielles",
+      "status": "available",
+      "api": [
+        "cartomize.vector.dissolve",
+        "cartomize.vector.overlay",
+        "cartomize.vector.validate",
+        "cartomize.vector.area"
+      ],
+      "implemented": "Réunion des exclusions, différence géométrique, contrôle et mesure de la surface restante par étapes explicites.",
+      "missing": [],
+      "conditions": [
+        "Utiliser overlay avec how=\"difference\" et un SCR de mesure adapté",
+        "Le sens de la soustraction est choisi par l’expert."
+      ],
+      "next_module": null,
+      "planned_fixes": [],
+      "references": [
+        "R020",
+        "R003"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "G11",
+      "procedure": "Dissolution et agrégation par catégorie",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "Opérations vectorielles",
+      "status": "available",
+      "api": [
+        "cartomize.vector.dissolve"
+      ],
+      "implemented": "Dissolution par un ou plusieurs champs et agrégations attributaires choisies avec aggfunc.",
+      "missing": [],
+      "conditions": [
+        "La fonction d’agrégation doit être fixée par attribut ; la valeur par défaut first ne constitue pas un bilan quantitatif."
+      ],
+      "next_module": null,
+      "planned_fixes": [],
+      "references": [
+        "R001"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "G12",
+      "procedure": "Zones tampons et anneaux de distance",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "Opérations vectorielles",
+      "status": "partial",
+      "api": [
+        "cartomize.vector.buffer",
+        "cartomize.vector.overlay",
+        "cartomize.vector.dissolve"
+      ],
+      "implemented": "Tampons métriques, y compris négatifs ; différences et dissolutions composables.",
+      "missing": [
+        "Production d’anneaux non superposés à partir d’une liste de distances",
+        "Attribution des bornes et contrôle des surfaces des couronnes."
+      ],
+      "conditions": [
+        "Distances en mètres ; les unités projetées en pieds sont converties."
+      ],
+      "next_module": "E01",
+      "planned_fixes": [],
+      "references": [
+        "R017",
+        "R001"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "G13",
+      "procedure": "Jointure spatiale et résumé par unité",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "Jointures et enrichissement",
+      "status": "available",
+      "api": [
+        "cartomize.vector.sjoin",
+        "cartomize.vector_workflows.spatial_summary"
+      ],
+      "implemented": "Jointure spatiale et résumés count, sum, mean, min, max avec conservation de toutes les zones.",
+      "missing": [],
+      "conditions": [
+        "within exclut les points sur la limite ; covered_by ou intersects peuvent les inclure",
+        "Les zones qui se recouvrent sont évaluées séparément",
+        "Somme sans observation : zéro ; observations toutes manquantes : valeur manquante."
+      ],
+      "next_module": null,
+      "planned_fixes": [],
+      "references": [
+        "R015"
+      ],
+      "completed_modules": [
+        "M02"
+      ]
+    },
+    {
+      "id": "G14",
+      "procedure": "Jointure d’enquêtes et de tables",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "Jointures et enrichissement",
+      "status": "partial",
+      "api": [
+        "cartomize.vector_workflows.join_attributes",
+        "cartomize.tableio.read_table"
+      ],
+      "implemented": "Jointures left/inner, cardinalité explicite, conservation de toutes les correspondances permises et politique des clés nulles.",
+      "missing": [
+        "Normalisation contrôlée des clés et agrégation préalable des tables",
+        "Tables des non-appariés et audit des doublons de l’ensemble des clés."
+      ],
+      "conditions": [
+        "null_keys=\"unmatched\" par défaut ; match et error sont explicites",
+        "En mode unmatched, la cardinalité porte sur les clés renseignées réellement appariables",
+        "Spécifier les types à la lecture pour conserver les zéros initiaux."
+      ],
+      "next_module": "E01",
+      "planned_fixes": [],
+      "references": [
+        "R002",
+        "R084",
+        "R085"
+      ],
+      "completed_modules": [
+        "M02"
+      ]
+    },
+    {
+      "id": "G15",
+      "procedure": "Import de relevés et création de points",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "Échantillonnage et mesures",
+      "status": "available",
+      "api": [
+        "cartomize.vector.from_xy",
+        "cartomize.tableio.read_table"
+      ],
+      "implemented": "Création de points depuis des colonnes XY finies en conservant les attributs ; lecture CSV/TSV dans le registre.",
+      "missing": [],
+      "conditions": [
+        "Le SCR source et les colonnes XY doivent être fournis correctement ; le moteur ne les déduit pas du seul aspect des coordonnées."
+      ],
+      "next_module": null,
+      "planned_fixes": [],
+      "references": [
+        "R007"
+      ],
+      "completed_modules": [
+        "M02"
+      ]
+    },
+    {
+      "id": "G16",
+      "procedure": "Grille d’analyse régulière",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "Échantillonnage et mesures",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun générateur de carroyage d’analyse.",
+      "missing": [
+        "Grilles carrées/hexagonales avec origine et taille explicites",
+        "Découpage, identifiants stables et fractions de couverture."
+      ],
+      "conditions": [],
+      "next_module": "E01",
+      "planned_fixes": [],
+      "references": [
+        "R007"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "G17",
+      "procedure": "Plan d’échantillonnage spatial",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "Échantillonnage et mesures",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun générateur de plan d’échantillonnage spatial.",
+      "missing": [
+        "Tirage aléatoire, systématique ou stratifié",
+        "Allocation, distance minimale, graine et probabilités d’inclusion."
+      ],
+      "conditions": [],
+      "next_module": "E02",
+      "planned_fixes": [],
+      "references": [
+        "R007",
+        "R008"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "G18",
+      "procedure": "Extraction de valeurs raster aux points",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "Rasters et mesures",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun outil public d’échantillonnage de rasters à des points.",
+      "missing": [
+        "Extraction multibande avec politique de rééchantillonnage",
+        "Conservation des points sans valeur, des unités et des masques."
+      ],
+      "conditions": [],
+      "next_module": "E01",
+      "planned_fixes": [],
+      "references": [
+        "R006"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "G19",
+      "procedure": "Statistiques zonales et superficies par classe",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "Rasters et mesures",
+      "status": "partial",
+      "api": [
+        "cartomize.raster.zonal_stats",
+        "cartomize.raster.class_areas"
+      ],
+      "implemented": "Statistiques zonales physiques ou brutes, préfixes, couverture observée et rapport de méthode ; superficies globales par valeur de classe.",
+      "missing": [
+        "Table de surfaces par classe et par zone",
+        "Pondération des observations par fraction de pixel couverte."
+      ],
+      "conditions": [
+        "value_mode=\"physical\" applique scale/offset GDAL ; raw conserve les valeurs stockées",
+        "Zones polygonales ; sans pixel valide, count=0 et statistiques manquantes, y compris sum",
+        "La couverture compte les cellules de toute la zone, y compris hors raster ; ce n’est pas une fraction exacte de superficie",
+        "Centres sur la frontière inclus par défaut ; all_touched suit une convention explicite stable entre blocs",
+        "class_areas exige un SCR projeté et reste distinct de zonal_stats."
+      ],
+      "next_module": "E02",
+      "planned_fixes": [],
+      "references": [
+        "R006"
+      ],
+      "completed_modules": [
+        "M03"
+      ]
+    },
+    {
+      "id": "G20",
+      "procedure": "Rasterisation d’une couche vectorielle",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "Rasters et mesures",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun opérateur public de rasterisation vectorielle.",
+      "missing": [
+        "Grille de référence, attribut ou valeur de brûlage",
+        "Règles de recouvrement, NoData et all_touched."
+      ],
+      "conditions": [],
+      "next_module": "E01",
+      "planned_fixes": [],
+      "references": [
+        "R009"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "G21",
+      "procedure": "Vectorisation d’un raster catégoriel",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "Rasters et mesures",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun opérateur public de polygonisation.",
+      "missing": [
+        "Composantes connexes et voisinage 4/8",
+        "Polygones par classe, superficies et filtrage facultatif."
+      ],
+      "conditions": [],
+      "next_module": "E01",
+      "planned_fixes": [],
+      "references": [
+        "R005",
+        "R086"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "G22",
+      "procedure": "Découpage et export par zone en série",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "Production et automatisation",
+      "status": "partial",
+      "api": [
+        "cartomize.vector.clip",
+        "cartomize.raster.clip",
+        "cartomize.automation.processing_plan",
+        "cartomize.automation.run_plan",
+        "cartomize.recipes.run_batch"
+      ],
+      "implemented": "Découpage isolé, plans explicites et lots de recettes cartographiques avec journal.",
+      "missing": [
+        "Itérateur d’unités générant les traitements et noms",
+        "Politique de reprise et rapport des échecs pour les exports de données par zone."
+      ],
+      "conditions": [
+        "run_batch vise les recettes de cartes ; il ne constitue pas un itérateur générique de géotraitement par entité."
+      ],
+      "next_module": "E01",
+      "planned_fixes": [],
+      "references": [
+        "R019",
+        "R012"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "G23",
+      "procedure": "Atlas et séries de cartes",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "Production et automatisation",
+      "status": "available",
+      "api": [
+        "cartomize.batch.atlas"
+      ],
+      "implemented": "Export PDF, PNG ou SVG par entité d’index, réutilisation des styles et ajustement de l’emprise.",
+      "missing": [],
+      "conditions": [
+        "Géométries valides et non vides, emprises non nulles, noms de pages uniques",
+        "Les emprises de cadres explicitement fixées sont conservées."
+      ],
+      "next_module": null,
+      "planned_fixes": [],
+      "references": [
+        "R010"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "G24",
+      "procedure": "Recette de traitement réutilisable",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "Production et automatisation",
+      "status": "available",
+      "api": [
+        "cartomize.processing.operation_catalog",
+        "cartomize.processing.execute_operation",
+        "cartomize.automation.processing_plan",
+        "cartomize.automation.validate_plan",
+        "cartomize.automation.run_plan"
+      ],
+      "implemented": "Opérateurs nommés, paramètres sérialisables, validation des dépendances, produits référencés et journal d’exécution.",
+      "missing": [],
+      "conditions": [
+        "Seuls les opérateurs enregistrés sont exécutables ; le plan ne crée pas une méthode analytique absente",
+        "Publication dans un dossier neuf après réussite du plan ; annulation coopérative."
+      ],
+      "next_module": null,
+      "planned_fixes": [],
+      "references": [
+        "R011",
+        "R012"
+      ],
+      "completed_modules": [
+        "M02"
+      ]
+    },
+    {
+      "id": "G25",
+      "procedure": "Géoréférencement de cartes et images par points d'appui",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "Géoréférencement",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun ajustement de géoréférencement par points d’appui.",
+      "missing": [
+        "Modèles de transformation et résidus",
+        "Points de contrôle indépendants",
+        "Rééchantillonnage à partir du modèle ajusté."
+      ],
+      "conditions": [],
+      "next_module": "E07",
+      "planned_fixes": [],
+      "references": [
+        "R021"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "G26",
+      "procedure": "Contrôle et classification des points du sol",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "LiDAR et nuages de points",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun traitement de nuages de points LiDAR.",
+      "missing": [
+        "Lecture et inventaire LAS/LAZ",
+        "Détection du bruit, classification du sol et contrôle des classes."
+      ],
+      "conditions": [],
+      "next_module": "E07",
+      "planned_fixes": [],
+      "references": [
+        "R022",
+        "R023",
+        "R025"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "G27",
+      "procedure": "Production du MNT, du MNS et des hauteurs normalisées",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "LiDAR et modèles de hauteur",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun moteur de production MNT/MNS depuis les points.",
+      "missing": [
+        "Interpolation des points sol et surface",
+        "Normalisation des hauteurs",
+        "Diagnostics de densité et lacunes."
+      ],
+      "conditions": [
+        "La lecture d’un MNT raster existant et une soustraction raster ne réalisent pas cette chaîne LiDAR."
+      ],
+      "next_module": "E07",
+      "planned_fixes": [],
+      "references": [
+        "R022",
+        "R024"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "G28",
+      "procedure": "Métriques de hauteur et de couvert par placette",
+      "domain": "Socle SIG et LiDAR",
+      "theme": "LiDAR forestier",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune métrique LiDAR par placette.",
+      "missing": [
+        "Sélection des classes/retours",
+        "Percentiles, dispersion et couvert avec définition explicite",
+        "Effectifs et qualité par placette."
+      ],
+      "conditions": [],
+      "next_module": "E07",
+      "planned_fixes": [],
+      "references": [
+        "R024",
+        "R026"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "RS01",
+      "procedure": "Auditer les scènes et diagnostiquer la couverture utile",
+      "domain": "Télédétection et images",
+      "theme": "Préparation optique",
+      "status": "available",
+      "api": [
+        "cartomize.scenes.discover_scenes",
+        "cartomize.imagery_audit.audit_imagery"
+      ],
+      "implemented": "Diagnostic des emprises, données présentes et pixels utiles communs aux bandes ; cartes de lacunes et recommandation de scènes ; résolution affine et dates contrôlées.",
+      "missing": [],
+      "conditions": [
+        "Landsat C2 L2 et Sentinel-2 L2A reconnus ; autres produits via métadonnées/manifeste explicite",
+        "Pourcentages de cellules de la zone sur la grille cible, selon all_touched ; pas d’aires polygonales fractionnaires",
+        "Toutes les bandes d’un pixel utile proviennent de la même scène",
+        "Une date vide devient inconnue ; plusieurs scènes de dates différentes ou inconnues exigent allow_mixed_dates=True."
+      ],
+      "next_module": null,
+      "planned_fixes": [],
+      "references": [
+        "R027",
+        "R033",
+        "R034"
+      ],
+      "completed_modules": [
+        "M01"
+      ]
+    },
+    {
+      "id": "RS02",
+      "procedure": "Préparer automatiquement une mosaïque optique multiscène pour la zone",
+      "domain": "Télédétection et images",
+      "theme": "Préparation optique",
+      "status": "available",
+      "api": [
+        "cartomize.imagery.prepare_imagery",
+        "cartomize.imagery_pipeline.process_imagery",
+        "cartomize.imagery_pipeline.split_bands"
+      ],
+      "implemented": "Calibration, masques, grille commune, mosaïque spectrale, multibande, découpage et rapport de couverture avec index de provenance.",
+      "missing": [],
+      "conditions": [
+        "Scènes optiques compatibles ; dates différentes ou inconnues contrôlées et mélange autorisé explicitement",
+        "La résolution tient compte des axes affines natifs, y compris tournés, ou de la grille proposée par GDAL lors d’une reprojection",
+        "Priorité first ou last commune à toutes les bandes ; pas d’équilibrage radiométrique intercapteurs",
+        "Une sortie sans aucun pixel valide est refusée."
+      ],
+      "next_module": null,
+      "planned_fixes": [],
+      "references": [
+        "R027",
+        "R034",
+        "R044"
+      ],
+      "completed_modules": [
+        "M01"
+      ]
+    },
+    {
+      "id": "RS03",
+      "procedure": "Convertir les données optiques et appliquer une correction atmosphérique conditionnelle",
+      "domain": "Télédétection et images",
+      "theme": "Préparation optique",
+      "status": "partial",
+      "api": [
+        "cartomize.scenes.discover_scenes",
+        "cartomize.imagery.prepare_imagery"
+      ],
+      "implemented": "Décodage des facteurs et offsets des produits pris en charge avant rééchantillonnage.",
+      "missing": [
+        "Correction atmosphérique de produits L1 avec un processeur adapté",
+        "Contrat d’entrée/sortie et rapport du processeur externe."
+      ],
+      "conditions": [
+        "La mise à l’échelle de réflectances L2 déjà corrigées ne constitue pas une correction atmosphérique."
+      ],
+      "next_module": "E07",
+      "planned_fixes": [],
+      "references": [
+        "R029",
+        "R034",
+        "R037"
+      ],
+      "completed_modules": [
+        "M01"
+      ]
+    },
+    {
+      "id": "RS04",
+      "procedure": "Masquer nuages, ombres, neige et pixels défectueux avec bilan de qualité",
+      "domain": "Télédétection et images",
+      "theme": "Préparation optique",
+      "status": "partial",
+      "api": [
+        "cartomize.imagery.prepare_imagery",
+        "cartomize.imagery_audit.audit_imagery"
+      ],
+      "implemented": "Masques QA/SCL et saturation disponibles selon le produit ; bilan spatial de la couverture conservée.",
+      "missing": [
+        "Sélection détaillée des classes ou seuils de qualité",
+        "Dilatation contrôlée des masques",
+        "Complément temporel piloté par une politique de qualité."
+      ],
+      "conditions": [
+        "Les catégories de rejet du moteur sont fixées ; mask_clouds=False est explicite pour un produit sans masque."
+      ],
+      "next_module": "E02",
+      "planned_fixes": [],
+      "references": [
+        "R033",
+        "R034"
+      ],
+      "completed_modules": [
+        "M01"
+      ]
+    },
+    {
+      "id": "RS05",
+      "procedure": "Harmoniser un ensemble multibande, multidate ou multicapteur",
+      "domain": "Télédétection et images",
+      "theme": "Préparation optique",
+      "status": "partial",
+      "api": [
+        "cartomize.scenes.discover_scenes",
+        "cartomize.imagery.prepare_imagery",
+        "cartomize.raster.reproject"
+      ],
+      "implemented": "Association des rôles spectraux, calibration et grille commune pour les jeux compatibles.",
+      "missing": [
+        "Harmonisation radiométrique intercapteurs",
+        "Estimation des décalages résiduels",
+        "Organisation des jeux multidates avec contrôle de comparabilité."
+      ],
+      "conditions": [
+        "Les mélanges incompatibles sont refusés ; une résolution plus fine n’ajoute pas d’information native."
+      ],
+      "next_module": "E03",
+      "planned_fixes": [],
+      "references": [
+        "R027",
+        "R028",
+        "R044"
+      ],
+      "completed_modules": [
+        "M01"
+      ]
+    },
+    {
+      "id": "RS06",
+      "procedure": "Orthorectifier et recaler des images avant comparaison",
+      "domain": "Télédétection et images",
+      "theme": "Préparation optique",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun moteur d’orthorectification ou d’estimation de recalage.",
+      "missing": [
+        "Modèle capteur/RPC et relief",
+        "Estimation du déplacement",
+        "Erreur sur points indépendants."
+      ],
+      "conditions": [
+        "Une reprojection de données déjà géoréférencées ne réalise pas ces étapes."
+      ],
+      "next_module": "E07",
+      "planned_fixes": [],
+      "references": [
+        "R027",
+        "R028",
+        "R037"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "RS07",
+      "procedure": "Produire une image multispectrale améliorée par bande panchromatique",
+      "domain": "Télédétection et images",
+      "theme": "Préparation optique",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun algorithme de fusion panchromatique.",
+      "missing": [
+        "Contrôle PAN/multispectral",
+        "Méthode de fusion",
+        "Diagnostics spectraux et spatiaux."
+      ],
+      "conditions": [],
+      "next_module": "E07",
+      "planned_fixes": [],
+      "references": [
+        "R027",
+        "R028",
+        "R037"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "RS08",
+      "procedure": "Réduire la dimension des données spectrales",
+      "domain": "Télédétection et images",
+      "theme": "Prédicteurs spectraux",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune analyse en composantes principales spectrale.",
+      "missing": [
+        "Échantillonnage et centrage/réduction",
+        "Ajustement, variance expliquée et modèle réutilisable",
+        "Projection par blocs."
+      ],
+      "conditions": [],
+      "next_module": "E02",
+      "planned_fixes": [],
+      "references": [
+        "R028",
+        "R032",
+        "R037"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "RS09",
+      "procedure": "Construire un jeu de prédicteurs spectraux et texturaux",
+      "domain": "Télédétection et images",
+      "theme": "Prédicteurs spectraux",
+      "status": "partial",
+      "api": [
+        "cartomize.indices.spectral_indices",
+        "cartomize.indices.register_index",
+        "cartomize.focal.focal",
+        "cartomize.algebra.calculate"
+      ],
+      "implemented": "Indices spectraux nommés et personnalisables, algèbre et statistiques locales de fenêtre.",
+      "missing": [
+        "Textures GLCM avec quantification, distances et directions",
+        "Assemblage documenté d’un jeu hétérogène de prédicteurs et de ses unités."
+      ],
+      "conditions": [
+        "Les statistiques focales disponibles ne sont pas des textures GLCM ; la fenêtre et les masques restent explicites."
+      ],
+      "next_module": "E02",
+      "planned_fixes": [],
+      "references": [
+        "R028",
+        "R037",
+        "R041"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "RS10",
+      "procedure": "Classer l'occupation du sol par apprentissage supervisé au pixel",
+      "domain": "Télédétection et images",
+      "theme": "Classification",
+      "status": "partial",
+      "api": [
+        "cartomize.classification.fit_classifier",
+        "cartomize.classification.classify_landcover",
+        "cartomize.classification.load_classifier"
+      ],
+      "implemented": "Random Forest/ExtraTrees, séparation avant extraction, validation séparée, classes/confiance et modèle rechargeable ; identités de classes typées et échantillonnage sur emprises affines.",
+      "missing": [
+        "Construction et contrôle de blocs spatiaux",
+        "Recherche de paramètres limitée à l’apprentissage."
+      ],
+      "conditions": [
+        "1 et 1.0 numériques désignent une même classe ; textes, nombres et booléens restent distincts, sans arrondir les grands entiers",
+        "La séparation par groupes ne garantit l’indépendance spatiale que si les groupes le permettent",
+        "Les probabilités du modèle ne sont pas une validation indépendante",
+        "Les algorithmes disponibles sont RF et ExtraTrees."
+      ],
+      "next_module": "E02",
+      "planned_fixes": [],
+      "references": [
+        "R028",
+        "R031",
+        "R037"
+      ],
+      "completed_modules": [
+        "M04"
+      ]
+    },
+    {
+      "id": "RS11",
+      "procedure": "Explorer les groupes spectraux par classification non supervisée",
+      "domain": "Télédétection et images",
+      "theme": "Classification",
+      "status": "available",
+      "api": [
+        "cartomize.classification.cluster_raster",
+        "cartomize.raster.reclassify"
+      ],
+      "implemented": "MiniBatchKMeans avec échantillonnage borné, standardisation, centres, carte de groupes et paramètres enregistrés ; regroupement explicite possible.",
+      "missing": [],
+      "conditions": [
+        "2 à 64 groupes ; les numéros de groupes n’ont pas de signification thématique automatique",
+        "L’interprétation et la nomenclature reposent sur les références de l’expert."
+      ],
+      "next_module": null,
+      "planned_fixes": [],
+      "references": [
+        "R028",
+        "R031",
+        "R037"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "RS12",
+      "procedure": "Segmenter l'image puis classer les objets",
+      "domain": "Télédétection et images",
+      "theme": "Classification",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune segmentation puis classification d’objets.",
+      "missing": [
+        "Segmentation",
+        "Attributs d’objets",
+        "Apprentissage, prédiction et validation par objets",
+        "Gestion des coutures."
+      ],
+      "conditions": [],
+      "next_module": "E07",
+      "planned_fixes": [],
+      "references": [
+        "R028",
+        "R031",
+        "R037"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "RS13",
+      "procedure": "Évaluer indépendamment une carte de classification",
+      "domain": "Télédétection et images",
+      "theme": "Validation thématique",
+      "status": "partial",
+      "api": [
+        "cartomize.classification.fit_classifier",
+        "cartomize.classification.classify_landcover"
+      ],
+      "implemented": "Matrice de confusion et métriques intégrées à l’apprentissage sur références réservées ou validation fournie.",
+      "missing": [
+        "Évaluation autonome d’une carte de classes externe",
+        "Plan d’échantillonnage probabiliste",
+        "Surfaces ajustées de l’erreur et incertitudes correspondantes."
+      ],
+      "conditions": [
+        "La qualité du plan de référence reste à établir ; une validation impossible n’est pas remplacée par un score d’apprentissage."
+      ],
+      "next_module": "E02",
+      "planned_fixes": [],
+      "references": [
+        "R028",
+        "R031"
+      ],
+      "completed_modules": [
+        "M04"
+      ]
+    },
+    {
+      "id": "RS14",
+      "procedure": "Régulariser une carte thématique selon l'unité minimale de cartographie",
+      "domain": "Télédétection et images",
+      "theme": "Classification",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune régularisation spatiale par unité minimale de cartographie.",
+      "missing": [
+        "Composantes, îlots et trous",
+        "Règles de fusion par classe et préservation d’objets",
+        "Comparaison avant/après sur références."
+      ],
+      "conditions": [
+        "reclassify change les codes ; focal ne propose ni mode majoritaire ni filtrage par aire de composante."
+      ],
+      "next_module": "E02",
+      "planned_fixes": [],
+      "references": [
+        "R027",
+        "R028",
+        "R031"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "RS15",
+      "procedure": "Quantifier les transitions entre cartes thématiques",
+      "domain": "Télédétection et images",
+      "theme": "Changements d'occupation du sol",
+      "status": "partial",
+      "api": [
+        "cartomize.raster.change_matrix",
+        "cartomize.raster.class_areas"
+      ],
+      "implemented": "Matrice de couples de classes avec nombres de pixels comparables ; superficies globales par classe séparément.",
+      "missing": [
+        "Surfaces et bilans de gains/pertes par transition et zone",
+        "Carte des transitions et des secteurs non évaluables",
+        "Harmonisation de nomenclature guidée."
+      ],
+      "conditions": [
+        "Les deux cartes doivent avoir la même grille ; seules les cellules valides aux deux dates entrent dans la matrice."
+      ],
+      "next_module": "E02",
+      "planned_fixes": [],
+      "references": [
+        "R036",
+        "R031"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "RS16",
+      "procedure": "Détecter un changement continu entre deux observations",
+      "domain": "Télédétection et images",
+      "theme": "Changements spectraux",
+      "status": "partial",
+      "api": [
+        "cartomize.algebra.calculate",
+        "cartomize.raster.reproject"
+      ],
+      "implemented": "Différences et ratios raster avec gestion des masques et alignement explicite.",
+      "missing": [
+        "Contrôle du recalage et de la comparabilité des acquisitions",
+        "Estimation du bruit et seuils sur références",
+        "Rapport dédié des changements."
+      ],
+      "conditions": [
+        "L’algèbre exécute la formule fournie ; elle ne valide pas sa signification thématique."
+      ],
+      "next_module": "E02",
+      "planned_fixes": [],
+      "references": [
+        "R028",
+        "R036"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "RS17",
+      "procedure": "Construire un cube temporel et des composites réguliers",
+      "domain": "Télédétection et images",
+      "theme": "Séries temporelles",
+      "status": "partial",
+      "api": [
+        "cartomize.algebra.reduce_rasters",
+        "cartomize.imagery.prepare_imagery"
+      ],
+      "implemented": "Réductions multirasters mean, sum, min, max, std, median, count ; provenance de mosaïque spatiale.",
+      "missing": [
+        "Cube indexé par dates",
+        "Fenêtres régulières et compte d’observations par période",
+        "Médoïde, meilleure observation et provenance temporelle."
+      ],
+      "conditions": [
+        "Une liste de rasters réduite n’est pas un cube temporel ; une mosaïque first/last n’est pas un composite temporel médian."
+      ],
+      "next_module": "E03",
+      "planned_fixes": [],
+      "references": [
+        "R032",
+        "R034"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "RS18",
+      "procedure": "Nettoyer et lisser une série avec gestion explicite des lacunes",
+      "domain": "Télédétection et images",
+      "theme": "Séries temporelles",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun nettoyage ou lissage de séries datées.",
+      "missing": [
+        "Détection des lacunes et aberrants",
+        "Interpolation limitée",
+        "Filtres temporels et séparation observé/reconstruit."
+      ],
+      "conditions": [],
+      "next_module": "E03",
+      "planned_fixes": [],
+      "references": [
+        "R032"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "RS19",
+      "procedure": "Extraire début, pic et fin de saison végétative",
+      "domain": "Télédétection et images",
+      "theme": "Agriculture et phénologie",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune extraction de phénologie.",
+      "missing": [
+        "Cycles, ligne de base et méthode saisonnière",
+        "Dates, durée, amplitude, intégrale et indicateurs de qualité."
+      ],
+      "conditions": [],
+      "next_module": "E03",
+      "planned_fixes": [],
+      "references": [
+        "R032",
+        "R041"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "RS20",
+      "procedure": "Mesurer tendances et anomalies de végétation ou d'humidité",
+      "domain": "Télédétection et images",
+      "theme": "Séries temporelles",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun estimateur de tendance ou test temporel.",
+      "missing": [
+        "Calendrier et saisonnalité",
+        "Climatologie, anomalies, pente et inférence",
+        "Incertitude et persistance."
+      ],
+      "conditions": [],
+      "next_module": "E03",
+      "planned_fixes": [],
+      "references": [
+        "R032",
+        "R041"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "RS21",
+      "procedure": "Détecter des ruptures et trajectoires de perturbation/récupération",
+      "domain": "Télédétection et images",
+      "theme": "Séries temporelles",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun moteur de détection de ruptures temporelles.",
+      "missing": [
+        "Ajustement de trajectoire",
+        "Ruptures, dates et amplitudes",
+        "Validation des perturbations et récupérations."
+      ],
+      "conditions": [],
+      "next_module": "E03",
+      "planned_fixes": [],
+      "references": [
+        "R036",
+        "R032"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "RS22",
+      "procedure": "Cartographier la biomasse par régression calibrée",
+      "domain": "Télédétection et images",
+      "theme": "Forêts et biomasse",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune régression de biomasse calibrée.",
+      "missing": [
+        "Extraction sur placettes",
+        "Modèle de régression et validation spatiale",
+        "Incertitude et domaine d’application."
+      ],
+      "conditions": [
+        "Le classificateur catégoriel existant ne réalise pas une régression continue."
+      ],
+      "next_module": "E07",
+      "planned_fixes": [],
+      "references": [
+        "R028",
+        "R031",
+        "R042"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "RS23",
+      "procedure": "Cartographier pertes, régénération et dégradation forestières",
+      "domain": "Télédétection et images",
+      "theme": "Forêts",
+      "status": "partial",
+      "api": [
+        "cartomize.classification.classify_landcover",
+        "cartomize.raster.change_matrix",
+        "cartomize.indices.spectral_indices"
+      ],
+      "implemented": "Classification, indices et dénombrement des transitions disponibles pour préparer une analyse forestière.",
+      "missing": [
+        "Définition forêt et unité minimale",
+        "Persistance des conversions",
+        "Diagnostic de dégradation interne et validation des événements."
+      ],
+      "conditions": [
+        "Une transition de classes ne suffit pas à qualifier une dégradation écologique."
+      ],
+      "next_module": "E03",
+      "planned_fixes": [],
+      "references": [
+        "R036",
+        "R042",
+        "R031"
+      ],
+      "completed_modules": [
+        "M04"
+      ]
+    },
+    {
+      "id": "RS24",
+      "procedure": "Identifier les cultures et suivre l'état des parcelles",
+      "domain": "Télédétection et images",
+      "theme": "Agriculture",
+      "status": "partial",
+      "api": [
+        "cartomize.classification.classify_landcover",
+        "cartomize.indices.spectral_indices",
+        "cartomize.raster.zonal_stats"
+      ],
+      "implemented": "Classification au pixel, indices et statistiques par polygones de parcelles.",
+      "missing": [
+        "Trajectoires et métriques saisonnières par parcelle",
+        "Validation spatiale et temporelle du protocole cultures",
+        "Profils de référence et alertes."
+      ],
+      "conditions": [
+        "Aucun suivi agronomique ou diagnostic automatique de stress n’est fourni."
+      ],
+      "next_module": "E03",
+      "planned_fixes": [],
+      "references": [
+        "R040",
+        "R031",
+        "R032"
+      ],
+      "completed_modules": [
+        "M03",
+        "M04"
+      ]
+    },
+    {
+      "id": "RS25",
+      "procedure": "Cartographier l'eau de surface et sa fréquence saisonnière",
+      "domain": "Télédétection et images",
+      "theme": "Eau",
+      "status": "partial",
+      "api": [
+        "cartomize.indices.spectral_indices",
+        "cartomize.algebra.calculate",
+        "cartomize.algebra.reduce_rasters"
+      ],
+      "implemented": "Indices d’eau, seuils raster explicites et agrégations de rasters disponibles.",
+      "missing": [
+        "Politique de seuil et traitement des confusions",
+        "Série datée et fréquence rapportée aux seules observations valides",
+        "Saison et validation dédiées."
+      ],
+      "conditions": [],
+      "next_module": "E03",
+      "planned_fixes": [],
+      "references": [
+        "R041",
+        "R032",
+        "R031"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "RS26",
+      "procedure": "Évaluer les surfaces brûlées, la sévérité et la récupération",
+      "domain": "Télédétection et images",
+      "theme": "Incendies et végétation",
+      "status": "partial",
+      "api": [
+        "cartomize.indices.spectral_indices",
+        "cartomize.algebra.calculate",
+        "cartomize.raster.reclassify"
+      ],
+      "implemented": "NBR, différence avant/après et reclassification explicite composables.",
+      "missing": [
+        "Contrôle de comparabilité saisonnière",
+        "Classes de sévérité étayées par références",
+        "Suivi et validation de récupération."
+      ],
+      "conditions": [
+        "Le sens de la différence et les seuils sont à définir ; aucun seuil universel n’est appliqué."
+      ],
+      "next_module": "E03",
+      "planned_fixes": [],
+      "references": [
+        "R043",
+        "R041",
+        "R036"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "RS27",
+      "procedure": "Analyser la température de surface et les contrastes urbains",
+      "domain": "Télédétection et images",
+      "theme": "Température et milieu urbain",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune chaîne dédiée de température de surface.",
+      "missing": [
+        "Décodage des produits thermiques et de leur qualité",
+        "Conversion et unités spécifiques",
+        "Contrastes urbains, incertitude et référence temporelle."
+      ],
+      "conditions": [
+        "Une formule raster ou une composition colorée n’atteste pas d’un traitement thermique complet."
+      ],
+      "next_module": "E07",
+      "planned_fixes": [],
+      "references": [
+        "R029",
+        "R033",
+        "R039"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "RS28",
+      "procedure": "Entraîner et appliquer une segmentation sémantique d'images",
+      "domain": "Télédétection et images",
+      "theme": "Apprentissage profond",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune segmentation sémantique par apprentissage profond.",
+      "missing": [
+        "Annotations, patchs et séparation géographique",
+        "Entraînement et évaluation",
+        "Inférence tuilée et fusion des scores."
+      ],
+      "conditions": [],
+      "next_module": "E07",
+      "planned_fixes": [],
+      "references": [
+        "R038"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "RS29",
+      "procedure": "Détecter, délimiter et compter des objets individuels",
+      "domain": "Télédétection et images",
+      "theme": "Apprentissage profond",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun détecteur ou segmentateur d’instances.",
+      "missing": [
+        "Entraînement et inférence",
+        "Déduplication de tuiles",
+        "Géométries, comptages et validation omissions/fausses détections."
+      ],
+      "conditions": [],
+      "next_module": "E07",
+      "planned_fixes": [],
+      "references": [
+        "R038"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "RS30",
+      "procedure": "Préparer des données Sentinel-1 GRD pour l'analyse",
+      "domain": "Télédétection et images",
+      "theme": "Radar",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune chaîne de préparation Sentinel-1 GRD.",
+      "missing": [
+        "Orbites, bruits et calibration SAR",
+        "Corrections terrain géométriques et radiométriques",
+        "Masques de géométrie, unités et qualité."
+      ],
+      "conditions": [],
+      "next_module": "E07",
+      "planned_fixes": [],
+      "references": [
+        "R030",
+        "R040",
+        "R028"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "RS31",
+      "procedure": "Construire des indicateurs polarimétriques et temporels radar",
+      "domain": "Télédétection et images",
+      "theme": "Radar",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun calcul dédié de variables radar ou polarimétriques.",
+      "missing": [
+        "Contrats d’unités linéaires/dB et de polarisation",
+        "Contrôle des acquisitions",
+        "Variables radar et composites documentés."
+      ],
+      "conditions": [
+        "Une expression générique de rapport ne contrôle pas la physique ou la compatibilité SAR."
+      ],
+      "next_module": "E07",
+      "planned_fixes": [],
+      "references": [
+        "R030",
+        "R040"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "RS32",
+      "procedure": "Délimiter une inondation à partir d'images radar avant/après",
+      "domain": "Télédétection et images",
+      "theme": "Radar et inondations",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune chaîne de cartographie d’inondation par radar.",
+      "missing": [
+        "Prétraitement SAR",
+        "Détection et masques eau permanente/artefacts",
+        "Validation et emprise d’inondation."
+      ],
+      "conditions": [],
+      "next_module": "E07",
+      "planned_fixes": [],
+      "references": [
+        "R030",
+        "R040"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "RS33",
+      "procedure": "Analyser la cohérence et ses changements",
+      "domain": "Télédétection et images",
+      "theme": "Radar interférométrique",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun calcul de cohérence à partir de données complexes.",
+      "missing": [
+        "Paires et bursts",
+        "Corégistration complexe",
+        "Cohérence, déburst et géocodage",
+        "Comparaison validée."
+      ],
+      "conditions": [],
+      "next_module": "E07",
+      "planned_fixes": [],
+      "references": [
+        "R030",
+        "R035"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "RS34",
+      "procedure": "Estimer un déplacement selon la ligne de visée par InSAR",
+      "domain": "Télédétection et images",
+      "theme": "Radar interférométrique",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune chaîne InSAR.",
+      "missing": [
+        "Interférogrammes et phase topographique",
+        "Filtrage et dépliage",
+        "Référence, déplacement LOS et contrôle des artefacts."
+      ],
+      "conditions": [],
+      "next_module": "E07",
+      "planned_fixes": [],
+      "references": [
+        "R030",
+        "R035"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "TH01",
+      "procedure": "Conditionnement hydrologique du terrain",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Terrain et MNT",
+      "status": "partial",
+      "api": [
+        "cartomize.hydrology.hydrology"
+      ],
+      "implemented": "Remplissage Priority-Flood, drainage des plats et recalcul D8.",
+      "missing": [
+        "Diagnostic des dépressions",
+        "Conservation sélective, incision ou ouverture des obstacles",
+        "Choix et rapport des modifications."
+      ],
+      "conditions": [
+        "Grille projetée orientée au nord ; les bords et voisins de NoData sont des sorties ouvertes",
+        "Le budget mémoire porte sur un calcul global."
+      ],
+      "next_module": "E04",
+      "planned_fixes": [],
+      "references": [
+        "R046",
+        "R047",
+        "R049"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "TH02",
+      "procedure": "Diagnostic des versants par pente et exposition",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Terrain et MNT",
+      "status": "partial",
+      "api": [
+        "cartomize.terrain.terrain",
+        "cartomize.raster.zonal_stats"
+      ],
+      "implemented": "Pente et exposition Horn 3×3, facteur vertical, code des plats et statistiques zonales disponibles.",
+      "missing": [
+        "Synthèse circulaire de l’exposition par unité",
+        "Rapport conjoint des unités, surfaces planes et support valide."
+      ],
+      "conditions": [
+        "MNT projeté sur grille orientée au nord ; voisinages 3×3 incomplets exclus",
+        "Pente en degrés ; exposition relative au nord de grille, plats=-1",
+        "Ne pas interpréter une moyenne arithmétique des azimuts comme une exposition moyenne."
+      ],
+      "next_module": "E04",
+      "planned_fixes": [],
+      "references": [
+        "R045",
+        "R049",
+        "R006"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "TH03",
+      "procedure": "Courbures et convergence des versants",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Terrain et MNT",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune courbure de terrain documentée.",
+      "missing": [
+        "Formulations et convention de signe",
+        "Courbures de profil et transversale à échelle choisie",
+        "Contrôles sur surfaces analytiques."
+      ],
+      "conditions": [],
+      "next_module": "E04",
+      "planned_fixes": [],
+      "references": [
+        "R049"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "TH04",
+      "procedure": "Classification géomorphométrique du relief",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Terrain et MNT",
+      "status": "partial",
+      "api": [
+        "cartomize.terrain.terrain"
+      ],
+      "implemented": "TPI, TRI de Riley et rugosité sur voisinage 3×3 ; ombrage de contrôle.",
+      "missing": [
+        "Geomorphons ou TPI multi-échelle",
+        "Classification des formes selon nomenclature",
+        "Validation géomorphologique."
+      ],
+      "conditions": [
+        "Un indicateur TPI seul n’est pas une classification du relief."
+      ],
+      "next_module": "E04",
+      "planned_fixes": [],
+      "references": [
+        "R055",
+        "R045"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "TH05",
+      "procedure": "Profils altimétriques et profils en travers",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Terrain et MNT",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune extraction de profils altimétriques.",
+      "missing": [
+        "Densification métrique des lignes",
+        "Échantillonnage du MNT",
+        "Distances cumulées, profils en travers et tableaux."
+      ],
+      "conditions": [],
+      "next_module": "E04",
+      "planned_fixes": [],
+      "references": [
+        "R049",
+        "R006"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "TH06",
+      "procedure": "Visibilité simple et cumulée",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Terrain et MNT",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun calcul de visibilité.",
+      "missing": [
+        "Hauteurs observateur/cible",
+        "Ligne de visée et courbure selon méthode",
+        "Vues cumulées et couverture."
+      ],
+      "conditions": [],
+      "next_module": "E04",
+      "planned_fixes": [],
+      "references": [
+        "R049"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "TH07",
+      "procedure": "Volumes par rapport à une surface de référence",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Terrain et MNT",
+      "status": "partial",
+      "api": [
+        "cartomize.algebra.calculate",
+        "cartomize.raster.zonal_stats"
+      ],
+      "implemented": "Différence signée entre surfaces alignées et sommes zonales possibles.",
+      "missing": [
+        "Intégration explicite par aire de cellule",
+        "Unités verticales et bilan déblais/remblais",
+        "Méthode des pixels de bord et bilan par cote."
+      ],
+      "conditions": [
+        "Une somme d’altitudes ou de différences n’est pas encore un volume."
+      ],
+      "next_module": "E04",
+      "planned_fixes": [],
+      "references": [
+        "R006",
+        "R049",
+        "R047"
+      ],
+      "completed_modules": [
+        "M03"
+      ]
+    },
+    {
+      "id": "TH08",
+      "procedure": "Directions d'écoulement",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Hydrologie et bassins",
+      "status": "available",
+      "api": [
+        "cartomize.hydrology.hydrology"
+      ],
+      "implemented": "Directions de plus forte pente D8 sur MNT comblé ; arbre parent pour les plats et contrôle d’absence de cycles.",
+      "missing": [],
+      "conditions": [
+        "D8 uniquement ; ni MFD ni D-infinity",
+        "Bords du raster et voisinage NoData ouverts",
+        "Direction zéro aux exutoires ; 65535 pour NoData."
+      ],
+      "next_module": null,
+      "planned_fixes": [],
+      "references": [
+        "R046",
+        "R047"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "TH09",
+      "procedure": "Accumulation et aire contributive",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Hydrologie et bassins",
+      "status": "partial",
+      "api": [
+        "cartomize.hydrology.hydrology",
+        "cartomize.algebra.calculate"
+      ],
+      "implemented": "Accumulation en nombre de cellules et aire métrique de cellule dans le rapport ; conversion algébrique possible.",
+      "missing": [
+        "Produit dédié d’aire contributive et unités",
+        "Pondération des contributions",
+        "Contrôle amont/aval prêt à l’emploi."
+      ],
+      "conditions": [
+        "L’accumulation inclut la cellule elle-même ; D8 uniquement."
+      ],
+      "next_module": "E04",
+      "planned_fixes": [],
+      "references": [
+        "R046",
+        "R047"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "TH10",
+      "procedure": "Extraction d'un réseau hydrographique",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Hydrologie et bassins",
+      "status": "partial",
+      "api": [
+        "cartomize.hydrology.hydrology"
+      ],
+      "implemented": "Raster binaire de chenaux à partir d’un seuil d’accumulation.",
+      "missing": [
+        "Seuil exprimé directement en surface",
+        "Segmentation aux confluences",
+        "Vectorisation en lignes et comparaison au réseau de référence."
+      ],
+      "conditions": [
+        "stream_threshold est exprimé en cellules contributives."
+      ],
+      "next_module": "E04",
+      "planned_fixes": [],
+      "references": [
+        "R046",
+        "R047",
+        "R049"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "TH11",
+      "procedure": "Positionnement et contrôle des exutoires",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Hydrologie et bassins",
+      "status": "partial",
+      "api": [
+        "cartomize.hydrology.hydrology"
+      ],
+      "implemented": "Reprojection des points, contrôle de présence dans une cellule valide et rejet de plusieurs points dans une même cellule.",
+      "missing": [
+        "Recherche du chenal admissible dans une tolérance",
+        "Proposition de déplacement et tableau initial/final",
+        "Validation explicite des nouveaux exutoires."
+      ],
+      "conditions": [
+        "Les exutoires fournis ne sont jamais déplacés implicitement."
+      ],
+      "next_module": "E04",
+      "planned_fixes": [],
+      "references": [
+        "R047",
+        "R046"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "TH12",
+      "procedure": "Délimitation de bassins et sous-bassins",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Hydrologie et bassins",
+      "status": "partial",
+      "api": [
+        "cartomize.hydrology.hydrology"
+      ],
+      "implemented": "Raster de bassins d’exutoires naturels ou de points fournis.",
+      "missing": [
+        "Vectorisation et bilan des bassins",
+        "Choix entre bassins complets et incrémentaux",
+        "Arbre explicite des relations d’emboîtement."
+      ],
+      "conditions": [
+        "Avec exutoires imbriqués, chaque cellule appartient au premier exutoire rencontré en aval ; ce sont des bassins incrémentaux."
+      ],
+      "next_module": "E04",
+      "planned_fixes": [],
+      "references": [
+        "R046",
+        "R047",
+        "R049"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "TH13",
+      "procedure": "Hiérarchisation et connectivité des cours d'eau",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Hydrologie et bassins",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun ordre Strahler ou Shreve.",
+      "missing": [
+        "Graphe dirigé des tronçons",
+        "Ordre et connectivité",
+        "Affectation aux lignes et statistiques par ordre."
+      ],
+      "conditions": [],
+      "next_module": "E04",
+      "planned_fixes": [],
+      "references": [
+        "R047",
+        "R060"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "TH14",
+      "procedure": "Morphométrie des bassins",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Hydrologie et bassins",
+      "status": "partial",
+      "api": [
+        "cartomize.vector.area",
+        "cartomize.vector.length",
+        "cartomize.terrain.terrain",
+        "cartomize.raster.zonal_stats"
+      ],
+      "implemented": "Mesures des polygones et du relief disponibles pour des bassins déjà préparés.",
+      "missing": [
+        "Densité de drainage, indices de forme et longueurs du réseau",
+        "Courbe hypsométrique",
+        "Tableau morphométrique avec conventions."
+      ],
+      "conditions": [
+        "Les mesures génériques ne fournissent pas à elles seules les indicateurs de bassin."
+      ],
+      "next_module": "E04",
+      "planned_fixes": [],
+      "references": [
+        "R060",
+        "R006",
+        "R047"
+      ],
+      "completed_modules": [
+        "M03"
+      ]
+    },
+    {
+      "id": "TH15",
+      "procedure": "Hauteur au-dessus du drainage HAND",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Hydrologie et inondation",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun calcul HAND fondé sur le chenal atteint par le routage.",
+      "missing": [
+        "Association hydrologique cellule-chenal",
+        "Différence verticale",
+        "Contrôle des sorties non raccordées."
+      ],
+      "conditions": [
+        "La distance au cours d’eau le plus proche n’est pas HAND."
+      ],
+      "next_module": "E04",
+      "planned_fixes": [],
+      "references": [
+        "R048",
+        "R047",
+        "R087"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "TH16",
+      "procedure": "Indice topographique d'humidité",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Hydrologie et sols",
+      "status": "partial",
+      "api": [
+        "cartomize.hydrology.hydrology",
+        "cartomize.terrain.terrain"
+      ],
+      "implemented": "Accumulation D8 et pente disponibles comme données préparatoires.",
+      "missing": [
+        "Aire contributive spécifique",
+        "Formulation TWI, traitement des plats et unités",
+        "Contrôles des extrêmes."
+      ],
+      "conditions": [
+        "Le nombre de cellules accumulées ne remplace pas directement l’aire spécifique exigée par une formule TWI."
+      ],
+      "next_module": "E04",
+      "planned_fixes": [],
+      "references": [
+        "R046",
+        "R049"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "TH17",
+      "procedure": "Simulation du ruissellement événementiel",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Hydrologie de surface",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune simulation de ruissellement événementiel.",
+      "missing": [
+        "Moteur SIMWE ou autre moteur explicitement retenu",
+        "Pluie, infiltration et rugosité",
+        "Calibration et validation des sorties."
+      ],
+      "conditions": [],
+      "next_module": "E07",
+      "planned_fixes": [],
+      "references": [
+        "R056",
+        "R052"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "TH18",
+      "procedure": "Simulation de propagation d'une inondation",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Hydraulique et inondation",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun solveur hydraulique de propagation.",
+      "missing": [
+        "Domaine et conditions initiales/limites",
+        "Scénario temporel",
+        "Solveur, calibration et résultats spatiotemporels."
+      ],
+      "conditions": [],
+      "next_module": "E07",
+      "planned_fixes": [],
+      "references": [
+        "R052"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "TH19",
+      "procedure": "Susceptibilité topographique aux inondations",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Inondation",
+      "status": "partial",
+      "api": [
+        "cartomize.terrain.terrain",
+        "cartomize.hydrology.hydrology",
+        "cartomize.raster.reclassify",
+        "cartomize.algebra.calculate"
+      ],
+      "implemented": "Facteurs de relief et drainage, reclassification et combinaison explicite de rasters.",
+      "missing": [
+        "Protocole de susceptibilité",
+        "Pondérations ou apprentissage justifiés",
+        "Sensibilité et validation spatiale."
+      ],
+      "conditions": [
+        "Un score topographique ne représente ni une hauteur d’eau ni une probabilité d’inondation calibrée."
+      ],
+      "next_module": "E06",
+      "planned_fixes": [],
+      "references": [
+        "R048",
+        "R006",
+        "R053"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "TH20",
+      "procedure": "Exposition des bâtiments, routes et populations",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Inondation et enjeux",
+      "status": "partial",
+      "api": [
+        "cartomize.vector.overlay",
+        "cartomize.vector_workflows.spatial_summary",
+        "cartomize.raster.zonal_stats"
+      ],
+      "implemented": "Croisement d’emprises et enjeux, résumés d’attributs et statistiques raster par zones.",
+      "missing": [
+        "Règles métier d’affectation sans double comptage",
+        "Distinction effectifs/densités",
+        "Bilans d’exposition et hauteur par objet."
+      ],
+      "conditions": [],
+      "next_module": "E05",
+      "planned_fixes": [],
+      "references": [
+        "R003",
+        "R006",
+        "R052"
+      ],
+      "completed_modules": [
+        "M02",
+        "M03"
+      ]
+    },
+    {
+      "id": "TH21",
+      "procedure": "Facteur topographique LS",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Érosion",
+      "status": "partial",
+      "api": [
+        "cartomize.terrain.terrain",
+        "cartomize.hydrology.hydrology"
+      ],
+      "implemented": "Pente et accumulation disponibles pour préparer un facteur topographique.",
+      "missing": [
+        "Formulation LS identifiée et paramètres",
+        "Aire spécifique et traitement des chenaux",
+        "Contrôles d’unités et extrêmes."
+      ],
+      "conditions": [],
+      "next_module": "E04",
+      "planned_fixes": [],
+      "references": [
+        "R050",
+        "R046"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "TH22",
+      "procedure": "Estimation RUSLE des pertes moyennes de sol",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Érosion",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune recette RUSLE avec contrat des facteurs.",
+      "missing": [
+        "Unités et domaine de R, K, LS, C et P",
+        "Alignement et calcul contrôlés",
+        "Sensibilité et bilans de perte moyenne."
+      ],
+      "conditions": [
+        "L’algèbre permet une multiplication fournie par l’expert ; cela ne constitue pas un modèle RUSLE validé."
+      ],
+      "next_module": "E07",
+      "planned_fixes": [],
+      "references": [
+        "R051",
+        "R050",
+        "R006"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "TH23",
+      "procedure": "Susceptibilité aux glissements de terrain",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Versants et glissements",
+      "status": "partial",
+      "api": [
+        "cartomize.terrain.terrain",
+        "cartomize.raster.reclassify",
+        "cartomize.algebra.calculate"
+      ],
+      "implemented": "Production de facteurs de relief et combinaison de critères reclassés.",
+      "missing": [
+        "Protocole glissements, classes et poids justifiés",
+        "Validation sur événements et sensibilité",
+        "Domaine d’application."
+      ],
+      "conditions": [],
+      "next_module": "E06",
+      "planned_fixes": [],
+      "references": [
+        "R053"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "TH24",
+      "procedure": "Facteur d'érodibilité K depuis les propriétés du sol",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Pédologie et érosion",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune estimation dédiée du facteur K.",
+      "missing": [
+        "Unités, profondeur et fermeture des fractions",
+        "Relation pédologique choisie",
+        "Contrôle de qualité et incertitude."
+      ],
+      "conditions": [],
+      "next_module": "E07",
+      "planned_fixes": [],
+      "references": [
+        "R057",
+        "R051"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "TH25",
+      "procedure": "Unités pédogéologiques et synthèses territoriales",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Géologie et pédologie",
+      "status": "partial",
+      "api": [
+        "cartomize.vector.overlay",
+        "cartomize.vector.area",
+        "cartomize.vector.dissolve",
+        "cartomize.vector_workflows.join_attributes"
+      ],
+      "implemented": "Jointure de nomenclatures, intersection, surfaces et agrégation disponibles.",
+      "missing": [
+        "Harmonisation des codes et compatibilité des échelles",
+        "Table croisée pédogéologique",
+        "Bilan de conservation des surfaces."
+      ],
+      "conditions": [],
+      "next_module": "E05",
+      "planned_fixes": [],
+      "references": [
+        "R003"
+      ],
+      "completed_modules": [
+        "M02"
+      ]
+    },
+    {
+      "id": "TH26",
+      "procedure": "Vulnérabilité des eaux souterraines",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Hydrogéologie et sols",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun modèle dédié de vulnérabilité des eaux souterraines.",
+      "missing": [
+        "Méthode et domaine hydrogéologique",
+        "Classes et paramètres",
+        "Confrontation aux observations et bilans d’enjeux."
+      ],
+      "conditions": [
+        "Reclassification et somme pondérée seules ne constituent pas un protocole hydrogéologique."
+      ],
+      "next_module": "E07",
+      "planned_fixes": [],
+      "references": [
+        "R058",
+        "R003"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "TH27",
+      "procedure": "Interpolation IDW de mesures ponctuelles",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Interpolation pédoclimatique",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune interpolation IDW.",
+      "missing": [
+        "Voisinage, puissance et doublons",
+        "Prédiction raster",
+        "Validation indépendante et limite d’extrapolation."
+      ],
+      "conditions": [],
+      "next_module": "E05",
+      "planned_fixes": [],
+      "references": [
+        "R045",
+        "R059"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "TH28",
+      "procedure": "Krigeage et validation des surfaces",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Interpolation pédoclimatique",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun krigeage ni variogramme.",
+      "missing": [
+        "Exploration et variogramme",
+        "Prédiction et incertitude",
+        "Validation spatiale et comparaison à une base simple."
+      ],
+      "conditions": [],
+      "next_module": "E05",
+      "planned_fixes": [],
+      "references": [
+        "R059",
+        "R054"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "TH29",
+      "procedure": "Spatialisation climatique avec altitude et covariables",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Interpolation climatique",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune spatialisation climatique par régression de covariables.",
+      "missing": [
+        "Échantillonnage et modèle",
+        "Interpolation éventuelle des résidus",
+        "Validation spatiale et contrôle d’extrapolation."
+      ],
+      "conditions": [],
+      "next_module": "E07",
+      "planned_fixes": [],
+      "references": [
+        "R054",
+        "R059"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "TH30",
+      "procedure": "Bilans climatiques par bassin, saison et année",
+      "domain": "Terrain, eau, sols et climat",
+      "theme": "Climat et territoires",
+      "status": "partial",
+      "api": [
+        "cartomize.algebra.reduce_rasters",
+        "cartomize.raster.zonal_stats"
+      ],
+      "implemented": "Réductions de rasters compatibles et statistiques par bassin.",
+      "missing": [
+        "Contrats état/flux/cumul et déaccumulation",
+        "Calendriers, durées et données manquantes",
+        "Bilans saisonniers/annuels et anomalies."
+      ],
+      "conditions": [
+        "Une somme de fichiers n’applique pas automatiquement la durée représentée ni la déaccumulation."
+      ],
+      "next_module": "E03",
+      "planned_fixes": [],
+      "references": [
+        "R006",
+        "R088"
+      ],
+      "completed_modules": [
+        "M03"
+      ]
+    },
+    {
+      "id": "SA01",
+      "procedure": "Diagnostic des quartiers insuffisamment équipés",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Urbain et services",
+      "status": "partial",
+      "api": [
+        "cartomize.vector_workflows.spatial_summary",
+        "cartomize.vector_workflows.join_attributes"
+      ],
+      "implemented": "Comptage d’équipements, sommes de capacités et jointure de dénominateurs par unité.",
+      "missing": [
+        "Profil d’indicateurs avec période et population cible",
+        "Ratios et déficits selon seuils de planification",
+        "Contrôles de couverture et dénominateurs."
+      ],
+      "conditions": [],
+      "next_module": "E05",
+      "planned_fixes": [],
+      "references": [
+        "R061",
+        "R075"
+      ],
+      "completed_modules": [
+        "M02"
+      ]
+    },
+    {
+      "id": "SA02",
+      "procedure": "Gradient de pression selon la distance aux routes ou aux villages",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Pressions anthropiques",
+      "status": "partial",
+      "api": [
+        "cartomize.vector.buffer",
+        "cartomize.vector.overlay",
+        "cartomize.vector_workflows.spatial_summary",
+        "cartomize.raster.zonal_stats"
+      ],
+      "implemented": "Tampons, différences et résumés des réponses par zones.",
+      "missing": [
+        "Couronnes non superposées automatiques",
+        "Proportions sur le support effectivement observé",
+        "Comparaisons statistiques entre distances et périodes."
+      ],
+      "conditions": [],
+      "next_module": "E05",
+      "planned_fixes": [],
+      "references": [
+        "R061",
+        "R064",
+        "R078"
+      ],
+      "completed_modules": [
+        "M02",
+        "M03"
+      ]
+    },
+    {
+      "id": "SA03",
+      "procedure": "Population et bâtiments exposés à un aléa déjà cartographié",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Exposition territoriale",
+      "status": "partial",
+      "api": [
+        "cartomize.vector.overlay",
+        "cartomize.vector_workflows.spatial_summary",
+        "cartomize.raster.zonal_stats"
+      ],
+      "implemented": "Croisement géométrique, sommes d’effectifs et statistiques zonales disponibles.",
+      "missing": [
+        "Conversion des densités en effectifs avec aire appropriée",
+        "Affectation des objets coupés et contrôle de doubles comptes",
+        "Bilan par classe d’aléa."
+      ],
+      "conditions": [],
+      "next_module": "E05",
+      "planned_fixes": [],
+      "references": [
+        "R073",
+        "R061"
+      ],
+      "completed_modules": [
+        "M02",
+        "M03"
+      ]
+    },
+    {
+      "id": "SA04",
+      "procedure": "Densité et emprise du bâti par quartier ou maille",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Morphologie urbaine",
+      "status": "partial",
+      "api": [
+        "cartomize.vector.clip",
+        "cartomize.vector.area",
+        "cartomize.vector_workflows.spatial_summary"
+      ],
+      "implemented": "Découpage, superficies des bâtiments et comptages par unités fournies.",
+      "missing": [
+        "Déduplication et choix d’affectation des bâtiments traversant des limites",
+        "Génération du maillage",
+        "Parts bâties et densités avec dénominateurs."
+      ],
+      "conditions": [],
+      "next_module": "E05",
+      "planned_fixes": [],
+      "references": [
+        "R061",
+        "R074"
+      ],
+      "completed_modules": [
+        "M02"
+      ]
+    },
+    {
+      "id": "SA05",
+      "procedure": "Indicateurs territoriaux sur carroyage et contrôle de l'effet du zonage",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Population et indicateurs",
+      "status": "partial",
+      "api": [
+        "cartomize.vector_workflows.spatial_summary",
+        "cartomize.vector_workflows.join_attributes"
+      ],
+      "implemented": "Agrégations de numérateurs et dénominateurs sur des unités déjà fournies.",
+      "missing": [
+        "Grilles à tailles/origines variables",
+        "Indicateurs comparables",
+        "Analyse de stabilité des classements selon le zonage."
+      ],
+      "conditions": [],
+      "next_module": "E05",
+      "planned_fixes": [],
+      "references": [
+        "R061",
+        "R065",
+        "R074"
+      ],
+      "completed_modules": [
+        "M02"
+      ]
+    },
+    {
+      "id": "SA06",
+      "procedure": "Densité à noyau d'événements ou d'activités",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Densité spatiale",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune densité à noyau spatiale.",
+      "missing": [
+        "Noyau, rayon, poids et grille",
+        "Unités de densité",
+        "Comparaison des rayons et effet des bords."
+      ],
+      "conditions": [],
+      "next_module": "E05",
+      "planned_fixes": [],
+      "references": [
+        "R062"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "SA07",
+      "procedure": "Détection de groupes de points par DBSCAN",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Regroupements spatiaux",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun DBSCAN spatial.",
+      "missing": [
+        "Distance métrique, rayon et effectif minimal",
+        "Groupes, bruit et résumés",
+        "Stabilité des paramètres."
+      ],
+      "conditions": [
+        "Les K-means spectraux ne regroupent pas les points d’événements selon DBSCAN."
+      ],
+      "next_module": "E05",
+      "planned_fixes": [],
+      "references": [
+        "R061",
+        "R064"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "SA08",
+      "procedure": "Déplacement du centre et orientation d'une distribution",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Organisation spatiale",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun centre pondéré ou ellipse de dispersion d’une distribution.",
+      "missing": [
+        "Conventions de pondération et dispersion",
+        "Centres et ellipses par groupe",
+        "Comparaison temporelle."
+      ],
+      "conditions": [
+        "Le centroïde géométrique d’un polygone est une autre opération."
+      ],
+      "next_module": "E05",
+      "planned_fixes": [],
+      "references": [
+        "R061",
+        "R064"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "SA09",
+      "procedure": "Autocorrélation globale de Moran",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Statistiques spatiales",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun Moran global.",
+      "missing": [
+        "Poids spatiaux et unités isolées",
+        "Statistique et permutations",
+        "Diagnostics de voisinage."
+      ],
+      "conditions": [],
+      "next_module": "E05",
+      "planned_fixes": [],
+      "references": [
+        "R064",
+        "R065"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "SA10",
+      "procedure": "Clusters et valeurs atypiques avec Moran local",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Statistiques spatiales",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun Moran local.",
+      "missing": [
+        "Voisinage et permutations",
+        "Comparaisons multiples",
+        "Classes HH, LL, HL, LH et non significatives."
+      ],
+      "conditions": [],
+      "next_module": "E05",
+      "planned_fixes": [],
+      "references": [
+        "R064",
+        "R065"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "SA11",
+      "procedure": "Points chauds et froids par Getis-Ord Gi*",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Statistiques spatiales",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun Getis-Ord Gi*.",
+      "missing": [
+        "Variable et normalisation",
+        "Inclusion focale et voisinage",
+        "Inférence corrigée et cartographie."
+      ],
+      "conditions": [],
+      "next_module": "E05",
+      "planned_fixes": [],
+      "references": [
+        "R064",
+        "R065"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "SA12",
+      "procedure": "Régression globale de facteurs territoriaux",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Modélisation spatiale",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune régression statistique de facteurs territoriaux.",
+      "missing": [
+        "Famille, colinéarité et données manquantes",
+        "Ajustement et résidus",
+        "Validation hors échantillon et dépendance spatiale."
+      ],
+      "conditions": [],
+      "next_module": "E05",
+      "planned_fixes": [],
+      "references": [
+        "R078",
+        "R066"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "SA13",
+      "procedure": "Régression avec retard spatial ou erreur spatiale",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Modélisation spatiale",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun modèle de retard ou erreur spatiale.",
+      "missing": [
+        "Hypothèses et poids spatiaux",
+        "Estimation des modèles",
+        "Diagnostics, validation et effets."
+      ],
+      "conditions": [],
+      "next_module": "E05",
+      "planned_fixes": [],
+      "references": [
+        "R066"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "SA14",
+      "procedure": "Relations locales par GWR ou MGWR",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Modélisation spatiale",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune GWR ou MGWR.",
+      "missing": [
+        "Modèle global et voisinage",
+        "Ajustements locaux",
+        "Colinéarité locale, résidus et validation par blocs."
+      ],
+      "conditions": [],
+      "next_module": "E05",
+      "planned_fixes": [],
+      "references": [
+        "R076",
+        "R078"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "SA15",
+      "procedure": "Itinéraires les plus courts ou les plus rapides",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Réseaux",
+      "status": "partial",
+      "api": [
+        "cartomize.routing.shortest_path"
+      ],
+      "implemented": "Dijkstra sur réseau non orienté au coût de distance ; projection sur arêtes par défaut, mode sommets conservé, intersections facultatives et rattachement borné.",
+      "missing": [
+        "Coûts de temps",
+        "Sens uniques et restrictions de virage."
+      ],
+      "conditions": [
+        "snap=\"edge\" traite ensemble les projections sur une même arête ; snap=\"node\" conserve le raccordement aux sommets",
+        "Sans nœudage, une projection ne crée pas de connexion à une autre arête croisée",
+        "Un même nœud de départ/arrivée produit un Point valide avec route_status=\"coincident\" ; sinon LineString et route_status=\"ok\"",
+        "Distances de raccordement séparées du coût réseau ; SCR source conservé et unités projetées converties en mètres."
+      ],
+      "next_module": "E06",
+      "planned_fixes": [],
+      "references": [
+        "R063",
+        "R067"
+      ],
+      "completed_modules": [
+        "M05"
+      ]
+    },
+    {
+      "id": "SA16",
+      "procedure": "Aires de desserte et population accessible",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Réseaux",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun calcul d’aire de desserte.",
+      "missing": [
+        "Arêtes atteignables par seuil de coût",
+        "Méthode d’affectation des populations",
+        "Couverture et non-couverture."
+      ],
+      "conditions": [],
+      "next_module": "E06",
+      "planned_fixes": [],
+      "references": [
+        "R063",
+        "R067",
+        "R075"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "SA17",
+      "procedure": "Matrice origine-destination et indicateurs d'accessibilité",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Réseaux",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune matrice origine-destination réseau.",
+      "missing": [
+        "Raccordement multi-origines/destinations",
+        "Coûts, seuils et destinations retenues",
+        "Indicateurs d’accessibilité et cas non reliés."
+      ],
+      "conditions": [],
+      "next_module": "E06",
+      "planned_fixes": [],
+      "references": [
+        "R063",
+        "R067"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "SA18",
+      "procedure": "Équipement le plus proche par temps de trajet",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Réseaux",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune affectation au plus proche équipement par temps réseau.",
+      "missing": [
+        "Coûts de temps et recherche multi-destination",
+        "Itinéraires ou affectations",
+        "Seuils et demandes non desservies."
+      ],
+      "conditions": [
+        "vector.nearest mesure une proximité géométrique plane ; ce n’est pas un temps de trajet."
+      ],
+      "next_module": "E06",
+      "planned_fixes": [],
+      "references": [
+        "R063",
+        "R067"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "SA19",
+      "procedure": "Localisation-allocation de nouveaux équipements",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Localisation de services",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun solveur de localisation-allocation.",
+      "missing": [
+        "Objectif, capacités et contraintes",
+        "Matrice demande-candidats",
+        "Optimisation et demande non couverte."
+      ],
+      "conditions": [],
+      "next_module": "E06",
+      "planned_fixes": [],
+      "references": [
+        "R067"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "SA20",
+      "procedure": "Carte d'aptitude multicritère pondérée",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Aide à la décision",
+      "status": "partial",
+      "api": [
+        "cartomize.raster.reclassify",
+        "cartomize.algebra.calculate",
+        "cartomize.vector.overlay"
+      ],
+      "implemented": "Reclassement, exclusions vectorielles et combinaison explicite d’expressions raster.",
+      "missing": [
+        "Contrat de critères et normalisation",
+        "Contrôle des poids et exclusions",
+        "Décomposition des contributions et validation du score."
+      ],
+      "conditions": [
+        "Les poids et fonctions de préférence doivent être fournis ; aucune méthode multicritère n’est inférée."
+      ],
+      "next_module": "E06",
+      "planned_fixes": [],
+      "references": [
+        "R068",
+        "R069"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "SA21",
+      "procedure": "Sensibilité et robustesse d'un modèle multicritère",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Aide à la décision",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun moteur d’analyse de sensibilité multicritère.",
+      "missing": [
+        "Plan des variations",
+        "Répétitions et traçabilité",
+        "Stabilité des scores, rangs et sélections."
+      ],
+      "conditions": [],
+      "next_module": "E06",
+      "planned_fixes": [],
+      "references": [
+        "R069"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "SA22",
+      "procedure": "Sélection de zones candidates contiguës sous contraintes",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Aide à la décision",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune sélection optimisée de régions contiguës.",
+      "missing": [
+        "Unités admissibles",
+        "Contraintes de surface, contiguïté et espacement",
+        "Classement ou optimisation et diagnostic de faisabilité."
+      ],
+      "conditions": [],
+      "next_module": "E06",
+      "planned_fixes": [],
+      "references": [
+        "R068",
+        "R069"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "SA23",
+      "procedure": "Fragmentation par taches, surfaces et lisières",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Écologie du paysage",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun moteur de métriques de taches ou de lisières.",
+      "missing": [
+        "Composantes selon voisinage",
+        "Surfaces, nombres, tailles et lisières",
+        "Comparaison à grain et support constants."
+      ],
+      "conditions": [
+        "Une maquette nommée fragmentation forestière ne calcule pas la fragmentation."
+      ],
+      "next_module": "E06",
+      "planned_fixes": [],
+      "references": [
+        "R070",
+        "R072"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "SA24",
+      "procedure": "Habitat intérieur et influence des lisières",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Écologie du paysage",
+      "status": "partial",
+      "api": [
+        "cartomize.vector.buffer",
+        "cartomize.vector.area"
+      ],
+      "implemented": "Érosion métrique de polygones par tampon négatif et mesure de la surface restante.",
+      "missing": [
+        "Définition des bordures écologiquement pertinentes",
+        "Identification des cœurs et composantes",
+        "Bilan habitat intérieur/total."
+      ],
+      "conditions": [
+        "Un tampon négatif sur des polygones fournis ne détermine pas seul les taches d’habitat."
+      ],
+      "next_module": "E06",
+      "planned_fixes": [],
+      "references": [
+        "R071"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "SA25",
+      "procedure": "Agrégation, isolement et connectivité structurelle des habitats",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Écologie du paysage",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune analyse de connectivité structurelle des habitats.",
+      "missing": [
+        "Taches et adjacences",
+        "Métriques d’agrégation et isolement",
+        "Graphe par seuil et comparaison de scénarios."
+      ],
+      "conditions": [],
+      "next_module": "E06",
+      "planned_fixes": [],
+      "references": [
+        "R072",
+        "R070"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "SA26",
+      "procedure": "Réseau de connexions écologiques au moindre coût",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Écologie et connectivité",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun réseau écologique de moindre coût sur résistance raster.",
+      "missing": [
+        "Régions et résistance",
+        "Distance de coût et connexions",
+        "Réseau retenu et sensibilité aux résistances."
+      ],
+      "conditions": [
+        "Le routage de lignes par distance ne traite pas un raster de résistance."
+      ],
+      "next_module": "E06",
+      "planned_fixes": [],
+      "references": [
+        "R077"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "SA27",
+      "procedure": "Désagrégation dasymétrique de la population",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Population",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune désagrégation dasymétrique.",
+      "missing": [
+        "Supports et pondérations",
+        "Redistribution à somme conservée",
+        "Contrôle des totaux et validation sur références fines."
+      ],
+      "conditions": [],
+      "next_module": "E05",
+      "planned_fixes": [],
+      "references": [
+        "R073"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "SA28",
+      "procedure": "Classification standardisée du degré d'urbanisation",
+      "domain": "Territoires et analyse spatiale",
+      "theme": "Population et urbanisation",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucune classification DEGURBA.",
+      "missing": [
+        "Grille de population adaptée",
+        "Groupes de cellules selon les règles",
+        "Parts de population et classes administratives."
+      ],
+      "conditions": [],
+      "next_module": "E05",
+      "planned_fixes": [],
+      "references": [
+        "R074"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "EC01",
+      "procedure": "Distribution potentielle actuelle d'une espèce",
+      "domain": "Habitat et prospective",
+      "theme": "Écologie et distribution des espèces",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun workflow de distribution potentielle d’espèce.",
+      "missing": [
+        "Biais et déduplication des occurrences",
+        "Présences-fond ou absences",
+        "Covariables, validation spatiale et projection."
+      ],
+      "conditions": [
+        "Une classification d’occupation du sol ne fournit pas ce protocole écologique."
+      ],
+      "next_module": "E07",
+      "planned_fixes": [],
+      "references": [
+        "R079",
+        "R080"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "EC02",
+      "procedure": "Projection climatique d'un modèle d'habitat",
+      "domain": "Habitat et prospective",
+      "theme": "Climat et habitats",
+      "status": "absent",
+      "api": [],
+      "implemented": "Aucun moteur de projection climatique d’un modèle d’habitat.",
+      "missing": [
+        "Compatibilité des covariables",
+        "Transformations du modèle",
+        "Scénarios, extrapolation et désaccord."
+      ],
+      "conditions": [],
+      "next_module": "E07",
+      "planned_fixes": [],
+      "references": [
+        "R079",
+        "R081"
+      ],
+      "completed_modules": []
+    },
+    {
+      "id": "EC03",
+      "procedure": "Quantités de changement et allocation spatiale",
+      "domain": "Habitat et prospective",
+      "theme": "Prospective de l'occupation du sol",
+      "status": "partial",
+      "api": [
+        "cartomize.raster.change_matrix"
+      ],
+      "implemented": "Comptage historique des transitions entre deux cartes sur grille identique.",
+      "missing": [
+        "Probabilités et quantités Markov au pas temporel choisi",
+        "Scores de transition et allocation spatiale",
+        "Rétroprédiction avant projection."
+      ],
+      "conditions": [
+        "Une matrice de comptages observés ne constitue pas un modèle prospectif."
+      ],
+      "next_module": "E07",
+      "planned_fixes": [],
+      "references": [
+        "R082",
+        "R083"
+      ],
+      "completed_modules": []
+    }
+  ],
+  "sources": [
+    {
+      "id": "R001",
+      "titre": "QGIS : géométrie vectorielle",
+      "organisme": "QGIS",
+      "url": "https://docs.qgis.org/3.44/en/docs/user_manual/processing_algs/qgis/vectorgeometry.html",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R002",
+      "titre": "QGIS : gestion et jointures vectorielles",
+      "organisme": "QGIS",
+      "url": "https://docs.qgis.org/3.44/en/docs/user_manual/processing_algs/qgis/vectorgeneral.html",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R003",
+      "titre": "QGIS : superpositions vectorielles",
+      "organisme": "QGIS",
+      "url": "https://docs.qgis.org/3.44/en/docs/user_manual/processing_algs/qgis/vectoroverlay.html",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R004",
+      "titre": "QGIS : vérificateur de géométrie",
+      "organisme": "QGIS",
+      "url": "https://docs.qgis.org/3.44/en/docs/user_manual/plugins/core_plugins/plugins_geometry_checker.html",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R005",
+      "titre": "QGIS/GDAL : conversion raster",
+      "organisme": "QGIS",
+      "url": "https://docs.qgis.org/3.44/en/docs/user_manual/processing_algs/gdal/rasterconversion.html",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R006",
+      "titre": "QGIS : analyse raster",
+      "organisme": "QGIS",
+      "url": "https://docs.qgis.org/3.44/en/docs/user_manual/processing_algs/qgis/rasteranalysis.html",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R007",
+      "titre": "QGIS : création de grilles et de points",
+      "organisme": "QGIS",
+      "url": "https://docs.qgis.org/3.44/en/docs/user_manual/processing_algs/qgis/vectorcreation.html",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R008",
+      "titre": "QGIS : sélection vectorielle",
+      "organisme": "QGIS",
+      "url": "https://docs.qgis.org/3.44/en/docs/user_manual/processing_algs/qgis/vectorselection.html",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R009",
+      "titre": "QGIS/GDAL : conversion vectorielle et rasterisation",
+      "organisme": "QGIS",
+      "url": "https://docs.qgis.org/3.44/en/docs/user_manual/processing_algs/gdal/vectorconversion.html",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R010",
+      "titre": "QGIS : export cartographique et atlas",
+      "organisme": "QGIS",
+      "url": "https://docs.qgis.org/3.44/en/docs/user_manual/print_layout/create_output.html",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R011",
+      "titre": "QGIS : concepteur de modèles",
+      "organisme": "QGIS",
+      "url": "https://docs.qgis.org/3.44/en/docs/user_manual/processing/modeler.html",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R012",
+      "titre": "ArcGIS Pro : ModelBuilder",
+      "organisme": "Esri",
+      "url": "https://doc.esri.com/en/arcgis-pro/latest/help/analysis/geoprocessing/modelbuilder/what-is-modelbuilder-.html",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R013",
+      "titre": "ArcGIS Pro : Check Geometry",
+      "organisme": "Esri",
+      "url": "https://doc.esri.com/en/arcgis-pro/latest/tool-reference/data-management/check-geometry.html",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R014",
+      "titre": "ArcGIS Pro : Project",
+      "organisme": "Esri",
+      "url": "https://doc.esri.com/en/arcgis-pro/latest/tool-reference/data-management/project.html",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R015",
+      "titre": "ArcGIS Pro : Spatial Join",
+      "organisme": "Esri",
+      "url": "https://doc.esri.com/en/arcgis-pro/latest/tool-reference/analysis/spatial-join.html",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R016",
+      "titre": "ArcGIS Pro : Merge",
+      "organisme": "Esri",
+      "url": "https://doc.esri.com/en/arcgis-pro/latest/tool-reference/data-management/merge.html",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R017",
+      "titre": "ArcGIS Pro : Buffer",
+      "organisme": "Esri",
+      "url": "https://doc.esri.com/en/arcgis-pro/latest/tool-reference/analysis/buffer.html",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R018",
+      "titre": "QGIS : analyse vectorielle appliquée",
+      "organisme": "QGIS",
+      "url": "https://docs.qgis.org/3.44/en/docs/training_manual/vector_analysis/basic_analysis.html",
+      "nature": "Tutoriel",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R019",
+      "titre": "QGIS : exécution itérative par entité",
+      "organisme": "QGIS",
+      "url": "https://docs.qgis.org/3.44/en/docs/training_manual/processing/iterative.html",
+      "nature": "Tutoriel",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R020",
+      "titre": "ArcGIS Pro : outils de superposition",
+      "organisme": "Esri",
+      "url": "https://doc.esri.com/en/arcgis-pro/latest/tool-reference/analysis/an-overview-of-the-overlay-toolset.html",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R021",
+      "titre": "Géoréférenceur de QGIS 3.44",
+      "organisme": "QGIS",
+      "url": "https://docs.qgis.org/3.44/en/docs/user_manual/managing_data_source/georeferencer.html",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R022",
+      "titre": "Point Cloud Conversion — algorithmes Processing dépendant de PDAL",
+      "organisme": "QGIS",
+      "url": "https://docs.qgis.org/3.44/en/docs/user_manual/processing_algs/qgis/pointcloudconversion.html",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R023",
+      "titre": "filters.smrf — classification des points du sol",
+      "organisme": "PDAL",
+      "url": "https://pdal.io/en/stable/stages/filters.smrf.html",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R024",
+      "titre": "filters.hag_dem — normalisation des hauteurs",
+      "organisme": "PDAL",
+      "url": "https://pdal.io/en/latest/stages/filters.hag_dem.html",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R025",
+      "titre": "Classify LAS Ground",
+      "organisme": "Esri / ArcGIS Pro",
+      "url": "https://pro.arcgis.com/en/pro-app/latest/tool-reference/3d-analyst/classify-las-ground.htm",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R026",
+      "titre": "LAS Point Statistics By Area",
+      "organisme": "Esri / ArcGIS Pro",
+      "url": "https://pro.arcgis.com/en/pro-app/latest/tool-reference/3d-analyst/las-point-statistics-by-area.htm",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R027",
+      "titre": "GDAL algorithm provider — QGIS Documentation",
+      "organisme": "QGIS",
+      "url": "https://docs.qgis.org/3.44/en/docs/user_manual/processing_algs/gdal/index.html",
+      "nature": "Documentation officielle",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R028",
+      "titre": "Applications by module — Orfeo ToolBox 10.0",
+      "organisme": "Orfeo ToolBox / CNES",
+      "url": "https://www.orfeo-toolbox.org/CookBook/Applications.html",
+      "nature": "Documentation officielle",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R029",
+      "titre": "Landsat Collection 2 Level-2 Science Products",
+      "organisme": "USGS",
+      "url": "https://www.usgs.gov/landsat-missions/landsat-collection-2-level-2-science-products",
+      "nature": "Documentation officielle",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R030",
+      "titre": "An overview of the Synthetic Aperture Radar toolset",
+      "organisme": "Esri / ArcGIS Pro",
+      "url": "https://doc.esri.com/en/arcgis-pro/latest/tool-reference/image-analyst/an-overview-of-the-synthetic-aperture-radar-toolset.html",
+      "nature": "Documentation officielle",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R031",
+      "titre": "An overview of the Classification and Pattern Recognition toolset",
+      "organisme": "Esri / ArcGIS Pro",
+      "url": "https://doc.esri.com/en/arcgis-pro/latest/tool-reference/image-analyst/an-overview-of-the-segmentation-and-classification-tools-in-image-analyst.html",
+      "nature": "Documentation officielle",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R032",
+      "titre": "An overview of the Multidimensional Analysis toolset",
+      "organisme": "Esri / ArcGIS Pro",
+      "url": "https://doc.esri.com/en/arcgis-pro/latest/tool-reference/image-analyst/an-overview-of-the-multidimensional-analysis-toolset-in-image-analyst.html",
+      "nature": "Documentation officielle",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R033",
+      "titre": "Landsat Collection 2 Quality Assessment Bands",
+      "organisme": "USGS",
+      "url": "https://www.usgs.gov/landsat-missions/landsat-collection-2-quality-assessment-bands",
+      "nature": "Documentation officielle",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R034",
+      "titre": "S2 Products",
+      "organisme": "Copernicus / ESA, SentiWiki",
+      "url": "https://sentiwiki.copernicus.eu/web/s2-products",
+      "nature": "Documentation officielle",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R035",
+      "titre": "TOPS Interferometry Tutorial — Sentinel-1 Toolbox",
+      "organisme": "ESA STEP / Andreas Braun et Luis Veci",
+      "url": "https://step.esa.int/docs/tutorials/S1TBX%20TOPSAR%20Interferometry%20with%20Sentinel-1%20Tutorial_v2.pdf",
+      "nature": "Tutoriel",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R036",
+      "titre": "Change Detection Wizard",
+      "organisme": "Esri / ArcGIS Pro",
+      "url": "https://doc.esri.com/en/arcgis-pro/latest/help/analysis/image-analyst/the-change-detection-wizard.html",
+      "nature": "Documentation officielle",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R037",
+      "titre": "Imagery tools — GRASS Documentation",
+      "organisme": "GRASS Development Team / OSGeo",
+      "url": "https://grass.osgeo.org/grass-stable/manuals/imagery.html",
+      "nature": "Documentation officielle",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R038",
+      "titre": "An overview of the Deep Learning toolset",
+      "organisme": "Esri / ArcGIS Pro",
+      "url": "https://doc.esri.com/en/arcgis-pro/latest/tool-reference/image-analyst/an-overview-of-the-deep-learning-toolset-in-image-analyst.html",
+      "nature": "Documentation officielle",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R039",
+      "titre": "Landsat Collection 2 Surface Temperature",
+      "organisme": "USGS",
+      "url": "https://www.usgs.gov/landsat-missions/landsat-collection-2-surface-temperature",
+      "nature": "Documentation officielle",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R040",
+      "titre": "Time-series analysis with Sentinel-1",
+      "organisme": "ESA STEP / Andreas Braun",
+      "url": "https://step.esa.int/docs/tutorials/S1TBX%20Time-series%20analysis%20with%20Sentinel-1.pdf",
+      "nature": "Tutoriel",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R041",
+      "titre": "Band Arithmetic function",
+      "organisme": "Esri / ArcGIS Pro",
+      "url": "https://doc.esri.com/en/arcgis-pro/latest/help/analysis/raster-functions/band-arithmetic-function.html",
+      "nature": "Documentation officielle",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R042",
+      "titre": "GEDI L4A Footprint Level Aboveground Biomass Density, Version 3",
+      "organisme": "NASA / ORNL DAAC",
+      "url": "https://daac.ornl.gov/GEDI/guides/GEDI_L4A_AGB_Density_V3.html",
+      "nature": "Guide officiel de données",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R043",
+      "titre": "Post-Fire Mapping Glossary",
+      "organisme": "USGS / Burn Severity Portal",
+      "url": "https://burnseverity.cr.usgs.gov/glossary",
+      "nature": "Documentation officielle",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R044",
+      "titre": "Composite Bands (Data Management)",
+      "organisme": "Esri / ArcGIS Pro",
+      "url": "https://pro.arcgis.com/en/pro-app/3.6/tool-reference/data-management/composite-bands.htm",
+      "nature": "Documentation officielle",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R045",
+      "titre": "Analyse raster : outils GDAL dans QGIS 3.44",
+      "organisme": "QGIS",
+      "url": "https://docs.qgis.org/3.44/en/docs/user_manual/processing_algs/gdal/rasteranalysis.html",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R046",
+      "titre": "r.watershed : paramètres hydrologiques et facteurs RUSLE",
+      "organisme": "GRASS GIS / OSGeo",
+      "url": "https://grass.osgeo.org/grass-stable/manuals/r.watershed.html",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R047",
+      "titre": "Présentation du jeu d'outils Hydrology",
+      "organisme": "Esri / ArcGIS Pro",
+      "url": "https://pro.arcgis.com/en/pro-app/latest/tool-reference/spatial-analyst/an-overview-of-the-hydrology-tools.htm",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R048",
+      "titre": "r.hand : hauteur au-dessus du drainage et scénarios HAND",
+      "organisme": "GRASS GIS / OSGeo",
+      "url": "https://grass.osgeo.org/grass-stable/manuals/addons/r.hand.html",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R049",
+      "titre": "Catalogue des outils raster GRASS",
+      "organisme": "GRASS GIS / OSGeo",
+      "url": "https://grass.osgeo.org/grass-stable/manuals/raster.html",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R050",
+      "titre": "LS Factor (One Step)",
+      "organisme": "SAGA GIS",
+      "url": "https://saga-gis.sourceforge.io/saga_tool_doc/9.5.0/tc_ta_hydrology_ls_factor.html",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R051",
+      "titre": "RUSLE2 User's Reference Guide — version de travail, 15 mai 2008",
+      "organisme": "USDA Agricultural Research Service",
+      "url": "https://www.ars.usda.gov/ARSUserFiles/60600505/RUSLE/RUSLE2_User_Ref_Guide.pdf",
+      "nature": "documentation scientifique",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R052",
+      "titre": "Flood simulation",
+      "organisme": "Esri / ArcGIS Pro",
+      "url": "https://pro.arcgis.com/en/pro-app/latest/help/mapping/simulation/simulation-in-arcgis-pro.htm",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R053",
+      "titre": "Identify infrastructure at risk of landslides — ArcGIS Pro",
+      "organisme": "Esri / Learn ArcGIS",
+      "url": "https://learn.arcgis.com/en/projects/identify-infrastructure-at-risk-of-landslides/arcgis-pro/",
+      "nature": "Tutoriel",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R054",
+      "titre": "EBK Regression Prediction",
+      "organisme": "Esri / ArcGIS Pro",
+      "url": "https://pro.arcgis.com/en/pro-app/latest/tool-reference/geostatistical-analyst/ebk-regression-prediction.htm",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R055",
+      "titre": "r.geomorphon : formes du terrain",
+      "organisme": "GRASS GIS / OSGeo",
+      "url": "https://grass.osgeo.org/grass-stable/manuals/r.geomorphon.html",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R056",
+      "titre": "r.sim.water : simulation du ruissellement SIMWE",
+      "organisme": "GRASS GIS / OSGeo",
+      "url": "https://grass.osgeo.org/grass-stable/manuals/r.sim.water.html",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R057",
+      "titre": "r.uslek : facteur d'érodibilité K",
+      "organisme": "GRASS GIS / OSGeo",
+      "url": "https://grass.osgeo.org/grass-stable/manuals/r.uslek.html",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R058",
+      "titre": "Identify groundwater vulnerable areas",
+      "organisme": "Esri / Learn ArcGIS",
+      "url": "https://learn.arcgis.com/en/projects/identify-groundwater-vulnerable-areas/",
+      "nature": "Tutoriel",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R059",
+      "titre": "Using cross validation to assess interpolation results",
+      "organisme": "Esri / ArcGIS Pro",
+      "url": "https://pro.arcgis.com/en/pro-app/latest/help/analysis/geostatistical-analyst/performing-cross-validation-and-validation.htm",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R060",
+      "titre": "r.basin : caractérisation morphométrique des bassins",
+      "organisme": "GRASS GIS / OSGeo",
+      "url": "https://grass.osgeo.org/grass-stable/manuals/addons/r.basin.html",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R061",
+      "titre": "Vector analysis — QGIS 3.44",
+      "organisme": "QGIS Project",
+      "url": "https://docs.qgis.org/3.44/en/docs/user_manual/processing_algs/qgis/vectoranalysis.html",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R062",
+      "titre": "Interpolation — Heatmap (kernel density estimation)",
+      "organisme": "QGIS Project",
+      "url": "https://docs.qgis.org/3.44/en/docs/user_manual/processing_algs/qgis/interpolation.html",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R063",
+      "titre": "Network analysis — QGIS 3.44",
+      "organisme": "QGIS Project",
+      "url": "https://docs.qgis.org/3.44/en/docs/user_manual/processing_algs/qgis/networkanalysis.html",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R064",
+      "titre": "An overview of the Spatial Statistics toolbox",
+      "organisme": "Esri",
+      "url": "https://doc.esri.com/en/arcgis-pro/latest/tool-reference/spatial-statistics/an-overview-of-the-spatial-statistics-toolbox.html",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R065",
+      "titre": "esda — API reference",
+      "organisme": "PySAL developers",
+      "url": "https://pysal.org/esda/stable/api.html",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R066",
+      "titre": "spreg — API reference",
+      "organisme": "PySAL developers",
+      "url": "https://pysal.org/spreg/api.html",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R067",
+      "titre": "Network Analyst solvers",
+      "organisme": "Esri",
+      "url": "https://doc.esri.com/en/arcgis-pro/latest/help/analysis/networks/network-analyst-solver-types.html",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R068",
+      "titre": "Implement the suitability modeling workflow",
+      "organisme": "Esri",
+      "url": "https://doc.esri.com/en/arcgis-pro/latest/help/analysis/spatial-analyst/suitability-modeler/implement-the-suitability-modeling-workflow-using-the-suitability-modeler.html",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R069",
+      "titre": "Evaluate environment in Suitability Modeler",
+      "organisme": "Esri",
+      "url": "https://pro.arcgis.com/en/pro-app/3.5/help/analysis/spatial-analyst/suitability-modeler/evaluate-environment-in-suitability-modeler.htm",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R070",
+      "titre": "Area and Edge metrics",
+      "organisme": "FRAGSTATS",
+      "url": "https://fragstats.org/index.php/fragstats-metrics/patch-based-metrics/area-and-edge-metrics",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R071",
+      "titre": "Core area metrics",
+      "organisme": "FRAGSTATS",
+      "url": "https://fragstats.org/index.php/fragstats-metrics/patch-based-metrics/core-area-metrics",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R072",
+      "titre": "Aggregation metrics",
+      "organisme": "FRAGSTATS",
+      "url": "https://fragstats.org/index.php/fragstats-metrics/patch-based-metrics/aggregation-metrics",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R073",
+      "titre": "Dasymetric Toolbox",
+      "organisme": "US Environmental Protection Agency — EnviroAtlas",
+      "url": "https://www.epa.gov/enviroatlas/dasymetric-toolbox",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R074",
+      "titre": "Classify areas by degree of urbanization",
+      "organisme": "Esri Learn ArcGIS / auteurs Esri et Commission européenne",
+      "url": "https://learn.arcgis.com/en/projects/classify-areas-by-degree-of-urbanization/",
+      "nature": "Tutoriel",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R075",
+      "titre": "Assess access to public transit",
+      "organisme": "Esri Learn ArcGIS",
+      "url": "https://learn.arcgis.com/en/projects/assess-access-to-public-transit/",
+      "nature": "Tutoriel",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R076",
+      "titre": "How Geographically Weighted Regression works",
+      "organisme": "Esri",
+      "url": "https://doc.esri.com/en/arcgis-pro/latest/tool-reference/spatial-statistics/how-geographicallyweightedregression-works.html",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R077",
+      "titre": "Optimal Region Connections",
+      "organisme": "Esri",
+      "url": "https://doc.esri.com/en/arcgis-pro/latest/tool-reference/spatial-analyst/optimal-region-connections.html",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R078",
+      "titre": "Generalized Linear Regression",
+      "organisme": "Esri",
+      "url": "https://doc.esri.com/en/arcgis-pro/latest/tool-reference/spatial-statistics/generalized-linear-regression.html",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R079",
+      "titre": "How Presence-only Prediction (MaxEnt) works",
+      "organisme": "Esri",
+      "url": "https://doc.esri.com/en/arcgis-pro/latest/tool-reference/spatial-statistics/how-presence-only-prediction-works.html",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R080",
+      "titre": "Perform species distribution modeling",
+      "organisme": "Esri Learn ArcGIS",
+      "url": "https://learn.arcgis.com/en/projects/perform-species-distribution-modeling/",
+      "nature": "Tutoriel",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R081",
+      "titre": "BIOMOD_Projection — Project calibrated species distribution models onto new environment",
+      "organisme": "biomod2 developers",
+      "url": "https://biomodhub.github.io/biomod2/reference/BIOMOD_Projection.html",
+      "nature": "documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R082",
+      "titre": "MOLUSCE — input preparation, transition modelling, cellular simulation and validation",
+      "organisme": "NextGIS, développeur de MOLUSCE",
+      "url": "https://docs.nextgis.com/docs_ngqgis/source/molusce.html",
+      "nature": "Tutoriel",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R083",
+      "titre": "Geospatial Research — Land change modeling",
+      "organisme": "Clark University, Center for Geospatial Analytics",
+      "url": "https://www.clarku.edu/geospatial-analytics/research/",
+      "nature": "documentation institutionnelle",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R084",
+      "titre": "Join Field",
+      "organisme": "Esri",
+      "url": "https://pro.arcgis.com/en/pro-app/latest/tool-reference/data-management/join-field.htm",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R085",
+      "titre": "Add Join",
+      "organisme": "Esri",
+      "url": "https://pro.arcgis.com/en/pro-app/latest/tool-reference/data-management/add-join.htm",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R086",
+      "titre": "Raster To Polygon",
+      "organisme": "Esri",
+      "url": "https://pro.arcgis.com/en/pro-app/latest/tool-reference/conversion/raster-to-polygon.htm",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R087",
+      "titre": "Flow Distance",
+      "organisme": "Esri",
+      "url": "https://pro.arcgis.com/en/pro-app/latest/tool-reference/spatial-analyst/flow-distance.htm",
+      "nature": "Documentation",
+      "consultation": "2026-10-26"
+    },
+    {
+      "id": "R088",
+      "titre": "Conversion table for accumulated variables",
+      "organisme": "ECMWF",
+      "url": "https://confluence.ecmwf.int/spaces/CKB/pages/197702790/Conversion%2Btable%2Bfor%2Baccumulated%2Bvariables%2Btotal%2Bprecipitation%2Bfluxes",
+      "nature": "Documentation de données",
+      "consultation": "2026-10-26"
+    }
+  ]
+}

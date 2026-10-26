@@ -2,7 +2,7 @@
 
 ## Registre et dépendances
 
-`operation_catalog()` décrit les 34 opérations, leurs paramètres, leur type de
+`operation_catalog()` décrit les 43 opérations, leurs paramètres, leur type de
 sortie et leurs produits secondaires. `execute_operation()` exécute une opération
 isolée. `processing_plan()` enchaîne des opérations sans imposer de carte finale.
 `plan_cartography(..., processing_steps=...)` les insère avant l’analyse du projet
@@ -75,15 +75,45 @@ D-infinity, incision des dépressions et Strahler ne sont pas inclus.
 ## Routage
 
 `shortest_path()` utilise Dijkstra sur un réseau de lignes, avec distances en mètres.
-Les coordonnées de départ/arrivée sont rattachées aux **nœuds** les plus proches
-dans `max_snap_m`. Les géométries sont segmentées aux sommets et, par défaut,
-aux intersections. Les distances de rattachement figurent dans le résultat et
-ne sont pas incluses dans la longueur du parcours sur le réseau.
+Par défaut, `snap="edge"` projette les coordonnées de départ/arrivée sur les
+segments les plus proches dans `max_snap_m`, puis insère ces positions dans le
+graphe. Deux positions à 400 m et 600 m sur un segment de 1 000 m donnent donc un
+trajet de 200 m. `snap="node"` conserve le rattachement aux seuls sommets, pour
+reproduire explicitement le comportement précédent.
+
+Les géométries sont segmentées aux sommets et, par défaut, aux intersections.
+Les deux extrémités projetées sur un même segment sont traitées ensemble ; les
+connexions existantes sont conservées. Une insertion sur une arête ne crée pas de
+connexion à un croisement non nodé lorsque `node_intersections=False`.
+
+Les distances de rattachement figurent dans `start_snap_m` et `end_snap_m`.
+`distance_m` mesure le parcours sur le réseau, hors déplacements de rattachement.
+`snap_method` enregistre le mode choisi. Si les deux coordonnées sont rattachées
+au même point du réseau, la sortie est un **Point valide** avec `distance_m=0`
+et `route_status="coincident"`. Un trajet ordinaire est une LineString avec
+`route_status="ok"`.
+
+```python
+trajet = cm.shortest_path(
+    "routes.gpkg", [400, 0], [600, 0],
+    points_crs="EPSG:32733", metric_crs="EPSG:32733",
+    max_snap_m=25, snap="edge",
+)
+```
+
+Les coordonnées de cet exemple sont illustratives. Déclarer leur SCR réel ; le
+SCR de calcul doit être projeté et adapté à l’étude. Les unités projetées en pieds
+sont converties en mètres. La géométrie de sortie retrouve le SCR du réseau source.
 
 Le graphe est bidirectionnel. Les sens uniques, restrictions de virage et vitesses
 ne sont pas inférés. Pour les ponts et passages dénivelés, fournir un réseau déjà
 préparé et désactiver `node_intersections`. Les composantes déconnectées et les
 rattachements hors tolérance provoquent une erreur explicite.
+
+Les segments équidistants sont départagés de manière déterministe selon leur
+ordre dans le graphe construit. Ce choix ne déduit ni le niveau d’un pont, ni le
+sens d’une route, ni l’itinéraire voulu par l’utilisateur. Examiner le rattachement
+sur la carte lorsque plusieurs axes sont très proches.
 
 ## Scènes STAC et capteurs supplémentaires
 

@@ -37,17 +37,52 @@ def _bands(src,bands):
     return result
 
 
+def _class_key(value):
+    """Typed identity: integral floats equal integers; text is never parsed.
+
+    Booleans have their own kind, including in mixed object columns. Integers
+    never pass through float, so identifiers beyond float64 precision survive.
+    """
+    if isinstance(value,(bool,np.bool_)):
+        return ('boolean',bool(value))
+    if isinstance(value,str):
+        return ('string',str(value))
+    if isinstance(value,(int,np.integer)):
+        return ('number',int(value))
+    if isinstance(value,(float,np.floating)):
+        if isinstance(value,np.floating) and value.dtype.itemsize>8:
+            raise ValueError('Les identifiants flottants au-delà de 64 bits ne sont pas pris en charge.')
+        value=float(value)
+        if not math.isfinite(value):
+            raise ValueError('Les identifiants numériques de classe doivent être finis.')
+        return ('number',int(value) if value.is_integer() else value)
+    raise ValueError(f'Type d’identifiant de classe non pris en charge : {type(value).__name__}.')
+
+
+def _class_keys(data,column):
+    if column not in data or data[column].isna().any():
+        raise ValueError('Chaque échantillon doit avoir une classe renseignée.')
+    keys=[]
+    for position,value in enumerate(data[column].tolist()):
+        try:keys.append(_class_key(value))
+        except ValueError as exc:
+            raise ValueError(f'Identifiant de classe invalide à la position {position} : {exc}') from None
+    return keys
+
+
 def _class_table(data,column,label_column=None):
-    if column not in data or data[column].isna().any():raise ValueError('Chaque échantillon doit avoir une classe renseignée.')
-    raw=list(dict.fromkeys(data[column].tolist()))
-    numeric=all(isinstance(x,(int,float,np.integer,np.floating)) and np.isfinite(x) and float(x)==int(x) and 0<=x<2**24 for x in raw)
-    mapping={str(x):int(x) if numeric else i+1 for i,x in enumerate(sorted(raw,key=str))}
+    keys=_class_keys(data,column)
+    positions={}
+    for position,key in enumerate(keys):positions.setdefault(key,[]).append(position)
+    ordered=sorted(positions,key=lambda key:(key[0],str(key[1])))
+    numeric=all(kind=='number' and isinstance(value,int) and 0<=value<2**24 for kind,value in ordered)
+    mapping={key:key[1] if numeric else i+1 for i,key in enumerate(ordered)}
     if len(mapping)<2:raise ValueError('Fournir au moins deux classes distinctes.')
     palette=colormaps['tab20'].resampled(len(mapping));classes={}
-    for i,(label,code) in enumerate(mapping.items()):
-        subset=data[data[column].astype(str)==label]
+    for i,(key,code) in enumerate(mapping.items()):
+        subset=data.iloc[positions[key]];label=str(key[1])
         names=subset[label_column].dropna().astype(str).unique() if label_column and label_column in data else []
-        if len(names)>1:raise ValueError(f'Plusieurs libellés pour la classe {label}.')
+        if len(names)>1:raise ValueError(f'Plusieurs libellés pour la classe {label} ({key[0]}).')
         classes[code]=[names[0] if len(names) else label,to_hex(palette(i))]
     return mapping,classes
 
@@ -59,13 +94,13 @@ def _sample_features(src,features,column,mapping,bands,limit,seed,cancel,exclude
     conflicts and validation overlap are checked before sampling, including
     pixels which will not be retained in the reservoir.
     """
-    from shapely.geometry import box
-    from rasterio.windows import bounds as window_bounds
+    from shapely.geometry import Polygon
     rng=np.random.default_rng(seed);features=features.to_crs(src.crs)
     if features.geometry.isna().any() or features.geometry.is_empty.any() or not features.geometry.is_valid.all():raise ValueError('Géométries des échantillons absentes ou invalides.')
     if not features.geom_type.isin(['Point','MultiPoint','Polygon','MultiPolygon']).all():raise ValueError('Utiliser des points ou des polygones comme échantillons.')
-    if column not in features or not set(features[column].astype(str))<=set(mapping):raise ValueError('Classes de référence inconnues ou absentes.')
-    codes=features[column].astype(str).map(mapping).to_numpy();index=features.sindex
+    keys=_class_keys(features,column)
+    if not set(keys)<=set(mapping):raise ValueError('Classes de référence inconnues ou absentes.')
+    codes=np.fromiter((mapping[key] for key in keys),dtype='int64',count=len(keys));index=features.sindex
     if excluded is not None:excluded=excluded.to_crs(src.crs);excluded_index=excluded.sindex
     groups={code:(np.empty((0,len(bands))),np.empty(0),np.empty(0,dtype='int64')) for code in mapping.values()};cap=max(2,limit//len(groups))
     try:bounds=geometry_window(src,features.geometry,pad_x=.5,pad_y=.5)
@@ -74,16 +109,20 @@ def _sample_features(src,features,column,mapping,bands,limit,seed,cancel,exclude
         for x in range(int(bounds.col_off),int(bounds.col_off+bounds.width),256):
             _check_cancel(cancel)
             win=Window(x,y,min(256,int(bounds.col_off+bounds.width)-x),min(256,int(bounds.row_off+bounds.height)-y))
-            hits=index.query(box(*window_bounds(win,src.transform)),predicate='intersects')
+            transform=src.window_transform(win)
+            corners=[(0,0),(win.width,0),(win.width,win.height),(0,win.height)]
+            transform.itransform(corners)
+            footprint=Polygon(corners)
+            hits=index.query(footprint,predicate='intersects')
             if not len(hits):continue
-            values,valid=_spectral(src,bands,win);assigned=np.full(valid.shape,-1,dtype='int64');transform=src.window_transform(win)
+            values,valid=_spectral(src,bands,win);assigned=np.full(valid.shape,-1,dtype='int64')
             for code in np.unique(codes[hits]):
                 geometries=features.geometry.iloc[hits[codes[hits]==code]]
                 inside=geometry_mask(geometries,valid.shape,transform,invert=True)&valid
                 if ((assigned>=0)&inside).any():raise ValueError('Des échantillons de classes différentes couvrent le même pixel.')
                 assigned[inside]=code
             if excluded is not None:
-                other=excluded_index.query(box(*window_bounds(win,src.transform)),predicate='intersects')
+                other=excluded_index.query(footprint,predicate='intersects')
                 if len(other) and ((assigned>=0)&geometry_mask(excluded.geometry.iloc[other],valid.shape,transform,invert=True)).any():raise ValueError('Apprentissage et validation partagent des pixels ; utiliser des échantillons spatialement distincts.')
             for code in groups:
                 rows,cols=np.where(assigned==code)
@@ -162,6 +201,16 @@ def load_classifier(path):
 def fit_classifier(source,training,class_column,*,bands=None,algorithm='random_forest',label_column=None,
                    validation=None,group_column=None,sample_limit=50_000,test_fraction=.25,
                    n_estimators=100,max_depth=24,workers=1,random_state=42,cancel=None,progress=None):
+    """Fit a forest using typed reference classes and spatially separate samples.
+
+    Numeric 1 and 1.0 share an identity; strings such as '01' and '1', and
+    boolean True, remain distinct from numeric 1. Finite integer numeric codes
+    in 0..2**24-1 are retained when all classes qualify; otherwise stable codes
+    start at 1. label_column only controls display labels. class_encoding in the
+    report records each typed identity and code, with numbers stored as exact
+    canonical strings for JSON portability. Existing model v1 files still load
+    without this optional report metadata and their codes are never remapped.
+    """
     from sklearn.ensemble import RandomForestClassifier,ExtraTreesClassifier
     from sklearn.model_selection import GroupShuffleSplit
     from sklearn.metrics import confusion_matrix,classification_report,cohen_kappa_score,accuracy_score,balanced_accuracy_score
@@ -177,11 +226,11 @@ def fit_classifier(source,training,class_column,*,bands=None,algorithm='random_f
         groups=data[group_column] if group_column else np.arange(len(data))
         train=data
         if len(set(groups))>=4:
+            keys=_class_keys(data,class_column);required=set(mapping)
             splitter=GroupShuffleSplit(n_splits=30,test_size=test_fraction,random_state=random_state)
             for a,b in splitter.split(data,groups=groups):
-                if set(data.iloc[a][class_column])==set(mapping.keys()) or set(data.iloc[a][class_column].astype(str))==set(mapping):
-                    if set(data.iloc[b][class_column].astype(str))==set(mapping):
-                        train=data.iloc[a];evaluation=data.iloc[b];split_kind='held_out_features' if group_column is None else 'held_out_groups';break
+                if {keys[i] for i in a}==required and {keys[i] for i in b}==required:
+                    train=data.iloc[a];evaluation=data.iloc[b];split_kind='held_out_features' if group_column is None else 'held_out_groups';break
     with rasterio.open(source) as src:
         bands=_bands(src,bands);names=[src.descriptions[b-1] or f'band_{b}' for b in bands]
         x,y,train_ids=_sample_features(src,train,class_column,mapping,bands,sample_limit,random_state,cancel,excluded=evaluation)
@@ -201,6 +250,8 @@ def fit_classifier(source,training,class_column,*,bands=None,algorithm='random_f
                 training_source=str(Path(training).resolve()) if isinstance(training,(str,Path)) else 'GeoDataFrame',
                 validation_source=str(Path(validation).resolve()) if isinstance(validation,(str,Path)) else None,
                 class_column=class_column,label_column=label_column,group_column=group_column,
+                class_encoding=[dict(kind=kind,value=str(value) if kind=='number' else value,code=code)
+                                for (kind,value),code in mapping.items()],
                 parameters=dict(n_estimators=n_estimators,max_depth=max_depth,sample_limit=sample_limit,test_fraction=test_fraction),
                 counts={str(c):int((y==c).sum()) for c in estimator.classes_},validation_method=split_kind,
                 validation=None,feature_importance=dict(zip(names,estimator.feature_importances_.tolist())),

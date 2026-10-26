@@ -14,6 +14,7 @@ from .imagery import _check_cancel
 
 def _catalog():
     from . import vector, raster
+    from . import vector_workflows
     from .algebra import calculate, reduce_rasters
     from .terrain import terrain, convolve
     from .focal import focal
@@ -35,6 +36,30 @@ def _catalog():
                       ('nearest','Jointure de proximité'),('dissolve','Dissolution'),('reproject','Reprojection vectorielle'),
                       ('make_valid','Réparation des géométries')]:
         add('vector.'+key,label,getattr(vector,key),'vector','vector')
+    for key,label in [('select_attributes','Sélection par attribut'),
+                      ('select_location','Sélection spatiale'),
+                      ('geometry_operation','Transformation des géométries'),
+                      ('spatial_summary','Synthèse des observations par zone'),
+                      ('latest_records','Dernier relevé par identifiant')]:
+        add('vector.'+key,label,getattr(vector_workflows,key),'vector','vector')
+    def table_input(data,table_dtypes,delimiter,encoding):
+        from .tableio import read_table
+        import pandas as pd
+        if isinstance(data,(str,Path)):
+            return read_table(data,dtype=table_dtypes,delimiter=delimiter,encoding=encoding)
+        table=pd.DataFrame(data).copy()
+        return table.astype(table_dtypes) if table_dtypes is not None else table
+    def table_join(data,table,*,left_on,right_on=None,how='left',validate='many_to_one',
+                   null_keys='unmatched',table_dtypes=None,delimiter=None,encoding='utf-8-sig'):
+        return vector_workflows.join_attributes(data,
+            table_input(table,table_dtypes,delimiter,encoding),left_on=left_on,
+            right_on=right_on,how=how,validate=validate,null_keys=null_keys)
+    def table_points(data,x='longitude',y='latitude',crs='EPSG:4326',*,
+                     table_dtypes=None,delimiter=None,encoding='utf-8-sig'):
+        return vector.from_xy(table_input(data,table_dtypes,delimiter,encoding),x=x,y=y,crs=crs)
+    add('vector.join_attributes','Jointure attributaire',table_join,'vector','vector')
+    add('vector.from_xy','Points depuis un tableau XY',table_points,'vector','vector')
+    add('vector.validate','Diagnostic des géométries',vector.validate,'document','vector')
     from functools import partial
     for mode,label in [('intersection','Intersection'),('union','Union'),('difference','Différence'),('symmetric_difference','Différence symétrique')]:
         add('vector.'+mode,label,partial(vector.overlay,how=mode),'vector','vector')
@@ -56,9 +81,27 @@ def _catalog():
     from .catalogs import search_stac,download_stac
     from .imagery import prepare_imagery
     from .scenes import discover_scenes
-    def preparation(sources,destination,band_order=('blue','green','red','nir'),aoi=None,target_crs=None,mask_clouds=True,allow_mixed_dates=False,progress=None,cancel=None):
-        return prepare_imagery(discover_scenes(sources),destination,band_order=band_order,aoi=aoi,target_crs=target_crs,mask_clouds=mask_clouds,allow_mixed_dates=allow_mixed_dates,progress=progress,cancel=cancel).path
+    def preparation(sources,destination,band_order=('blue','green','red','nir'),aoi=None,
+                    target_crs=None,resolution=None,overlap='first',resampling='nearest',
+                    mask_clouds=True,mask_saturation=True,allow_mixed_dates=False,
+                    all_touched=False,max_pixels=250_000_000,progress=None,cancel=None):
+        return prepare_imagery(discover_scenes(sources),destination,band_order=band_order,
+            aoi=aoi,target_crs=target_crs,resolution=resolution,overlap=overlap,
+            resampling=resampling,mask_clouds=mask_clouds,mask_saturation=mask_saturation,
+            allow_mixed_dates=allow_mixed_dates,all_touched=all_touched,
+            max_pixels=max_pixels,progress=progress,cancel=cancel).path
+    def imagery_audit(sources,destination,*,aoi,band_order=None,target_crs=None,
+                      resolution=None,resampling='nearest',mask_clouds=True,
+                      mask_saturation=True,allow_mixed_dates=False,all_touched=False,
+                      max_pixels=250_000_000,coverage_threshold=100.,progress=None,cancel=None):
+        from .imagery_audit import audit_imagery
+        return audit_imagery(discover_scenes(sources),destination,aoi=aoi,
+            band_order=band_order,target_crs=target_crs,resolution=resolution,
+            resampling=resampling,mask_clouds=mask_clouds,mask_saturation=mask_saturation,
+            allow_mixed_dates=allow_mixed_dates,all_touched=all_touched,max_pixels=max_pixels,
+            coverage_threshold=coverage_threshold,progress=progress,cancel=cancel).manifest
     add('prepare','Prétraitement multispectral',preparation,'raster','prepare')
+    add('imagery.audit','Diagnostic de couverture des images',imagery_audit,'document','prepare')
     add('hydrology','Analyse hydrologique D8',hydrology,'raster','processing')
     add('routing','Plus court chemin',shortest_path,'vector','processing')
     add('stac.search','Recherche de scènes STAC',search_stac,'document','processing')
@@ -86,6 +129,8 @@ def operation_catalog():
             for name,default in dict(execution='threads',scheduler_address=None).items():parameters.append(dict(name=name,required=False,default=default))
         if key in CUDA_OPERATIONS:parameters.append(dict(name='device',required=False,default='cpu'))
         if key=='hydrology':products+=['filled','direction','accumulation','streams','watersheds']
+        if key=='imagery.audit':products+=['coverage','gaps']
+        if key=='prepare':products+=['result_source_index']
         if key=='classify':products+=['classification','confidence']
         if key=='classify':
             from .classification import fit_classifier
@@ -155,7 +200,7 @@ def execute_operation(operation,parameters,destination,*,workers=1,block_size=51
         if operation=='raster.reclassify':p['mapping']={float(k):v for k,v in p['mapping'].items()}
         # JSON raster assets use [path, band], accepted by the array engine.
         if 'destination' in signature.parameters:
-            p['destination']=work/'products' if operation in {'classify','cluster','hydrology','stac.download'} else work/'result.tif'
+            p['destination']=work/'products' if operation in {'classify','cluster','hydrology','stac.download','imagery.audit'} else work/'result.tif'
         for name,value in [('workers',workers),('block_size',block_size),('memory_limit_mb',memory_limit_mb)]:
             if 'options' in signature.parameters or name in signature.parameters or operation=='classify' and name=='workers':p.setdefault(name,value)
         if operation=='classify' and p.get('model'):p.setdefault('training',None)
@@ -175,6 +220,8 @@ def execute_operation(operation,parameters,destination,*,workers=1,block_size=51
         files=[str(destination/p.relative_to(work)) for p in sorted(work.rglob('*')) if p.is_file()]
         record=dict(schema='cartomize.operation.result.v1',operation=operation,
                     primary=str(destination/primary.relative_to(work)),kind=spec['output'],files=files)
+        metadata=getattr(result,'attrs',{}).get('cartomize')
+        if metadata is not None:record['metadata']=json_value(metadata)
         products={'primary':record['primary']}
         for path in sorted(work.rglob('*')):
             if path.is_file() and path.suffix.lower() in {'.tif','.gpkg','.csv'}:
@@ -183,6 +230,8 @@ def execute_operation(operation,parameters,destination,*,workers=1,block_size=51
                 products[key]=str(destination/path.relative_to(work))
         record['products']=products
         from .storage import relocate_products
+        save_json(record,work/'operation.json')
         relocate_products(work,destination)
-        save_json(record,work/'operation.json');_check_cancel(cancel)
+        record=json.loads((work/'operation.json').read_text(encoding='utf-8'))
+        _check_cancel(cancel)
     return record

@@ -2,6 +2,29 @@
 
 Les exemples utilisent des chemins de données à adapter au projet. Les traitements nécessitent des systèmes de coordonnées et des bandes compatibles.
 
+Les scripts et les cellules Jupyter appellent cette même API, sans dépendance à Qt. Voir [l’installation et les noyaux Jupyter](NOTEBOOKS.md). Les changements de valeurs par défaut de la version 1.3.0 sont décrits dans la [note de version](RELEASE_1.3.0.md).
+
+## Diagnostic des scènes et couverture zonale
+
+```python
+import cartomize as cm
+
+diagnostic = cm.audit_imagery(
+    "donnees/scenes", "resultats/diagnostic_01",
+    aoi="zone_etude.gpkg", band_order=["red", "nir"],
+)
+print(diagnostic.report["recommended_action"])
+print(diagnostic.report["usable_percent"])
+
+zones = cm.read_file("zones.gpkg")
+tableau = cm.raster.zonal_stats(
+    "ndvi.tif", zones, value_mode="physical",
+    prefix="ndvi_", include_coverage=True,
+)
+```
+
+Le diagnostic et les statistiques sont deux opérations indépendantes dans cet extrait ; `ndvi.tif` doit avoir été calculé à partir d’un produit scientifique adapté. Le [cours 13](../tutorials/notebooks/13_diagnostic_automatique.ipynb) exécute leur enchaînement complet sur des données générées. Les contrats des [images](IMAGERY_AUDIT.md), des [statistiques zonales](RASTER_STATISTICS.md), de la [classification](CLASSIFICATION.md) et du [registre de traitements](PROCESSING.md) précisent les paramètres et les limites.
+
 ## Analyse du projet et NoData
 
 La rubrique **Analyse du projet** importe plusieurs couches, détecte les fonds
