@@ -269,3 +269,7 @@ python examples/demo.py
 La démonstration génère des **données fictives**, explicitement identifiées,
 et des cartes PDF/PNG/SVG. Les fichiers existants sont protégés sauf demande
 explicite `overwrite=True`. L'atlas vérifie les noms avant de produire les pages.
+
+## Qualité des données vectorielles
+
+`cm.audit_geometries()`, `cm.repair_geometries()`, `cm.check_topology()` et `cm.deduplicate()` renvoient un `VectorQualityResult` : couche principale, rapport par entité, synthèse et couches de diagnostic/exclusion. Les paramètres sont communs au terminal et à la fenêtre. Voir [G01–G03](VECTOR_QUALITY.md) et le [cours 14](../tutorials/notebooks/14_qualite_vectorielle.ipynb).

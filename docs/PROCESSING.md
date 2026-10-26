@@ -2,7 +2,7 @@
 
 ## Registre et dépendances
 
-`operation_catalog()` décrit les 44 opérations, leurs paramètres, leur type de
+`operation_catalog()` décrit les 48 opérations, leurs paramètres, leur type de
 sortie et leurs produits secondaires. `execute_operation()` exécute une opération
 isolée. `processing_plan()` enchaîne des opérations sans imposer de carte finale.
 `plan_cartography(..., processing_steps=...)` les insère avant l’analyse du projet
@@ -210,3 +210,7 @@ une vérification cartographique.
 - STAC, métadonnées : https://github.com/radiantearth/stac-spec/blob/master/commons/common-metadata.md
 - STAC Item Search : https://github.com/radiantearth/stac-api-spec/blob/main/item-search/README.md
 - QGIS, styles : https://docs.qgis.org/testing/en/docs/user_manual/working_with_vector/vector_properties.html
+
+## Qualité vectorielle dans les chaînes
+
+Les quatre opérateurs `vector.audit_geometries`, `vector.repair_geometries`, `vector.check_topology` et `vector.deduplicate` exposent les produits `data`, `report`, `summary`, `issues` et `rejected`. Le produit principal de l’audit est la couche des anomalies ; celui de la réparation et du dédoublonnage est la couche conservée. Le contrôle topologique renvoie les violations. Utiliser `@audit:data` pour poursuivre depuis les données originales auditées. Les résultats sont publiés ensemble dans un nouveau dossier ; erreur ou annulation ne publient aucun résultat partiel. Voir [le guide](VECTOR_QUALITY.md).

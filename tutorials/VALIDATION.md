@@ -1,11 +1,26 @@
 # Validation du parcours
 
-Le parcours courant installe les sources **Cartomize 1.4.0** de la copie du dépôt
+Le parcours courant installe les sources **Cartomize 1.5.0** de la copie du dépôt
 utilisée. Les résultats des versions précédentes sont conservés ci-dessous avec
 leur version et leur date ; ils ne constituent pas une nouvelle exécution de
 tous les cours avec la version courante.
 
-## Résultats locaux du 26 octobre 2026 — sources 1.4.0
+## Résultats locaux du 26 octobre 2026 — sources 1.5.0
+
+Le nouveau [cours 14](notebooks/14_qualite_vectorielle.ipynb) a été exécuté
+dans un véritable noyau Jupyter : **8 cellules, aucune erreur, 4,62 secondes**.
+Il vérifie le diagnostic et la réparation des géométries, la déduplication,
+la topologie et les produits d’une chaîne complète. Ses sorties sont enregistrées.
+Le registre courant comprend **48 opérateurs**.
+
+Le parcours autonome comprend désormais **13 notebooks (00 à 10, 13 et 14)**,
+soit **81 cellules de code**. La réexécution complète sur Windows et Ubuntu
+est suivie par le workflow de la demande d’intégration M08 ; le résultat local
+ci-dessus concerne le cours 14. Les cours 11 et 12 nécessitent des données locales.
+La [validation 1.5.0](../docs/VALIDATION_1.5.0.json) décrit aussi la suite
+logicielle complète : **865 tests réussis et 2 exclusions**.
+
+## Historique du 26 octobre 2026 — sources 1.4.0
 
 Les cours **00 à 10 et 13** ont été exécutés dans des noyaux Jupyter réels
 indépendants sous Linux / Python 3.12.14 : **12 notebooks, 73 cellules de code,
@@ -17,7 +32,7 @@ utilise maintenant le [module M07](../docs/IMAGERY_AUTOMATIC.md) : la
 première zone, couverte à **83,28 %** en données utiles, est refusée avec un
 diagnostic conservé. Un second cas pédagogique distinct atteint **100 %** avec
 deux scènes ; le moteur sélectionne la mosaïque, puis les cellules calculent le
-NDVI et les statistiques zonales. Le registre courant comporte **44 opérateurs**.
+NDVI et les statistiques zonales. Le registre de cette version comporte **44 opérateurs**.
 
 Le cours 00 accepte explicitement les données pédagogiques partielles avec
 `allow_partial=True`. Le seuil reste 100 %, le rapport vérifie `status="partial"`
@@ -56,7 +71,7 @@ Le [workflow Tutoriels](https://github.com/cedrick14/cartomize-python/actions/ru
 | Windows, noyaux Jupyter indépendants | Cours 00 à 10 | 11 notebooks réussis |
 | Python 3.12 / IPython local, données fournies | Cours 11 et 12 | 2 notebooks réussis |
 
-Lors de cette validation historique, la construction HTML a réussi sur les deux systèmes. Les deux cas réels ont été contrôlés localement sans redistribution de leurs données ou sorties dans le dépôt. L’exécution utilisait alors le paquet publié `cartomize==1.0.1` et l’intitulé **Version 1.0**. Les dépendances courantes installent désormais la copie des sources, et le cours 13 complète le parcours autonome.
+Lors de cette validation historique, la construction HTML a réussi sur les deux systèmes. Les deux cas réels ont été contrôlés localement sans redistribution de leurs données ou sorties dans le dépôt. L’exécution utilisait alors le paquet publié `cartomize==1.0.1` et l’intitulé **Version 1.0**. Les dépendances courantes installent désormais la copie des sources, et les cours 13 et 14 complètent le parcours autonome.
 
 ## Vérifications
 
@@ -64,7 +79,7 @@ Lors de cette validation historique, la construction HTML a réussi sur les deux
 - Les contrôles portent sur les bandes, le SCR, la résolution, les masques, les codes, les superficies, les transitions, l’égalité de deux calculs et la présence des livrables.
 - Les références de classification simulées sont séparées entre apprentissage et validation. Les scores ne constituent pas une validation sur le terrain.
 - Le cours STAC utilise un serveur HTTP local de démonstration. La disponibilité d’un catalogue distant et de Binder est hors du périmètre de ces contrôles.
-- Les cas Mvouti et okapis nécessitent les fichiers privés fournis localement. Leur validation historique est décrite ci-dessus ; ils n’ont pas été réexécutés avec la version 1.4.0 et ne sont pas exécutés par le workflow public, qui ne dispose pas du ZIP.
+- Les cas Mvouti et okapis nécessitent les fichiers privés fournis localement. Leur validation historique est décrite ci-dessus ; ils n’ont pas été réexécutés avec la version 1.5.0 et ne sont pas exécutés par le workflow public, qui ne dispose pas du ZIP.
 - L’examen des cartes vérifie les titres, légendes, tables et rendus. Les mesures liées aux données sources restent soumises aux limites indiquées dans [DATA.md](DATA.md).
 
 ## Reproduire les contrôles

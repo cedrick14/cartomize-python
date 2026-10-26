@@ -154,6 +154,7 @@ def probe(output, expected):
         with rasterio.open(ndvi) as src:np.testing.assert_allclose(src.read(1),.5,atol=1e-6)
         checks.append('GeoTIFF import and NDVI calculation')
         checks.extend(_analysis_checks(cm,root))
+        checks.extend(_vector_quality_checks(cm, root))
         points=root/'points.gpkg'
         gpd.GeoDataFrame({'nom':['Site A']},geometry=[Point(300300,9499700)],crs=32733).to_file(points)
         assert window.project_explorer.open_path(points) is not None
@@ -191,6 +192,28 @@ def probe(output, expected):
         if window.thread is not None:
             window.cancel();wait_for(lambda:window.thread is None)
         window.close();app.processEvents()
+
+
+def _vector_quality_checks(cm, root):
+    """Exercise the shipped quality code and its complete file products."""
+    import geopandas as gpd
+    from shapely.geometry import Polygon, box
+    data = gpd.GeoDataFrame({'code': ['a', 'b', 'c'], 'fid': [4, 4, 4]}, geometry=[
+        Polygon([(0, 0), (4, 4), (0, 4), (4, 0), (0, 0)]),
+        box(10, 0, 12, 2), box(10, 0, 12, 2)], crs=32733)
+    assert cm.audit_geometries(data).summary['invalid_geometries'] == 1
+    repaired = cm.repair_geometries(data, id_field='code')
+    assert repaired.data.is_valid.all() and repaired.data.area.sum() == 16.
+    unique = cm.deduplicate(repaired.data, geometry='topological', id_field='code')
+    assert unique.data.code.tolist() == ['a', 'b'] and unique.data.area.sum() == 12.
+    topology = cm.check_topology(unique.data, rules=['duplicates', 'overlaps'])
+    assert topology.data.empty
+    destination = root / 'vector-quality'
+    record = cm.execute_operation('vector.repair_geometries', {'data': data, 'id_field': 'code'}, destination)
+    assert all(Path(path).is_file() for path in record['products'].values())
+    assert gpd.read_file(record['primary']).fid.tolist() == [4, 4, 4]
+    return ['installed vector quality: invalid polygon repaired, exact areas 16 then 12 m2, duplicate removed, clean topology',
+            'installed quality bundle: all related products readable and business fid attribute retained']
 
 
 def main():

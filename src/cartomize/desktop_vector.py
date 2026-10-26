@@ -10,11 +10,12 @@ from PySide6.QtWidgets import QComboBox, QLineEdit, QLabel
 import cartomize as cm
 from .tableio import read_table
 from .desktop_tools_base import VectorPage as BaseVectorPage, write_result
+from .desktop_vector_quality import VectorQualityControls
 from .vector_workflows import (select_attributes, select_location, geometry_operation,
                                spatial_summary, join_attributes, latest_records)
 
 
-class VectorPage(BaseVectorPage):
+class VectorPage(VectorQualityControls, BaseVectorPage):
     EXTRA = [('Sélection par attribut', 'select_attributes'), ('Sélection spatiale', 'select_location'),
              ('Synthèse par zone', 'spatial_summary'), ('Jointure attributaire', 'join_attributes'),
              ('Dernier relevé par identifiant', 'latest_records'), ('Centroïdes', 'centroid'),
@@ -79,6 +80,7 @@ class VectorPage(BaseVectorPage):
         self.form.insertRow(self.form.rowCount()-1, self.join_policy_note)
         for label,key in self.EXTRA:
             self.operation.addItem(label,key)
+        self.init_quality_controls()
         self._fields_timer = QTimer(self)
         self._fields_timer.setSingleShot(True)
         self._fields_timer.setInterval(180)
@@ -91,7 +93,7 @@ class VectorPage(BaseVectorPage):
 
     def refresh_fields(self):
         import pyogrio
-        source_controls = [self.attribute,self.left_key,self.order_field]
+        source_controls = [self.attribute,self.left_key,self.order_field,self.quality_id]
         other_controls = [self.right_key]
         (source_controls if self.operation.currentData()=='dissolve' else other_controls).append(self.summary_field)
         for text, controls in [(self.source.text(),source_controls),(self.secondary.text(),other_controls)]:
@@ -155,9 +157,12 @@ class VectorPage(BaseVectorPage):
         self.form.labelForField(self.distance).setText('Tolérance (m)' if op=='simplify' else 'Distance (m)')
         self.form.labelForField(self.crs).setText('SCR des coordonnées XY' if op=='from_xy' else 'Système de coordonnées projeté')
         self.refresh_fields()
+        self.update_quality_controls()
 
     def job(self, options):
         op = self.operation.currentData()
+        if op in {key for _, key in self.QUALITY_OPERATIONS}:
+            return self.quality_job(options)
         if op not in {key for _,key in self.EXTRA} and op!='dissolve':
             return super().job(options)
         source, other = self.source.text(), self.secondary.text()
@@ -219,3 +224,7 @@ class VectorPage(BaseVectorPage):
             return write_result(result,destination,sources=(source,other) if needs_other else (source,),
                                 overwrite=options.get('overwrite',False))
         return run
+
+    def restore_controls(self):
+        """Restore conditional controls after loading a saved desktop session."""
+        self.changed()

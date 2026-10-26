@@ -58,7 +58,7 @@ class Page(QWidget):
     engine=True
     def __init__(self,title,description):
         super().__init__();self.layout=QVBoxLayout(self)
-        heading=QLabel(title);heading.setObjectName("pageTitle")
+        heading=QLabel(title);heading.setObjectName("pageTitle");heading.setWordWrap(True)
         detail=QLabel(description);detail.setWordWrap(True);detail.setObjectName("description")
         self.layout.addWidget(heading);self.layout.addWidget(detail)
         self.parameter_card=QGroupBox('Données et paramètres');self.parameter_card.setObjectName('parameterCard')

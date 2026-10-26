@@ -1,6 +1,6 @@
 # Catalogue des outils
 
-Ce catalogue décrit les sources **Cartomize 1.4.0**. Les outils sont accessibles dans l’interface graphique et par l’API Python. Les traitements enregistrés peuvent également être intégrés aux plans et chaînes d’opérations.
+Ce catalogue décrit les sources **Cartomize 1.5.0**. Les outils sont accessibles dans l’interface graphique et par l’API Python. Les traitements enregistrés peuvent également être intégrés aux plans et chaînes d’opérations.
 
 | Rubrique | Algorithmes et produits |
 |---|---|
@@ -10,7 +10,7 @@ Ce catalogue décrit les sources **Cartomize 1.4.0**. Les outils sont accessible
 | Prétraitement multispectral | M07 automatique : contrôle de couverture, compléments STAC facultatifs, sélection des scènes, mosaïque décidée par le moteur, calibration, QA/SCL, multibande, découpage, RVB et bandes séparées ; seuil appliqué à la production, résultat partiel explicite ; mode expert et session persistante |
 | Composition colorée | Quatre compositions spectrales et RVB natif ; sortie RGBA |
 | Classification | Forêt aléatoire, arbres extrêmement aléatoires, K-moyennes ; classes, confiance, validation et modèle |
-| Traitements vectoriels | Superpositions, sélections, jointures spatiales et attributaires, tampons, dissolution, réparations, synthèses, relevés datés et coordonnées XY |
+| Traitements vectoriels | M08 : diagnostic détaillé, réparation traçable, topologie polygonale/linéaire, doublons et exclusions ; superpositions, sélections, jointures spatiales et attributaires, tampons, dissolution, réparations, synthèses, relevés datés et coordonnées XY |
 | Traitements raster | Inspection, découpage, reprojection, reclassification, statistiques zonales, surfaces et changements selon le sélecteur |
 | Analyse de terrain | Pente, exposition, ombrage, TPI, TRI, rugosité et convolution par blocs |
 | Indices spectraux | 18 indices intégrés, paramètres, calibration et correspondances ; registre extensible |
@@ -22,7 +22,7 @@ Ce catalogue décrit les sources **Cartomize 1.4.0**. Les outils sont accessible
 | Production automatisée | Avec zone d’étude : prétraitement automatique et seuil de couverture avant composition colorée, superposition et export ; diagnostics conservés si la couverture bloque le calcul |
 | Recettes et production en série | Recettes réutilisables, variables, associations, migration historique, manifestes jusqu’à 5 000 tâches |
 | Projets SIG | Inventaire QGS/QGZ, import des sous-couches et styles pris en charge ; passerelle native optionnelle pour copie et export |
-| Chaîne de traitements | 44 opérateurs, références aux résultats et produits secondaires, paramètres moteur, exécution autonome ou intégrée à la carte |
+| Chaîne de traitements | 48 opérateurs, références aux résultats et produits secondaires, paramètres moteur, exécution autonome ou intégrée à la carte |
 | Révision cartographique | Instantanés, empreintes, comparaison, décision nominative et contrôle de la carte |
 | Visualisation des résultats | Onglets intégrés, zoom, déplacement, valeurs de pixels, légendes, métadonnées, comparaisons, tableaux et graphiques |
 
@@ -36,8 +36,8 @@ Le [module M07](IMAGERY_AUTOMATIC.md) partage le même contrôle entre Python,
 le terminal, la fenêtre et les plans. Une couverture inférieure au seuil
 interrompt les étapes dépendantes, sauf acceptation explicite d’un résultat
 partiel non vide. Le rapport distingue la couverture réelle complète de
-l’atteinte d’un seuil réduit. Les 44 opérateurs ne correspondent pas à
-44 procédures expertes intégralement achevées ; voir l’[inventaire](EXPERT_PROCEDURES.md).
+l’atteinte d’un seuil réduit. Les 48 opérateurs ne correspondent pas à
+48 procédures expertes intégralement achevées ; voir l’[inventaire](EXPERT_PROCEDURES.md).
 
 ## Conditions et limites
 

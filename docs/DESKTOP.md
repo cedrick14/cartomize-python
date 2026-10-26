@@ -277,3 +277,7 @@ valides en l’absence d’une autre règle explicite de masquage.
 ## Moteurs et interopérabilité
 
 Moteurs d’exécution, transfert des styles et validation native : voir [EXECUTION](EXECUTION.md). Les choix Dask/CUDA sont persistés avec la session et transmis aux traitements compatibles. Le calcul distribué utilise des processus distincts ; le GPU reste à valider sur le matériel approprié.
+
+## Qualité des données vectorielles
+
+Dans **Traitements vectoriels**, choisir **Diagnostic détaillé des géométries**, **Réparation avec rapport des changements**, **Contrôle topologique** ou **Traitement des doublons**. Les règles et les politiques de conservation sont explicites. Choisir un répertoire parent puis un nouveau nom de dossier. Les couches, le rapport CSV et la synthèse sont ajoutés aux résultats. Les paramètres sont conservés dans le projet. Voir [le guide détaillé](VECTOR_QUALITY.md).

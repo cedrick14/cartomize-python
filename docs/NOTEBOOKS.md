@@ -1,6 +1,6 @@
 # Utilisation dans Jupyter
 
-Cartomize possède un seul moteur Python. Les cellules d’un notebook peuvent appeler ses fonctions sans interface graphique ; un notebook local peut aussi ouvrir la fenêtre de bureau si les dépendances graphiques sont installées. Les sources de ce dépôt correspondent à la version **1.4.0**.
+Cartomize possède un seul moteur Python. Les cellules d’un notebook peuvent appeler ses fonctions sans interface graphique ; un notebook local peut aussi ouvrir la fenêtre de bureau si les dépendances graphiques sont installées. Les sources de ce dépôt correspondent à la version **1.5.0**.
 
 ## 1. Appeler les modules depuis les cellules
 
@@ -118,3 +118,7 @@ print(cm.__file__)
 ```
 
 L’installation d’une version publiée depuis PyPI reste possible ; sa version peut différer du dépôt. Les contrôles de [démarrage](../tests/test_startup.py) vérifient séparément l’API sans Qt, la GUI et le retour d’une cellule dans un véritable noyau Jupyter.
+
+## Qualité vectorielle — cours 14
+
+Le [cours 14](../tutorials/notebooks/14_qualite_vectorielle.ipynb) exécute huit cellules sur des données simulées pour auditer et réparer les géométries, traiter les doublons et contrôler la topologie. Le code utilise les mêmes fonctions que la fenêtre et vérifie leurs produits dans une chaîne complète.

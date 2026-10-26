@@ -1,6 +1,6 @@
 # Cartomize : projets pratiques
 
-**Sources Cartomize 1.4.0**
+**Sources Cartomize 1.5.0**
 
 Préparer des images, analyser des couches et produire des cartes reproductibles avec Cartomize. Le parcours associe des explications, du code exécutable, des résultats enregistrés et des exercices corrigés.
 
@@ -69,12 +69,13 @@ L’interface de bureau est facultative pour ce parcours. Les calculs et cartes 
 | [11](notebooks/11_mvouti_concessions.ipynb) | Mvouti et concessions | 50 min | Carte réelle, atlas et groupes exploratoires |
 | [12](notebooks/12_okapis_raster_classe.ipynb) | Raster classé de la réserve à okapis | 35 min | Audit des codes, superficies et carte |
 | [13](notebooks/13_diagnostic_automatique.ipynb) | Diagnostic et préparation automatiques | 25 min | Couverture, lacunes, décision de mosaïque, NDVI et couverture zonale |
+| [14](notebooks/14_qualite_vectorielle.ipynb) | Qualité et préparation vectorielles | 30 min | Audit, réparation, doublons, topologie, rapports et couches écartées |
 
 Pour découvrir la valeur de l’automatisation : **00 → 02 → 13 → 07 → 08**. Pour une formation complète : suivre l’ordre du tableau. Chaque notebook recrée ses entrées pédagogiques et peut être exécuté indépendamment.
 
 ## Cas réels
 
-Les cours 11 et 12 utilisent les cinq jeux de données contenus dans `Tuto.zip`. Le fichier source n’est pas redistribué dans le dépôt. Les cours 00 à 10 et 13 génèrent leurs propres données et n’exigent aucun téléchargement géographique.
+Les cours 11 et 12 utilisent les cinq jeux de données contenus dans `Tuto.zip`. Le fichier source n’est pas redistribué dans le dépôt. Les cours 00 à 10, 13 et 14 génèrent leurs propres données et n’exigent aucun téléchargement géographique.
 
 Pour les personnes disposant de l’archive :
 

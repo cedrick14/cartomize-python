@@ -18,7 +18,12 @@ def widget_state(widget):
     if isinstance(widget,QLineEdit):return dict(type='line',text=widget.text())
     if isinstance(widget,QPlainTextEdit):return dict(type='plain',text=widget.toPlainText())
     if isinstance(widget,QCheckBox):return dict(type='check',checked=widget.isChecked())
-    if isinstance(widget,QComboBox):return dict(type='combo',index=widget.currentIndex(),items=[[widget.itemText(i),widget.itemData(i)] for i in range(widget.count())])
+    if isinstance(widget,QComboBox):
+        state = dict(type='combo', index=widget.currentIndex(),
+                     items=[[widget.itemText(i),widget.itemData(i)] for i in range(widget.count())])
+        if widget.isEditable():
+            state['text'] = widget.currentText()
+        return state
     if isinstance(widget,(QSpinBox,QDoubleSpinBox)):
         return dict(type='real' if isinstance(widget,QDoubleSpinBox) else 'spin',value=widget.value(),minimum=widget.minimum(),maximum=widget.maximum(),suffix=widget.suffix(),special=widget.specialValueText())
     if isinstance(widget,QTableWidget):
@@ -59,6 +64,8 @@ def restore_widget(widget,state):
         widget.blockSignals(True);widget.clear()
         for label,data in state['items']:widget.addItem(label,data)
         widget.blockSignals(False);widget.setCurrentIndex(state['index'])
+        if widget.isEditable() and 'text' in state:
+            widget.setCurrentText(state['text'])
     elif kind in {'spin','real'}:
         widget.setRange(state['minimum'],state['maximum']);widget.setValue(state['value']);widget.setSuffix(state['suffix']);widget.setSpecialValueText(state['special'])
     elif kind=='table':
