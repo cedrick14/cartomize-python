@@ -4,7 +4,7 @@ from itertools import combinations
 import numpy as np
 import geopandas as gpd
 import rasterio
-from shapely.geometry import box
+from shapely.geometry import Polygon
 from ._validation import frame,linear_factor
 from .imagery import _check_cancel
 
@@ -15,7 +15,10 @@ def analyze_relations(layers,*,metric_crs=None,max_pairs=1000,cancel=None,progre
         spec=dict(item) if isinstance(item,dict) else {'data':item};source=spec['data'];name=spec.get('name') or (Path(source).stem if isinstance(source,(str,Path)) else f'Couche {i+1}')
         raster=spec.get('kind')=='raster' or isinstance(source,(str,Path)) and Path(source).suffix.lower() in {'.tif','.tiff','.jp2','.vrt','.img'}
         if raster:
-            with rasterio.open(source) as src:data=gpd.GeoDataFrame(geometry=[box(*src.bounds)],crs=src.crs)
+            with rasterio.open(source) as src:
+                if src.crs is None:raise ValueError(f'Le raster doit avoir un système de coordonnées : {name}')
+                corners=[src.transform*point for point in ((0,0),(src.width,0),(src.width,src.height),(0,src.height))]
+                data=gpd.GeoDataFrame(geometry=[Polygon(corners)],crs=src.crs)
         else:data=frame(source)
         usable=data.geometry.notna()&~data.geometry.is_empty
         if not data.loc[usable].geometry.is_valid.all():raise ValueError(f'Géométries invalides : {name}')

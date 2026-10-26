@@ -22,7 +22,10 @@ LABELS={'data':'Couche source','source':'Raster ou couche source','left':'Couche
         'null_keys':'Clés manquantes : unmatched, match ou error',
         'table_dtypes':'Types des colonnes (objet JSON)','delimiter':'Séparateur du tableau','encoding':'Encodage du tableau',
         'group_by':'Identifiant de regroupement','order_by':'Champ de date','output_field':'Champ de sortie',
-        'operation':'Transformation géométrique','tolerance':'Tolérance (m)','statistic':'Statistique','predicate':'Relation spatiale'}
+        'operation':'Transformation géométrique','tolerance':'Tolérance (m)','statistic':'Statistique','predicate':'Relation spatiale',
+        'value_mode':'Valeurs : physical ou raw','prefix':'Préfixe des champs de résultat',
+        'include_coverage':'Mesurer la couverture de chaque zone','max_zone_pixels':'Limite de pixels candidats par zone',
+        'all_touched':'Inclure tous les pixels touchés par la zone'}
 PATHS={'data','source','left','right','mask','zones','before','after','training','validation','model','valid_footprint','outlets','table','observations','aoi'}
 COMPLEX={'inputs','sources','kernel','mapping','products','indices','border_values','nodata_values','keep_values','classes','band_map','bands','predictors','rgb','start','end','bbox','collections','assets','band_order','table_dtypes'}
 

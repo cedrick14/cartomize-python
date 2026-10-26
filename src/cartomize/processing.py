@@ -220,6 +220,8 @@ def execute_operation(operation,parameters,destination,*,workers=1,block_size=51
         files=[str(destination/p.relative_to(work)) for p in sorted(work.rglob('*')) if p.is_file()]
         record=dict(schema='cartomize.operation.result.v1',operation=operation,
                     primary=str(destination/primary.relative_to(work)),kind=spec['output'],files=files)
+        metadata=getattr(result,'attrs',{}).get('cartomize')
+        if metadata is not None:record['metadata']=json_value(metadata)
         products={'primary':record['primary']}
         for path in sorted(work.rglob('*')):
             if path.is_file() and path.suffix.lower() in {'.tif','.gpkg','.csv'}:
@@ -228,6 +230,8 @@ def execute_operation(operation,parameters,destination,*,workers=1,block_size=51
                 products[key]=str(destination/path.relative_to(work))
         record['products']=products
         from .storage import relocate_products
+        save_json(record,work/'operation.json')
         relocate_products(work,destination)
-        save_json(record,work/'operation.json');_check_cancel(cancel)
+        record=json.loads((work/'operation.json').read_text(encoding='utf-8'))
+        _check_cancel(cancel)
     return record

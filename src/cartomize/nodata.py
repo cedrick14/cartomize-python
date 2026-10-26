@@ -153,9 +153,10 @@ def mask_background(source,destination,*,border_values=(),nodata_values=(),keep_
         profile=src.profile.copy();profile.update(driver='GTiff',compress='lzw',tiled=True,blockxsize=256,blockysize=256,BIGTIFF='IF_SAFER')
         profile.pop('photometric',None)
         counts=dict(provider_invalid=0,additional_border_masked=0,additional_value_masked=0,outside_footprint_masked=0,valid_pixels=0)
+        sources=(source,valid_footprint) if isinstance(valid_footprint,(str,Path)) else (source,)
         # A single TIFF must retain its mask when moved to its final name.
         with rasterio.Env(GDAL_TIFF_INTERNAL_MASK=True):
-            with _writer(destination,profile,overwrite=overwrite,sources=(source,)) as dst:
+            with _writer(destination,profile,overwrite=overwrite,sources=sources) as dst:
                 for number,window in enumerate(_windows(src,block_size),1):
                     _check_cancel(cancel);all_data=src.read(window=window);data=all_data[np.array(bands)-1]
                     valid=np.all(src.read_masks(bands,window=window)>0,axis=0)&np.isfinite(data).all(axis=0)
