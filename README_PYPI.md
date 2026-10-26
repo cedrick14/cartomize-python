@@ -1,6 +1,6 @@
 # Cartomize
 
-**Version 1.5.0**
+**Version 1.6.0**
 
 Cartomize provides a Python API, a command-line interface and a desktop application for geospatial processing and cartographic production. It runs independently of QGIS and ArcGIS Pro. Native project bridges are optional.
 
@@ -18,7 +18,7 @@ python -m cartomize gui
 For a downloaded wheel:
 
 ```bash
-python -m pip install "./cartomize-1.5.0-py3-none-any.whl[gui]"
+python -m pip install "./cartomize-1.6.0-py3-none-any.whl[gui]"
 ```
 
 For the current GitHub sources:
@@ -59,11 +59,13 @@ Imported files are available for viewing and transfer to compatible processing t
 | Classification | Random forests, extra trees, K-means, validation and saved models |
 | Terrain and networks | Terrain derivatives, convolution, D8 drainage, watersheds and shortest paths |
 | Cartography | 24 templates, symbology, labels, legends, scale bars, multiple frames, atlases and PDF/PNG/SVG export |
-| Automation | 48 registered operators, processing plans, reusable recipes, batch production and saved sessions |
+| Automation | 49 registered operators, processing plans, reusable recipes, batch production and saved sessions |
 
 Optional Dask and CUDA execution is available for supported operators. Native GIS bridges and CUDA hardware execution require the corresponding runtime.
 
-Version 1.5.0 adds row-level geometry audits and repairs, polygon and line topology checks, and explicit duplicate selection. Each operation keeps decision tables, retained and rejected records, and source identifiers across the API, CLI, processing plans and desktop. See the [vector quality guide](https://github.com/cedrick14/cartomize-python/blob/main/docs/VECTOR_QUALITY.md).
+Version 1.6.0 adds automatic vector batch reprojection: discover files, folders and multi-layer datasets; inspect and select geodetic operations; retain source attributes and geometry; and publish one GeoPackage per layer with coordinate bounds, a CSV and a transformation manifest. The default policy requires the best available operation and rejects ballpark transformations. Layer IDs expose each result to later processing-plan steps. See the [batch reprojection guide](https://github.com/cedrick14/cartomize-python/blob/main/docs/VECTOR_REPROJECTION.md).
+
+Version 1.5.0 added row-level geometry audits and repairs, polygon and line topology checks, and explicit duplicate selection. Each operation keeps decision tables, retained and rejected records, and source identifiers across the API, CLI, processing plans and desktop. See the [vector quality guide](https://github.com/cedrick14/cartomize-python/blob/main/docs/VECTOR_QUALITY.md).
 
 Version 1.4.0 added a complete automatic optical-imagery workflow: a fixed-grid coverage check controls scene selection, mosaicking and optional bounded STAC replenishment. Blocked runs preserve actionable diagnostics, and partial output requires an explicit policy. STAC scientific bands, QA/SCL, saturation and calibration metadata are connected through the same engine in Python, the CLI, plans and the desktop. See the [automatic workflow](https://github.com/cedrick14/cartomize-python/blob/main/docs/IMAGERY_AUTOMATIC.md).
 

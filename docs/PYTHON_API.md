@@ -273,3 +273,32 @@ explicite `overwrite=True`. L'atlas vérifie les noms avant de produire les page
 ## Qualité des données vectorielles
 
 `cm.audit_geometries()`, `cm.repair_geometries()`, `cm.check_topology()` et `cm.deduplicate()` renvoient un `VectorQualityResult` : couche principale, rapport par entité, synthèse et couches de diagnostic/exclusion. Les paramètres sont communs au terminal et à la fenêtre. Voir [G01–G03](VECTOR_QUALITY.md) et le [cours 14](../tutorials/notebooks/14_qualite_vectorielle.ipynb).
+
+## Reprojection vectorielle par lot
+
+```python
+sources = "donnees/vecteurs"
+inspection = cm.inspect_reprojection(sources, "EPSG:32733", recursive=True)
+for couche in inspection["layers"]:
+    print(couche["id"], couche["source_crs"], couche["catalogue"]["best_available"])
+
+lot = cm.reproject_batch(sources, "resultats/reprojection_01", "EPSG:32733", recursive=True)
+print(lot.manifest, lot.report)
+for identifiant, chemin in lot.layers.items():
+    print(identifiant, chemin)
+```
+
+`discover_vector_layers` découvre les couches, y compris celles d’un GeoPackage
+multicouche. `inspect_reprojection` expose les opérations, leur précision annoncée
+et les grilles disponibles ou manquantes. `reproject_batch` publie un nouveau
+dossier contenant un GeoPackage par couche, le bilan CSV et le manifeste de
+transformation. Les coordonnées sont transformées dans l’ordre SIG x/y ; les
+attributs et les géométries enregistrées sont relus avant publication.
+
+Les valeurs par défaut exigent la meilleure opération disponible et refusent
+les approximations géodésiques. `operations={identifiant_couche: identifiant_operation}`
+fixe les choix examinés ; la référence `@lot:identifiant_couche` transmet une
+couche précise aux étapes suivantes d’un plan. Le module couvre les SCR
+horizontaux statiques à deux axes ; Z est conservé sans transformation verticale.
+Voir le [contrat M09/G04](VECTOR_REPROJECTION.md) et le
+[cours 15](../tutorials/notebooks/15_reprojection_vectorielle_par_lot.ipynb).

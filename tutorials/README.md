@@ -1,6 +1,6 @@
 # Cartomize : projets pratiques
 
-**Sources Cartomize 1.5.0**
+**Sources Cartomize 1.6.0**
 
 Préparer des images, analyser des couches et produire des cartes reproductibles avec Cartomize. Le parcours associe des explications, du code exécutable, des résultats enregistrés et des exercices corrigés.
 
@@ -21,6 +21,7 @@ Cartomize complète GeoPandas, Rasterio et Matplotlib en reliant la préparation
 | Produire des cartes cohérentes | Nomenclature, cadres, légendes et maquettes réutilisables | PDF, PNG et SVG |
 | Décliner les livrables | Atlas, recettes et variables de lot | Une série de cartes sans reconfigurer chaque page |
 | Conserver le projet | Sessions, archives portables et empreintes | Projet réouvrable et révision traçable |
+| Reprojeter plusieurs couches | Découverte multicouche, choix géodésique et contrôles des coordonnées | GeoPackage, emprises avant/après et manifeste des opérations |
 
 L’automatisation exécute les choix méthodologiques explicités par l’utilisateur. La définition des classes, la qualité des références et l’interprétation scientifique restent des décisions de l’étude.
 
@@ -70,12 +71,13 @@ L’interface de bureau est facultative pour ce parcours. Les calculs et cartes 
 | [12](notebooks/12_okapis_raster_classe.ipynb) | Raster classé de la réserve à okapis | 35 min | Audit des codes, superficies et carte |
 | [13](notebooks/13_diagnostic_automatique.ipynb) | Diagnostic et préparation automatiques | 25 min | Couverture, lacunes, décision de mosaïque, NDVI et couverture zonale |
 | [14](notebooks/14_qualite_vectorielle.ipynb) | Qualité et préparation vectorielles | 30 min | Audit, réparation, doublons, topologie, rapports et couches écartées |
+| [15](notebooks/15_reprojection_vectorielle_par_lot.ipynb) | Reprojection vectorielle par lot | 30 min | Découverte multicouche, coordonnées de référence, GeoPackage, emprises et chaîne de tampons |
 
 Pour découvrir la valeur de l’automatisation : **00 → 02 → 13 → 07 → 08**. Pour une formation complète : suivre l’ordre du tableau. Chaque notebook recrée ses entrées pédagogiques et peut être exécuté indépendamment.
 
 ## Cas réels
 
-Les cours 11 et 12 utilisent les cinq jeux de données contenus dans `Tuto.zip`. Le fichier source n’est pas redistribué dans le dépôt. Les cours 00 à 10, 13 et 14 génèrent leurs propres données et n’exigent aucun téléchargement géographique.
+Les cours 11 et 12 utilisent les cinq jeux de données contenus dans `Tuto.zip`. Le fichier source n’est pas redistribué dans le dépôt. Les cours 00 à 10 et 13 à 15 génèrent leurs propres données et n’exigent aucun téléchargement géographique.
 
 Pour les personnes disposant de l’archive :
 

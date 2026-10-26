@@ -227,7 +227,7 @@ attributs et proposition de champs pour le vecteur; métadonnées, bandes,
 échantillon de valeurs et diagnostic NoData pour le raster. Ce diagnostic
 ne constitue pas l’audit complet d’un projet SIG.
 
-**Traitements vectoriels** propose 13 opérations. Les distances de tampon
+**Traitements vectoriels** regroupe les opérations vectorielles. Les distances de tampon
 sont en mètres. Les mesures demandent un système projeté adapté; les résultats
 sont enregistrés dans de nouveaux champs. Les sorties sont des GeoPackage ou
 GeoJSON et ne remplacent jamais un fichier source.
@@ -281,3 +281,22 @@ Moteurs d’exécution, transfert des styles et validation native : voir [EXECUT
 ## Qualité des données vectorielles
 
 Dans **Traitements vectoriels**, choisir **Diagnostic détaillé des géométries**, **Réparation avec rapport des changements**, **Contrôle topologique** ou **Traitement des doublons**. Les règles et les politiques de conservation sont explicites. Choisir un répertoire parent puis un nouveau nom de dossier. Les couches, le rapport CSV et la synthèse sont ajoutés aux résultats. Les paramètres sont conservés dans le projet. Voir [le guide détaillé](VECTOR_QUALITY.md).
+
+## Reprojection vectorielle par lot
+
+Dans **Traitements vectoriels**, choisir la reprojection par lot. Ajouter les
+fichiers ou dossiers, renseigner le SCR cible, puis examiner les couches et
+leurs opérations géodésiques. Un GeoPackage peut fournir plusieurs couches.
+Les identifiants permettent de fixer une opération pour chaque couche ; ils
+sont associés au chemin et au nom de la source.
+
+Les réglages stricts demandent la meilleure opération disponible, refusent
+les transformations approximatives et bloquent les dépassements du domaine
+d’utilisation annoncé. Une dérogation reste une décision explicite enregistrée
+dans le manifeste. Le dossier final doit être nouveau.
+
+Après exécution, le bilan CSV présente les effectifs, les SCR, les emprises
+avant/après et la transformation utilisée. Les GeoPackage et le manifeste
+rejoignent les résultats du projet. Le [guide M09](VECTOR_REPROJECTION.md)
+précise les paramètres et le [cours 15](../tutorials/notebooks/15_reprojection_vectorielle_par_lot.ipynb)
+reproduit le parcours avec l’API et les plans.

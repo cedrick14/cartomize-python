@@ -155,6 +155,7 @@ def probe(output, expected):
         checks.append('GeoTIFF import and NDVI calculation')
         checks.extend(_analysis_checks(cm,root))
         checks.extend(_vector_quality_checks(cm, root))
+        checks.extend(_vector_reprojection_checks(cm, root))
         points=root/'points.gpkg'
         gpd.GeoDataFrame({'nom':['Site A']},geometry=[Point(300300,9499700)],crs=32733).to_file(points)
         assert window.project_explorer.open_path(points) is not None
@@ -214,6 +215,39 @@ def _vector_quality_checks(cm, root):
     assert gpd.read_file(record['primary']).fid.tolist() == [4, 4, 4]
     return ['installed vector quality: invalid polygon repaired, exact areas 16 then 12 m2, duplicate removed, clean topology',
             'installed quality bundle: all related products readable and business fid attribute retained']
+
+
+def _vector_reprojection_checks(cm, root):
+    """Check the installed batch against an analytic coordinate reference."""
+    import math
+    import geopandas as gpd
+    from shapely.geometry import Point
+    data = gpd.GeoDataFrame({'code': ['001', '002'], 'fid': [7, 7],
+                            'identifier': [2**53 + 1, 2**53 + 3]},
+                           geometry=[Point(15, -4), Point(16, -5)], crs=4326)
+    source = root / 'batch-input.gpkg'
+    data.to_file(source, layer='sites', index=False, layer_options={'FID': 'source_record'})
+    data.iloc[:1].to_file(source, layer='subset', index=False, layer_options={'FID': 'source_record'})
+    inspection = cm.inspect_reprojection(source, 3857)
+    assert len(inspection['layers']) == 2
+    selections = {layer['id']: layer['catalogue']['operations'][0]['id']
+                  for layer in inspection['layers']}
+    result = cm.reproject_batch(source, root / 'vector-batch', 3857, operations=selections)
+    assert result.summary['feature_count'] == 3
+    for path in result.layers.values():
+        output = gpd.read_file(path)
+        for position, point in enumerate(output.geometry):
+            lon, lat = (15 + position), (-4 - position)
+            expected = (6378137 * math.radians(lon),
+                        6378137 * math.log(math.tan(math.pi / 4 + math.radians(lat) / 2)))
+            assert abs(point.x - expected[0]) < 1e-6 and abs(point.y - expected[1]) < 1e-6
+        assert output.identifier.tolist() == data.identifier.iloc[:len(output)].tolist()
+        assert output.fid.tolist() == [7] * len(output)
+    assert all(row['selection'] == 'explicit' and row['operation']['definition']
+               for row in result.summary['layers'])
+    assert 'vector.reproject_batch' in {entry['id'] for entry in cm.operation_catalog()}
+    return ['installed vector reprojection: automatic discovery of two GeoPackage layers, explicit operations and retained identifiers',
+            'installed reprojection coordinates: analytic Mercator reference within 1 micrometre, complete manifest and CSV report']
 
 
 def main():

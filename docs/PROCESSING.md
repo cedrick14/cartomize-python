@@ -2,7 +2,7 @@
 
 ## Registre et dépendances
 
-`operation_catalog()` décrit les 48 opérations, leurs paramètres, leur type de
+`operation_catalog()` décrit les 49 opérations, leurs paramètres, leur type de
 sortie et leurs produits secondaires. `execute_operation()` exécute une opération
 isolée. `processing_plan()` enchaîne des opérations sans imposer de carte finale.
 `plan_cartography(..., processing_steps=...)` les insère avant l’analyse du projet
@@ -214,3 +214,13 @@ une vérification cartographique.
 ## Qualité vectorielle dans les chaînes
 
 Les quatre opérateurs `vector.audit_geometries`, `vector.repair_geometries`, `vector.check_topology` et `vector.deduplicate` exposent les produits `data`, `report`, `summary`, `issues` et `rejected`. Le produit principal de l’audit est la couche des anomalies ; celui de la réparation et du dédoublonnage est la couche conservée. Le contrôle topologique renvoie les violations. Utiliser `@audit:data` pour poursuivre depuis les données originales auditées. Les résultats sont publiés ensemble dans un nouveau dossier ; erreur ou annulation ne publient aucun résultat partiel. Voir [le guide](VECTOR_QUALITY.md).
+
+## Reprojection vectorielle par lot
+
+`vector.reproject_batch` accepte `sources` et `target_crs`, ainsi que les politiques
+et sélections du [module M09](VECTOR_REPROJECTION.md). Il découvre automatiquement
+les couches des fichiers et dossiers. `@lot:identifiant_couche` sélectionne une
+couche précise du résultat d’une étape `lot` ; les identifiants sont obtenus avec
+`discover_vector_layers`. Le manifeste et le bilan CSV conservent les opérations
+réellement exécutées et les emprises avant/après. Le [cours 15](../tutorials/notebooks/15_reprojection_vectorielle_par_lot.ipynb)
+exécute un plan qui poursuit les sites reprojetés avec des tampons.

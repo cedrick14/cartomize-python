@@ -13,7 +13,7 @@ natifs Esri et une boîte à outils Python ArcPy. La bibliothèque reprend les
 modules Python indépendants d'ArcPy et les maquettes de cette édition.
 Les dix modules repris sont conservés dans `_core`, à usage interne.
 Leur version interne 10.5.1 exprime leur provenance; la version du
-paquet est 1.5.0. Les fichiers originaux ne sont pas modifiés.
+paquet est 1.6.0. Les fichiers originaux ne sont pas modifiés.
 
 ## Fonctionnalités
 
@@ -24,6 +24,7 @@ paquet est 1.5.0. Les fichiers originaux ne sont pas modifiés.
 | Analyse raster | Profils et inférence originaux, lecture/masque Rasterio |
 | Cartographie | Rendu Matplotlib, cadres multiples, échelle géodésique locale, nord vrai, légendes |
 | Géométrie | GeoPandas/Shapely : clip, overlay, sjoin, dissolve, buffer, réparation et audit |
+| Reprojection vectorielle | Découverte multicouche, catalogue PROJ, choix géodésique par couche, emprises et publication atomique du lot |
 | Mesures | Distances en mètres, surfaces m²/ha/km² et conversion des unités projetées |
 | Raster | NDVI/différence normalisée, reclassification, découpage, reprojection, statistiques zonales, surfaces et transitions |
 | Imagerie | Découverte des scènes, contrôle de couverture, sélection et compléments STAC facultatifs, calibration, masques, mosaïque cohérente, multibande, AOI, compositions RGB/RGBA et traçabilité |
@@ -112,3 +113,19 @@ sources. Le plan charge les classes dans `MappingPage`, puis dans `Map`.
 Les tableaux raster sont limités aux tuiles ; les métadonnées de composantes
 croissent avec leur nombre et celui des tuiles. La limite de composantes ne
 constitue pas une limite stricte de mémoire du processus.
+
+## Reprojection vectorielle par lot
+
+`vector_reprojection` sépare la découverte des couches, l’inspection des
+transformations et leur exécution. Le catalogue sérialisable conserve les
+identifiants et définitions des opérations PROJ ; aucun objet Transformer ne
+doit être transmis entre les contrôles graphiques et leur travailleur.
+Chaque couche est transformée par une seule opération choisie, puis écrite
+et relue avant publication du dossier entier.
+
+`processing` expose `vector.reproject_batch` avec les mêmes paramètres que
+l’API. Les identifiants des couches deviennent des noms de produits secondaires
+dans les plans. Le manifeste conserve les SCR, les emprises issues des sommets
+réels, les opérations, les grilles, les politiques et l’environnement.
+Le [guide M09](VECTOR_REPROJECTION.md) décrit les contrats de coordonnées,
+les contrôles de fidélité et la portée horizontale du traitement.

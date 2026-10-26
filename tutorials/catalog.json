@@ -88,5 +88,11 @@
     "title": "Qualité vectorielle : géométries, topologie et doublons",
     "real": false,
     "minutes": 30
+  },
+  {
+    "slug": "15_reprojection_vectorielle_par_lot",
+    "title": "Reprojection vectorielle par lot et contrôle des coordonnées",
+    "real": false,
+    "minutes": 30
   }
 ]

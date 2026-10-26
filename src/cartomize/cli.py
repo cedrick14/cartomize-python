@@ -67,6 +67,21 @@ def main(argv=None):
     mapping.add_argument("--rgb", choices=list(COMPOSITIONS)+["native"])
     discovery = subs.add_parser("scenes", help="Discover standard local Landsat/Sentinel scenes")
     discovery.add_argument("source")
+    projection = subs.add_parser('reproject-batch', help='Reproject discovered vector layers with a geodetic audit')
+    projection.add_argument('destination', help='New directory for layers and reports')
+    projection.add_argument('sources', nargs='+', help='Local vector files or directories')
+    projection.add_argument('--operations', help='JSON file mapping inspected layer IDs to operation IDs')
+    projection.add_argument('--allow-unavailable-best', action='store_true',
+                            help='Explicitly permit an available alternative when preferred grids are missing')
+    projection.add_argument('--area-policy', choices=['error', 'warn'], default='error')
+    projection_options = subs.add_parser('reprojection-options', help='Inspect vector layers and geodetic transformations')
+    projection_options.add_argument('sources', nargs='+', help='Local vector files or directories')
+    for command in (projection, projection_options):
+        command.add_argument('--crs', required=True, help='Target horizontal CRS, e.g. EPSG:32733')
+        command.add_argument('--recursive', action='store_true')
+        command.add_argument('--area-of-interest', type=float, nargs=4, metavar=('WEST', 'SOUTH', 'EAST', 'NORTH'))
+        command.add_argument('--accuracy', type=float, help='PROJ operation accuracy filter in metres')
+        command.add_argument('--allow-ballpark', action='store_true', help='Explicitly permit approximate datum transformations')
     audit = subs.add_parser("audit-imagery", help="Diagnose AOI coverage and recommend spectral scene preparation")
     audit.add_argument("source", help="Scene directory or scene manifest")
     audit.add_argument("destination", help="New directory for coverage maps and report")
@@ -184,6 +199,18 @@ def main(argv=None):
             elif args.command=='batch':output=cm.run_batch(args.manifest,args.destination,bindings=json.loads(args.bindings),reviewed=args.reviewed,continue_on_error=args.continue_on_error)
             else:output=cm.native_project(args.project,python=args.python,action=args.action,destination=args.destination,layout=args.layout,template=args.template,texts=json.loads(args.texts),extents=json.loads(args.extents))
             result=output if isinstance(output,dict) else {'output':str(output)}
+        elif args.command in {'reproject-batch', 'reprojection-options'}:
+            import cartomize as cm
+            parameters = dict(sources=args.sources, target_crs=args.crs, recursive=args.recursive,
+                              area_of_interest=args.area_of_interest, accuracy=args.accuracy,
+                              allow_ballpark=args.allow_ballpark)
+            if args.command == 'reprojection-options':
+                result = cm.inspect_reprojection(**parameters)
+            else:
+                selections = json.loads(Path(args.operations).read_text(encoding='utf-8')) if args.operations else None
+                parameters.update(operations=selections, require_best=not args.allow_unavailable_best,
+                                  area_policy=args.area_policy)
+                result = cm.execute_operation('vector.reproject_batch', parameters, args.destination)
         elif args.command == "indices":result=list_indices()
         elif args.command == 'assess':result=assess_project(args.sources,goal=args.goal,data_kind=args.kind,aoi=args.aoi)
         elif args.command == 'project':result=prepare_project(args.sources,args.destination,auto_background=not args.without_background_detection).report

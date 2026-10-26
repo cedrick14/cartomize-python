@@ -9,6 +9,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QComboBox,QLineEdit,QLabel,QPlainTextEdit,QPushButton,QCheckBox,QSizePolicy
 import cartomize as cm
 from .desktop import Page,PathField,spin,real,RASTER_FILTER,VECTOR_FILTER
+from .desktop_reprojection import BatchReprojectionControls
 from ._validation import output_path
 
 
@@ -66,7 +67,7 @@ class InspectionPage(Page):
     def show_result(self,path):self.report.setPlainText(Path(path).read_text(encoding='utf-8'))
 
 
-class VectorPage(Page):
+class VectorPage(BatchReprojectionControls, Page):
     engine=False
     cancellable=False
     OPERATIONS=[('Découpage','clip'),('Zone tampon','buffer'),('Intersection','intersection'),('Union','union'),
@@ -88,6 +89,7 @@ class VectorPage(Page):
             ('Système de coordonnées projeté',self.crs),('Distance (m)',self.distance),('Champ de dissolution',self.field),
             ('Distance maximale (m)',self.maximum),('Relation spatiale',self.predicate),('Type de jointure',self.join),('Unité',self.unit)]:self.form.addRow(label,widget)
         self.output.filter='GeoPackage (*.gpkg);;GeoJSON (*.geojson)';self.finish()
+        self.init_reprojection_controls()
         self.operation.currentIndexChanged.connect(self.changed);self.changed()
     def changed(self):
         op=self.operation.currentData()
@@ -96,7 +98,10 @@ class VectorPage(Page):
             self.predicate:op=='sjoin',self.join:op in {'sjoin','nearest'},self.unit:op in {'area','length'}}
         for widget,visible in show.items():widget.setVisible(visible);self.form.labelForField(widget).setVisible(visible)
         self.unit.clear();self.unit.addItems(['m','km'] if op=='length' else ['ha','m2','km2'])
+        self.update_reprojection_controls()
     def job(self,options):
+        if self.operation.currentData()=='reproject_batch':
+            return self.reprojection_job(options)
         op=self.operation.currentData();source=self.source.text();other=self.secondary.text();crs=self.crs.text().strip() or None
         distance=self.distance.value();field=self.field.text().strip() or None;unit=self.unit.currentText()
         predicate=self.predicate.currentText();how=self.join.currentData();destination=self.destination()
