@@ -1,8 +1,8 @@
 {
   "schema": "cartomize.validation_m09_real.v1",
-  "generated_at_utc": "2026-10-26T18:59:57.947447+00:00",
+  "generated_at_utc": "2026-10-26T19:18:59.928032+00:00",
   "cartomize_version": "1.6.0",
-  "repository_head_at_validation": "f9a2117f70c91cdbb46026ec57b786a997915271",
+  "repository_head_at_validation": "67118663fdbaf8b18a87b17f0f87424c081546a8",
   "validation_script_sha256": "7b2a8469f55da0ec8584c1f7fadf5a6cb29c8b1c6b58cd831aa8e675b4edc744",
   "tested_source_sha256": {
     "src/cartomize/__init__.py": "f0e7f32e94b1ea956d13f42d363d55b2bf1e7af10c473cec0a95f084853d898d",
@@ -48,7 +48,7 @@
     "src/cartomize/desktop_processing.py": "be6e966c7df84d22e3ab5f6017210287d0f90d987c4218da861d88f866494265",
     "src/cartomize/desktop_project.py": "e1e1ef4a222f3da95c4323317fc84b39e9436069c43286303b7ae020ce5f9869",
     "src/cartomize/desktop_recipes.py": "62cb23398014d49224fe2c45be644a9d8f98f4b48d6ea4539752e7a410bb9c53",
-    "src/cartomize/desktop_reprojection.py": "4baca77b2c625d1f183f53c3c652410f50ea0ca7b4726bbf55e81111e3ecf205",
+    "src/cartomize/desktop_reprojection.py": "773d051d7721e099c0b293f009c7619a00d6e7d54166b531cfefe5cef1654fed",
     "src/cartomize/desktop_results.py": "424a73d8aab716dcfed957971279c1b6f75ae591749907c8b579c3c5f660bbc2",
     "src/cartomize/desktop_session.py": "ff4ca61939ceb348abc0d8faf68c48ab4fc0b89919da577ce136767ce8164407",
     "src/cartomize/desktop_tables.py": "f725546206935633805cd25c4e3a008c5c39e05bd660c2e8079ab4a6bbaa7dd3",
@@ -337,5 +337,5 @@
   "passed": 12,
   "failed": 0,
   "status": "passed",
-  "duration_seconds": 9.298
+  "duration_seconds": 7.276
 }

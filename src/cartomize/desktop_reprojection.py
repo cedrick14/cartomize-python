@@ -43,7 +43,9 @@ class BatchReprojectionControls:
             button = QPushButton(text)
             button.clicked.connect(callback)
             buttons.addWidget(button, row, column, 1, span)
-        self.batch_recursive = QCheckBox('Inclure les sous-dossiers')
+        # QCheckBox does not wrap text to the available width. Explicit line
+        # breaks keep the complete labels readable with wider native fonts.
+        self.batch_recursive = QCheckBox('Inclure les\nsous-dossiers')
         self.batch_target_crs = QLineEdit()
         self.batch_target_crs.setPlaceholderText('Exemple : EPSG:32733')
         self.batch_accuracy = QLineEdit()
@@ -52,9 +54,9 @@ class BatchReprojectionControls:
         self.batch_aoi = QLineEdit()
         self.batch_aoi.setPlaceholderText('Ouest, sud, est, nord ; coordonnées en degrés')
         self.batch_aoi.setToolTip('Facultatif : emprise géographique WGS 84 utilisée pour rechercher les transformations.')
-        self.batch_ballpark = QCheckBox('Autoriser une approximation')
+        self.batch_ballpark = QCheckBox('Autoriser une\napproximation')
         self.batch_ballpark.setToolTip('Autoriser explicitement une transformation géodésique approximative, qui sera signalée dans le rapport.')
-        self.batch_require_best = QCheckBox('Exiger la meilleure transformation')
+        self.batch_require_best = QCheckBox('Exiger la meilleure\ntransformation')
         self.batch_require_best.setChecked(True)
         self.batch_require_best.setToolTip('Arrêter si une grille nécessaire à la meilleure transformation est absente. Le lot n’active aucun téléchargement de grilles.')
         self.batch_area_policy = self._reprojection_combo()

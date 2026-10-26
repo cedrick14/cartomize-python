@@ -13,7 +13,7 @@ from shapely.geometry import Point
 pytest.importorskip('PySide6')
 from PySide6.QtCore import QEventLoop, QSettings, Qt, QTimer
 from PySide6.QtTest import QTest
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QWidget
 
 from cartomize.desktop_vector import VectorPage
 from cartomize.desktop_session import capture_widgets, restore_widgets
@@ -222,8 +222,9 @@ def test_pre_cancelled_inspection_publishes_no_report(page, tmp_path):
     assert not Path(page._batch_preview_dirs[-1].name).exists()
 
 
-@pytest.mark.parametrize('font_size', [12, 16])
-def test_batch_form_fits_compact_window(application, tmp_path, monkeypatch, font_size):
+@pytest.mark.parametrize('font_size,wide_labels', [(12, False), (16, False), (12, True)],
+                         ids=['12', '16', 'wide_native_labels'])
+def test_batch_form_fits_compact_window(application, tmp_path, monkeypatch, font_size, wide_labels):
     import cartomize.desktop as desktop
     monkeypatch.setattr(desktop, 'QSettings', lambda *args: QSettings(str(tmp_path / 'appearance.ini'), QSettings.Format.IniFormat))
     window = desktop.CartomizeWindow()
@@ -234,13 +235,46 @@ def test_batch_form_fits_compact_window(application, tmp_path, monkeypatch, font
         window.select_tool('vector')
         page = window.tool('vector')
         page.operation.setCurrentIndex(page.operation.findData('reproject_batch'))
+        checkboxes = (page.batch_recursive, page.batch_ballpark, page.batch_require_best)
+        if wide_labels:
+            # Reproduce native text wider than the Linux default. Unwrapped
+            # checkbox labels force a horizontal scrollbar at these metrics.
+            for checkbox in checkboxes:
+                checkbox.setStyleSheet('font-size: 24px;')
         QTest.qWait(50)
         scroll = window.stack.currentWidget()
         for control in (page.batch_inspect_button, page.batch_layers, page.output):
             scroll.ensureWidgetVisible(control)
             QTest.qWait(20)
-            assert scroll.horizontalScrollBar().maximum() == 0
+            geometry = {
+                'font_size': font_size,
+                'wide_labels': wide_labels,
+                'style': application.style().objectName(),
+                'viewport': scroll.viewport().size().toTuple(),
+                'page': page.size().toTuple(),
+                'minimum_hint': page.minimumSizeHint().toTuple(),
+                'layout_minimum': page.layout.minimumSize().toTuple(),
+                'batch_minimum': page.batch_section.minimumSizeHint().toTuple(),
+                'horizontal_range': scroll.horizontalScrollBar().maximum(),
+            }
+            if geometry['horizontal_range']:
+                names = {id(value): key for key, value in vars(page).items() if isinstance(value, QWidget)}
+                geometry['widest_controls'] = sorted([
+                    {'minimum_width': child.minimumSizeHint().width(),
+                     'width': child.width(), 'type': type(child).__name__,
+                     'name': names.get(id(child), child.objectName()),
+                     'text': getattr(child, 'text', lambda: '')()[:120],
+                     'font_family': child.font().family(),
+                     'font_pixels': child.font().pixelSize(),
+                     'font_points': child.font().pointSizeF()}
+                    for child in page.findChildren(QWidget) if child.isVisible()
+                ], key=lambda record: record['minimum_width'], reverse=True)[:12]
+                print('Batch form geometry: ' + json.dumps(geometry, ensure_ascii=False))
+            assert scroll.horizontalScrollBar().maximum() == 0, json.dumps(geometry, ensure_ascii=False)
             assert control.width() <= scroll.viewport().width()
+        for checkbox in checkboxes:
+            assert checkbox.width() >= checkbox.minimumSizeHint().width()
+            assert checkbox.height() >= checkbox.sizeHint().height()
         assert window.run_button.isVisible()
         assert not page.source.isVisible()
     finally:

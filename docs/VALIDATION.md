@@ -2,8 +2,8 @@
 
 ## Cartomize 1.6.0 — M09, reprojection vectorielle par lot
 
-La suite locale complète valide **939 tests, avec 2 exclusions prévues et
-aucun échec** sous Linux / Python 3.12.14. Les 73 nouvelles régressions M09
+La suite locale complète valide **940 tests, avec 2 exclusions prévues et
+aucun échec** sous Linux / Python 3.12.14. Les 74 nouvelles régressions M09
 sont incluses. Les exclusions concernent le matériel CUDA indisponible et
 le moteur QGIS natif, qui possède un contrôle distant dédié.
 
@@ -13,7 +13,7 @@ environnement neuf hors du dépôt : ses **14 contrôles** API/fenêtre/console
 réussissent, et ses **90 modules Python** sont identiques aux sources testées.
 
 Le [rapport M09 sur données réelles](VALIDATION_M09_REAL.json) enregistre
-**12 contrôles réussis, 0 échec**, en **9,298 s** le 26 octobre 2026.
+**12 contrôles réussis, 0 échec**, en **7,276 s** le 26 octobre 2026.
 Les trois jeux épinglés comprennent 80 quartiers parisiens, 3 687 relevés
 miniers et 50 aires protégées de RDC. Les 10 fichiers d’entrée et les 90 modules
 Python conservent leurs empreintes pendant l’exécution.

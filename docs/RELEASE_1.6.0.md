@@ -44,11 +44,11 @@ strictement positive ; `None` signifie qu’aucun filtre numérique n’est dema
 
 | Vérification | Résultat observé le 26 octobre 2026 |
 |---|---|
-| Suite locale complète, Python 3.12 | **939 tests réussis**, 2 exclusions prévues, 0 échec |
-| Régressions ajoutées pour M09 | **73 tests**, inclus dans la suite complète : 51 moteur, 6 terminal/plans, 16 fenêtre |
+| Suite locale complète, Python 3.12 | **940 tests réussis**, 2 exclusions prévues, 0 échec |
+| Régressions ajoutées pour M09 | **74 tests**, inclus dans la suite complète : 51 moteur, 6 terminal/plans, 17 fenêtre |
 | Parcours autonome complet | **14 notebooks, 89 cellules exécutées**, 50,56 s cumulées dans des noyaux neufs |
 | Wheel 1.6.0 installée hors des sources | **14 contrôles réussis**, environnement neuf, API/fenêtre/console ; 90 modules identiques aux sources vérifiées |
-| Données réelles épinglées | **12 contrôles réussis**, 0 échec, 9,298 s |
+| Données réelles épinglées | **12 contrôles réussis**, 0 échec, 7,276 s |
 | Intégrité des entrées et du code pendant ces contrôles | 10 fichiers d’entrée et 90 modules Python inchangés |
 | Cours 15 dans un noyau Jupyter neuf | **8 cellules exécutées**, aucune erreur, 4,22 s |
 
@@ -57,6 +57,14 @@ et le moteur QGIS natif absent de cet environnement ; QGIS possède son job
 dédié dans la matrice distante. Les contrôles de la wheel comprennent sa
 relecture, `pip check` et `twine check --strict`. La restauration complète
 des sessions existantes est vérifiée sans modifier son test historique.
+
+Les premières exécutions Windows ont révélé deux débordements horizontaux du
+formulaire compact. Les libellés complets des cases à cocher tiennent désormais
+sur deux lignes. Une régression supplémentaire simule des caractères de 24 px
+et vérifie que les cases reçoivent toute leur largeur et leur hauteur requises.
+Les trois cas compacts sont exécutés au début des jobs Windows, puis inclus
+dans la suite générale. La suite locale complète et l'installation isolée ont
+été réexécutées après cette correction.
 
 Le [rapport réel](VALIDATION_M09_REAL.json) conserve les références, versions,
 empreintes SHA256 et résultats numériques. Le
