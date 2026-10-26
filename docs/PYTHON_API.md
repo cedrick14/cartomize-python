@@ -302,3 +302,38 @@ couche précise aux étapes suivantes d’un plan. Le module couvre les SCR
 horizontaux statiques à deux axes ; Z est conservé sans transformation verticale.
 Voir le [contrat M09/G04](VECTOR_REPROJECTION.md) et le
 [cours 15](../tutorials/notebooks/15_reprojection_vectorielle_par_lot.ipynb).
+
+## Harmonisation et fusion de couches
+
+```python
+sources = ["releve_A.gpkg", "releve_B.gpkg"]
+inspection = cm.inspect_merge(sources)
+for couche in inspection["layers"]:
+    print(couche["id"], couche["fields"])
+
+# Exemple de schéma pour des champs déjà nommés de façon identique.
+schema = {"code": "string", "nom": "string", "habitants": "int64"}
+fusion = cm.merge_layers(sources, "resultats/fusion_01", schema=schema)
+couche = cm.vector.read_file(fusion.data)
+print(fusion.manifest, fusion.report, fusion.issues)
+```
+
+`field_maps={identifiant_source: {champ_source: champ_cible}}` raccorde les noms
+différents ; une cible `None` supprime explicitement un champ. Le schéma peut
+préciser `nullable` et `default`. Les conversions invalides sont refusées par
+défaut ; `conversion_errors="null"` les consigne et crée une absence soumise
+aux obligations du schéma. Les paramètres `missing_fields` et `extra_fields`
+rendent également explicites les champs manquants ou non retenus.
+
+L’inspection expose les conflits de noms tels que `Name`/`name` et les attributs
+métier nommés `geometry`, afin de pouvoir les remapper avant la fusion. Un champ
+`object` entièrement nul sans type déclaré peut adopter le type concret d’une
+autre source ; un champ déclaré `TEXT` conserve son type texte même entièrement
+nul. Le [guide des schémas](VECTOR_MERGE.md) décrit ces décisions.
+
+`MergedVectors` expose `data`, `manifest`, `report`, `issues` et `summary`.
+Les enregistrements conservent cinq colonnes de provenance et leurs géométries.
+Sans `target_crs`, les SCR doivent déjà être identiques ; une cible explicite
+réutilise les règles de M09. L’opérateur `vector.merge_layers` expose notamment
+`@fusion:data` dans les plans. Voir le [guide M10/G05](VECTOR_MERGE.md) et le
+[cours 16](../tutorials/notebooks/16_harmonisation_fusion_vectorielle.ipynb).

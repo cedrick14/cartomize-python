@@ -15,7 +15,7 @@ import cartomize as cm
 fenetre = cm.launch()
 ```
 
-Adapter le chemin à la copie GitHub utilisée pour les cours. La fenêtre et l’API utilisent alors les mêmes sources **1.6.0**. Les services de notebooks distants n’ouvrent pas une fenêtre native sur l’ordinateur de l’utilisateur ; les cours API et leurs graphiques restent utilisables dans ces services.
+Adapter le chemin à la copie GitHub utilisée pour les cours. La fenêtre et l’API utilisent alors les mêmes sources **1.7.0**. Les services de notebooks distants n’ouvrent pas une fenêtre native sur l’ordinateur de l’utilisateur ; les cours API et leurs graphiques restent utilisables dans ces services.
 
 ## Parcours de travail
 

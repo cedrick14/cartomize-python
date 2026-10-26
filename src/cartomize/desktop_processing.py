@@ -42,17 +42,29 @@ LABELS.update({
     'allow_ballpark': 'Autoriser une transformation approximative',
     'require_best': 'Exiger la meilleure transformation et ses grilles',
     'area_policy': 'Hors du domaine de validité',
+    'schema': 'Schéma des champs cibles (objet JSON)',
+    'field_maps': 'Correspondances des champs par couche (objet JSON)',
+    'reprojection_options': 'Paramètres géodésiques facultatifs (objet JSON)',
+    'conversion_errors': 'Échec de conversion',
+    'missing_fields': 'Champs absents',
+    'extra_fields': 'Champs hors du schéma cible',
 })
 PATHS={'data','source','left','right','mask','zones','before','after','training','validation','model','valid_footprint','outlets','table','observations','aoi'}
 PATHS.update({'reference', 'allowed_gaps'})
 COMPLEX={'inputs','sources','kernel','mapping','products','indices','border_values','nodata_values','keep_values','classes','band_map','bands','predictors','rgb','start','end','bbox','collections','assets','band_order','table_dtypes'}
 COMPLEX.update({'keys', 'rules', 'operations', 'area_of_interest'})
+COMPLEX.update({'schema', 'field_maps', 'reprojection_options'})
 CHOICES={
     'snap':[('Sur le segment le plus proche','edge'),('Sur le sommet le plus proche','node')],
     'null_keys':[('Ne pas apparier','unmatched'),('Apparier les clés manquantes','match'),('Refuser les clés manquantes','error')],
     'value_mode':[('Valeurs physiques (calibration du raster)','physical'),('Valeurs brutes (DN)','raw')],
 }
 OPERATION_CHOICES = {
+    'vector.merge_layers': {
+        'conversion_errors': [('Interrompre', 'error'), ('Valeur nulle et rapport', 'null')],
+        'missing_fields': [('Valeur nulle ou défaut', 'null'), ('Interrompre', 'error')],
+        'extra_fields': [('Interrompre', 'error'), ('Écarter et consigner', 'drop')],
+    },
     'vector.reproject_batch': {
         'area_policy': [('Arrêter le lot', 'error'), ('Continuer avec un avertissement', 'warn')],
     },
@@ -111,7 +123,7 @@ class OperationDialog(QDialog):
         self.add_map.setEnabled(self.allow_map and spec['output'] in {'raster','vector'});self.product.clear();self.product.addItems(spec['products'])
         for field in spec['parameters']:
             name=field['name'];default=field['default'];label=LABELS.get(name,name.replace('_',' '))+(' *' if field['required'] else '')
-            if spec['id']=='vector.reproject_batch' and name=='sources':
+            if spec['id'] in {'vector.reproject_batch', 'vector.merge_layers'} and name=='sources':
                 label='Fichiers, dossiers ou couches sélectionnées (liste JSON) *'
             if name in self._choices:
                 widget=QComboBox();widget.setPlaceholderText('Choisir une valeur')

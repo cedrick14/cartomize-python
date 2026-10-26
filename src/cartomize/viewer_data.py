@@ -208,7 +208,8 @@ def table_page(path, offset=0, size=2000, layer=None):
     path = Path(path)
     if path.suffix.lower() in VECTORS:
         import pyogrio
-        data = pyogrio.read_dataframe(path, layer=layer, skip_features=offset, max_features=size+1, read_geometry=False)
+        from .vector_io import read_vector
+        data = read_vector(path, layer=layer, skip_features=offset, max_features=size+1, ignore_geometry=True)
     else:
         data = pd.read_csv(path, sep='\t' if path.suffix.lower()=='.tsv' else None, engine='python',
                            skiprows=range(1, offset+1), nrows=size+1, encoding='utf-8-sig')

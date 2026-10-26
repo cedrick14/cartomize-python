@@ -82,6 +82,20 @@ def main(argv=None):
         command.add_argument('--area-of-interest', type=float, nargs=4, metavar=('WEST', 'SOUTH', 'EAST', 'NORTH'))
         command.add_argument('--accuracy', type=float, help='PROJ operation accuracy filter in metres')
         command.add_argument('--allow-ballpark', action='store_true', help='Explicitly permit approximate datum transformations')
+    merge = subs.add_parser('merge-layers', help='Harmonize vector schemas and merge features with provenance')
+    merge.add_argument('destination', help='New directory for the merged layer and reports')
+    merge.add_argument('sources', nargs='+', help='Local vector files or directories')
+    merge.add_argument('--schema', help='JSON file describing target field types, nullability and defaults')
+    merge.add_argument('--crs', help='Explicit target CRS; otherwise source CRSs must match')
+    merge.add_argument('--reprojection-options', help='JSON file containing the M09 geodetic options')
+    merge.add_argument('--on-conversion-error', choices=['error', 'null'], default='error')
+    merge.add_argument('--missing-fields', choices=['null', 'error'], default='null')
+    merge.add_argument('--extra-fields', choices=['error', 'drop'], default='error')
+    merge_options = subs.add_parser('merge-options', help='Inspect source fields and propose a compatible target schema')
+    merge_options.add_argument('sources', nargs='+', help='Local vector files or directories')
+    for command in (merge, merge_options):
+        command.add_argument('--recursive', action='store_true')
+        command.add_argument('--field-maps', help='JSON file mapping source layer IDs and source fields to target fields')
     audit = subs.add_parser("audit-imagery", help="Diagnose AOI coverage and recommend spectral scene preparation")
     audit.add_argument("source", help="Scene directory or scene manifest")
     audit.add_argument("destination", help="New directory for coverage maps and report")
@@ -199,6 +213,20 @@ def main(argv=None):
             elif args.command=='batch':output=cm.run_batch(args.manifest,args.destination,bindings=json.loads(args.bindings),reviewed=args.reviewed,continue_on_error=args.continue_on_error)
             else:output=cm.native_project(args.project,python=args.python,action=args.action,destination=args.destination,layout=args.layout,template=args.template,texts=json.loads(args.texts),extents=json.loads(args.extents))
             result=output if isinstance(output,dict) else {'output':str(output)}
+        elif args.command in {'merge-layers', 'merge-options'}:
+            import cartomize as cm
+            def json_option(path):
+                return json.loads(Path(path).read_text(encoding='utf-8')) if path else None
+            parameters = dict(sources=args.sources, recursive=args.recursive,
+                              field_maps=json_option(args.field_maps))
+            if args.command == 'merge-options':
+                result = cm.inspect_merge(**parameters)
+            else:
+                parameters.update(schema=json_option(args.schema), target_crs=args.crs,
+                    reprojection_options=json_option(args.reprojection_options),
+                    conversion_errors=args.on_conversion_error, missing_fields=args.missing_fields,
+                    extra_fields=args.extra_fields)
+                result = cm.execute_operation('vector.merge_layers', parameters, args.destination)
         elif args.command in {'reproject-batch', 'reprojection-options'}:
             import cartomize as cm
             parameters = dict(sources=args.sources, target_crs=args.crs, recursive=args.recursive,

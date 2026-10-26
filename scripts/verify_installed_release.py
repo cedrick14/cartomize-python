@@ -156,6 +156,7 @@ def probe(output, expected):
         checks.extend(_analysis_checks(cm,root))
         checks.extend(_vector_quality_checks(cm, root))
         checks.extend(_vector_reprojection_checks(cm, root))
+        checks.extend(_vector_merge_checks(cm, root))
         points=root/'points.gpkg'
         gpd.GeoDataFrame({'nom':['Site A']},geometry=[Point(300300,9499700)],crs=32733).to_file(points)
         assert window.project_explorer.open_path(points) is not None
@@ -186,7 +187,8 @@ def probe(output, expected):
         assert expected in console.output.toPlainText()
         checks.append('installed Python console kernel')
         report={'status':'passed','version':cm.__version__,'python':sys.version.split()[0],
-                'executable':sys.executable,'module':str(installed),'checks':checks}
+                'executable':sys.executable,'module':str(installed),
+                'check_count':len(checks),'checks':checks}
         output.write_text(json.dumps(report,indent=2,ensure_ascii=False),encoding='utf-8')
         print(json.dumps(report,ensure_ascii=False))
     finally:
@@ -248,6 +250,131 @@ def _vector_reprojection_checks(cm, root):
     assert 'vector.reproject_batch' in {entry['id'] for entry in cm.operation_catalog()}
     return ['installed vector reprojection: automatic discovery of two GeoPackage layers, explicit operations and retained identifiers',
             'installed reprojection coordinates: analytic Mercator reference within 1 micrometre, complete manifest and CSV report']
+
+
+def _vector_merge_checks(cm, root):
+    """Exercise packaged typed I/O and named plan products against SQLite."""
+    from contextlib import closing
+    import math
+    import sqlite3
+    import numpy as np
+    import pyogrio
+    from pyproj import CRS
+    import shapely
+    from shapely.geometry import Point
+
+    fields = ('identifier', 'code', 'survey_date', 'observed_at', 'approved', 'fid')
+    expected = [
+        (2**60 + 3, '001', '2024-02-29', '2024-02-29T10:30:00.123Z', 1, 7),
+        (None, '002', None, None, None, 7),
+        (2**53 + 1, '003', '2024-03-02', '2024-03-02T10:00:00.250Z', 0, 7),
+    ]
+    expected_types = dict(zip(fields, ('INTEGER', 'TEXT', 'DATE', 'DATETIME', 'BOOLEAN', 'INTEGER')))
+
+    def quoted(name):
+        return '"' + name.replace('"', '""') + '"'
+
+    def saved_attributes(path, columns):
+        # Close SQLite explicitly before temporary-directory cleanup on Windows.
+        with closing(sqlite3.connect(path)) as connection:
+            layers = connection.execute('SELECT table_name, srs_id FROM gpkg_geometry_columns').fetchall()
+            assert len(layers) == 1 and layers[0][1] == 32733
+            layer = layers[0][0]
+            info = connection.execute(f'PRAGMA table_info({quoted(layer)})').fetchall()
+            primary = next(row[1] for row in info if row[5] == 1)
+            assert primary != 'fid', 'The business fid must remain an ordinary attribute.'
+            types = {row[1]: row[2].upper() for row in info}
+            assert {name: types[name] for name in fields} == expected_types
+            selected = ', '.join(quoted(name) for name in columns)
+            return connection.execute(
+                f'SELECT {selected} FROM {quoted(layer)} ORDER BY {quoted(primary)}').fetchall()
+
+    # All fixtures and products are local to this context, including on failure.
+    # Absolute source paths exercise the installed reader independently of cwd.
+    with tempfile.TemporaryDirectory(prefix='merge-probe-', dir=Path(root).resolve()) as temporary:
+        work = Path(temporary).resolve()
+        first, second = work / 'survey_a.gpkg', work / 'survey_b.gpkg'
+        geometries = [Point(500000, 9500000), Point(500200, 9500000), Point(500400, 9500200)]
+        nulls = np.array([False, True])
+        pyogrio.raw.write(first, geometry=shapely.to_wkb(geometries[:2]),
+            field_data=[np.array([2**60 + 3, 0], dtype='int64'),
+                        np.array(['001', '002'], dtype=object),
+                        np.array(['2024-02-29', 'NaT'], dtype='datetime64[D]'),
+                        np.array(['2024-02-29T10:30:00.123', 'NaT'], dtype='datetime64[ms]'),
+                        np.array([True, False], dtype=bool), np.array([7, 7], dtype='int64')],
+            fields=['visit_id', 'site_code', 'recorded_on', 'seen_at', 'verified', 'fid'],
+            field_mask=[nulls, None, None, None, nulls, None], layer='survey_a', driver='GPKG',
+            geometry_type='Point', crs=CRS(32733).to_wkt(), promote_to_multi=False,
+            layer_options={'FID': 'source_record'},
+            gdal_tz_offsets={'seen_at': np.full(2, 100, dtype=np.int32)})
+        pyogrio.raw.write(second, geometry=shapely.to_wkb(geometries[2:]),
+            field_data=[np.array(['9007199254740993'], dtype=object),
+                        np.array(['003'], dtype=object), np.array(['2024-03-02'], dtype=object),
+                        np.array(['2024-03-02T12:00:00.250+02:00'], dtype=object),
+                        np.array(['false'], dtype=object), np.array([7], dtype='int64')],
+            fields=['legacy_id', 'local_code', 'date_iso', 'instant_iso', 'approval', 'business_id'],
+            layer='survey_b', driver='GPKG', geometry_type='Point', crs=CRS(32733).to_wkt(),
+            promote_to_multi=False, layer_options={'FID': 'source_record'})
+        originals = {path: path.read_bytes() for path in (first, second)}
+        sources = [{'path': str(first), 'layer': 'survey_a'},
+                   {'path': str(second), 'layer': 'survey_b'}]
+        inspection = cm.inspect_merge(sources)
+        assert inspection['schema'] == 'cartomize.vector_merge_inspection.v1'
+        assert inspection['layer_count'] == 2 and inspection['feature_count'] == 3
+        layers = inspection['layers']
+        maps = {
+            layers[0]['id']: dict(zip(('visit_id', 'site_code', 'recorded_on', 'seen_at', 'verified', 'fid'), fields)),
+            layers[1]['id']: dict(zip(('legacy_id', 'local_code', 'date_iso', 'instant_iso', 'approval', 'business_id'), fields)),
+        }
+        schema = dict(zip(fields, ('int64', 'string', 'date', 'datetime_utc', 'boolean', 'int64')))
+        result = cm.merge_layers(sources, work / 'merged', schema=schema, field_maps=maps)
+        assert isinstance(result, cm.MergedVectors)
+        assert all(Path(path).is_file() for path in (result.manifest, result.data, result.report, result.issues))
+        record = json.loads(result.manifest.read_text(encoding='utf-8'))
+        assert record['schema'] == 'cartomize.vector_merge.v1' and record['status'] == 'complete'
+        assert record['feature_count'] == 3 and record['source_count'] == 2
+        assert record['conversion_error_count'] == 0
+        provenance = record['provenance_columns']
+        semantics = ('source_id', 'source_name', 'source_path', 'source_layer', 'source_row')
+        assert set(provenance) == set(semantics)
+        expected_provenance = [(layer['id'], layer['name'], layer['path'], layer['layer'], row)
+                               for layer in layers for row in range(layer['features'])]
+        assert saved_attributes(result.data, tuple(provenance[name] for name in semantics)) == expected_provenance
+        assert cm.read_file(result.data).geometry.to_wkb().tolist() == [point.wkb for point in geometries]
+        assert saved_attributes(result.data, fields) == expected
+
+        # A second execution tests the registry and @step:data resolution, then
+        # reopens its typed output in another operation before writing again.
+        catalog = {entry['id']: entry for entry in cm.operation_catalog()}
+        assert {'data', 'manifest', 'report', 'issues'} <= set(catalog['vector.merge_layers']['products'])
+        plan = cm.processing_plan([
+            dict(id='merged', operation='vector.merge_layers', parameters={
+                'sources': sources, 'schema': schema, 'field_maps': maps}),
+            dict(id='buffered', operation='vector.buffer', parameters={'data': '@merged:data', 'distance': 25}),
+        ])
+        plan_path = cm.run_plan(plan, work / 'plan')
+        document = json.loads(Path(plan_path).read_text(encoding='utf-8'))
+        products = document['products']['merged']
+        assert all(Path(path).is_file() for path in products.values())
+        planned_manifest = Path(products['manifest'])
+        planned = json.loads(planned_manifest.read_text(encoding='utf-8'))
+        assert planned['data'] == products['data']
+        assert '.cartomize-' not in planned_manifest.read_text(encoding='utf-8')
+        assert '.cartomize-' not in Path(plan_path).read_text(encoding='utf-8')
+        buffered_path = Path(document['results']['buffered'])
+        all_fields = fields + tuple(provenance[name] for name in semantics)
+        complete_expected = [values + origin for values, origin in zip(expected, expected_provenance)]
+        assert saved_attributes(products['data'], all_fields) == complete_expected
+        assert saved_attributes(buffered_path, all_fields) == complete_expected
+        buffered = cm.read_file(buffered_path)
+        assert len(buffered) == 3 and buffered.geometry.is_valid.all()
+        assert CRS(buffered.crs) == CRS(32733)
+        np.testing.assert_allclose(buffered.geometry.area, math.pi * 25**2, rtol=.01)
+        assert all(path.read_bytes() == original for path, original in originals.items())
+        assert not list(work.rglob('.cartomize-*'))
+    return ['installed vector merge: two heterogeneous GeoPackage schemas mapped to three rows with complete provenance',
+            'installed merge types: exact nullable int64 above 2**53, leading-zero codes, DATE and UTC DATETIME verified by SQLite',
+            'installed merge plan: named data product feeds 25 m buffers with typed attributes and source files intact']
 
 
 def main():

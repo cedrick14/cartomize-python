@@ -300,3 +300,24 @@ avant/après et la transformation utilisée. Les GeoPackage et le manifeste
 rejoignent les résultats du projet. Le [guide M09](VECTOR_REPROJECTION.md)
 précise les paramètres et le [cours 15](../tutorials/notebooks/15_reprojection_vectorielle_par_lot.ipynb)
 reproduit le parcours avec l’API et les plans.
+
+## Harmonisation et fusion de couches
+
+Dans **Traitements vectoriels**, choisir **Harmonisation et fusion**.
+Ajouter les sources, puis analyser leurs schémas. Examiner les correspondances
+des champs et choisir pour chaque cible son type, sa nullabilité et, si
+nécessaire, sa valeur par défaut. Les champs non retenus demandent une décision
+explicite ; les conflits ne sont pas résolus en devinant les unités ou le sens
+des valeurs.
+
+Choisir les politiques de conversion et de champs manquants. Le mode strict
+refuse une conversion invalide. L’acceptation vers une valeur nulle est
+enregistrée dans le rapport et reste soumise aux obligations du schéma.
+Laisser le SCR cible vide pour des sources déjà dans le même SCR ; une cible
+explicite demande la reprojection avec les règles M09.
+
+Le résultat réunit la couche GeoPackage, le manifeste, le bilan et les problèmes
+de conversion. Les paramètres sont conservés dans la session ; chaque
+enregistrement garde sa provenance. Le [guide M10](VECTOR_MERGE.md) et le
+[cours 16](../tutorials/notebooks/16_harmonisation_fusion_vectorielle.ipynb)
+expliquent les décisions sur un exemple autonome.

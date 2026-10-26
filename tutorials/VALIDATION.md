@@ -1,11 +1,41 @@
 # Validation du parcours
 
-Le parcours courant installe les sources **Cartomize 1.6.0** de la copie du dépôt
+Le parcours courant installe les sources **Cartomize 1.7.0** de la copie du dépôt
 utilisée. Les résultats des versions précédentes sont conservés ci-dessous avec
 leur version et leur date ; ils ne constituent pas une nouvelle exécution de
 tous les cours avec la version courante.
 
-## Résultats locaux du 26 octobre 2026 — sources 1.6.0
+## Parcours courant — sources 1.7.0
+
+La réexécution complète sur les sources finales réussit : **15 notebooks,
+97 cellules de code, aucune erreur**, en **47,85 secondes cumulées** sous
+Linux / Python 3.12.14. Chaque cours utilise un noyau Jupyter neuf dans une
+copie temporaire du parcours. Les deux cours 11 et 12, qui nécessitent
+les données locales de `Tuto.zip`, restent hors de cette exécution autonome.
+Les empreintes des notebooks d’entrée et les résultats par cours figurent
+dans le [rapport de livraison 1.7.0](../docs/VALIDATION_1.7.0.json).
+
+Le [cours 16](notebooks/16_harmonisation_fusion_vectorielle.ipynb) ajoute huit
+cellules autonomes : schémas de deux relevés villageois simulés, correspondances,
+types et valeurs manquantes, lecture SQLite de contrôle, provenance et plan de
+tampons. Il distingue une conversion refusée d’une conversion explicitement
+acceptée vers une valeur nulle.
+
+Son exécution locale du 26 octobre 2026 dans un noyau Jupyter neuf réussit :
+**8 cellules, aucune erreur, 3,14 secondes**, y compris le plan de fusion puis
+tampons. Les sorties numériques et la figure sont enregistrées dans le fichier.
+
+Le parcours comporte **15 notebooks autonomes (00 à 10 et 13 à 16), soit
+97 cellules de code**. La [matrice pédagogique](COVERAGE.md) relie **42 opérateurs
+aux cours sur les 50 enregistrés**. Les résultats exécutés sont suivis dans
+la [validation 1.7.0](../docs/VALIDATION_1.7.0.json) et les jobs Windows/Ubuntu
+du workflow Tutoriels. Les deux cours privés restent séparés.
+
+L’édition HTML des **17 cours** a été construite avec les sorties enregistrées.
+Les pages privées 11 et 12 conservent leurs résultats historiques ; leur export
+HTML ne constitue pas une nouvelle exécution de ces deux études.
+
+## Historique du 26 octobre 2026 — sources 1.6.0
 
 Le nouveau [cours 15](notebooks/15_reprojection_vectorielle_par_lot.ipynb) a été
 exécuté dans un noyau Jupyter neuf : **8 cellules, aucune erreur, 4,22 secondes**.
@@ -88,7 +118,7 @@ Le [workflow Tutoriels](https://github.com/cedrick14/cartomize-python/actions/ru
 | Windows, noyaux Jupyter indépendants | Cours 00 à 10 | 11 notebooks réussis |
 | Python 3.12 / IPython local, données fournies | Cours 11 et 12 | 2 notebooks réussis |
 
-Lors de cette validation historique, la construction HTML a réussi sur les deux systèmes. Les deux cas réels ont été contrôlés localement sans redistribution de leurs données ou sorties dans le dépôt. L’exécution utilisait alors le paquet publié `cartomize==1.0.1` et l’intitulé **Version 1.0**. Les dépendances courantes installent désormais la copie des sources, et les cours 13 à 15 complètent le parcours autonome.
+Lors de cette validation historique, la construction HTML a réussi sur les deux systèmes. Les deux cas réels ont été contrôlés localement sans redistribution de leurs données ou sorties dans le dépôt. L’exécution utilisait alors le paquet publié `cartomize==1.0.1` et l’intitulé **Version 1.0**. Les dépendances courantes installent désormais la copie des sources, et les cours 13 à 16 complètent le parcours autonome.
 
 ## Vérifications
 
@@ -96,7 +126,7 @@ Lors de cette validation historique, la construction HTML a réussi sur les deux
 - Les contrôles portent sur les bandes, le SCR, la résolution, les masques, les codes, les superficies, les transitions, l’égalité de deux calculs et la présence des livrables.
 - Les références de classification simulées sont séparées entre apprentissage et validation. Les scores ne constituent pas une validation sur le terrain.
 - Le cours STAC utilise un serveur HTTP local de démonstration. La disponibilité d’un catalogue distant et de Binder est hors du périmètre de ces contrôles.
-- Les cas Mvouti et okapis nécessitent les fichiers privés fournis localement. Leur validation historique est décrite ci-dessus ; ils n’ont pas été réexécutés avec la version 1.6.0 et ne sont pas exécutés par le workflow public, qui ne dispose pas du ZIP.
+- Les cas Mvouti et okapis nécessitent les fichiers privés fournis localement. Leur validation historique est décrite ci-dessus ; ils n’ont pas été réexécutés avec la version 1.7.0 et ne sont pas exécutés par le workflow public, qui ne dispose pas du ZIP.
 - L’examen des cartes vérifie les titres, légendes, tables et rendus. Les mesures liées aux données sources restent soumises aux limites indiquées dans [DATA.md](DATA.md).
 
 ## Reproduire les contrôles

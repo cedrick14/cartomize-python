@@ -13,7 +13,7 @@ natifs Esri et une boîte à outils Python ArcPy. La bibliothèque reprend les
 modules Python indépendants d'ArcPy et les maquettes de cette édition.
 Les dix modules repris sont conservés dans `_core`, à usage interne.
 Leur version interne 10.5.1 exprime leur provenance; la version du
-paquet est 1.6.0. Les fichiers originaux ne sont pas modifiés.
+paquet est 1.7.0. Les fichiers originaux ne sont pas modifiés.
 
 ## Fonctionnalités
 
@@ -25,6 +25,7 @@ paquet est 1.6.0. Les fichiers originaux ne sont pas modifiés.
 | Cartographie | Rendu Matplotlib, cadres multiples, échelle géodésique locale, nord vrai, légendes |
 | Géométrie | GeoPandas/Shapely : clip, overlay, sjoin, dissolve, buffer, réparation et audit |
 | Reprojection vectorielle | Découverte multicouche, catalogue PROJ, choix géodésique par couche, emprises et publication atomique du lot |
+| Harmonisation vectorielle | Inspection des schémas, correspondances, conversions et valeurs manquantes explicites, concaténation avec provenance et relecture typée |
 | Mesures | Distances en mètres, surfaces m²/ha/km² et conversion des unités projetées |
 | Raster | NDVI/différence normalisée, reclassification, découpage, reprojection, statistiques zonales, surfaces et transitions |
 | Imagerie | Découverte des scènes, contrôle de couverture, sélection et compléments STAC facultatifs, calibration, masques, mosaïque cohérente, multibande, AOI, compositions RGB/RGBA et traçabilité |
@@ -129,3 +130,20 @@ dans les plans. Le manifeste conserve les SCR, les emprises issues des sommets
 réels, les opérations, les grilles, les politiques et l’environnement.
 Le [guide M09](VECTOR_REPROJECTION.md) décrit les contrats de coordonnées,
 les contrôles de fidélité et la portée horizontale du traitement.
+
+## Harmonisation et fusion de couches
+
+`vector_merge` sépare l’inspection des sources de la conversion vers le schéma
+cible et de la concaténation. Les correspondances sont des objets sérialisables
+indexés par les identifiants des sources ; elles ne contiennent aucun widget
+ni objet de moteur externe. Le même contrat alimente Python, le terminal,
+les plans et les formulaires de `desktop_merge`.
+
+`vector_io` utilise Arrow pour la lecture, puis des tableaux typés et leurs
+masques de valeurs nulles pour l’écriture. Les entiers et types attributaires
+ne transitent pas par une représentation flottante implicite. La relecture du
+GeoPackage contrôle les données enregistrées avant publication atomique du
+nouveau dossier. Le manifeste conserve schéma, correspondances, politiques,
+provenance et transformations éventuelles. Une reprojection explicitement
+demandée réutilise M09 ; la fusion attributaire n’effectue aucune union de
+géométries. Voir le [contrat M10](VECTOR_MERGE.md).

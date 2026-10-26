@@ -13,7 +13,8 @@ def frame(data):
     elif isinstance(data, gpd.GeoSeries):
         result = gpd.GeoDataFrame(geometry=data.copy(), crs=data.crs)
     else:
-        result = gpd.read_file(data)
+        from .vector_io import read_vector
+        result = read_vector(data)
     if result.crs is None:
         raise ValueError("The data has no CRS. Set its actual source CRS before processing.")
     return result

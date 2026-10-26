@@ -11,8 +11,9 @@ from ._core.vector import _profile_field, _infer_role, _choose_label, _choose_th
 
 
 def read_file(path, **kwargs):
-    """Read a vector file into a standard GeoPandas GeoDataFrame."""
-    return gpd.read_file(path, **kwargs)
+    """Read vector data with nullable integers and exact datetime values."""
+    from .vector_io import read_vector
+    return read_vector(path, **kwargs)
 
 
 def from_xy(data, x="longitude", y="latitude", crs="EPSG:4326"):

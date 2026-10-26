@@ -22,6 +22,7 @@ required_modules=(
     'routing','processing','storage','cli','imagery_automatic','catalogs','automation','workflow',
     'vector_quality','vector_quality_result','vector_topology','vector_duplicates','desktop_vector_quality',
     'vector_reprojection','desktop_reprojection',
+    'vector_merge','vector_io','desktop_merge',
 )
 directory=Path(sys.argv[1]) if len(sys.argv)>1 else root/'pypi-dist'
 expected={f'{name}-{version}-py3-none-any.whl',f'{name}-{version}.tar.gz'}
@@ -75,8 +76,13 @@ with tarfile.open(directory/f'{name}-{version}.tar.gz') as archive:
                  'docs/VALIDATION_M09_REAL.json','tests/test_vector_reprojection.py',
                  'tests/test_vector_reprojection_interfaces.py','tests/test_desktop_reprojection.py',
                  'scripts/validate_vector_reprojection_real.py',
+                 'docs/VECTOR_MERGE.md','docs/RELEASE_1.7.0.md','docs/VALIDATION_1.7.0.json',
+                 'docs/VALIDATION_M10_REAL.json','tests/test_vector_merge.py',
+                 'tests/test_vector_merge_interfaces.py','tests/test_desktop_merge.py','tests/test_vector_io.py',
+                 'scripts/validate_vector_merge_real.py',
                  'tutorials/course.py','tutorials/requirements.txt','tutorials/scripts/execute.py',
                  'tutorials/notebooks/15_reprojection_vectorielle_par_lot.ipynb',
+                 'tutorials/notebooks/16_harmonisation_fusion_vectorielle.ipynb',
                  'scripts/check_startup.py','scripts/check_release.py','scripts/verify_installed_release.py'):
         assert f'{name}-{version}/{file}' in names,file
 print(json.dumps({'name':name,'version':version,'files':[
