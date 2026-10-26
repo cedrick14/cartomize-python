@@ -107,7 +107,7 @@ La [fiche de validation](VALIDATION.md) et le
 contrôles distants attachés au commit dans
 [GitHub Actions](https://github.com/cedrick14/cartomize-python/actions).
 
-- Suite complète locale Linux/Python 3.12 : **722 tests réussis, 2 ignorés**
+- Suite complète locale initiale Linux/Python 3.12 : **722 tests réussis, 2 ignorés**
   pour les environnements matériels CUDA et natif QGIS indisponibles localement.
 - Parcours Jupyter : **12 notebooks et 73 cellules exécutés**, avec un noyau
   neuf par cours. Le cours 00 accepte et signale sa couverture partielle ;
@@ -119,6 +119,9 @@ contrôles distants attachés au commit dans
 - Fenêtre : parcours automatique, catalogue, refus et résultat partiel,
   restauration de projet et transfert entre traitements couverts par les tests.
   Formulaire inspecté à 1440 × 940 avec textes de 12 et 16 pixels.
+  Les actions de la barre d’outils conservent leurs libellés après changement
+  d’état, sans récupération d’un bouton interne pendant l’initialisation ;
+  21 cas ciblés vérifient les actions et les ouvertures/fermetures de fenêtre.
 - Paquet installé dans un environnement neuf : contrôle de couverture,
   mosaïque et valeurs physiques exactes, 20 pages graphiques, trois thèmes,
   calcul du NDVI, tampon vectoriel, exports PDF/PNG/SVG, projet réouvert et

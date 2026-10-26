@@ -46,10 +46,10 @@ class AdaptiveWorkspace(QObject):
         for key, label in [('open', 'Ouvrir'), ('save', 'Enregistrer'),
                            ('import', 'Importer'), ('run', 'Exécuter')]:
             action = workbench.actions[key]
-            control = workbench.toolbar.widgetForAction(action)
-            if control:
-                control.setText(label)
-                control.setToolTip(action.text())
+            # Qt creates and resynchronizes its toolbar buttons from the action.
+            # Keep their compact label here, without retrieving an internal widget.
+            action.setIconText(label)
+            action.setToolTip(action.text())
         window.theme_selector.setMinimumWidth(90)
         workbench.font_size.setMinimumWidth(78)
         workbench.bottom_tabs.currentChanged.connect(self.schedule)

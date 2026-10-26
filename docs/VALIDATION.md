@@ -2,7 +2,7 @@
 
 ## Cartomize 1.4.0 — module M07, validation locale du 26 octobre 2026
 
-La suite complète passe **722 tests**, avec deux essais conditionnels ignorés
+La suite complète locale initiale a validé **722 tests**, avec deux essais conditionnels ignorés
 (CUDA et QGIS natif), sous Linux / Python 3.12.14. Les douze cours autonomes,
 00 à 10 et 13, passent dans des noyaux Jupyter neufs, avec **73 cellules de code
 exécutées**. Le cours 00 indique explicitement sa couverture partielle acceptée.
@@ -34,6 +34,15 @@ celles reproduisant exactement le débordement Windows. Les libellés et boutons
 restent intégralement lisibles, y compris avec les marges supplémentaires des
 champs numériques de Windows 11. La wheel reconstruite est installée et vérifiée
 à nouveau ; la matrice complète finale est celle du commit publié dans GitHub.
+
+Un contrôle supplémentaire a révélé un échec intermittent lors de la récupération
+d’un bouton interne de la barre d’outils. Les libellés sont désormais définis
+sur les actions Qt, ce qui supprime cette récupération et les conserve après
+activation ou désactivation. **21 cas ciblés** valident les actions, le diagnostic
+d’images, l’espace de travail et le cycle de vie de la fenêtre. Ils comprennent
+six créations/destructions avec clic sur Exécuter, dont trois avec le retour
+Qt inattendu observé en CI. La wheel issue de cette correction est reconstruite,
+installée et vérifiée à nouveau hors des sources.
 
 ## Cartomize 1.3.0 — validation locale du 26 octobre 2026
 

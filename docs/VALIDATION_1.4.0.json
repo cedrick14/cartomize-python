@@ -34,7 +34,7 @@
     ],
     "command": "QT_QPA_PLATFORM=offscreen MPLBACKEND=Agg OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 python -m pytest --timeout=90 --disable-warnings",
     "network_regressions": "Actual local HTTP server: polygon STAC search, pagination, bounded downloads, QA companions, broken chunked transfers and invalid status lines; eight HTTP failure cases preserve diagnostics and previous useful acquisitions.",
-    "source_stage": "Full local suite before the final GUI typography adjustment; the affected GUI tests were rerun afterward."
+    "source_stage": "Full local suite before final GUI refinements; the affected GUI tests were rerun afterward. Full remote suites are attached to the published commit."
   },
   "notebooks": {
     "passed": 12,
@@ -97,8 +97,8 @@
     "wheel_build": "passed",
     "wheel_twine_strict": "passed",
     "wheel": "cartomize-1.4.0-py3-none-any.whl",
-    "wheel_bytes": 398880,
-    "wheel_sha256": "81951807de67372f17189854a3c22db6a2f69057997ece6357589b935c155efb",
+    "wheel_bytes": 398937,
+    "wheel_sha256": "f36c76648e7deff64cef121f52d1640df706c0f5825c30e5c796b764b6082851",
     "source_archive_check": "scripts/check_release.py: modules, metadata, documentation, tests and all real/reference data files verified.",
     "source_archive_build": "passed",
     "twine_strict": "passed",
@@ -170,5 +170,25 @@
     ],
     "local_validation": "All 12 autonomous notebooks passed. After the typography-only GUI correction, 28 affected GUI regressions and 16 geometry cases passed across offscreen/minimal and Windows/Fusion at 12/16 px, including an extra 28 px for numeric controls; the rebuilt wheel was installed and verified again.",
     "remote_ci": "Use checks attached to the final PR head. Earlier failed runs remain part of GitHub history."
+  },
+  "toolbar_follow_up": {
+    "reason": "The push workflow exposed an intermittent QWidgetItem return from QToolBar.widgetForAction during desktop construction. Independent reproduction also showed direct button text being reset after action enabled-state changes.",
+    "change": "Set QAction iconText and toolTip directly; no internal button lookup, type guard or swallowed exception during construction. The precise binding-level cause of the unexpected wrapper remains unproven.",
+    "local_tests": {
+      "passed": 21,
+      "failed": 0,
+      "scope": [
+        "desktop_adaptive",
+        "desktop_imagery_audit",
+        "desktop_workbench",
+        "desktop_lifecycle"
+      ]
+    },
+    "regressions": [
+      "Four action labels survive enabled-state changes with menu text, tooltip and shortcut preserved.",
+      "Six window creations, actual Run clicks and native destructions, including three with the unexpected QWidgetItem return injected."
+    ],
+    "isolated_install": "Wheel rebuilt after the action correction, all Python modules compared byte-for-byte to source, then installed and verified again in a clean environment outside the checkout.",
+    "remote_ci": "Verify both push and pull_request workflows attached to the final published commit."
   }
 }
