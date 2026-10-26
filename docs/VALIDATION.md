@@ -2,7 +2,7 @@
 
 ## Cartomize 1.3.0 — validation locale du 26 octobre 2026
 
-Les sources complétées passent **615 tests**, avec deux essais conditionnels ignorés (CUDA et QGIS natif), sous Linux / Python 3.12.14. Les douze notebooks autonomes passent également dans de vrais noyaux Jupyter, soit 73 cellules de code. La wheel construite est installée dans un environnement neuf et vérifiée hors du dépôt : calculs, 20 pages graphiques, exports, projet et console.
+Les sources complétées passent **626 tests**, avec deux essais conditionnels ignorés (CUDA et QGIS natif), sous Linux / Python 3.12.14. Les douze notebooks autonomes passent également dans de vrais noyaux Jupyter, soit 73 cellules de code. La wheel construite est installée dans un environnement neuf et vérifiée hors du dépôt : calculs, 20 pages graphiques, exports, projet et console.
 
 La [note de version](RELEASE_1.3.0.md) détaille les contrats modifiés et les contrôles. Le [rapport machine](VALIDATION_1.3.0.json) conserve les dépendances, les limites et l’empreinte de la wheel testée. Les résultats ci-dessous restent des preuves historiques de la version 1.0.1 ; les résultats CI de 1.3.0 sont à lire sur les commits correspondants dans GitHub Actions.
 

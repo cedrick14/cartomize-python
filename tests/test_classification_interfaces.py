@@ -26,18 +26,18 @@ def test_classification_numeric_identity_survives_files_cli_and_model_reload(wri
                       class_column='classe', label_column='libelle', n_estimators=10, max_depth=4, sample_limit=128)
     direct = cm.classify_landcover(source, training, tmp_path/'direct', validation=validation,
         class_column='classe', label_column='libelle', n_estimators=10, max_depth=4, sample_limit=128)
-    parameter_file = tmp_path/'parameters.json'; parameter_file.write_text(json.dumps(parameters))
+    parameter_file = tmp_path/'parameters.json'; parameter_file.write_text(json.dumps(parameters), encoding='utf-8')
     assert main(['process', 'classify', str(parameter_file), str(tmp_path/'cli')]) == 0
     cli = json.loads(capsys.readouterr().out)
     plan = cm.processing_plan([dict(id='classes', operation='classify', parameters=parameters)])
-    chain = json.loads(cm.run_plan(plan, tmp_path/'chain').read_text())
+    chain = json.loads(cm.run_plan(plan, tmp_path/'chain').read_text(encoding='utf-8'))
     with rasterio.open(direct) as src:
         expected = src.read(1)
     assert set(np.unique(expected)) == {1, 2}
     for path in (cli['primary'], chain['results']['classes']):
         with rasterio.open(path) as src:
             np.testing.assert_array_equal(src.read(1), expected)
-        metadata = json.loads((Path(path).parent/'classification.json').read_text())
+        metadata = json.loads((Path(path).parent/'classification.json').read_text(encoding='utf-8'))
         assert metadata['validation']['accuracy'] == 1
         assert {x['value']: x['code'] for x in metadata['class_encoding']} == {'1': 1, '2': 2}
         assert metadata['classes']['1'][0] == 'Végétation'

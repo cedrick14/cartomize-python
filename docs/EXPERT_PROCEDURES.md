@@ -6,7 +6,7 @@ L’inventaire comprend **123 procédures** : **11 disponibles dans un périmèt
 
 ## Portée et lecture des statuts
 
-Le diagnostic porte sur les fichiers sources de la version 1.3.0 et les interfaces effectivement raccordées. Les modules **M01 à M06 sont implémentés** : couverture des images, workflows vectoriels, statistiques/emprises raster, identité des classes, raccordement des itinéraires et installation commune Python/Jupyter/fenêtre. La validation locale comprend 615 tests réussis, 12 notebooks autonomes et l’installation du paquet dans un environnement neuf ; voir le [rapport 1.3.0](VALIDATION_1.3.0.json). Le commit de base ci-dessus identifie le point de départ du travail, pas un commit final de publication. Les contrôles GitHub Actions et la publication distante restent distincts de cette validation locale.
+Le diagnostic porte sur les fichiers sources de la version 1.3.0 et les interfaces effectivement raccordées. Les modules **M01 à M06 sont implémentés** : couverture des images, workflows vectoriels, statistiques/emprises raster, identité des classes, raccordement des itinéraires et installation commune Python/Jupyter/fenêtre. La validation locale comprend 626 tests réussis, 12 notebooks autonomes et l’installation du paquet dans un environnement neuf ; voir le [rapport 1.3.0](VALIDATION_1.3.0.json). Le commit de base ci-dessus identifie le point de départ du travail, pas un commit final de publication. Les contrôles GitHub Actions et la publication distante restent distincts de cette validation locale.
 
 | Statut | Sens |
 |---|---|

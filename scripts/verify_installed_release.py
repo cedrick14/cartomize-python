@@ -86,7 +86,9 @@ def probe(output, expected):
     from PySide6.QtWidgets import QApplication
 
     output=Path(output).resolve();output.parent.mkdir(parents=True,exist_ok=True)
-    root=output.parent/'installed-data';root.mkdir(exist_ok=True)
+    # Keep each probe's products separate so validation can be repeated with
+    # the same report path without overwriting an earlier run's exports.
+    root=Path(tempfile.mkdtemp(prefix='installed-data-',dir=output.parent))
     installed=Path(cm.__file__).resolve()
     assert Path(sys.prefix).resolve() in installed.parents, installed
     assert cm.__version__==expected, (cm.__version__,expected)

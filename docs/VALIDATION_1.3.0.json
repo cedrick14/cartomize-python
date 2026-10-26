@@ -23,8 +23,8 @@
     }
   },
   "tests": {
-    "collected": 617,
-    "passed": 615,
+    "collected": 628,
+    "passed": 626,
     "skipped": 2,
     "failed": 0,
     "skipped_reasons": [
@@ -63,8 +63,8 @@
     "twine_strict": "passed",
     "archive_content_checks": "passed",
     "wheel": "cartomize-1.3.0-py3-none-any.whl",
-    "wheel_bytes": 377100,
-    "wheel_sha256": "7d2f889815e6bc126691ff1214b4aae1cda9cd9a4e5d56d26be146ccb568d7cd"
+    "wheel_bytes": 377295,
+    "wheel_sha256": "6ac28d582e65bd8b2ede95aa36d023bee6d40b110ffe2d611abae4c76af71283"
   },
   "isolated_install": {
     "status": "passed",
@@ -90,7 +90,20 @@
       940
     ],
     "zonal_form_horizontal_scroll": 0,
-    "browse_buttons_visible": true
+    "browse_buttons_visible": true,
+    "font_sizes": [
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+    ],
+    "qt_styles_validated_on_linux": [
+      "Windows",
+      "Fusion"
+    ],
+    "parameterized_geometry_cases": 12
   },
   "not_validated": [
     "Native CUDA calculations",
@@ -98,5 +111,16 @@
     "Binder service availability",
     "Private tutorial datasets",
     "Remote STAC provider availability"
-  ]
+  ],
+  "follow_up": {
+    "reason": "Windows CI identified a locale-dependent JSON test read and a real minimum-width overflow in the zonal form.",
+    "changes": [
+      "Read the UTF-8 classification fixture explicitly as UTF-8.",
+      "Allow the two zonal choices to shrink and wrap form labels; retain full tooltips.",
+      "Test all supported text sizes and available Qt styles.",
+      "Use a fresh product directory for each installed-wheel probe."
+    ],
+    "local_validation": "Full suite and rebuilt installed wheel revalidated after these changes.",
+    "remote_ci": "Read the checks associated with the final pull-request head; earlier failed runs are retained in GitHub history."
+  }
 }

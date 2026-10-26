@@ -6,9 +6,9 @@ os.environ.setdefault('QT_QPA_PLATFORM', 'offscreen')
 import pytest
 
 pytest.importorskip('PySide6')
-from PySide6.QtCore import QPoint, QSettings
+from PySide6.QtCore import QPoint, QSettings, Qt
 from PySide6.QtTest import QTest
-from PySide6.QtWidgets import QApplication, QDialog, QMessageBox, QPushButton
+from PySide6.QtWidgets import QApplication, QDialog, QMessageBox, QPushButton, QStyleFactory
 
 from cartomize.desktop_processing import OperationDialog
 
@@ -105,8 +105,12 @@ def test_explicit_null_paths_and_parameters_survive_reopening(application):
         application.processEvents()
 
 
-def test_zonal_form_fits_default_window_and_keeps_browse_buttons_visible(application, tmp_path, monkeypatch):
+@pytest.mark.parametrize('font_size', range(11, 17))
+@pytest.mark.parametrize('style', QStyleFactory.keys())
+def test_zonal_form_fits_default_window_and_keeps_browse_buttons_visible(application, tmp_path, monkeypatch, font_size, style):
     import cartomize.desktop as desktop
+    previous_style = application.style().objectName()
+    application.setStyle(style)
     monkeypatch.setattr(desktop, 'QSettings', lambda *args: QSettings(str(tmp_path / 'appearance.ini'), QSettings.Format.IniFormat))
     window = desktop.CartomizeWindow()
     try:
@@ -114,6 +118,7 @@ def test_zonal_form_fits_default_window_and_keeps_browse_buttons_visible(applica
         window.select_tool('raster')
         page = window.tool('raster')
         page.operation.setCurrentIndex(page.operation.findData('zonal_stats'))
+        window._workbench.font_size.setValue(font_size)
         window.show()
         QTest.qWait(50)
         scroll = window.stack.currentWidget()
@@ -122,6 +127,10 @@ def test_zonal_form_fits_default_window_and_keeps_browse_buttons_visible(applica
         assert scroll.horizontalScrollBar().maximum() == 0
         assert 'zone_pixels' in page.include_coverage.toolTip()
         assert 'hors du raster' in page.include_coverage.toolTip()
+        for choice in (page.value_mode, page.all_touched):
+            assert choice.toolTip() == choice.currentText()
+            for index in range(choice.count()):
+                assert choice.itemData(index, Qt.ItemDataRole.ToolTipRole) == choice.itemText(index)
         for field in (page.source, page.secondary, page.output):
             buttons = field.findChildren(QPushButton)
             assert buttons
@@ -131,3 +140,4 @@ def test_zonal_form_fits_default_window_and_keeps_browse_buttons_visible(applica
     finally:
         window.close()
         application.processEvents()
+        application.setStyle(previous_style)

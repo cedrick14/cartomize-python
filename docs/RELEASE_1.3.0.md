@@ -88,7 +88,7 @@ Validation locale du **26 octobre 2026**, sous **Linux / Python 3.12.14**. Le [r
 
 | Contrôle | Résultat |
 |---|---|
-| Suite complète | **615 réussis, 2 ignorés**, aucun échec ; 617 tests collectés. |
+| Suite complète | **626 réussis, 2 ignorés**, aucun échec ; 628 tests collectés. |
 | Jupyter | **12 notebooks autonomes**, cours 00 à 10 et 13 ; **73 cellules de code exécutées**, un noyau réel neuf par cours. |
 | Édition HTML | 14 cours exportés ; cela inclut les sorties historiques des deux cours privés, sans prétendre les avoir réexécutés. |
 | Construction | Wheel et archive source 1.3.0 construites ; Twine strict et contrôle des modules, ressources et métadonnées réussis. |
@@ -96,7 +96,7 @@ Validation locale du **26 octobre 2026**, sous **Linux / Python 3.12.14**. Le [r
 | Calculs depuis le paquet installé | NDVI, tampon de 200 m, diagnostic d’imagerie et statistiques calibrées ; couverture de référence **5 pixels valides sur 8, soit 62,5 %**. |
 | Interface installée | 20 pages, trois thèmes, exports PDF/PNG/SVG, sauvegarde/réouverture et noyau de console vérifiés. |
 | Contrat API et fenêtre | API importable sans Qt ; erreur d’installation explicite à l’ouverture sans l’option graphique ; vraie cellule Jupyter rendue avec événements Qt actifs. |
-| Revue du formulaire zonal | Fenêtre 1440 × 940, boutons de fichiers visibles et aucune barre de défilement horizontale. |
+| Revue du formulaire zonal | Fenêtre 1440 × 940, tailles de texte 11–16 et styles Windows/Fusion sous Linux : boutons de fichiers visibles et aucune barre de défilement horizontale. |
 
 Les essais graphiques utilisent Qt en mode hors écran. Ces résultats locaux ne remplacent pas les jobs Windows, Linux et QGIS du dépôt ; leurs résultats sont associés aux commits dans [GitHub Actions](https://github.com/cedrick14/cartomize-python/actions). Les tests de chaque module et les scripts de reproduction sont inclus dans les sources.
 

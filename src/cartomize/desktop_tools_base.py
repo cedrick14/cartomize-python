@@ -5,7 +5,8 @@ import os
 import tempfile
 import math
 import numpy as np
-from PySide6.QtWidgets import QComboBox,QLineEdit,QLabel,QPlainTextEdit,QPushButton,QCheckBox
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QComboBox,QLineEdit,QLabel,QPlainTextEdit,QPushButton,QCheckBox,QSizePolicy
 import cartomize as cm
 from .desktop import Page,PathField,spin,real,RASTER_FILTER,VECTOR_FILTER
 from ._validation import output_path
@@ -143,6 +144,12 @@ class RasterToolsPage(Page):
         self.include_coverage.setToolTip('Ajouter zone_pixels, raster_pixels et coverage_percent : pixels de toute la zone, pixels dans le raster et pourcentage de pixels valides. Le dénominateur inclut la partie hors du raster.')
         self.all_touched=QComboBox()
         self.all_touched.addItem('Centre du pixel dans la zone (par défaut)',False);self.all_touched.addItem('Tous les pixels touchés par la zone',True)
+        for choice in (self.value_mode,self.all_touched):
+            choice.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
+            choice.setMinimumContentsLength(12)
+            choice.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
+            for index in range(choice.count()):choice.setItemData(index,choice.itemText(index),Qt.ItemDataRole.ToolTipRole)
+            choice.currentTextChanged.connect(choice.setToolTip);choice.setToolTip(choice.currentText())
         self.max_zone_pixels=spin(250_000_000,1,2_147_483_647);self.max_zone_pixels.setGroupSeparatorShown(True)
         self.max_zone_pixels.setToolTip('Limite du nombre de pixels de la fenêtre examinée par zone ; la partie hors du raster est incluse si la couverture est demandée.')
         self.zonal_note=QLabel('Valeur physique = valeur brute × facteur + décalage des métadonnées de la bande ; sans calibration, facteur 1 et décalage 0. '
@@ -152,7 +159,8 @@ class RasterToolsPage(Page):
             ('Système de coordonnées cible',self.crs),('Résolution (unités du système cible)',self.resolution),('Rééchantillonnage',self.resampling),
             ('Correspondance des classes',self.mapping),('Valeurs sans correspondance',self.unmatched),('Unité de superficie',self.unit),
             ('Valeurs utilisées',self.value_mode),('Préfixe des champs de résultat',self.zonal_prefix),('Couverture de chaque zone',self.include_coverage),
-            ('Inclusion des pixels',self.all_touched),('Limite de pixels candidats par zone',self.max_zone_pixels)]:self.form.addRow(label,widget)
+            ('Inclusion des pixels',self.all_touched),('Limite de pixels candidats par zone',self.max_zone_pixels)]:
+            self.form.addRow(label,widget);self.form.labelForField(widget).setWordWrap(True)
         self.form.addRow(self.zonal_note)
         self.finish();self.operation.currentIndexChanged.connect(self.changed);self.changed()
     def changed(self):
