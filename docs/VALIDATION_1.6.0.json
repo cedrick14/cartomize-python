@@ -5,9 +5,9 @@
   "procedures": [
     "G04"
   ],
-  "generated_at_utc": "2026-10-26T19:22:18.375684+00:00",
+  "generated_at_utc": "2026-10-26T19:28:37.617543+00:00",
   "baseline_commit": "f9a2117f70c91cdbb46026ec57b786a997915271",
-  "source_identity_note": "The baseline predates M09 and the validation parent predates the checkbox layout correction. The exact corrected working sources are identified by all module hashes below; the full suite and installed wheel were rerun on those sources. Remote checks identify the final GitHub commit separately.",
+  "source_identity_note": "The hashes identify the final sources. The full local suite ran on commit 51201b9; the only later source change adds one line break to a checkbox label. Seventeen desktop tests, the isolated installed-wheel probe and real-data checks were repeated on the final sources. Native CI outcomes remain linked to their exact tested commit on PR #6.",
   "tested_source_sha256": {
     "src/cartomize/__init__.py": "f0e7f32e94b1ea956d13f42d363d55b2bf1e7af10c473cec0a95f084853d898d",
     "src/cartomize/__main__.py": "79ee6f134c5c5193377cf9b189cbdcc3e2095e49ba9cec310114441c15a917c4",
@@ -52,7 +52,7 @@
     "src/cartomize/desktop_processing.py": "be6e966c7df84d22e3ab5f6017210287d0f90d987c4218da861d88f866494265",
     "src/cartomize/desktop_project.py": "e1e1ef4a222f3da95c4323317fc84b39e9436069c43286303b7ae020ce5f9869",
     "src/cartomize/desktop_recipes.py": "62cb23398014d49224fe2c45be644a9d8f98f4b48d6ea4539752e7a410bb9c53",
-    "src/cartomize/desktop_reprojection.py": "773d051d7721e099c0b293f009c7619a00d6e7d54166b531cfefe5cef1654fed",
+    "src/cartomize/desktop_reprojection.py": "480f30732573875bca495f8038dafb4fed5080190019aea7c4973aa4b6c4c91c",
     "src/cartomize/desktop_results.py": "424a73d8aab716dcfed957971279c1b6f75ae591749907c8b579c3c5f660bbc2",
     "src/cartomize/desktop_session.py": "ff4ca61939ceb348abc0d8faf68c48ab4fc0b89919da577ce136767ce8164407",
     "src/cartomize/desktop_tables.py": "f725546206935633805cd25c4e3a008c5c39e05bd660c2e8079ab4a6bbaa7dd3",
@@ -114,7 +114,10 @@
     "skip_reasons": [
       "No CUDA device/runtime: hardware validation required",
       "QGIS runtime not configured"
-    ]
+    ],
+    "validated_commit": "51201b91ec153e04c758be7147939644bd1132cd",
+    "desktop_module_sha256_at_validation": "773d051d7721e099c0b293f009c7619a00d6e7d54166b531cfefe5cef1654fed",
+    "scope_note": "Only the checkbox label line break changed afterwards. All other module hashes remain identical. The 17 desktop tests and the complete installed-wheel probe were repeated after it."
   },
   "new_regressions": {
     "total": 74,
@@ -246,10 +249,10 @@
   },
   "real_data": {
     "report": "docs/VALIDATION_M09_REAL.json",
-    "report_sha256": "63f20978ca609f690e96279c3a327884c19fbcef2d053c7ac6fd4381b5ccf85a",
+    "report_sha256": "5e43825b3c446dfaaf195674269c4168311b122ebbb995b5a65099599a26a049",
     "passed": 12,
     "failed": 0,
-    "seconds": 7.276,
+    "seconds": 6.824,
     "features": {
       "paris_districts": 80,
       "mining_observations": 3687,
@@ -259,8 +262,8 @@
   },
   "installed_wheel": {
     "filename": "cartomize-1.6.0-py3-none-any.whl",
-    "bytes": 439770,
-    "sha256": "613901162df24bd3cf272b6c11f5b364a9900a5a3fc34acc6f3b812bb944a7eb",
+    "bytes": 439772,
+    "sha256": "470de97dd9a1d3c9a4862cbb49cb7b99cc3ea56a1b9c5f1594b388f310786806",
     "python_modules_identical_to_validated_sources": 90,
     "twine_strict": "passed",
     "isolated_venv": true,
@@ -272,8 +275,8 @@
       "status": "passed",
       "version": "1.6.0",
       "python": "3.12.14",
-      "executable": "/tmp/cartomize-install-r0sir4yh/venv/bin/python",
-      "module": "/tmp/cartomize-install-r0sir4yh/venv/lib/python3.12/site-packages/cartomize/__init__.py",
+      "executable": "/tmp/cartomize-install-j9qzg0je/venv/bin/python",
+      "module": "/tmp/cartomize-install-j9qzg0je/venv/lib/python3.12/site-packages/cartomize/__init__.py",
       "checks": [
         "installed desktop and 20 tool pages",
         "light dark and system appearance",
@@ -302,12 +305,12 @@
       16
     ],
     "observations": [
-      "No horizontal overflow in the batch form.",
+      "No horizontal overflow in the batch form at 12 and 16 pixels.",
+      "The complete checkbox labels use two or three lines and remain readable with simulated 24-pixel text.",
+      "All checkbox widths and heights satisfy their size hints; the execute control stays visible.",
       "Source discovery, operation details and execution controls remain usable.",
       "An existing 1.5 session retains its operation and gains the new batch entry.",
-      "Full session equality is covered by the unchanged existing regression test.",
-      "The complete checkbox labels use two lines; no horizontal overflow with wider 24-pixel checkbox text.",
-      "All checkbox widths and heights satisfy their size hints; the execute control stays visible."
+      "Full session equality is covered by the unchanged existing regression test."
     ],
     "platform": "Linux",
     "simulated_checkbox_font_pixels": 24
@@ -343,7 +346,7 @@
     "Source-datum geographic screening is an approximate rectangular domain check, not grid coverage proof.",
     "Physical CUDA hardware is not available in this local validation environment."
   ],
-  "validation_parent_commit": "67118663fdbaf8b18a87b17f0f87424c081546a8",
+  "validation_parent_commit": "51201b91ec153e04c758be7147939644bd1132cd",
   "desktop_layout_regression": {
     "initial_native_windows_run": "https://github.com/cedrick14/cartomize-python/actions/runs/40383876658",
     "initial_results_each_python_version": {
@@ -367,6 +370,12 @@
       "24 px checkbox text simulation"
     ],
     "early_windows_gate": true,
-    "native_confirmation": "The corrected commit is checked by the Windows jobs linked on PR #6; no native result is inferred from the Linux simulation."
+    "native_confirmation": "The corrected commit is checked by the Windows jobs linked on PR #6; no native result is inferred from the Linux simulation.",
+    "second_native_windows_run": "https://github.com/cedrick14/cartomize-python/actions/runs/40386290364",
+    "second_native_result": "The original 12/16-pixel cases passed. Only the new 24-pixel stress case overflowed: the best-transformation checkbox minimum width was 480 pixels, page width 530 and viewport width 431.",
+    "final_correction": "The best-transformation label uses three lines. Other labels and all stress-test assertions are unchanged.",
+    "final_local_desktop_tests_passed": 17,
+    "final_local_desktop_seconds": 4.93,
+    "final_local_desktop_log_sha256": "8402410c8bf6750243f4245b866b18e01a30aaaceae4100f0157cd169e628998"
   }
 }

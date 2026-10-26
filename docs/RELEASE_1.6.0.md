@@ -48,7 +48,7 @@ strictement positive ; `None` signifie qu’aucun filtre numérique n’est dema
 | Régressions ajoutées pour M09 | **74 tests**, inclus dans la suite complète : 51 moteur, 6 terminal/plans, 17 fenêtre |
 | Parcours autonome complet | **14 notebooks, 89 cellules exécutées**, 50,56 s cumulées dans des noyaux neufs |
 | Wheel 1.6.0 installée hors des sources | **14 contrôles réussis**, environnement neuf, API/fenêtre/console ; 90 modules identiques aux sources vérifiées |
-| Données réelles épinglées | **12 contrôles réussis**, 0 échec, 7,276 s |
+| Données réelles épinglées | **12 contrôles réussis**, 0 échec, 6,824 s |
 | Intégrité des entrées et du code pendant ces contrôles | 10 fichiers d’entrée et 90 modules Python inchangés |
 | Cours 15 dans un noyau Jupyter neuf | **8 cellules exécutées**, aucune erreur, 4,22 s |
 
@@ -60,11 +60,13 @@ des sessions existantes est vérifiée sans modifier son test historique.
 
 Les premières exécutions Windows ont révélé deux débordements horizontaux du
 formulaire compact. Les libellés complets des cases à cocher tiennent désormais
-sur deux lignes. Une régression supplémentaire simule des caractères de 24 px
+sur deux ou trois lignes. Une régression supplémentaire simule des caractères de 24 px
 et vérifie que les cases reçoivent toute leur largeur et leur hauteur requises.
 Les trois cas compacts sont exécutés au début des jobs Windows, puis inclus
-dans la suite générale. La suite locale complète et l'installation isolée ont
-été réexécutées après cette correction.
+dans la suite générale. La suite locale complète correspond à la révision `51201b9`. Après le dernier
+retour à la ligne du libellé, les 17 tests de la fenêtre, le paquet installé et
+les contrôles réels ont été réexécutés. La matrice distante vérifie la révision
+finale complète.
 
 Le [rapport réel](VALIDATION_M09_REAL.json) conserve les références, versions,
 empreintes SHA256 et résultats numériques. Le

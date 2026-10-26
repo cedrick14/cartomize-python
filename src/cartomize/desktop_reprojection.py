@@ -56,7 +56,7 @@ class BatchReprojectionControls:
         self.batch_aoi.setToolTip('Facultatif : emprise géographique WGS 84 utilisée pour rechercher les transformations.')
         self.batch_ballpark = QCheckBox('Autoriser une\napproximation')
         self.batch_ballpark.setToolTip('Autoriser explicitement une transformation géodésique approximative, qui sera signalée dans le rapport.')
-        self.batch_require_best = QCheckBox('Exiger la meilleure\ntransformation')
+        self.batch_require_best = QCheckBox('Exiger la\nmeilleure\ntransformation')
         self.batch_require_best.setChecked(True)
         self.batch_require_best.setToolTip('Arrêter si une grille nécessaire à la meilleure transformation est absente. Le lot n’active aucun téléchargement de grilles.')
         self.batch_area_policy = self._reprojection_combo()

@@ -7,13 +7,18 @@ aucun échec** sous Linux / Python 3.12.14. Les 74 nouvelles régressions M09
 sont incluses. Les exclusions concernent le matériel CUDA indisponible et
 le moteur QGIS natif, qui possède un contrôle distant dédié.
 
+Cette suite complète correspond au commit `51201b9`. La seule modification
+ultérieure du code ajoute un retour à la ligne dans une case à cocher. Les
+17 tests de la fenêtre, les contrôles du paquet installé et les essais réels
+sont réexécutés après ce changement ; la matrice distante couvre le commit final.
+
 Les **14 notebooks autonomes** exécutent **89 cellules** dans des noyaux neufs,
 en **50,56 s cumulées**. La wheel 1.6.0 est installée et utilisée dans un
 environnement neuf hors du dépôt : ses **14 contrôles** API/fenêtre/console
 réussissent, et ses **90 modules Python** sont identiques aux sources testées.
 
 Le [rapport M09 sur données réelles](VALIDATION_M09_REAL.json) enregistre
-**12 contrôles réussis, 0 échec**, en **7,276 s** le 26 octobre 2026.
+**12 contrôles réussis, 0 échec**, en **6,824 s** le 26 octobre 2026.
 Les trois jeux épinglés comprennent 80 quartiers parisiens, 3 687 relevés
 miniers et 50 aires protégées de RDC. Les 10 fichiers d’entrée et les 90 modules
 Python conservent leurs empreintes pendant l’exécution.
