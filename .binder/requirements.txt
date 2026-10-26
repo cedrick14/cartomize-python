@@ -1,4 +1,4 @@
-cartomize==1.0.1
+# The checked-out Cartomize sources are installed by postBuild.
 jupyterlab>=4.3,<5
 nbformat>=5.10,<6
 nbclient>=0.10,<1

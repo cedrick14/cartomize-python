@@ -5,7 +5,7 @@
 Dans une cellule du notebook, avec le noyau Python de l’environnement choisi :
 
 ```python
-%pip install "cartomize[notebook]==1.0.1"
+%pip install -e "C:/Projets/cartomize-python[notebook]"
 ```
 
 Redémarrer le noyau, puis exécuter :
@@ -15,12 +15,12 @@ import cartomize as cm
 fenetre = cm.launch()
 ```
 
-La fenêtre affiche **Version 1.0**. Le numéro 1.0.1 désigne la révision du paquet. Les services de notebooks distants n’ouvrent pas une fenêtre native sur l’ordinateur de l’utilisateur ; les cours API et leurs graphiques restent utilisables dans ces services.
+Adapter le chemin à la copie GitHub utilisée pour les cours. La fenêtre et l’API utilisent alors les mêmes sources **1.3.0**. Les services de notebooks distants n’ouvrent pas une fenêtre native sur l’ordinateur de l’utilisateur ; les cours API et leurs graphiques restent utilisables dans ces services.
 
 ## Parcours de travail
 
 1. **Analyser les entrées.** Charger les rasters et couches vectorielles. Examiner SCR, résolutions, NoData, champs et classes. Consulter le cours 09 pour distinguer un fond périphérique et un zéro valide.
-2. **Prétraiter les images.** Dans la rubrique multispectrale, vérifier les scènes et rôles des bandes, charger l’emprise puis sélectionner mosaïque, multibande, extraction de bandes et composition. Les paramètres correspondent au cours 02.
+2. **Prétraiter les images.** Dans la rubrique multispectrale, vérifier les scènes et rôles des bandes, charger l’emprise puis lancer le diagnostic de couverture. Appliquer la proposition de scènes avant de sélectionner mosaïque, multibande, extraction de bandes et composition. Les paramètres correspondent aux cours 02 et 13.
 3. **Analyser les produits scientifiques.** Choisir les indices, l’algèbre ou la classification sur le multibande scientifique, avec une calibration et des références adaptées. Les sorties RVB étirées servent à l’affichage.
 4. **Examiner les résultats.** Les sorties apparaissent dans les onglets du panneau droit. Utiliser zoom, déplacement, métadonnées et valeurs de pixels. Comparer les résultats avec des emprises liées et, pour les variables comparables, une échelle colorimétrique commune.
 5. **Composer la carte.** Définir les rôles des couches, l’ordre, les classes, les étiquettes, les cadres et les éléments de page. Contrôler les unités, sources, dates et limites de l’interprétation.

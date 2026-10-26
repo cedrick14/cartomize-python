@@ -4,8 +4,6 @@ import os
 import sys
 import threading
 import tempfile
-from .desktop_connections import ProjectConnections
-from .desktop_session import SessionControls
 
 try:
     from PySide6.QtCore import Qt, QObject, QThread, Signal, Slot, QUrl, QSize, QSettings
@@ -15,7 +13,10 @@ try:
         QStackedWidget,QComboBox,QSpinBox,QDoubleSpinBox,QCheckBox,QPlainTextEdit,
         QTableWidget,QTableWidgetItem,QHeaderView,QProgressBar,QMessageBox,QGroupBox,QScrollArea,QTabWidget,QSplitter,QToolButton,QListView,QDockWidget)
 except ImportError as exc:
-    raise ImportError('Interface graphique indisponible. Installer : python -m pip install "PySide6-Essentials>=6.7,<7"') from exc
+    raise ImportError('Interface graphique indisponible. Installer : python -m pip install "cartomize[gui]"') from exc
+
+from .desktop_connections import ProjectConnections
+from .desktop_session import SessionControls
 
 import rasterio
 import cartomize as cm

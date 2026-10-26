@@ -7,10 +7,10 @@ Les outils sont accessibles dans l’interface graphique et par l’API Python. 
 | Assistant cartographique | Examen, plan dépendant, variantes de maquettes, exécution jusqu’aux exports et reprise de mise en page |
 | Analyse du projet | Copies masquées, fond périphérique, classes éditables, application à la carte, rétablissement des sources |
 | Analyse des couches | Diagnostic raster et vectoriel |
-| Prétraitement multispectral | Tableau des bandes par scène, correspondances manuelles, calibration, QA/SCL, mosaïque facultative, assemblage multibande, extraction par masque, canaux RVB et GeoTIFF monobandes séparés ; session persistante |
+| Prétraitement multispectral | Tableau des bandes par scène, correspondances manuelles, diagnostic de couverture et proposition de scènes, calibration, QA/SCL, mosaïque facultative, assemblage multibande, extraction par masque, canaux RVB et GeoTIFF monobandes séparés ; session persistante |
 | Composition colorée | Quatre compositions spectrales et RVB natif ; sortie RGBA |
 | Classification | Forêt aléatoire, arbres extrêmement aléatoires, K-moyennes ; classes, confiance, validation et modèle |
-| Traitements vectoriels | 13 opérations GeoPandas, dont superposition, jointure, tampon, dissolution et réparation |
+| Traitements vectoriels | Superpositions, sélections, jointures spatiales et attributaires, tampons, dissolution, réparations, synthèses, relevés datés et coordonnées XY |
 | Traitements raster | Inspection, découpage, reprojection, reclassification, statistiques zonales, surfaces et changements selon le sélecteur |
 | Analyse de terrain | Pente, exposition, ombrage, TPI, TRI, rugosité et convolution par blocs |
 | Indices spectraux | 18 indices intégrés, paramètres, calibration et correspondances ; registre extensible |
@@ -22,7 +22,7 @@ Les outils sont accessibles dans l’interface graphique et par l’API Python. 
 | Production automatisée | Préparation des scènes, assemblage multibande, composition colorée, superposition et export |
 | Recettes et production en série | Recettes réutilisables, variables, associations, migration historique, manifestes jusqu’à 5 000 tâches |
 | Projets SIG | Inventaire QGS/QGZ, import des sous-couches et styles pris en charge ; passerelle native optionnelle pour copie et export |
-| Chaîne de traitements | 34 opérateurs, références aux résultats et produits secondaires, paramètres moteur, exécution autonome ou intégrée à la carte |
+| Chaîne de traitements | 43 opérateurs, références aux résultats et produits secondaires, paramètres moteur, exécution autonome ou intégrée à la carte |
 | Révision cartographique | Instantanés, empreintes, comparaison, décision nominative et contrôle de la carte |
 
 | Visualisation des résultats | Onglets intégrés, zoom, déplacement, valeurs de pixels, légendes, métadonnées, comparaisons, tableaux et graphiques |

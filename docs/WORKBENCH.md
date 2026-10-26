@@ -1,4 +1,4 @@
-# Espace de travail Cartomize 1.1
+# Espace de travail Cartomize 1.3
 
 ## Installation
 
@@ -14,7 +14,7 @@ python -m cartomize gui
 Depuis le paquet wheel de la version :
 
 ```bash
-python -m pip install "./cartomize-1.1.0-py3-none-any.whl[gui]"
+python -m pip install "./cartomize-1.3.0-py3-none-any.whl[gui]"
 python -m cartomize gui
 ```
 

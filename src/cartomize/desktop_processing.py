@@ -19,15 +19,20 @@ LABELS={'data':'Couche source','source':'Raster ou couche source','left':'Couche
         'table':'Tableau attributaire (CSV ou TSV)','observations':'Couche des observations','aoi':'Zone d’étude',
         'field':'Champ attributaire','comparison':'Comparaison','value':'Valeur ou liste de valeurs',
         'left_on':'Clé de la couche','right_on':'Clé du tableau','validate':'Cardinalité de la jointure',
-        'null_keys':'Clés manquantes : unmatched, match ou error',
+        'null_keys':'Clés manquantes',
         'table_dtypes':'Types des colonnes (objet JSON)','delimiter':'Séparateur du tableau','encoding':'Encodage du tableau',
         'group_by':'Identifiant de regroupement','order_by':'Champ de date','output_field':'Champ de sortie',
         'operation':'Transformation géométrique','tolerance':'Tolérance (m)','statistic':'Statistique','predicate':'Relation spatiale',
-        'value_mode':'Valeurs : physical ou raw','prefix':'Préfixe des champs de résultat',
+        'value_mode':'Valeurs utilisées','prefix':'Préfixe des champs de résultat','snap':'Rattachement au réseau',
         'include_coverage':'Mesurer la couverture de chaque zone','max_zone_pixels':'Limite de pixels candidats par zone',
         'all_touched':'Inclure tous les pixels touchés par la zone'}
 PATHS={'data','source','left','right','mask','zones','before','after','training','validation','model','valid_footprint','outlets','table','observations','aoi'}
 COMPLEX={'inputs','sources','kernel','mapping','products','indices','border_values','nodata_values','keep_values','classes','band_map','bands','predictors','rgb','start','end','bbox','collections','assets','band_order','table_dtypes'}
+CHOICES={
+    'snap':[('Sur le segment le plus proche','edge'),('Sur le sommet le plus proche','node')],
+    'null_keys':[('Ne pas apparier','unmatched'),('Apparier les clés manquantes','match'),('Refuser les clés manquantes','error')],
+    'value_mode':[('Valeurs physiques (calibration du raster)','physical'),('Valeurs brutes (DN)','raw')],
+}
 
 
 class OperationDialog(QDialog):
@@ -52,15 +57,29 @@ class OperationDialog(QDialog):
             for name,value in record['parameters'].items():
                 if name in self.controls:
                     widget=self.controls[name]
-                    if isinstance(widget,QCheckBox):widget.setChecked(bool(value))
+                    if name in CHOICES:
+                        index=widget.findData(value)
+                        if index<0:
+                            self._invalid_choices[name]=value
+                            widget.setPlaceholderText(f'Valeur inconnue : {value!r} — choisir')
+                        widget.setCurrentIndex(index)
+                    elif value is None:
+                        self._explicit_nulls.add(name)
+                        if isinstance(widget,QCheckBox):widget.setTristate(True);widget.setCheckState(Qt.CheckState.PartiallyChecked)
+                        else:widget.setCurrentText('')
+                    elif isinstance(widget,QCheckBox):widget.setChecked(bool(value))
                     else:widget.setCurrentText(json.dumps(value,ensure_ascii=False) if isinstance(value,(dict,list,tuple)) else str(value))
     def changed(self):
         while self.form.rowCount():self.form.removeRow(0)
-        self.controls={};spec=operation_spec(self.operation.currentData())
+        self.controls={};self._explicit_nulls=set();self._invalid_choices={};spec=operation_spec(self.operation.currentData())
         self.add_map.setEnabled(self.allow_map and spec['output'] in {'raster','vector'});self.product.clear();self.product.addItems(spec['products'])
         for field in spec['parameters']:
             name=field['name'];default=field['default'];label=LABELS.get(name,name.replace('_',' '))+(' *' if field['required'] else '')
-            if isinstance(default,bool):widget=QCheckBox();widget.setChecked(default);row=widget
+            if name in CHOICES:
+                widget=QComboBox();widget.setPlaceholderText('Choisir une valeur')
+                for title,value in CHOICES[name]:widget.addItem(title,value)
+                widget.setCurrentIndex(widget.findData(default));row=widget
+            elif isinstance(default,bool):widget=QCheckBox();widget.setChecked(default);row=widget
             else:
                 widget=QComboBox();widget.setEditable(True);widget.setMinimumWidth(270)
                 if name in PATHS:
@@ -82,10 +101,18 @@ class OperationDialog(QDialog):
         parameters={};spec=operation_spec(self.operation.currentData())
         for field in spec['parameters']:
             name=field['name'];widget=self.controls[name]
-            if isinstance(widget,QCheckBox):value=widget.isChecked()
+            if name in CHOICES:
+                if widget.currentIndex()<0:
+                    detail=f' (valeur enregistrée non reconnue : {self._invalid_choices[name]!r})' if name in self._invalid_choices else ''
+                    raise ValueError('Choisir '+LABELS.get(name,name)+detail)
+                value=widget.currentData()
+            elif isinstance(widget,QCheckBox):value=None if widget.checkState()==Qt.CheckState.PartiallyChecked else widget.isChecked()
             else:
                 text=widget.currentText().strip()
                 if not text:
+                    if name in self._explicit_nulls:
+                        parameters[name]=None
+                        continue
                     if field['required']:raise ValueError('Renseigner '+LABELS.get(name,name))
                     continue
                 default=field['default']

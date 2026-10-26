@@ -26,6 +26,7 @@ for path in sorted((ROOT/'notebooks').glob('*.ipynb')):
  started=time.perf_counter();print('START',path.name,flush=True)
  try:
   manager=KernelManager(kernel_name='python3',transport=args.transport)
+  manager.kernel_spec.argv[0]=sys.executable
   try:
    NotebookClient(notebook,km=manager,timeout=args.timeout,resources={'metadata':{'path':str(ROOT)}},record_timing=True).execute()
   finally:

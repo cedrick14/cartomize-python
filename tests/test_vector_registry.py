@@ -101,8 +101,10 @@ def test_chain_dialog_exposes_table_types_and_missing_key_policy():
     dialog = OperationDialog([])
     dialog.operation.setCurrentIndex(dialog.operation.findData('vector.join_attributes'))
     for key, value in dict(data='source.gpkg', table='attributes.csv', left_on='code',
-                           table_dtypes='{"code":"string"}', null_keys='error').items():
+                           table_dtypes='{"code":"string"}').items():
         dialog.controls[key].setCurrentText(value)
+    policy = dialog.controls['null_keys']
+    policy.setCurrentIndex(policy.findData('error'))
     assert dialog.controls['table'].findText('@scientific') >= 0
     record = dialog.value()
     assert record['parameters']['table_dtypes'] == {'code': 'string'}

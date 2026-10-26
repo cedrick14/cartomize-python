@@ -1,12 +1,12 @@
 # Couverture fonctionnelle
 
-Version 1.0. Les paramètres et conditions d’utilisation sont décrits dans le [catalogue des outils](TOOL_AUDIT.md).
+Version des sources 1.3.0. Les paramètres et conditions d’utilisation sont décrits dans le [catalogue des outils](TOOL_AUDIT.md).
 
 | Domaine | Fonctionnalités |
 |---|---|
 | API et interface graphique | API indépendante, 20 rubriques, traitements en arrière-plan |
 | Assistant cartographique | Règles explicables, plan exécutable, propositions de maquettes et reprise de la carte |
-| Scènes jusqu’à la carte | Calibration, QA/SCL, mosaïque, multibande, extraction, composition, couches et export |
+| Scènes jusqu’à la carte | Diagnostic de couverture, recommandation de scènes, calibration, QA/SCL, mosaïque, multibande, extraction, composition, couches et export |
 | NoData et bordures noires | Détection conservatrice, masquage des composantes périphériques, protection des classes et des sources |
 | Traitements vectoriels | GeoPandas, superpositions, jointures, proximités, mesures et réparations |
 | Raster et indices | Algèbre extensible, 18 indices, statistiques, classification, terrain et convolution |
@@ -14,7 +14,7 @@ Version 1.0. Les paramètres et conditions d’utilisation sont décrits dans le
 | Mise en page | 24 maquettes d’origine, cadres, habillage, dimensions éditables, textes mesurés, étiquettes, aperçu et export |
 | Persistance | État des outils, couches, résultats et maquettes ; JSON et archive CMZ ; historique des actions principales |
 | Recettes, lots et révision | Variables, associations de couches, journaux, migration, empreintes et décision nominative |
-| Chaînes de traitements | 34 opérateurs, dépendances vérifiées, produits secondaires et paramètres moteur transmis |
+| Chaînes de traitements | 43 opérateurs, dépendances vérifiées, produits secondaires et paramètres moteur transmis |
 | Hydrologie, routage et STAC | Drainage D8, bassins, plus court chemin, recherche et téléchargement de scènes |
 | Projets natifs | Inventaire QGS/QGZ et import des styles pris en charge opérationnels ; passerelle QGIS testée dans le moteur QGIS ; validation ArcPy encore requise |
 | Identité visuelle | Icône originale en couleur ; titre et contrôles en noir, blanc et gris |
@@ -22,3 +22,5 @@ Version 1.0. Les paramètres et conditions d’utilisation sont décrits dans le
 
 
 Le [guide des moteurs](EXECUTION.md) précise les opérations compatibles avec Dask et CUDA. Le [guide de visualisation](RESULTS_WORKSPACE.md) décrit les vues, comparaisons et limites de rendu.
+
+L’[inventaire expert](EXPERT_PROCEDURES.md) distingue 123 procédures complètes : 11 disponibles, 48 partielles et 64 absentes. Les 43 opérateurs enregistrés désignent des fonctions composables, pas 43 procédures expertes achevées. Les limites et priorités sont documentées séparément pour chaque procédure.

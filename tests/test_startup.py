@@ -10,11 +10,52 @@ import pytest
 
 def test_installed_startup_in_fresh_process():
     script = Path(__file__).resolve().parents[1] / 'scripts' / 'check_startup.py'
+    result = subprocess.run([sys.executable, str(script)],
+                            capture_output=True, text=True, timeout=150)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert 'CARTOMIZE_STARTUP_OK' in result.stdout
+    assert 'CARTOMIZE_GUI_OK' not in result.stdout
+
+
+def test_installed_gui_startup_in_fresh_process():
+    pytest.importorskip('PySide6')
+    script = Path(__file__).resolve().parents[1] / 'scripts' / 'check_startup.py'
     result = subprocess.run([sys.executable, str(script), '--gui'],
                             capture_output=True, text=True, timeout=150)
     assert result.returncode == 0, result.stdout + result.stderr
     assert 'CARTOMIZE_STARTUP_OK' in result.stdout
     assert 'CARTOMIZE_GUI_OK' in result.stdout
+
+
+def test_python_api_without_qt_and_actionable_launch_error(tmp_path):
+    # Exercise the missing optional dependency even when the test runner has Qt.
+    script = '''
+import importlib.abc
+import sys
+
+class WithoutQt(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname == 'PySide6' or fullname.startswith('PySide6.'):
+            raise ModuleNotFoundError('Qt deliberately unavailable for this test', name=fullname)
+
+sys.meta_path.insert(0, WithoutQt())
+import cartomize as cm
+from cartomize.processing import operation_catalog
+assert {'routing', 'raster.zonal_stats', 'vector.join_attributes'} <= {item['id'] for item in operation_catalog()}
+assert not any(name == 'PySide6' or name.startswith('PySide6.') for name in sys.modules)
+try:
+    cm.launch(block=False)
+except ImportError as error:
+    assert 'Interface graphique indisponible' in str(error), str(error)
+    assert 'python -m pip install "cartomize[gui]"' in str(error), str(error)
+else:
+    raise AssertionError('Desktop launch must explain its missing Qt dependency')
+print('CARTOMIZE_WITHOUT_QT_OK')
+'''
+    result = subprocess.run([sys.executable, '-I', '-c', script], cwd=tmp_path,
+                            capture_output=True, text=True, timeout=45)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert 'CARTOMIZE_WITHOUT_QT_OK' in result.stdout
 
 
 def test_notebook_launch_returns_and_processes_qt_events(tmp_path):
