@@ -15,9 +15,16 @@ LABELS={'data':'Couche source','source':'Raster ou couche source','left':'Couche
         'products':'Dérivées du terrain (liste JSON)','kernel':'Matrice de convolution (JSON)',
         'mapping':'Correspondance des classes (objet JSON)','zones':'Couche des zones','before':'Raster initial',
         'after':'Raster final','training':'Échantillons de référence','class_column':'Champ des classes','indices':'Indices (liste JSON)',
-        'border_values':'Valeurs périphériques à masquer (liste JSON)','keep_values':'Valeurs à conserver (liste JSON)'}
-PATHS={'data','source','left','right','mask','zones','before','after','training','validation','model','valid_footprint','outlets'}
-COMPLEX={'inputs','sources','kernel','mapping','products','indices','border_values','nodata_values','keep_values','classes','band_map','bands','predictors','rgb','start','end','bbox','collections','assets','band_order'}
+        'border_values':'Valeurs périphériques à masquer (liste JSON)','keep_values':'Valeurs à conserver (liste JSON)',
+        'table':'Tableau attributaire (CSV ou TSV)','observations':'Couche des observations','aoi':'Zone d’étude',
+        'field':'Champ attributaire','comparison':'Comparaison','value':'Valeur ou liste de valeurs',
+        'left_on':'Clé de la couche','right_on':'Clé du tableau','validate':'Cardinalité de la jointure',
+        'null_keys':'Clés manquantes : unmatched, match ou error',
+        'table_dtypes':'Types des colonnes (objet JSON)','delimiter':'Séparateur du tableau','encoding':'Encodage du tableau',
+        'group_by':'Identifiant de regroupement','order_by':'Champ de date','output_field':'Champ de sortie',
+        'operation':'Transformation géométrique','tolerance':'Tolérance (m)','statistic':'Statistique','predicate':'Relation spatiale'}
+PATHS={'data','source','left','right','mask','zones','before','after','training','validation','model','valid_footprint','outlets','table','observations','aoi'}
+COMPLEX={'inputs','sources','kernel','mapping','products','indices','border_values','nodata_values','keep_values','classes','band_map','bands','predictors','rgb','start','end','bbox','collections','assets','band_order','table_dtypes'}
 
 
 class OperationDialog(QDialog):

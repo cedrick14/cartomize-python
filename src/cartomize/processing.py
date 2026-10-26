@@ -14,6 +14,7 @@ from .imagery import _check_cancel
 
 def _catalog():
     from . import vector, raster
+    from . import vector_workflows
     from .algebra import calculate, reduce_rasters
     from .terrain import terrain, convolve
     from .focal import focal
@@ -35,6 +36,30 @@ def _catalog():
                       ('nearest','Jointure de proximité'),('dissolve','Dissolution'),('reproject','Reprojection vectorielle'),
                       ('make_valid','Réparation des géométries')]:
         add('vector.'+key,label,getattr(vector,key),'vector','vector')
+    for key,label in [('select_attributes','Sélection par attribut'),
+                      ('select_location','Sélection spatiale'),
+                      ('geometry_operation','Transformation des géométries'),
+                      ('spatial_summary','Synthèse des observations par zone'),
+                      ('latest_records','Dernier relevé par identifiant')]:
+        add('vector.'+key,label,getattr(vector_workflows,key),'vector','vector')
+    def table_input(data,table_dtypes,delimiter,encoding):
+        from .tableio import read_table
+        import pandas as pd
+        if isinstance(data,(str,Path)):
+            return read_table(data,dtype=table_dtypes,delimiter=delimiter,encoding=encoding)
+        table=pd.DataFrame(data).copy()
+        return table.astype(table_dtypes) if table_dtypes is not None else table
+    def table_join(data,table,*,left_on,right_on=None,how='left',validate='many_to_one',
+                   null_keys='unmatched',table_dtypes=None,delimiter=None,encoding='utf-8-sig'):
+        return vector_workflows.join_attributes(data,
+            table_input(table,table_dtypes,delimiter,encoding),left_on=left_on,
+            right_on=right_on,how=how,validate=validate,null_keys=null_keys)
+    def table_points(data,x='longitude',y='latitude',crs='EPSG:4326',*,
+                     table_dtypes=None,delimiter=None,encoding='utf-8-sig'):
+        return vector.from_xy(table_input(data,table_dtypes,delimiter,encoding),x=x,y=y,crs=crs)
+    add('vector.join_attributes','Jointure attributaire',table_join,'vector','vector')
+    add('vector.from_xy','Points depuis un tableau XY',table_points,'vector','vector')
+    add('vector.validate','Diagnostic des géométries',vector.validate,'document','vector')
     from functools import partial
     for mode,label in [('intersection','Intersection'),('union','Union'),('difference','Différence'),('symmetric_difference','Différence symétrique')]:
         add('vector.'+mode,label,partial(vector.overlay,how=mode),'vector','vector')
