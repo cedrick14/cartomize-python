@@ -261,6 +261,17 @@ def _field_array(values, kind):
     return np.asarray(filled, dtype=dtype), mask
 
 
+def _has_standalone_ring(geometry):
+    # Polygon rings are ordinary polygon structure; a collection member that
+    # is itself a LinearRing has no distinct WKB representation and must fail.
+    if geometry is None:
+        return False
+    if geometry.geom_type == 'LinearRing':
+        return True
+    return (any(_has_standalone_ring(part) for part in geometry.geoms)
+            if hasattr(geometry, 'geoms') else False)
+
+
 def write_geopackage(data, path, *, types=None, layer='features', cancel=None):
     """Write typed scalar attributes and verify every value and geometry.
 
@@ -274,9 +285,8 @@ def write_geopackage(data, path, *, types=None, layer='features', cancel=None):
     columns = [name for name in data.columns if name != data.geometry.name]
     folded = [str(name).casefold() for name in data.columns]
     if (len(set(folded)) != len(folded)
-            or any(not isinstance(name, str) or not name.strip() or '\x00' in name for name in data.columns)
-            or any(name.casefold() == 'geometry' for name in columns)):
-        raise ValueError('GeoPackage attribute names must be nonempty, case-insensitively unique and distinct from geometry.')
+            or any(not isinstance(name, str) or not name.strip() or '\x00' in name for name in data.columns)):
+        raise ValueError('GeoPackage attribute names must be nonempty and case-insensitively unique.')
     hints = {**data.attrs.get('_cartomize_declared_fields', {}),
              **data.attrs.get('_cartomize_temporal_fields', {})}
     kinds = {name: (types[name] if types is not None else field_kind(data[name], hints.get(name))) for name in columns}
@@ -298,6 +308,13 @@ def write_geopackage(data, path, *, types=None, layer='features', cancel=None):
         geometry_name += '_'
     _check_cancel(cancel)
     geometries = data.geometry.to_numpy()
+    for geometry in geometries:
+        if geometry is None:
+            continue
+        if _has_standalone_ring(geometry):
+            raise ValueError('A standalone LinearRing cannot be preserved in a GeoPackage; choose its geometry type explicitly.')
+        if tuple(shapely.geos_version) >= (3, 12, 0) and bool(getattr(geometry, 'has_m', False)):
+            raise ValueError('Measured (M) geometries cannot be preserved by this GeoPackage writer; no output may be published.')
     pyogrio.raw.write(path, shapely.to_wkb(geometries), arrays, columns,
         field_mask=masks, layer=layer, driver='GPKG', geometry_type='Unknown',
         crs=CRS(data.crs).to_wkt(), promote_to_multi=False,

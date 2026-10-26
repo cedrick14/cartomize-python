@@ -211,8 +211,22 @@ def table_page(path, offset=0, size=2000, layer=None):
         from .vector_io import read_vector
         data = read_vector(path, layer=layer, skip_features=offset, max_features=size+1, ignore_geometry=True)
     else:
+        options = {}
+        schema_path = path.with_suffix(path.suffix + '.schema.json')
+        if schema_path.is_file():
+            schema = json.loads(schema_path.read_text(encoding='utf-8'))
+            if schema.get('schema') == 'cartomize.table.v1':
+                types = schema.get('types', {})
+                allowed = {'string', 'Int64', 'Float64', 'boolean'}
+                if not isinstance(types, dict) or any(value not in allowed for value in types.values()):
+                    raise ValueError('Invalid table schema.')
+                labels = schema.get('label_columns', [])
+                # Empty / NA-looking identifiers are labels. Other missing
+                # report cells are the empty values written by to_csv.
+                options = dict(dtype=types, keep_default_na=False,
+                               na_values={name: [''] for name in types if name not in labels})
         data = pd.read_csv(path, sep='\t' if path.suffix.lower()=='.tsv' else None, engine='python',
-                           skiprows=range(1, offset+1), nrows=size+1, encoding='utf-8-sig')
+                           skiprows=range(1, offset+1), nrows=size+1, encoding='utf-8-sig', **options)
     return dict(frame=data.iloc[:size].copy(), more=len(data)>size, offset=offset, size=size)
 
 

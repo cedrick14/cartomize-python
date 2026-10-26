@@ -1,6 +1,6 @@
 # Cartomize
 
-**Version 1.7.0**
+**Version 1.8.0**
 
 Cartomize provides a Python API, a command-line interface and a desktop application for geospatial processing and cartographic production. It runs independently of QGIS and ArcGIS Pro. Native project bridges are optional.
 
@@ -18,7 +18,7 @@ python -m cartomize gui
 For a downloaded wheel:
 
 ```bash
-python -m pip install "./cartomize-1.7.0-py3-none-any.whl[gui]"
+python -m pip install "./cartomize-1.8.0-py3-none-any.whl[gui]"
 ```
 
 For the current GitHub sources:
@@ -63,7 +63,7 @@ Imported files are available for viewing and transfer to compatible processing t
 
 Optional Dask and CUDA execution is available for supported operators. Native GIS bridges and CUDA hardware execution require the corresponding runtime.
 
-Version 1.7.0 adds schema harmonization and layer merging: inspect fields, map each source to a declared schema, control conversions and missing values, and concatenate records with row-level provenance. Arrow reading and typed output arrays preserve integer identifiers and nullable values. The saved GeoPackage, conversion reports and manifest are published together after verification. The same operation is available in Python, the CLI, processing plans and the desktop. See the [merge guide](https://github.com/cedrick14/cartomize-python/blob/main/docs/VECTOR_MERGE.md).
+Version 1.8.0 completes the G01 geometry quality workflow: select a file layer, diagnose original geometries, choose explicit repair and retention policies, and optionally apply an XY precision grid in the source projected CRS units. Reports distinguish repair from precision changes and link every original record to its retained or rejected output. A complete before layer supports direct comparison in the desktop. GeoPackages are read back and checked for exact attribute and geometry preservation before the bundle is published. The same workflow is available in Python, the CLI, processing plans and the desktop. See the [G01 guide](https://github.com/cedrick14/cartomize-python/blob/main/docs/G01_GEOMETRY_QUALITY.md).
 
 Version 1.6.0 added automatic vector batch reprojection: discover files, folders and multi-layer datasets; inspect and select geodetic operations; retain source attributes and geometry; and publish one GeoPackage per layer with coordinate bounds, a CSV and a transformation manifest. The default policy requires the best available operation and rejects ballpark transformations. Layer IDs expose each result to later processing-plan steps. See the [batch reprojection guide](https://github.com/cedrick14/cartomize-python/blob/main/docs/VECTOR_REPROJECTION.md).
 

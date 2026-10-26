@@ -100,5 +100,11 @@
     "title": "Harmonisation et fusion de couches vectorielles",
     "real": false,
     "minutes": 30
+  },
+  {
+    "slug": "17_g01_controle_reparation_geometries",
+    "title": "G01 : contrôle et réparation des géométries",
+    "real": false,
+    "minutes": 35
   }
 ]

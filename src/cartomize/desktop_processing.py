@@ -27,6 +27,7 @@ LABELS={'data':'Couche source','source':'Raster ou couche source','left':'Couche
         'include_coverage':'Mesurer la couverture de chaque zone','max_zone_pixels':'Limite de pixels candidats par zone',
         'all_touched':'Inclure tous les pixels touchés par la zone'}
 LABELS.update({
+    'layer': 'Couche du fichier vectoriel',
     'id_field': 'Identifiant unique des entités', 'method': 'Méthode de réparation',
     'missing': 'Géométries manquantes', 'empty': 'Géométries vides',
     'type_changes': 'Changements de type géométrique', 'keep_collapsed': 'Conserver les composantes effondrées',
@@ -123,6 +124,8 @@ class OperationDialog(QDialog):
         self.add_map.setEnabled(self.allow_map and spec['output'] in {'raster','vector'});self.product.clear();self.product.addItems(spec['products'])
         for field in spec['parameters']:
             name=field['name'];default=field['default'];label=LABELS.get(name,name.replace('_',' '))+(' *' if field['required'] else '')
+            if spec['id'] == 'vector.repair_geometries' and name == 'tolerance':
+                label='Pas de grille XY (unités du SCR source projeté ; 0 désactive)'
             if spec['id'] in {'vector.reproject_batch', 'vector.merge_layers'} and name=='sources':
                 label='Fichiers, dossiers ou couches sélectionnées (liste JSON) *'
             if name in self._choices:
@@ -166,7 +169,7 @@ class OperationDialog(QDialog):
                     if field['required']:raise ValueError('Renseigner '+LABELS.get(name,name))
                     continue
                 default=field['default']
-                if name in PATHS:value=text
+                if name in PATHS or name in {'layer', 'id_field'}:value=text
                 elif name in COMPLEX or isinstance(default,(list,tuple,dict)):value=json.loads(text)
                 elif isinstance(default,int):value=int(text)
                 elif isinstance(default,float):value=float(text)

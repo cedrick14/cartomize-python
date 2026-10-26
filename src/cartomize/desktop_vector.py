@@ -93,11 +93,18 @@ class VectorPage(VectorQualityControls, BaseVectorPage):
 
     def refresh_fields(self):
         import pyogrio
-        source_controls = [self.attribute,self.left_key,self.order_field,self.quality_id]
+        op = self.operation.currentData()
+        if op in self.G01_OPERATIONS:
+            self.refresh_quality_layers()
+        # G01 has its own layer-dependent selector. Leave dormant controls
+        # untouched so selecting a layer and restoring a session agree.
+        source_controls = [] if op in self.G01_OPERATIONS else [self.attribute,self.left_key,self.order_field]
+        if op in {'check_topology', 'deduplicate'}:
+            source_controls.append(self.quality_id)
         other_controls = [self.right_key]
         (source_controls if self.operation.currentData()=='dissolve' else other_controls).append(self.summary_field)
         for text, controls in [(self.source.text(),source_controls),(self.secondary.text(),other_controls)]:
-            if not text or not Path(text).is_file():
+            if not controls or not text or not Path(text).is_file():
                 continue
             try:
                 if Path(text).suffix.lower() in {'.csv','.tsv'}:
@@ -229,6 +236,7 @@ class VectorPage(VectorQualityControls, BaseVectorPage):
 
     def restore_controls(self):
         """Restore conditional controls after loading a saved desktop session."""
+        self.restore_quality_controls()
         self.changed()
         self.restore_reprojection_controls()
         self.restore_merge_controls()

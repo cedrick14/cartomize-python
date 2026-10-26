@@ -11,6 +11,13 @@ parcours autonome sur des données simulées : diagnostic, réparation,
 dédoublonnage, contrôle topologique et comparaison des résultats avec des
 surfaces connues.
 
+Le complément **G01 de la version 1.8.0** ajoute une sélection explicite de
+couche, un pas de grille XY facultatif, le suivi des dimensions et une source
+complète persistée avec correspondance avant/après. Son contrat, ses unités
+et ses limites sont détaillés dans le [guide G01](G01_GEOMETRY_QUALITY.md) et
+le [cours 17](../tutorials/notebooks/17_g01_controle_reparation_geometries.ipynb).
+Les preuves historiques M08 et les sorties du cours 14 sont conservées.
+
 ## Choisir le contrôle adapté
 
 | Besoin | Fonction Python | Opérateur commun | Résultat principal enregistré |
@@ -36,6 +43,7 @@ Chaque appel Python retourne un objet `VectorQualityResult` :
 | `summary` | Paramètres, effectifs, conventions et résultats globaux. |
 | `issues` | Couche de localisation des anomalies lorsqu'elle s'applique. |
 | `rejected` | Enregistrements écartés, conservés avec leur géométrie d'origine lorsqu'ils existent. |
+| `before` | Pour G01, source complète inchangée ; les positions `source_row`, `output_row` et `rejected_row` du rapport relient la source, les résultats et les exclusions. |
 
 `source_row` désigne la **position de la ligne dans l'entrée de l'opération,
 à partir de zéro**. Ce champ reste utilisable lorsque l'index pandas contient
@@ -56,6 +64,7 @@ fenêtre. Chaque exécution crée **un nouveau dossier** :
 | `rejected` | `rejected.gpkg` | Objets écartés ; couche vide lorsqu'aucun objet n'a été écarté. |
 | `report` | `report.csv` | Rapport détaillé, UTF-8 avec marqueur d'encodage, sans index supplémentaire. |
 | `summary` | `summary.json` | Résumé des règles, unités et effectifs. |
+| `before` | `before.gpkg` | Pour G01, source complète permettant une comparaison après fermeture de la session. |
 | — | `operation.json` | Opérateur, résultat principal et chemins de tous les produits. |
 
 Utiliser les chemins du dictionnaire `products` plutôt que supposer que tous
@@ -89,6 +98,7 @@ reparation = cm.repair_geometries(
     "donnees/parcelles.gpkg",
     id_field="identifiant",
     method="linework",
+    tolerance=0.0,  # Pas de grille XY ; zéro conserve la précision originale.
     missing="drop",
     empty="error",
     type_changes="allow",
@@ -116,13 +126,18 @@ une autre définition du doublon et une règle de conservation.
 | `missing`, `empty` | `keep` : conserver et signaler ; `drop` : écarter dans `rejected` ; `error` : arrêter. |
 | `type_changes` | `allow` : accepter et signaler ; `drop` : écarter ; `error` : arrêter. Un passage de Polygon à MultiPolygon est un changement de type. |
 | `keep_collapsed` | Conserver les composantes réduites à une ligne ou un point. Toujours vrai avec `linework` ; désactivable avec `structure`. |
+| `tolerance` | Pas de grille XY en unités du SCR source projeté, zéro par défaut. Une valeur positive est refusée pour une source géographique. La grille intervient après la réparation et ne modifie pas le rôle de `metric_crs`, réservé aux mesures. |
 
 Les règles `missing` et `empty` valent `keep` par défaut. La politique des
 géométries vides s'applique aussi à un résultat devenu vide après réparation.
 Une collection ou une composante de dimension inférieure est conservée lorsque
 les règles l'autorisent ; aucune extraction implicite des seules parties
 polygonales n'est effectuée. Les coordonnées non finies provoquent un arrêt.
-Les entités déjà valides passent sans modification. Les principes des deux
+Avec `tolerance=0`, les entités déjà valides passent sans modification. Le pas
+positif est une réduction de précision explicite ; `repair_changed` et
+`precision_changed` en distinguent les effets. Les règles de vides et de types
+valent également après cette étape. `keep_collapsed` concerne la réparation
+GEOS et ne protège pas les composantes que la grille supprime. Les principes des deux
 méthodes et leurs effets sur les collections sont décrits dans la
 [documentation Shapely de `make_valid`](https://shapely.readthedocs.io/en/stable/reference/shapely.make_valid.html).
 

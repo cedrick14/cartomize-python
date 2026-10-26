@@ -20,3 +20,4 @@ class VectorQualityResult:
     summary: dict
     issues: gpd.GeoDataFrame | None = None
     rejected: gpd.GeoDataFrame | None = None
+    before: gpd.GeoDataFrame | None = None

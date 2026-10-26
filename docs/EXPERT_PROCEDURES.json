@@ -1,7 +1,7 @@
 {
   "schema": "cartomize.expert_procedures.v1",
   "date": "2026-10-26",
-  "source_version": "1.7.0",
+  "source_version": "1.8.0",
   "source_state": "reviewed_source",
   "baseline_commit": "ad4d1d7a89557e347b9a322f73c32205807c077a",
   "inventory": {
@@ -17,7 +17,8 @@
     ]
   },
   "scope": [
-    "Correspondance de l’inventaire expert avec Cartomize 1.7.0 ; modules M01 à M10 implémentés dans leurs périmètres explicites.",
+    "Correspondance de l’inventaire expert avec Cartomize 1.8.0 ; modules M01 à M10 implémentés dans leurs périmètres explicites.",
+    "Le complément G01 de 1.8.0 termine la sélection de couche, la grille XY facultative, les correspondances avant/après, la publication vérifiée et le parcours de comparaison ; il prolonge M08 sans créer de module M11.",
     "baseline_commit identifie le point de départ du dépôt avant les compléments ; il ne désigne pas un commit final de publication de la version 1.3.0.",
     "M10 relie inspection des schémas, correspondances de champs, conversions contrôlées, fusion avec provenance et publication atomique à Python, au terminal, aux plans et à la fenêtre. La validation de chaque version reste décrite dans son rapport propre.",
     "Une ligne représente une procédure experte, pas un nombre de fonctions ni une promesse de parité QGIS/ArcGIS.",
@@ -599,13 +600,13 @@
         "cartomize.vector_quality.audit_geometries",
         "cartomize.vector_quality.repair_geometries"
       ],
-      "implemented": "Audit par identifiant : validité, motifs GEOS, géométries manquantes, vides, non finies et doublons exacts. Réparation linework ou structure avec rapport avant/après, surfaces/longueurs, types, décisions et couche des exclusions.",
+      "implemented": "Audit par identifiant : validité, motifs GEOS, géométries manquantes, vides, non finies et doublons exacts. Réparation linework ou structure. Complément G01 1.8.0 : choix explicite de couche, pas de grille XY facultatif, dimensions et empreintes, changements par étape, source complète before et correspondances persistantes avec résultats et exclusions ; export vérifié par relecture.",
       "missing": [],
       "conditions": [
-        "Identifiant métier unique et renseigné, ou position source explicite ; attributs, ordre et SCR conservés.",
+        "Identifiant métier unique et renseigné, ou position source explicite ; attributs, ordre et SCR conservés. Un fichier multicouche exige layer explicite. Le produit before conserve toutes les entrées ; source_row/output_row/rejected_row relient les produits sans injecter d'ID métier.",
         "Politiques keep/drop/error pour manquants/vides et allow/drop/error pour changements de type. Une réparation encore invalide ou non finie est refusée.",
-        "Mesures en m²/m dans un SCR projeté choisi ; indisponibles en géographique sans metric_crs. Pas de déplacement par tolérance.",
-        "structure exige Shapely >= 2.1 et GEOS >= 3.10 ; linework fonctionne avec Shapely >= 2.0."
+        "tolerance est le pas de grille XY en unités du SCR source projeté, zéro par défaut ; une valeur positive est refusée sur une source géographique. Réparation GEOS puis grille valid_output, avec changements séparés. metric_crs ne sert qu'aux mesures en m²/m, indisponibles en géographique sans ce choix.",
+        "structure exige Shapely >= 2.1 et GEOS >= 3.10 ; linework fonctionne avec Shapely >= 2.0. keep_collapsed concerne GEOS, pas les parties supprimées par la grille. Z suivi mais validité planaire ; M refusé avant mutation et à la publication GeoPackage. Toute altération de WKB ou d'attribut à la relecture refuse atomiquement la publication."
       ],
       "next_module": null,
       "planned_fixes": [],
