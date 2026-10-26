@@ -58,7 +58,7 @@ class Page(QWidget):
     engine=True
     def __init__(self,title,description):
         super().__init__();self.layout=QVBoxLayout(self)
-        heading=QLabel(title);heading.setObjectName("pageTitle")
+        heading=QLabel(title);heading.setObjectName("pageTitle");heading.setWordWrap(True)
         detail=QLabel(description);detail.setWordWrap(True);detail.setObjectName("description")
         self.layout.addWidget(heading);self.layout.addWidget(detail)
         self.parameter_card=QGroupBox('Données et paramètres');self.parameter_card.setObjectName('parameterCard')
@@ -558,12 +558,7 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
         self.tool_pages={key:self.tool_pages[key] for key in order}
         self.pages=list(self.tool_pages.values());titles=['Assistant cartographique' if key=='assistant' else TOOL_LABELS[key] for key in self.tool_pages]
         for title,page in zip(titles,self.pages):
-            self.navigation.addItem(title)
-            scroll=QScrollArea()
-            # These panels are borderless in the theme. Explicitly remove the
-            # native frame too, so Windows and Qt agree on the viewport width.
-            scroll.setFrameShape(QScrollArea.Shape.NoFrame)
-            scroll.setWidgetResizable(True);scroll.setWidget(page);self.stack.addWidget(scroll)
+            self.navigation.addItem(title);scroll=QScrollArea();scroll.setWidgetResizable(True);scroll.setWidget(page);self.stack.addWidget(scroll)
             for form in page.findChildren(QFormLayout):form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.WrapAllRows)
             # Read-only diagnostics remain visible within their tool panels.
             if isinstance(page,MappingPage):

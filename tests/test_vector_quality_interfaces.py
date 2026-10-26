@@ -180,12 +180,13 @@ def test_desktop_quality_worker_captures_rules_and_restores_controls(tmp_path):
     app.processEvents()
 
 
-@pytest.mark.parametrize('font_size', [12, 16])
-def test_quality_forms_fit_compact_window(font_size, tmp_path, monkeypatch):
+@pytest.mark.parametrize('font_size,wide_heading', [(12, False), (16, False), (12, True)],
+                         ids=['12', '16', 'wide_native_heading'])
+def test_quality_forms_fit_compact_window(font_size, wide_heading, tmp_path, monkeypatch):
     app = application()
     from PySide6.QtCore import QSettings
     from PySide6.QtTest import QTest
-    from PySide6.QtWidgets import QWidget
+    from PySide6.QtWidgets import QLabel, QWidget
     import cartomize.desktop as desktop
     monkeypatch.setattr(desktop, 'QSettings', lambda *args:
                         QSettings(str(tmp_path / 'settings.ini'), QSettings.Format.IniFormat))
@@ -195,6 +196,11 @@ def test_quality_forms_fit_compact_window(font_size, tmp_path, monkeypatch):
         window.resize(1100, 740)
         window.show(); window.select_tool('vector')
         page = window.tool('vector')
+        heading = page.findChild(QLabel, 'pageTitle')
+        if wide_heading:
+            # Reproduce a title wider than the panel even on systems whose
+            # default font metrics are narrower than those on Windows.
+            heading.setStyleSheet('font-size: 32px; font-weight: 600;')
         for _, operation in page.QUALITY_OPERATIONS:
             page.operation.setCurrentIndex(page.operation.findData(operation))
             app.processEvents()
@@ -230,6 +236,8 @@ def test_quality_forms_fit_compact_window(font_size, tmp_path, monkeypatch):
                 ], reverse=True)[:8]
                 print('Quality form geometry: ' + json.dumps(geometry, ensure_ascii=False))
             assert inner.horizontalScrollBar().maximum() == 0, json.dumps(geometry)
+            assert heading.width() <= inner.viewport().width()
+            assert heading.height() >= heading.heightForWidth(heading.width())
             assert page.output.isVisible()
             assert window.run_button.isVisible()
     finally:
