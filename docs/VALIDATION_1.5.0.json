@@ -4,7 +4,7 @@
   "date": "2026-10-26",
   "baseline_commit": "d840b6d2930fd578b7cdf2423452cffcae9585fa",
   "scope": "M08 : G01, G02 et G03 ; API, terminal, chaînes, interface et paquet installé.",
-  "source_identity": "The complete Python module SHA-256 map identifies source_commit after the Windows tool-panel frame correction. The initial local full suite, notebook, real-data and desktop records retain their own source_commit; baseline_commit is the integrated M07 base. Windows follow-up checks and the rebuilt installed wheel are recorded separately.",
+  "source_identity": "The complete Python module SHA-256 map identifies source_commit after the Windows tool-page heading wrapping correction. The initial local full suite, notebook, real-data and desktop records retain their own source_commit; baseline_commit is the integrated M07 base. Windows follow-up checks and the rebuilt installed wheel are recorded separately.",
   "source_sha256": {
     "src/cartomize/__init__.py": "c5559f478b2a8e6cd345435899f6cebbe63f6b0efa1b7d79ab84f729ea1db8a3",
     "src/cartomize/__main__.py": "79ee6f134c5c5193377cf9b189cbdcc3e2095e49ba9cec310114441c15a917c4",
@@ -32,7 +32,7 @@
     "src/cartomize/color.py": "f896198f7e4cd2968c5b25c60817c24e1fb6999d68f243b492d9831ddcb0e610",
     "src/cartomize/composition.py": "7ad56e4fd743ffba5c8b89bc9b94d0475d341c32283c24d259c734482cddc2c2",
     "src/cartomize/cuda.py": "717f58fc1073683e3cf70b7dccf70cc6db5f763a766bedb02f3888ec31a7d2e8",
-    "src/cartomize/desktop.py": "8087736f771d8c2944a9adab0f7dc1be4d5b5a3a539e815ac21554478816ccbe",
+    "src/cartomize/desktop.py": "b60e6f2f63b84a81ac33255bde919c5d75f837a20ed06e26317d800d3df81a65",
     "src/cartomize/desktop_adaptive.py": "2eb8772e3e01e61d0f01844955413577c461d6780179f9fc3adb9a10141b532b",
     "src/cartomize/desktop_assistant.py": "8f2fbf5b1937f0681b8ce755469d3f193fdfc549987441f6fbcf0b6371d52b01",
     "src/cartomize/desktop_canvas.py": "23563da064504a02cf93d563f21c119fa5921645903a6b64771f25bd2ae5a323",
@@ -109,7 +109,7 @@
       "Native QGIS runtime not configured locally"
     ],
     "source_commit": "93954d934d6e2c82330f54fce06ea63577ea7ba3",
-    "scope": "Historical complete local suite before the Windows native-frame correction; not a new full-suite execution of the follow-up commit."
+    "scope": "Historical complete local suite before the Windows heading-wrapping correction and its one added regression case; not a new full-suite execution of the follow-up commit."
   },
   "notebook": {
     "notebook": "14_qualite_vectorielle.ipynb",
@@ -150,10 +150,10 @@
       "project save and reopen",
       "installed Python console kernel"
     ],
-    "source_commit": "b71f28acd620dcdc0de4011754fb0314b9e55b4e",
+    "source_commit": "d2889cb273f8387ecced75832247643a0b8bccd8",
     "isolated_from_sources": true,
     "filename": "cartomize-1.5.0-py3-none-any.whl",
-    "sha256": "123983de7f1cd07a9ee71f8078948a616ae7f0aae2ea6d6708496145e1bc88b3"
+    "sha256": "4479ea56f4763b15dd2a397a9636308a9c58306a650c08cb7c930daab4c6be28"
   },
   "desktop": {
     "status": "passed",
@@ -181,10 +181,10 @@
   },
   "continuous_integration": {
     "pull_request": "https://github.com/cedrick14/cartomize-python/pull/5",
-    "source_commit": "b71f28acd620dcdc0de4011754fb0314b9e55b4e",
+    "source_commit": "d2889cb273f8387ecced75832247643a0b8bccd8",
     "status": "tracked_on_pull_request",
-    "workflow_run_id": 40361991135,
-    "workflow_run_url": "https://github.com/cedrick14/cartomize-python/actions/runs/40361991135",
+    "workflow_run_id": 40364248966,
+    "workflow_run_url": "https://github.com/cedrick14/cartomize-python/actions/runs/40364248966",
     "scope": "Windows/Ubuntu Python 3.11/3.12 and native QGIS. Live conclusions and subsequent documentation-only revisions are recorded on pull request #5; this file preserves source and installed-package provenance.",
     "initial_run": {
       "source_commit": "93954d934d6e2c82330f54fce06ea63577ea7ba3",
@@ -192,10 +192,12 @@
       "workflow_run_id": 40359828793,
       "workflow_run_url": "https://github.com/cedrick14/cartomize-python/actions/runs/40359828793",
       "reason": "Windows compact quality form horizontal overflow; both Ubuntu jobs and native QGIS passed."
-    }
+    },
+    "notebooks_run_id": 40364248898,
+    "notebooks_run_url": "https://github.com/cedrick14/cartomize-python/actions/runs/40364248898"
   },
   "pypi_publication": false,
-  "source_commit": "b71f28acd620dcdc0de4011754fb0314b9e55b4e",
+  "source_commit": "d2889cb273f8387ecced75832247643a0b8bccd8",
   "previous_installed_wheel": {
     "status": "passed",
     "version": "1.5.0",
@@ -220,22 +222,24 @@
     "source_commit": "93954d934d6e2c82330f54fce06ea63577ea7ba3"
   },
   "windows_layout_followup": {
-    "source_commit": "b71f28acd620dcdc0de4011754fb0314b9e55b4e",
-    "issue": "The initial GitHub Windows jobs reported a 1 px horizontal overflow in the compact quality form at font size 12.",
-    "change": "Explicit NoFrame on inner tool-page QScrollArea widgets aligns native frame geometry with the borderless desktop theme; the existing zero-overflow assertion is retained and now reports geometry diagnostics.",
+    "source_commit": "d2889cb273f8387ecced75832247643a0b8bccd8",
+    "issue": "Native Windows font metrics made the unwrapped tool-page title impose a minimum width greater than the compact quality-form viewport, causing 1 px horizontal overflow at font size 12.",
+    "change": "Tool-page titles now wrap to the available width. The zero-overflow assertion remains strict, after normal layout events; bounds and height assertions ensure the title remains fully visible.",
+    "added_regression_tests": 1,
+    "regression": "A 32 px heading reproduces the wide native-title constraint on systems with narrower default font metrics.",
     "local_suite": {
       "status": "passed",
-      "passed": 18,
+      "passed": 19,
       "skipped": 0,
       "failed": 0,
       "errors": 0,
-      "seconds": 17.437,
+      "seconds": 19.876,
       "test_files": [
         "tests/test_vector_quality_interfaces.py",
         "tests/test_desktop_workbench.py",
         "tests/test_workbench_viewports.py"
       ],
-      "scope": "Targeted local offscreen GUI checks after the correction; Windows confirmation is recorded in continuous_integration."
+      "scope": "Targeted local offscreen GUI checks after the correction; actual Windows/Ubuntu full-suite conclusions are tracked on the pull request."
     }
   }
 }

@@ -42,7 +42,7 @@ une erreur métier.
 | Notebook 14 | **8 cellules exécutées**, 4,62 s |
 | Données réelles épinglées | **11 contrôles réussis**, aucune mutation des sources |
 | Paquet wheel installé dans un environnement neuf | Interface, 20 rubriques, trois thèmes, console, prétraitement optique, qualité vectorielle, exports et réouverture du projet réussis |
-| Correction du cadre des panneaux, révision `b71f28a` | **18 tests graphiques ciblés réussis**, 0 exclusion, 0 échec, 17,437 s ; wheel reconstruite et vérifiée hors des sources |
+| Retour à la ligne des titres, révision `d2889cb` | **19 tests graphiques ciblés réussis**, 0 exclusion, 0 échec, 19,876 s ; un cas de non-régression ajouté |
 
 Les deux exclusions locales concernent CUDA sans matériel compatible et le
 runtime QGIS natif non configuré. Les contrôles Windows/Ubuntu et QGIS de
@@ -54,16 +54,22 @@ empreintes des modules testés et du paquet installé.
 
 Les premiers contrôles GitHub ont détecté un débordement horizontal d’un pixel
 dans le formulaire compact de qualité vectorielle, avec le texte à 12 px.
-La révision [b71f28a](https://github.com/cedrick14/cartomize-python/commit/b71f28acd620dcdc0de4011754fb0314b9e55b4e)
-retire explicitement le cadre natif des panneaux défilants, conformément au
-thème sans bordure. Le contrôle exige toujours l’absence de défilement horizontal
-et affiche désormais les dimensions du panneau en cas d’échec.
+Les métriques de police Windows donnaient au titre « Traitements vectoriels »
+une largeur minimale supérieure à celle du panneau. La révision
+[d2889cb](https://github.com/cedrick14/cartomize-python/commit/d2889cb273f8387ecced75832247643a0b8bccd8)
+permet aux titres des outils de passer à la ligne selon la largeur disponible.
+Le contrôle exige toujours l’absence de défilement horizontal après la mise
+en page. Il vérifie aussi que le titre reste dans le panneau et dispose de la
+hauteur nécessaire pour être entièrement visible.
 
-Les 18 vérifications locales concernées passent après cette correction.
-La wheel reconstruite a également été installée et exécutée dans un nouvel
-environnement, hors des sources. Les 865 tests du tableau restent ceux de la
-suite locale initiale ; les identifiants des deux révisions sont conservés dans
-le rapport machine. La [matrice GitHub de la révision corrigée](https://github.com/cedrick14/cartomize-python/actions/runs/40361991135)
+Les **19 vérifications locales concernées** passent après cette correction,
+dont un nouveau cas avec un titre à 32 px pour reproduire le débordement sur
+les systèmes aux métriques de police plus étroites. Les 865 tests du tableau
+restent ceux de la suite locale initiale, avant l’ajout de ce cas ; les
+identifiants des deux révisions sont conservés dans le rapport machine,
+avec la vérification isolée du paquet reconstruit. Cette wheel a été installée
+et exécutée avec succès dans un nouvel environnement, hors des sources. La
+[matrice GitHub de la révision corrigée](https://github.com/cedrick14/cartomize-python/actions/runs/40364248966)
 conserve les journaux Windows/Ubuntu et QGIS. Les conclusions vérifiées et les
 contrôles des notebooks sont consignés dans la
 [demande d’intégration nº 5](https://github.com/cedrick14/cartomize-python/pull/5).

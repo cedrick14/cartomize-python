@@ -18,14 +18,19 @@ aux résultats locaux. Les validations 1.4.0 et antérieures suivent ci-dessous.
 
 Les premiers contrôles Windows ont révélé un débordement horizontal d’un pixel
 dans le formulaire compact de qualité vectorielle à 12 px. La révision
-[b71f28a](https://github.com/cedrick14/cartomize-python/commit/b71f28acd620dcdc0de4011754fb0314b9e55b4e)
-aligne le cadre natif des panneaux sur le thème sans bordure et conserve
-l’exigence d’absence de défilement horizontal. **18 tests graphiques ciblés**
-passent après cette correction, en 17,437 s, sans échec ni exclusion.
-La wheel reconstruite est installée et vérifiée dans un nouvel environnement
-hors des sources. Le rapport machine distingue ces contrôles de la suite
-locale initiale et en conserve les empreintes. La
-[matrice Windows/Ubuntu et QGIS de cette révision](https://github.com/cedrick14/cartomize-python/actions/runs/40361991135)
+[d2889cb](https://github.com/cedrick14/cartomize-python/commit/d2889cb273f8387ecced75832247643a0b8bccd8)
+autorise le retour à la ligne des titres, dont la largeur minimale imposée par
+les métriques Windows dépassait celle du panneau. Le contrôle conserve
+l’exigence d’absence de défilement horizontal après la mise en page et vérifie
+les dimensions nécessaires à la lecture complète du titre. **19 tests
+graphiques ciblés** passent après cette correction, en 19,876 s, sans échec ni
+exclusion. Ils comprennent un nouveau cas avec un titre à 32 px, qui reproduit
+le débordement même lorsque les polices du système sont plus étroites.
+Le rapport machine distingue ces contrôles de la suite locale initiale de
+865 tests et conserve les empreintes ainsi que la vérification isolée de la
+wheel reconstruite, installée et exécutée avec succès dans un nouvel
+environnement hors des sources. La
+[matrice Windows/Ubuntu et QGIS de cette révision](https://github.com/cedrick14/cartomize-python/actions/runs/40364248966)
 conserve les journaux d’exécution ; les conclusions vérifiées sont regroupées
 dans la [demande d’intégration nº 5](https://github.com/cedrick14/cartomize-python/pull/5),
 avec les contrôles des notebooks Windows/Ubuntu.
