@@ -1,4 +1,4 @@
-# Prétraitement multispectral à options : 1.0
+# Prétraitement multispectral à options
 
 La rubrique **Prétraitement multispectral** permet de sélectionner les étapes et les produits. Elle fonctionne avec les dépendances Python de Cartomize, sans QGIS ni ArcGIS Pro.
 
@@ -20,6 +20,20 @@ La rubrique **Prétraitement multispectral** permet de sélectionner les étapes
 | Extraction des bandes cochée | Un GeoTIFF monobande est enregistré pour chaque bande, avec la même grille, les masques et les métadonnées. |
 
 Au moins un produit doit être demandé : multibande, bandes séparées ou composition colorée. Si l’assemblage multibande n’est pas conservé, le fichier intermédiaire nécessaire aux autres produits est supprimé après traitement. Le rapport `imagery.json` indique les sorties effectivement présentes et la correspondance des canaux.
+
+## Vérifier la couverture avant de produire les images
+
+Après sélection des bandes, de la zone et du répertoire de sortie, cliquer sur
+**Diagnostiquer la couverture**. Le diagnostic calcule les emprises communes
+aux bandes, les données présentes et les pixels utilisables après les masques
+de qualité. Il affiche une recommandation et enregistre les cartes de couverture
+et de lacunes dans un dossier distinct.
+
+**Appliquer la sélection proposée** conserve les bandes cochées des scènes
+retenues et ajuste l'option de mosaïque. Une modification des données ou des
+paramètres invalide la recommandation précédente. La préparation reste lancée
+par **Exécuter**. Voir les sorties, les règles de mesure et les exemples Python
+et terminal dans le [guide du diagnostic](IMAGERY_AUDIT.md).
 
 ## Bandes personnalisées
 

@@ -56,9 +56,27 @@ def _catalog():
     from .catalogs import search_stac,download_stac
     from .imagery import prepare_imagery
     from .scenes import discover_scenes
-    def preparation(sources,destination,band_order=('blue','green','red','nir'),aoi=None,target_crs=None,mask_clouds=True,allow_mixed_dates=False,progress=None,cancel=None):
-        return prepare_imagery(discover_scenes(sources),destination,band_order=band_order,aoi=aoi,target_crs=target_crs,mask_clouds=mask_clouds,allow_mixed_dates=allow_mixed_dates,progress=progress,cancel=cancel).path
+    def preparation(sources,destination,band_order=('blue','green','red','nir'),aoi=None,
+                    target_crs=None,resolution=None,overlap='first',resampling='nearest',
+                    mask_clouds=True,mask_saturation=True,allow_mixed_dates=False,
+                    all_touched=False,max_pixels=250_000_000,progress=None,cancel=None):
+        return prepare_imagery(discover_scenes(sources),destination,band_order=band_order,
+            aoi=aoi,target_crs=target_crs,resolution=resolution,overlap=overlap,
+            resampling=resampling,mask_clouds=mask_clouds,mask_saturation=mask_saturation,
+            allow_mixed_dates=allow_mixed_dates,all_touched=all_touched,
+            max_pixels=max_pixels,progress=progress,cancel=cancel).path
+    def imagery_audit(sources,destination,*,aoi,band_order=None,target_crs=None,
+                      resolution=None,resampling='nearest',mask_clouds=True,
+                      mask_saturation=True,allow_mixed_dates=False,all_touched=False,
+                      max_pixels=250_000_000,coverage_threshold=100.,progress=None,cancel=None):
+        from .imagery_audit import audit_imagery
+        return audit_imagery(discover_scenes(sources),destination,aoi=aoi,
+            band_order=band_order,target_crs=target_crs,resolution=resolution,
+            resampling=resampling,mask_clouds=mask_clouds,mask_saturation=mask_saturation,
+            allow_mixed_dates=allow_mixed_dates,all_touched=all_touched,max_pixels=max_pixels,
+            coverage_threshold=coverage_threshold,progress=progress,cancel=cancel).manifest
     add('prepare','Prétraitement multispectral',preparation,'raster','prepare')
+    add('imagery.audit','Diagnostic de couverture des images',imagery_audit,'document','prepare')
     add('hydrology','Analyse hydrologique D8',hydrology,'raster','processing')
     add('routing','Plus court chemin',shortest_path,'vector','processing')
     add('stac.search','Recherche de scènes STAC',search_stac,'document','processing')
@@ -86,6 +104,8 @@ def operation_catalog():
             for name,default in dict(execution='threads',scheduler_address=None).items():parameters.append(dict(name=name,required=False,default=default))
         if key in CUDA_OPERATIONS:parameters.append(dict(name='device',required=False,default='cpu'))
         if key=='hydrology':products+=['filled','direction','accumulation','streams','watersheds']
+        if key=='imagery.audit':products+=['coverage','gaps']
+        if key=='prepare':products+=['result_source_index']
         if key=='classify':products+=['classification','confidence']
         if key=='classify':
             from .classification import fit_classifier
@@ -155,7 +175,7 @@ def execute_operation(operation,parameters,destination,*,workers=1,block_size=51
         if operation=='raster.reclassify':p['mapping']={float(k):v for k,v in p['mapping'].items()}
         # JSON raster assets use [path, band], accepted by the array engine.
         if 'destination' in signature.parameters:
-            p['destination']=work/'products' if operation in {'classify','cluster','hydrology','stac.download'} else work/'result.tif'
+            p['destination']=work/'products' if operation in {'classify','cluster','hydrology','stac.download','imagery.audit'} else work/'result.tif'
         for name,value in [('workers',workers),('block_size',block_size),('memory_limit_mb',memory_limit_mb)]:
             if 'options' in signature.parameters or name in signature.parameters or operation=='classify' and name=='workers':p.setdefault(name,value)
         if operation=='classify' and p.get('model'):p.setdefault('training',None)

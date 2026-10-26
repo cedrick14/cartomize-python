@@ -65,7 +65,13 @@ def test_selected_bands_pipeline_and_portable_session(application, write_raster,
         np.testing.assert_allclose(src.read(3),10400*.0000275-.2,atol=1e-7)
     with rasterio.open(record['products'][0]['composition']) as src:
         assert src.tags()['source_bands']=='(4, 3, 2)'
-    assert len(restored.results)==6
+    expected_products = {record['products'][0]['multiband'], record['products'][0]['composition'],
+                         record['products'][0]['source_index'],
+                         *(band['path'] for band in record['products'][0]['bands'].values())}
+    assert {layer['data'] for layer in restored.results} == expected_products
+    assert record['products'][0]['report'] in restored.workspace.records
+    provenance = next(layer for layer in restored.results if layer['data'] == record['products'][0]['source_index'])
+    assert provenance['purpose'] == 'diagnostic'
     assert restored.tool('indices').source.text()==record['products'][0]['multiband']
     restored.close();window.close()
 

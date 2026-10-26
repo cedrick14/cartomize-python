@@ -33,6 +33,9 @@ class PreparedImage:
 
 def _quality_valid(values, kind):
     valid = ~np.ma.getmaskarray(values) & np.isfinite(values.data)
+    if kind == "valid_mask":
+        # Custom masks accept every finite nonzero value, including fractions.
+        return valid & (values.data != 0)
     raw = np.nan_to_num(values.filled(0), nan=0).astype("uint32")
     if kind == "landsat_qa":
         # C2 fill, dilated cloud, cirrus (8/9), cloud, shadow and snow.
@@ -40,8 +43,6 @@ def _quality_valid(values, kind):
     elif kind == "sentinel_scl":
         # Keep dark areas, vegetation, bare soil, water and unclassified.
         valid &= np.isin(raw, [2,4,5,6,7])
-    elif kind == "valid_mask":
-        valid &= raw != 0
     elif kind == "saturation":
         valid &= raw == 0
     else:
@@ -88,21 +89,10 @@ def _calibrate(asset, scene, destination, mask_clouds, mask_saturation, cancel=N
                 dst.write(np.where(valid,calibrated,np.nan).astype("float32"),1,window=window)
 
 
-def prepare_imagery(scenes, destination, *, aoi=None, band_order=None,
-                    target_crs=None, resolution=None, overlap="first",
-                    resampling="nearest", mask_clouds=True, mask_saturation=True,
-                    allow_mixed_dates=False, all_touched=False,
-                    max_pixels=250_000_000, overwrite=False, progress=None, cancel=None):
-    """Mosaic scenes, stack spectral bands and clip to an AOI on one grid.
-
-    Resolution is in metres; default is the coarsest selected native resolution
-    transformed to the target projected CRS. No new detail is inferred by
-    oversampling. Dates/sensors/levels must agree unless mixed dates are explicit.
-
-    Overlap first/last chooses one valid scene for *all* bands of each pixel.
-    Bands are calibrated and cloud-masked before warping. The result includes
-    a source-scene index raster and a JSON processing manifest.
-    """
+def _plan_imagery(scenes, *, aoi=None, band_order=None, target_crs=None,
+                  resolution=None, resampling="nearest", mask_clouds=True,
+                  allow_mixed_dates=False, max_pixels=250_000_000, cancel=None):
+    """Validate spectral inputs and define the grid shared by audit and preparation."""
     _check_cancel(cancel)
     if isinstance(scenes,(str,Path)):
         scenes=discover_scenes(scenes)
@@ -116,8 +106,6 @@ def prepare_imagery(scenes, destination, *, aoi=None, band_order=None,
     dates={s.acquired for s in scenes}
     if not allow_mixed_dates and (len(dates)>1 or (len(scenes)>1 and None in dates)):
         raise ValueError("Dates differ or are unknown. Set allow_mixed_dates=True only for an intentional multitemporal mosaic.")
-    if overlap not in {"first","last"}:
-        raise ValueError("overlap must be 'first' or 'last' to preserve spectral coherence.")
     if resampling not in {"nearest","bilinear","cubic","average"}:
         raise ValueError("Unsupported spectral resampling method.")
     names=tuple(band_order) if band_order is not None else tuple(scenes[0].bands)
@@ -126,12 +114,14 @@ def prepare_imagery(scenes, destination, *, aoi=None, band_order=None,
     sources=[]; records=[]
     crs=CRS.from_user_input(target_crs) if target_crs else None
     for scene in scenes:
+        _check_cancel(cancel)
         missing=set(names)-set(scene.bands)
         if missing:
             raise ValueError(f"Scene {scene.scene_id} lacks bands: {sorted(missing)}.")
         if mask_clouds and scene.quality is None:
             raise ValueError(f"Scene {scene.scene_id} has no quality mask. Supply QA/SCL or explicitly set mask_clouds=False.")
         for name in names:
+            _check_cancel(cancel)
             asset=scene.bands[name]
             sources.append(asset.path)
             with rasterio.open(asset.path) as src:
@@ -180,6 +170,38 @@ def prepare_imagery(scenes, destination, *, aoi=None, band_order=None,
     if width<1 or height<1 or width*height>max_pixels:
         raise ValueError(f"Output grid is {width}×{height} pixels. Adjust AOI/resolution or max_pixels.")
     transform=from_origin(left,top,cell,cell)
+    return dict(scenes=scenes, names=names, sources=sources, records=records,
+                crs=crs, dates=dates, resolution=resolution, transform=transform,
+                width=width, height=height, geometries=geometries)
+
+
+def prepare_imagery(scenes, destination, *, aoi=None, band_order=None,
+                    target_crs=None, resolution=None, overlap="first",
+                    resampling="nearest", mask_clouds=True, mask_saturation=True,
+                    allow_mixed_dates=False, all_touched=False,
+                    max_pixels=250_000_000, overwrite=False, progress=None, cancel=None):
+    """Mosaic scenes, stack spectral bands and clip to an AOI on one grid.
+
+    Resolution is in metres; default is the coarsest selected native resolution
+    transformed to the target projected CRS. No new detail is inferred by
+    oversampling. Dates/sensors/levels must agree unless mixed dates are explicit.
+
+    Overlap first/last chooses one valid scene for *all* bands of each pixel.
+    Bands are calibrated and cloud-masked before warping. The result includes
+    a source-scene index raster and a JSON processing manifest.
+    """
+    _check_cancel(cancel)
+    if overlap not in {"first","last"}:
+        raise ValueError("overlap must be 'first' or 'last' to preserve spectral coherence.")
+    plan = _plan_imagery(scenes, aoi=aoi, band_order=band_order,
+        target_crs=target_crs, resolution=resolution, resampling=resampling,
+        mask_clouds=mask_clouds, allow_mixed_dates=allow_mixed_dates,
+        max_pixels=max_pixels, cancel=cancel)
+    scenes, names = plan["scenes"], plan["names"]
+    sources, records = plan["sources"], plan["records"]
+    crs, dates, resolution = plan["crs"], plan["dates"], plan["resolution"]
+    transform, width, height = plan["transform"], plan["width"], plan["height"]
+    geometries = plan["geometries"]
     destination=output_path(destination,overwrite,sources)
     index_path=output_path(destination.with_name(destination.stem+"_source_index.tif"),overwrite,sources)
     manifest_path=output_path(destination.with_suffix(".json"),overwrite,sources)
@@ -236,6 +258,7 @@ def prepare_imagery(scenes, destination, *, aoi=None, band_order=None,
                                 dates=",".join(sorted(d for d in dates if d)),overlap=overlap,
                                 spectral_coherence="one_scene_per_pixel_all_bands",calibration="applied")
                 ids.set_band_description(1,"source_scene_index")
+                ids.update_tags(CARTOMIZE_PRODUCT="source_index")
         if valid_pixels==0:
             raise ValueError("No valid pixels in the AOI after masking and alignment; no product was saved.")
         from . import __version__

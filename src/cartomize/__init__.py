@@ -78,6 +78,8 @@ from .native import validate_native_runtime
 __all__ += ["execution_capabilities", "validate_native_runtime"]
 from .imagery_pipeline import ImageryProducts, process_imagery, split_bands
 __all__ += ["ImageryProducts", "process_imagery", "split_bands"]
+from .imagery_audit import ImageryAudit, audit_imagery
+__all__ += ["ImageryAudit", "audit_imagery"]
 from .vector_workflows import (select_attributes, select_location, geometry_operation,
                                spatial_summary, join_attributes, latest_records)
 __all__ += ['select_attributes', 'select_location', 'geometry_operation',

@@ -342,6 +342,17 @@ class ResultsWorkspace(QWidget):
                         if p:=valid(product.get(key)): primary.append(p)
                     for band in product.get('bands',{}).values():
                         if p:=valid(band.get('path')): products.append(p)
+                    if p:=valid(product.get('source_index')):
+                        self.register(dict(data=str(p),purpose='diagnostic',name='Origine des pixels ; '+', '.join(product.get('scenes',[]))))
+                        products.append(p)
+                    if p:=valid(product.get('report')):
+                        self.register(dict(data=str(p),name='Rapport de préparation ; '+', '.join(product.get('scenes',[]))))
+                        products.append(p)
+            if record.get('schema')=='cartomize.imagery.audit.v1':
+                for key,label in [('coverage','Couverture : emprise, données et qualité'),('gaps','Lacunes de couverture utile')]:
+                    if p:=valid(record.get(key)):
+                        self.register(dict(data=str(p),purpose='diagnostic',name=label))
+                        products.append(p)
             for key in ('primary','multiband','composite','quality_report'):
                 if p:=valid(record.get(key)): products.append(p)
             for layer in record.get('layers',[]):
