@@ -37,6 +37,9 @@ jobs:
       - name: Install QGIS native runtime
         timeout-minutes: 10
         run: |
+          # Preserve the runner's signed Ubuntu sources; prefer the official HTTPS archives.
+          # Azure mirror throughput issue: https://github.com/actions/runner-images/issues/14823
+          printf 'https://archive.ubuntu.com/ubuntu/\tpriority:1\nhttps://security.ubuntu.com/ubuntu/\tpriority:2\nhttp://azure.archive.ubuntu.com/ubuntu/\tpriority:3\n' | sudo tee /etc/apt/apt-mirrors.txt
           sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 update
           sudo env DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 install -y python3-qgis libegl1 libopengl0
       - uses: actions/setup-python@v5
