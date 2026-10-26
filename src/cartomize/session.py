@@ -124,6 +124,8 @@ def save_session(state,path,*,portable=False,overwrite=False):
                 entries[target.as_posix()]=source
                 companions=list(source.parent.glob(source.stem+'.*')) if source.suffix.lower()=='.shp' else []
                 companions += [Path(str(source)+s) for s in ('.msk','.aux.xml','.ovr')]
+                if source.suffix.lower() in {'.csv', '.tsv'}:
+                    companions.append(source.with_suffix(source.suffix + '.schema.json'))
                 if source.name=='model.json':companions.append(source.with_suffix('.npz'))
                 for child in companions:
                     if child.is_file():entries[(target.parent/child.name).as_posix()]=child

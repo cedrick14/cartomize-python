@@ -1,6 +1,6 @@
 # Cartomize : projets pratiques
 
-**Sources Cartomize 1.7.0**
+**Sources Cartomize 1.8.0**
 
 Préparer des images, analyser des couches et produire des cartes reproductibles avec Cartomize. Le parcours associe des explications, du code exécutable, des résultats enregistrés et des exercices corrigés.
 
@@ -74,6 +74,7 @@ L’interface de bureau est facultative pour ce parcours. Les calculs et cartes 
 | [14](notebooks/14_qualite_vectorielle.ipynb) | Qualité et préparation vectorielles | 30 min | Audit, réparation, doublons, topologie, rapports et couches écartées |
 | [15](notebooks/15_reprojection_vectorielle_par_lot.ipynb) | Reprojection vectorielle par lot | 30 min | Découverte multicouche, coordonnées de référence, GeoPackage, emprises et chaîne de tampons |
 | [16](notebooks/16_harmonisation_fusion_vectorielle.ipynb) | Harmonisation et fusion de couches | 30 min | Schéma commun, types exacts, provenance, valeurs manquantes et chaîne de tampons |
+| [17](notebooks/17_g01_controle_reparation_geometries.ipynb) | G01 : contrôle et réparation des géométries | 35 min | Couche source, règles, grille XY, effets séparés, exclusions et comparaison avant/après |
 
 Pour découvrir la valeur de l’automatisation : **00 → 02 → 13 → 07 → 08**. Pour une formation complète : suivre l’ordre du tableau. Chaque notebook recrée ses entrées pédagogiques et peut être exécuté indépendamment.
 

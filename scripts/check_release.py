@@ -80,9 +80,13 @@ with tarfile.open(directory/f'{name}-{version}.tar.gz') as archive:
                  'docs/VALIDATION_M10_REAL.json','tests/test_vector_merge.py',
                  'tests/test_vector_merge_interfaces.py','tests/test_desktop_merge.py','tests/test_vector_io.py',
                  'scripts/validate_vector_merge_real.py',
+                 'docs/G01_GEOMETRY_QUALITY.md','docs/RELEASE_1.8.0.md','docs/VALIDATION_1.8.0.json',
+                 'docs/VALIDATION_G01_REAL.json','scripts/validate_g01_real.py',
+                 'tests/test_g01_precision.py','tests/test_g01_publication.py','tests/test_g01_desktop.py','tests/test_g01_interfaces.py',
                  'tutorials/course.py','tutorials/requirements.txt','tutorials/scripts/execute.py',
                  'tutorials/notebooks/15_reprojection_vectorielle_par_lot.ipynb',
                  'tutorials/notebooks/16_harmonisation_fusion_vectorielle.ipynb',
+                 'tutorials/notebooks/17_g01_controle_reparation_geometries.ipynb',
                  'scripts/check_startup.py','scripts/check_release.py','scripts/verify_installed_release.py'):
         assert f'{name}-{version}/{file}' in names,file
 print(json.dumps({'name':name,'version':version,'files':[

@@ -157,6 +157,7 @@ def probe(output, expected):
         checks.extend(_vector_quality_checks(cm, root))
         checks.extend(_vector_reprojection_checks(cm, root))
         checks.extend(_vector_merge_checks(cm, root))
+        checks.extend(_g01_checks(cm, root, window, wait_for))
         points=root/'points.gpkg'
         gpd.GeoDataFrame({'nom':['Site A']},geometry=[Point(300300,9499700)],crs=32733).to_file(points)
         assert window.project_explorer.open_path(points) is not None
@@ -195,6 +196,96 @@ def probe(output, expected):
         if window.thread is not None:
             window.cancel();wait_for(lambda:window.thread is None)
         window.close();app.processEvents()
+
+
+def _g01_checks(cm, root, window, wait_for):
+    """Run the installed G01 worker on an explicitly selected, typed file layer."""
+    from contextlib import closing
+    import sqlite3
+    import numpy as np
+    import geopandas as gpd
+    import pyogrio
+    from pyproj import CRS
+    import shapely
+    from shapely.geometry import Point, Polygon, box
+    from cartomize.viewer_data import table_page
+
+    source = root / 'g01-source.gpkg'
+    gpd.GeoDataFrame({'reference': ['background']}, geometry=[Point(20, 20)], crs=32733).to_file(
+        source, layer='reference', index=False)
+    original_shapes = [Polygon([(.12, .12), (2.12, 2.12), (.12, 2.12), (2.12, .12), (.12, .12)]),
+                       box(3.11, .11, 4.11, 1.11), None, Polygon()]
+    pyogrio.raw.write(source, shapely.to_wkb(original_shapes), [
+        np.array(['0001', 'NA', '0003', '0004'], dtype=object),
+        np.array([2**60 + 3, 0, 7, 8], dtype='int64'),
+        np.array(['2024-02-29', '2024-03-01', '1970-01-01', '2024-03-03'], dtype='datetime64[D]'),
+    ], ['identifier', 'large_id', 'survey_date'],
+        field_mask=[None, np.array([False, True, False, False]), np.array([False, False, True, False])],
+        layer='to_repair', driver='GPKG', geometry_type='Unknown', promote_to_multi=False,
+        crs=CRS(32733).to_wkt(), layer_options={'SPATIAL_INDEX': 'NO'})
+    original_bytes = source.read_bytes()
+    try:
+        cm.audit_geometries(source)
+    except ValueError as error:
+        assert 'layer' in str(error)
+    else:
+        raise AssertionError('The installed G01 workflow selected the first layer implicitly.')
+
+    window.transfer_result({'data': str(source), 'kind': 'vector'}, 'vector')
+    page = window.tool('vector')
+    page.operation.setCurrentIndex(page.operation.findData('repair_geometries'))
+    page.refresh_fields()
+    assert page.quality_layer.currentData() is None
+    page.quality_layer.setCurrentIndex(page.quality_layer.findData('to_repair'))
+    page.quality_id.setCurrentText('identifier')
+    page.repair_method.setCurrentIndex(page.repair_method.findData('linework'))
+    page.repair_missing.setCurrentIndex(page.repair_missing.findData('drop'))
+    page.repair_empty.setCurrentIndex(page.repair_empty.findData('drop'))
+    page.repair_type_changes.setCurrentIndex(page.repair_type_changes.findData('allow'))
+    page.repair_tolerance.setValue(.25)
+    page.crs.setText('')
+    page.output.edit.setText(str(root))
+    page.quality_folder.setText('g01-installed')
+    window.run_button.click()
+    wait_for(lambda: window.thread is None)
+    operation = root / 'g01-installed' / 'operation.json'
+    assert operation.is_file(), window.status.text()
+    record = json.loads(operation.read_text(encoding='utf-8'))
+    products = record['products']
+    before = cm.read_file(products['before'])
+    after = cm.read_file(products['data'])
+    report = table_page(products['report'])['frame']
+    summary = json.loads(Path(products['summary']).read_text(encoding='utf-8'))
+    assert len(before) == 4 and len(after) == 2
+    assert [None if geometry is None else geometry.wkb for geometry in before.geometry] == [
+        None if geometry is None else geometry.wkb for geometry in original_shapes]
+    assert after.identifier.tolist() == ['0001', 'NA']
+    assert after.geom_type.tolist() == ['MultiPolygon', 'Polygon']
+    assert after.geometry.area.tolist() == [2., 1.]
+    assert summary['source_layer'] == 'to_repair' and summary['tolerance'] == .25
+    assert summary['repair_changed_features'] == 1 and summary['precision_changed_features'] == 2
+    assert report.feature_id.tolist() == ['0001', 'NA', '0003', '0004']
+    assert report.output_row.dropna().tolist() == [0, 1]
+    assert report.rejected_row.dropna().tolist() == [0, 1]
+    with closing(sqlite3.connect(products['data'])) as connection:
+        types = {row[1]: row[2].upper() for row in connection.execute('PRAGMA table_info(features)')}
+        assert types['survey_date'] == 'DATE' and types['large_id'] == 'INTEGER'
+        assert connection.execute('SELECT identifier,large_id,survey_date FROM features').fetchall() == [
+            ('0001', 2**60 + 3, '2024-02-29'), ('NA', None, '2024-03-01')]
+    assert source.read_bytes() == original_bytes
+    table = page.open_quality_product('report')
+    wait_for(lambda: len(table.frame) == 4)
+    column = list(table.frame.columns).index('feature_id')
+    assert table.model.data(table.model.index(0, column)) == '0001'
+    assert table.model.data(table.model.index(1, column)) == 'NA'
+    comparison = page.compare_quality_results()
+    assert comparison is not None and comparison.link.isChecked()
+    assert [document.path for document in comparison.documents] == [products['before'], products['data']]
+    return [
+        'installed G01 desktop worker: explicit layer, XY grid, GEOS/grid changes and retained/rejected row mapping',
+        'installed G01 publication: exact original WKB, Polygon/MultiPolygon types, DATE, nullable int64 and labels',
+        'installed G01 views: exact report identifiers and synchronized before/after comparison',
+    ]
 
 
 def _vector_quality_checks(cm, root):

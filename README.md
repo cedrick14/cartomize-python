@@ -2,7 +2,7 @@
 
 Cartomize associe une bibliothèque Python, une interface graphique et des commandes pour le traitement géospatial et la production cartographique.
 
-La version des sources est **1.7.0**. La bibliothèque, les cellules Jupyter, les commandes du terminal et l’interface de bureau appellent les mêmes traitements. Cette version ajoute l’harmonisation et la fusion de couches : correspondances des champs, types et valeurs manquantes explicites, concaténation avec provenance et contrôle des données enregistrées. La reprojection par lot M09, la qualité vectorielle M08 et le prétraitement automatique optique M07 restent intégrés. Voir la [note de version](docs/RELEASE_1.7.0.md).
+La version des sources est **1.8.0**. La bibliothèque, les cellules Jupyter, les commandes du terminal et l’interface de bureau appellent les mêmes traitements. Cette version complète **G01 — Contrôle et réparation des géométries** : choix de la couche, grille de précision XY facultative, comparaison avant/après et publication vérifiée des géométries et attributs. Voir la [note de version](docs/RELEASE_1.8.0.md) et le [guide G01](docs/G01_GEOMETRY_QUALITY.md).
 
 ## Installation
 
@@ -71,7 +71,7 @@ fenetre = cm.launch()
 
 Pour ouvrir cette fenêtre depuis un notebook local, installer `.[notebook]`, redémarrer le noyau puis appeler `cm.launch()`. Les notebooks distants peuvent utiliser l’API sans ouvrir de fenêtre native.
 
-Les versions publiées sont indiquées sur [PyPI](https://pypi.org/project/cartomize/). La présence de 1.7.0 dans ce dépôt ne signifie pas sa publication sur cet index. Le [guide d’installation](docs/WORKBENCH.md) décrit également l’installation d’un paquet wheel.
+Les versions publiées sont indiquées sur [PyPI](https://pypi.org/project/cartomize/). La présence de 1.8.0 dans ce dépôt ne signifie pas sa publication sur cet index. Le [guide d’installation](docs/WORKBENCH.md) décrit également l’installation d’un paquet wheel.
 
 ## Espace de travail
 
@@ -116,6 +116,8 @@ L’[inventaire de 123 procédures](docs/EXPERT_PROCEDURES.md), également dispo
 
 Le [module M08](docs/VECTOR_QUALITY.md) et le [cours 14](tutorials/notebooks/14_qualite_vectorielle.ipynb) exécutent les procédures G01–G03 depuis Python, Jupyter et l’interface. Chaque opération conserve les diagnostics et les entités écartées.
 
+Le [parcours G01 complété](docs/G01_GEOMETRY_QUALITY.md) et le [cours 17](tutorials/notebooks/17_g01_controle_reparation_geometries.ipynb) précisent le choix d’une couche multicouche, les règles de réparation et les unités de la grille XY. Les fichiers « avant », corrigés et écartés restent raccordables au rapport par leurs positions explicites ou un identifiant métier. Les changements dus à GEOS et ceux dus à la grille sont distincts. Chaque produit GeoPackage est relu avant publication pour contrôler ses valeurs et ses géométries exactes.
+
 Le [module M09](docs/VECTOR_REPROJECTION.md) et le [cours 15](tutorials/notebooks/15_reprojection_vectorielle_par_lot.ipynb) terminent G04. Ils découvrent les couches des fichiers et dossiers, examinent les transformations disponibles et produisent un lot avec un GeoPackage par couche, un CSV et un manifeste. Les fichiers sources restent conservés.
 
 Le [module M10](docs/VECTOR_MERGE.md) et le [cours 16](tutorials/notebooks/16_harmonisation_fusion_vectorielle.ipynb) terminent G05. Ils réunissent des schémas différents dans une couche commune, avec conversions contrôlées, valeurs nulles distinctes des zéros et provenance par enregistrement. La fusion conserve les géométries et leurs éventuels recouvrements.
@@ -144,7 +146,7 @@ python -m pytest
 python -m build
 python -m twine check --strict dist/*
 python scripts/check_release.py dist
-python scripts/verify_installed_release.py --wheel dist/cartomize-1.7.0-py3-none-any.whl --output reports/installed.json
+python scripts/verify_installed_release.py --wheel dist/cartomize-1.8.0-py3-none-any.whl --output reports/installed.json
 ```
 
 La validation automatise les contrôles Windows et Linux, les traitements, l’interface, les projets, les exports, la console et une installation isolée du paquet construit. Les essais CUDA et QGIS natif demandent leurs environnements respectifs. Les résultats sont associés aux versions, aux données et aux commits inscrits dans les rapports.

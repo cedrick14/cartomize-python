@@ -156,9 +156,10 @@ def _write_vector_quality(result, work, *, cancel=None):
     an input attribute called ``fid`` remains an ordinary business identifier.
     """
     products = {}
-    for name, layer in (
-        ('data', result.data), ('issues', result.issues), ('rejected', result.rejected),
-    ):
+    layers = [('data', result.data), ('issues', result.issues), ('rejected', result.rejected)]
+    if result.before is not None:
+        layers.append(('before', result.before))
+    for name, layer in layers:
         _check_cancel(cancel)
         if layer is None:
             layer = result.data.iloc[:0].copy()
@@ -172,12 +173,26 @@ def _write_vector_quality(result, work, *, cancel=None):
         while fid.casefold() in folded:
             fid += '_'
         path = work / (name + '.gpkg')
-        layer.to_file(path, driver='GPKG', index=False, layer='features',
-                      layer_options={'FID': fid})
+        if result.before is not None:
+            # G01 publishes only after exact attribute/WKB verification.
+            # Keep the established G02/G03 interface outside this completion.
+            from .vector_io import write_geopackage
+            write_geopackage(layer, path, cancel=cancel)
+        else:
+            layer.to_file(path, driver='GPKG', index=False, layer='features',
+                          layer_options={'FID': fid})
         products[name] = path
     _check_cancel(cancel)
     result.report.to_csv(work / 'report.csv', index=False, encoding='utf-8-sig')
     products['report'] = work / 'report.csv'
+    if result.before is not None:
+        from .vector_io import field_kind
+        dtypes = {'int64': 'Int64', 'float64': 'Float64', 'boolean': 'boolean'}
+        label_columns = result.summary.get('report_label_columns', [])
+        types = {name: ('string' if name in label_columns else dtypes.get(field_kind(result.report[name]), 'string'))
+                 for name in result.report.columns}
+        save_json(dict(schema='cartomize.table.v1', types=types, label_columns=label_columns),
+                  work / 'report.csv.schema.json')
     save_json(result.summary, work / 'summary.json')
     products['summary'] = work / 'summary.json'
     return products
@@ -203,6 +218,8 @@ def operation_catalog():
         if key=='classify':products+=['classification','confidence']
         if key in VECTOR_QUALITY_OPERATIONS:
             products += ['data', 'report', 'summary', 'issues', 'rejected']
+        if key in {'vector.audit_geometries', 'vector.repair_geometries'}:
+            products += ['before']
         if key == 'vector.reproject_batch':
             products += ['manifest', 'report']
         if key == 'vector.merge_layers':

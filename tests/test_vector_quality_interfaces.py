@@ -36,7 +36,7 @@ def test_audit_cli_preserves_large_ids_and_original_fid(tmp_path, capsys):
     config.write_text(json.dumps({'data': str(source), 'id_field': 'identifier'}), encoding='utf-8')
     assert main(['process', 'vector.audit_geometries', str(config), str(tmp_path / 'audit')]) == 0
     record = json.loads(capsys.readouterr().out)
-    assert set(record['products']) == {'primary', 'data', 'report', 'summary', 'issues', 'rejected'}
+    assert set(record['products']) == {'primary', 'data', 'report', 'summary', 'issues', 'rejected', 'before'}
     assert record['primary'] == record['products']['issues']
     assert all(Path(path).is_file() for path in record['products'].values())
     retained = gpd.read_file(record['products']['data'])

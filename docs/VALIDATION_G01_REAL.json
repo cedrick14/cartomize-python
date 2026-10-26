@@ -1,0 +1,427 @@
+{
+  "schema": "cartomize.validation_g01_real.v1",
+  "generated_at_utc": "2026-10-26T21:29:20.876458+00:00",
+  "cartomize_version": "1.8.0",
+  "repository_head_at_validation": "448818778bfb0fc944cab94c7a405153031c6f02",
+  "validation_script_sha256": "e3e9fd10795ddc2924b7f444dbba014b77414125a8c93f8d1921ee151d5c999e",
+  "tested_source_sha256": {
+    "src/cartomize/__init__.py": "ff91ff37585234a560130e0086e50a300e9dc1ded5b705c6aa17814179976c0b",
+    "src/cartomize/__main__.py": "79ee6f134c5c5193377cf9b189cbdcc3e2095e49ba9cec310114441c15a917c4",
+    "src/cartomize/_core/__init__.py": "c3a4f54d5167d40f878807f2f86385271fe67d7af83bf4f096cbafab21e5424c",
+    "src/cartomize/_core/band_semantics.py": "7b96a22980a377867b3357aebef2b1436def0dd43a8151c51ec72299d4b892d4",
+    "src/cartomize/_core/constants.py": "3da966ffbeda1b3fa611cdf3dbd7aac3f5e53ebf1ff70ef637149f73103740cf",
+    "src/cartomize/_core/errors.py": "3dbe1ba0a88783c14068b7cbbcfb0940b260ea54aafd472a7c9964ceca3c20d5",
+    "src/cartomize/_core/layout_plan.py": "efbba1d8fa45344132109445ff81095226e9d6faf163e07367b6cc1b25a1ad82",
+    "src/cartomize/_core/models.py": "00c9e40fe32fa106873a892882e168ebcaad1271bf4f6bffeeffa75f50c0db77",
+    "src/cartomize/_core/raster_intelligence_core.py": "ea267f2134e8abda04af7a53ae9a752fd0242ad7926b90eb778d15f09d99a869",
+    "src/cartomize/_core/raster_sampling.py": "fed46fd7996d56e0e50b6e2a4a23545c95429f529d24ff24600d991590442e95",
+    "src/cartomize/_core/raster_themes.py": "5b3891185b0bbda51c00a04d4516df4f30df9a6d7bdfe6590b561d551608e3da",
+    "src/cartomize/_core/template_catalog.py": "15f1ac89d2048e90ec7de8a6a471aae8289103592de3e4dcea6b6b8730aa1512",
+    "src/cartomize/_core/vector.py": "9dca3693b19aba8dad959f53fcfe01f7d5b8d1fa4b8165f9bf5f49886307be20",
+    "src/cartomize/_native_worker.py": "b0a8fb1db479165f26d4bd5d24780a0fd3c5b1823263d7193c57f4a619669dfd",
+    "src/cartomize/_validation.py": "64f3be9ca03e3f2e3e9d29241aa85ef90f187e77fad49e4e8517cf473c280eb6",
+    "src/cartomize/algebra.py": "6614927cfaf3128960a05f39dc2acc803c59736c0511d7787c8f895a5f3dac8d",
+    "src/cartomize/assistant.py": "f54e9f3e770387cd118757b001804e204b2ad67332e9f3fa4102dc0ebdd673f1",
+    "src/cartomize/automation.py": "9d9974beccf66c3242e2e886c10f7a95bd95c85fb5770d243cdcc5d9a06a8c56",
+    "src/cartomize/batch.py": "b20ffe44b2a7e784fcef6f3951613a07c675ed7d6fb01274c3bb5ce045de5cfb",
+    "src/cartomize/cartographic_rules.py": "af80a19c1c24a0bba44656e108dc90d80d604530ba5d51115fb51aef329d7faf",
+    "src/cartomize/catalogs.py": "f6eb003c3fb05d0efdf21d4f05b1ddb6a247698ac3df1d36c508bf198f3ac2b6",
+    "src/cartomize/classification.py": "d46023210758736e8ab34d806fa5cfb2cb47fa3dc1225ebddd4188a4413301cc",
+    "src/cartomize/cli.py": "1e4842b95d0a79dac9f2b672c3e64d8abf69408ca8fe30506a6e48faa4a35485",
+    "src/cartomize/color.py": "f896198f7e4cd2968c5b25c60817c24e1fb6999d68f243b492d9831ddcb0e610",
+    "src/cartomize/composition.py": "7ad56e4fd743ffba5c8b89bc9b94d0475d341c32283c24d259c734482cddc2c2",
+    "src/cartomize/cuda.py": "717f58fc1073683e3cf70b7dccf70cc6db5f763a766bedb02f3888ec31a7d2e8",
+    "src/cartomize/desktop.py": "b60e6f2f63b84a81ac33255bde919c5d75f837a20ed06e26317d800d3df81a65",
+    "src/cartomize/desktop_adaptive.py": "2eb8772e3e01e61d0f01844955413577c461d6780179f9fc3adb9a10141b532b",
+    "src/cartomize/desktop_assistant.py": "8f2fbf5b1937f0681b8ce755469d3f193fdfc549987441f6fbcf0b6371d52b01",
+    "src/cartomize/desktop_canvas.py": "23563da064504a02cf93d563f21c119fa5921645903a6b64771f25bd2ae5a323",
+    "src/cartomize/desktop_classification.py": "3fbeeb301a8fd5fe74c3e302477b67687f95569504783cb0e38b684bd2ba4e2a",
+    "src/cartomize/desktop_connections.py": "da48587d8ec2813943505ddf56613145dfe5714a6832970e08b8c847612a7296",
+    "src/cartomize/desktop_console.py": "4b8ff4bc35bc980da89bf76a0e9b15ddb100f30eafe4bdd3b86f9668e15fa9f4",
+    "src/cartomize/desktop_execution.py": "152a0c18e696491fd1cd6f7bb3ff9f248306f07d7c02a47f3922b7a6f29f951b",
+    "src/cartomize/desktop_explorer.py": "9b17cd106db919d0cba057cc4d6cab75aadb5858987725e54bf72b4560557449",
+    "src/cartomize/desktop_imagery.py": "11cd79b0cc7714dadb95a881d8a40fb7aeea929f785796ac696059bf518d83cd",
+    "src/cartomize/desktop_kernel.py": "ac9d38452c18563c2f9a9bf64c3f6fed5b7a67a935a28a9c24d6fa9e5b194ef9",
+    "src/cartomize/desktop_layout.py": "9cc76b26057ba32fd9d44cfa8bafab5fc31bf929f4bfaaa61642449e72d7a075",
+    "src/cartomize/desktop_mapops.py": "4bb3d65c7b0aba70643b0da32683545eb29de9bb41b448e659425478bdb7542e",
+    "src/cartomize/desktop_merge.py": "9f11770f7f7a31d5b40df37165994594fcbcec6f481e1ef7a8f6354f70cc764a",
+    "src/cartomize/desktop_native.py": "b29526aea8b8554ac950dbcc44d876abba6721427f41ecc541fc865d74e71233",
+    "src/cartomize/desktop_processing.py": "ab31c9d2e8008a9d86234c3df0b0022b507d500e7e9be583a82b3cab3ed6b07f",
+    "src/cartomize/desktop_project.py": "e1e1ef4a222f3da95c4323317fc84b39e9436069c43286303b7ae020ce5f9869",
+    "src/cartomize/desktop_recipes.py": "62cb23398014d49224fe2c45be644a9d8f98f4b48d6ea4539752e7a410bb9c53",
+    "src/cartomize/desktop_reprojection.py": "480f30732573875bca495f8038dafb4fed5080190019aea7c4973aa4b6c4c91c",
+    "src/cartomize/desktop_results.py": "424a73d8aab716dcfed957971279c1b6f75ae591749907c8b579c3c5f660bbc2",
+    "src/cartomize/desktop_session.py": "ff4ca61939ceb348abc0d8faf68c48ab4fc0b89919da577ce136767ce8164407",
+    "src/cartomize/desktop_tables.py": "2769b278eb6d7f76393c98e297ba2531fe677cccb0cbf60e3121b2394f0c40ca",
+    "src/cartomize/desktop_terrain.py": "a2eb4d5a0ddc73ec1bd5438ec0efac3ef233dcc2f62c9c06acbd86ce91375509",
+    "src/cartomize/desktop_theme.py": "2661d2287d64be8a4dec9d8caf2bc176741f0471445b48a645369479d9283c65",
+    "src/cartomize/desktop_tools.py": "8d0baa2ed1174c30228e5ae32fc89c30a56a268436ef4879dd784c0c0421fbd8",
+    "src/cartomize/desktop_tools_base.py": "368098a2aaacb52e5de9135521e409f100f937b30e5d2417fed0691371b3f58c",
+    "src/cartomize/desktop_vector.py": "d3d48fb4c6a7e03072ed4b5c01cdd52bc37da507743b490fd736547a1970dd61",
+    "src/cartomize/desktop_vector_quality.py": "0240448cec7dfd4c36c2dec129038ba6910a71ccab6dc2095147800acb69f929",
+    "src/cartomize/desktop_workbench.py": "b2b406dbefb50ca579032fce0e4b6669fc7d57eb9cea59dc2e4c69891192da73",
+    "src/cartomize/execution.py": "34a3ea260f1009d186ffb94bc0f5835070b6947ee380671b94b67efd4c9fe7db",
+    "src/cartomize/focal.py": "356f7591e6664966c0e062fcfa9f7dc46f4a1722777e8b77c3af34d480aaa744",
+    "src/cartomize/hydrology.py": "136bdab6aa98712cc328a531baffc438e073863aab137a678a207cdf42d4a6d0",
+    "src/cartomize/imagery.py": "400e7e0b17b0761cb31e3ed9129c847487d259c8d0007b51c4fbe3fd75ee0a36",
+    "src/cartomize/imagery_audit.py": "057a0eeb93c5711e01bd1fc1c81cd6fbebe32e9bca260a65bcd50f0038e5f58d",
+    "src/cartomize/imagery_automatic.py": "b54a2a373c5270180fdf8a0697e17184893ee71f1dce4c9148a9431616540fb6",
+    "src/cartomize/imagery_pipeline.py": "813cb4c9bb172d7721be2056bf478c50a803ce29b0cb075d20e5490640c58a29",
+    "src/cartomize/indices.py": "d13c38c746f67c55c4de97698df108934e86dc6727e7b045686e5a086b16f52b",
+    "src/cartomize/mapops.py": "1071df7195bf0e581a002fc9efd4996f147220b855efab1927c64cb5260cdf34",
+    "src/cartomize/mapping.py": "ef26b0cbb0f93a8a7b6a5555e65422bd829d69aad47b1dcfd1d4c1cf71d1f0a8",
+    "src/cartomize/native.py": "b7c71a390783ebd73d2bfa59693b423669cea0e617b654a6f9a30c284494c07a",
+    "src/cartomize/native_styles.py": "1c16e684e8de9f52b15ee23969542fddfd0eb410487617bf9222a153cb3591a8",
+    "src/cartomize/nodata.py": "eb6ee4470f235e99ca3d019c328cf9df2dc622f4e2e7cc8bc40588adf8ef2720",
+    "src/cartomize/processing.py": "951f1f9cc455775fdc1920e48490c709c9a9121d6b9e6f9f20e85d54f7bf83fd",
+    "src/cartomize/project.py": "fe0bb97b9b1b4ace23f4bf9b2038e5aebe5c6d4c8f37e98a3e46aa1475897cfd",
+    "src/cartomize/quality.py": "de22e6dc8a5ffe711262a988ab7ec90dad08dc91bbc8d5d60abe5f0e717873fe",
+    "src/cartomize/raster.py": "81f94b725e02156c06de562799746a7242f23eb7980e4ef977c46842ccef282b",
+    "src/cartomize/recipes.py": "d130b87e5f88764cefd53bff2b9b538aa455c560ef941e421fd3831afffa142a",
+    "src/cartomize/relations.py": "b0b8b919342c2d4290d6f6115bdc3be81581b7dbbc2395e72e853a5ab58a61ba",
+    "src/cartomize/routing.py": "10488e55aa55601e8cc56798f26db873758367a58fc9e3f3fb25afd387278c67",
+    "src/cartomize/scenes.py": "92249555531e5be681d7d573fdf65f6eb2989dfabc0a263778e831b88d54151d",
+    "src/cartomize/session.py": "659790e83339e818b9133999e0882915b079176465dd9361c74c48955857375b",
+    "src/cartomize/storage.py": "c077e7202ac66e57d13a51b57d944c71d2ea77f0bbccafabaad422b20b56f5d8",
+    "src/cartomize/tableio.py": "446e9b9c7436c86c64e12bea1dadb3602a8957454deaae8249db2fd0e6dd9933",
+    "src/cartomize/templates.py": "f72d21d7096cc506736e65b16d72455f255ca1743f37fc552b737f990f554a1c",
+    "src/cartomize/terrain.py": "723c0d9dd2d1fad23bda3cb06a31b9371be2d50e1650fe702c01c0014d040b89",
+    "src/cartomize/typography.py": "38320404ff64a62a6b050835784abec016a0533ad50ab9b7c3e4b0bae19e2f54",
+    "src/cartomize/vector.py": "59aa00f750309f304869b34320f472e66f76c59bcc6007344735ab16f8c9c688",
+    "src/cartomize/vector_duplicates.py": "f1f04533c777b32b9bea63670b861eb69f3548be52a5d83ca979bd25e0452406",
+    "src/cartomize/vector_io.py": "d676d901e6487bbfd361761ad8fcf5f0417eef42634917ca15c2c49275ee6eec",
+    "src/cartomize/vector_merge.py": "fafdf798fd73b4733da547264bcf322b1905d1ddb8162de4232cfaaff0cf0d69",
+    "src/cartomize/vector_quality.py": "b9161aeb28ac1ae5427fd04267c2ec9d58b4fa65fb840462f837e8d69d6f274e",
+    "src/cartomize/vector_quality_result.py": "c7406ce942b9f6531344142dbcb66ae81ed640c0e89ac898580105c87232befd",
+    "src/cartomize/vector_reprojection.py": "bfeb607775acf4b181ce29e05a97c9ad4aa1c62f7d6c055a385327a3a0596d6e",
+    "src/cartomize/vector_topology.py": "0c315c3bdde4881d4ca172a0207dd1cd9f6780b9c75362c8c118dfb286f96f78",
+    "src/cartomize/vector_workflows.py": "d0416222e308473fcb2cf6a6660ba2ef314cffd435365e34c28dd37c3de54d85",
+    "src/cartomize/viewer_data.py": "7954f9cd58439ed9b5f2b1a4607acda55f5ca15c52e99c4492d5532df9603cfe",
+    "src/cartomize/workflow.py": "177a4985d45f77534e58fd393976e3962400b68b77460f46223da53db7b2368b"
+  },
+  "code_state": "Module hashes identify the tested working sources; HEAD may precede uncommitted implementation.",
+  "runtime": {
+    "python": "3.12.14",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+    "geos": "3.14.1",
+    "packages": {
+      "geopandas": "1.2.0",
+      "shapely": "2.2.0",
+      "pandas": "3.1.0",
+      "numpy": "2.5.4",
+      "pyproj": "3.8.0",
+      "pyogrio": "0.13.0",
+      "pyarrow": "26.0.0"
+    }
+  },
+  "source_repository": "https://github.com/jorisvandenbossche/geopandas-tutorial",
+  "source_commit": "72c7f3168e1e4e257caf84eb7b3fcaa47ade09c0",
+  "sources": [
+    {
+      "file_name": "paris_districts.geojson",
+      "url": "https://raw.githubusercontent.com/jorisvandenbossche/geopandas-tutorial/72c7f3168e1e4e257caf84eb7b3fcaa47ade09c0/data/paris_districts.geojson",
+      "bytes": 370905,
+      "sha256": "db65faf397e8876e9a62cdb722bc8c0897e9f9e4db4daa5c01a7e7d7883d626b"
+    },
+    {
+      "file_name": "cod_conservation.zip",
+      "url": "https://raw.githubusercontent.com/jorisvandenbossche/geopandas-tutorial/72c7f3168e1e4e257caf84eb7b3fcaa47ade09c0/data/cod_conservation.zip",
+      "bytes": 1511770,
+      "sha256": "af5f5300833296390930106fef971e7442da663d67e499538681908958a914b4"
+    }
+  ],
+  "source_file_sha256": {
+    "/tmp/cartomize-m08-real/data/paris_districts.geojson": "db65faf397e8876e9a62cdb722bc8c0897e9f9e4db4daa5c01a7e7d7883d626b",
+    "/tmp/cartomize-m08-real/data/cod_conservation.zip": "af5f5300833296390930106fef971e7442da663d67e499538681908958a914b4",
+    "/tmp/cartomize-m08-real/data/cod_conservation/Conservation/RDC_aire_protegee_2013.dbf": "5f10adf82c5311b5beeba52f4e20794d0d7ca52ebfa19832000fb8011d57c600",
+    "/tmp/cartomize-m08-real/data/cod_conservation/Conservation/RDC_aire_protegee_2013.prj": "f4971d8b322bc7cf2a83b8571b1e03498daa03051c4de57707d98e0015136404",
+    "/tmp/cartomize-m08-real/data/cod_conservation/Conservation/RDC_aire_protegee_2013.sbn": "b1c05935db59a5631cc197d30d7b8c9495678ec55858eb16931854154d910b5e",
+    "/tmp/cartomize-m08-real/data/cod_conservation/Conservation/RDC_aire_protegee_2013.sbx": "600adb761c62e5262ae53af1a14c4672fc527075359cb840b2d198b00273b7a3",
+    "/tmp/cartomize-m08-real/data/cod_conservation/Conservation/RDC_aire_protegee_2013.shp": "d7b1a3e31770e6ade4b70a6632e1fe544595a9a6652825f2c920607ecb62e720",
+    "/tmp/cartomize-m08-real/data/cod_conservation/Conservation/RDC_aire_protegee_2013.shp.xml": "952b2b3aec564357c5d9b1b31062dd7ec3721936fab7476266046d0110a92c87",
+    "/tmp/cartomize-m08-real/data/cod_conservation/Conservation/RDC_aire_protegee_2013.shx": "3b0f463e02a408eb048a989532132274618b0d2293aca8a0967b31d5422ec1bd"
+  },
+  "identifier_policy": {
+    "rdc": "Explicitly constructed validation_id; not an original business identifier.",
+    "rdc_prefix": "sha256:af5f5300833296390930106fef971e7442da663d67e499538681908958a914b4:Conservation/RDC_aire_protegee_2013.shp:row:",
+    "rdc_suffix": "zero-based original archive-member row",
+    "paris": "Original id attribute; preserved through an input permutation."
+  },
+  "input_dataset_scope": "Pinned historical teaching snapshots, not current protected-area inventories. Only a provenance attribute is added to the RDC in-memory validation copy.",
+  "method": "Real geometry integration plus independent translated shoelace arithmetic, literal analytic expectations, grid-multiple arithmetic and SQLite/GeoPackage WKB and attribute rereads. GEOS validity and repair are shared-engine checks, not independent certification.",
+  "grid_scenarios": {
+    "values": [
+      0.0,
+      0.01,
+      1.0
+    ],
+    "unit": "source projected metre",
+    "meaning": "Experimental verification scenarios; no source-accuracy recommendation."
+  },
+  "references": [
+    "https://docs.qgis.org/3.44/en/docs/user_manual/processing_algs/qgis/vectorgeometry.html",
+    "https://docs.qgis.org/3.44/en/docs/user_manual/processing_algs/qgis/checkgeometry.html",
+    "https://doc.esri.com/en/arcgis-pro/latest/tool-reference/data-management/check-geometry.html",
+    "https://shapely.readthedocs.io/en/stable/reference/shapely.make_valid.html",
+    "https://shapely.readthedocs.io/en/stable/reference/shapely.set_precision.html",
+    "https://www.geopackage.org/spec140/#gpb_format"
+  ],
+  "checks": [
+    {
+      "name": "Pinned datasets and explicit provenance identifiers",
+      "status": "passed",
+      "rdc_features": 50,
+      "paris_features": 80,
+      "rdc_business_attributes_unchanged": true,
+      "original_archive_sha256": "af5f5300833296390930106fef971e7442da663d67e499538681908958a914b4",
+      "rdc_identifier_example": "sha256:af5f5300833296390930106fef971e7442da663d67e499538681908958a914b4:Conservation/RDC_aire_protegee_2013.shp:row:1"
+    },
+    {
+      "name": "Original RDC diagnosis, dimensions and immutable source",
+      "status": "passed",
+      "invalid_source_rows": [
+        1
+      ],
+      "invalid_name": "Réserve naturelle d'Itombwe",
+      "reason": "Ring Self-intersection[3136110.1916 -376451.376800001]",
+      "coordinate_count": 148651,
+      "source_types": {
+        "Polygon": 44,
+        "MultiPolygon": 6
+      },
+      "source_unchanged": true
+    },
+    {
+      "name": "RDC repair and explicit XY grid scenario 0 metre",
+      "status": "passed",
+      "input_features": 50,
+      "retained_features": 50,
+      "valid_after": 50,
+      "repair_changed_features": 1,
+      "precision_changed_features": 0,
+      "total_geometry_changed_features": 1,
+      "output_types": {
+        "Polygon": 44,
+        "MultiPolygon": 6
+      },
+      "area_before_m2": 263701611791.03976,
+      "area_after_m2": 263701611791.03976,
+      "area_delta_sum_m2": -3.814697265625e-06,
+      "absolute_area_delta_sum_m2": 3.814697265625e-06,
+      "coordinate_count_before": 148651,
+      "coordinate_count_after": 148652,
+      "maximum_shoelace_area_difference_m2": 0.0001316070556640625,
+      "measurement_note": "Planar areas in source RDC Mercator; invalid pre-repair areas do not establish territorial surfaces.",
+      "unchanged_original_valid_wkb": 49
+    },
+    {
+      "name": "RDC repair and explicit XY grid scenario 0.01 metre",
+      "status": "passed",
+      "input_features": 50,
+      "retained_features": 50,
+      "valid_after": 50,
+      "repair_changed_features": 1,
+      "precision_changed_features": 50,
+      "total_geometry_changed_features": 50,
+      "output_types": {
+        "Polygon": 44,
+        "MultiPolygon": 6
+      },
+      "area_before_m2": 263701611791.03976,
+      "area_after_m2": 263701611105.13913,
+      "area_delta_sum_m2": -685.9006618782878,
+      "absolute_area_delta_sum_m2": 2717.1442564204335,
+      "coordinate_count_before": 148651,
+      "coordinate_count_after": 148627,
+      "maximum_shoelace_area_difference_m2": 0.0001239776611328125,
+      "measurement_note": "Planar areas in source RDC Mercator; invalid pre-repair areas do not establish territorial surfaces.",
+      "coordinates_checked": 148627,
+      "maximum_grid_multiple_residual": 2.9802322387695312e-08,
+      "floating_point_comparison_bound": 2.9759626229974856e-07
+    },
+    {
+      "name": "RDC repair and explicit XY grid scenario 1 metre",
+      "status": "passed",
+      "input_features": 50,
+      "retained_features": 50,
+      "valid_after": 50,
+      "repair_changed_features": 1,
+      "precision_changed_features": 50,
+      "total_geometry_changed_features": 50,
+      "output_types": {
+        "Polygon": 44,
+        "MultiPolygon": 6
+      },
+      "area_before_m2": 263701611791.03976,
+      "area_after_m2": 263701757254.0,
+      "area_delta_sum_m2": 145462.9602099955,
+      "absolute_area_delta_sum_m2": 428205.8611587584,
+      "coordinate_count_before": 148651,
+      "coordinate_count_after": 148541,
+      "maximum_shoelace_area_difference_m2": 0.0,
+      "measurement_note": "Planar areas in source RDC Mercator; invalid pre-repair areas do not establish territorial surfaces.",
+      "coordinates_checked": 148541,
+      "maximum_grid_multiple_residual": 0.0,
+      "floating_point_comparison_bound": 1e-07
+    },
+    {
+      "name": "Paris original business IDs survive an input permutation",
+      "status": "passed",
+      "features": 80,
+      "original_id_range": [
+        1,
+        80
+      ],
+      "random_state": 1701,
+      "complete_source_preserved": true,
+      "all_original_wkb_and_attributes_unchanged": true
+    },
+    {
+      "name": "Positive geographic grid is refused even with metric_crs",
+      "status": "passed",
+      "source_crs": "EPSG:4326",
+      "requested_measurement_crs": "EPSG:2154",
+      "requested_grid": 0.01,
+      "message": "This measurement needs a projected CRS; reproject the data first."
+    },
+    {
+      "name": "Independent analytic surfaces, collapse and correspondence",
+      "status": "passed",
+      "fixture": "Entirely synthetic geometry with literal expectations",
+      "expected_retained_ids": [
+        "001",
+        "002"
+      ],
+      "expected_rejected_ids": [
+        "003",
+        "004",
+        "005"
+      ],
+      "expected_after_areas_m2": [
+        2,
+        1,
+        0
+      ],
+      "collapse_error": "Precision produced an empty geometry at source_row 0.",
+      "source_count": 5,
+      "output_count": 2,
+      "rejected_count": 3
+    },
+    {
+      "name": "Grid dimensions, Z preservation and projected feet",
+      "status": "passed",
+      "expected_xyz": [
+        1.0,
+        1.0,
+        12.345
+      ],
+      "feet_unit": "US survey foot",
+      "metres_per_source_foot": 0.3048006096012192,
+      "expected_square_metre_area": 0.09290341161327482,
+      "scope": "Controlled synthetic fixtures; Z validity is not certified."
+    },
+    {
+      "name": "Multilayer file requires an explicit source layer",
+      "status": "passed",
+      "layers": [
+        "paris",
+        "rdc"
+      ],
+      "selected_layer": "paris",
+      "selected_features": 3,
+      "ambiguous_input_messages": [
+        "The input contains multiple layers; choose layer explicitly: paris, rdc",
+        "The input contains multiple layers; choose layer explicitly: paris, rdc"
+      ]
+    },
+    {
+      "name": "Published RDC before/data/rejected products and every saved attribute/WKB",
+      "status": "passed",
+      "published_product_names": [
+        "before",
+        "data",
+        "issues",
+        "primary",
+        "rejected",
+        "report",
+        "summary"
+      ],
+      "product_checks": {
+        "before": {
+          "features": 50,
+          "attributes_per_feature": 28,
+          "all_wkb_equal": true,
+          "all_attribute_values_equal": true
+        },
+        "data": {
+          "features": 50,
+          "attributes_per_feature": 28,
+          "all_wkb_equal": true,
+          "all_attribute_values_equal": true
+        },
+        "rejected": {
+          "features": 0,
+          "attributes_per_feature": 28,
+          "all_wkb_equal": true,
+          "all_attribute_values_equal": true
+        }
+      },
+      "saved_report_rows": 50,
+      "report_labels_preserved": true,
+      "complete_source_and_correspondence_persisted": true
+    },
+    {
+      "name": "Saved rejection correspondence preserves business fid and leading zeros",
+      "status": "passed",
+      "source_features": 2,
+      "output_features": 1,
+      "rejected_features": 1,
+      "large_business_fid": 1152921504606846977,
+      "missing_business_fid_preserved": true,
+      "leading_zero_ids": [
+        "001",
+        "002"
+      ],
+      "product_checks": {
+        "before": {
+          "features": 2,
+          "attributes_per_feature": 2,
+          "all_wkb_equal": true,
+          "all_attribute_values_equal": true
+        },
+        "data": {
+          "features": 1,
+          "attributes_per_feature": 2,
+          "all_wkb_equal": true,
+          "all_attribute_values_equal": true
+        },
+        "rejected": {
+          "features": 1,
+          "attributes_per_feature": 2,
+          "all_wkb_equal": true,
+          "all_attribute_values_equal": true
+        }
+      }
+    },
+    {
+      "name": "Measured coordinates are refused before mutation or atomic publication",
+      "status": "passed",
+      "valid_m_retained_in_memory_at_zero": true,
+      "mutation_refused": true,
+      "destination_published": false,
+      "mutation_message": "Measured (M) geometry at source_row 0; repair or precision modification cannot preserve M.",
+      "export_message": "Measured (M) geometries cannot be preserved by this GeoPackage writer; no output may be published."
+    },
+    {
+      "name": "Source records, pinned file bytes and tested modules remain unchanged",
+      "status": "passed",
+      "source_files": 9,
+      "tested_modules": 93,
+      "historical_validation_reports_rewritten": false
+    }
+  ],
+  "passed": 14,
+  "failed": 0,
+  "status": "passed",
+  "duration_seconds": 5.908
+}
