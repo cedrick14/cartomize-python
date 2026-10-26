@@ -29,7 +29,7 @@ from .relations import analyze_relations
 from .automation import plan_cartography,run_plan,propose_layouts
 from .mapops import snapshot_project,compare_snapshots,record_review,verify_review
 
-__version__ = "1.5.0"
+__version__ = "1.6.0"
 __display_version__ = ".".join(__version__.split(".")[:2])
 
 
@@ -92,3 +92,6 @@ from .vector_topology import check_topology
 from .vector_duplicates import deduplicate
 __all__ += ['VectorQualityResult', 'audit_geometries', 'repair_geometries',
             'check_topology', 'deduplicate']
+from .vector_reprojection import (ReprojectedBatch, discover_vector_layers,
+                                  inspect_reprojection, reproject_batch)
+__all__ += ['ReprojectedBatch', 'discover_vector_layers', 'inspect_reprojection', 'reproject_batch']

@@ -1,7 +1,7 @@
 {
   "schema": "cartomize.expert_procedures.v1",
   "date": "2026-10-26",
-  "source_version": "1.5.0",
+  "source_version": "1.6.0",
   "source_state": "reviewed_source",
   "baseline_commit": "ad4d1d7a89557e347b9a322f73c32205807c077a",
   "inventory": {
@@ -17,9 +17,9 @@
     ]
   },
   "scope": [
-    "Correspondance de l’inventaire expert avec Cartomize 1.5.0 ; modules M01–M07 et qualité vectorielle M08 (G01–G03) implémentés dans leurs périmètres.",
+    "Correspondance de l’inventaire expert avec Cartomize 1.6.0 ; modules M01–M08 et reprojection vectorielle par lot M09 (G04) implémentés dans leurs périmètres.",
     "baseline_commit identifie le point de départ du dépôt avant les compléments ; il ne désigne pas un commit final de publication de la version 1.3.0.",
-    "M07 relie le contrôle de couverture à la production, aux catalogues STAC, aux chaînes et à la fenêtre. La validation de chaque version reste décrite dans son rapport propre.",
+    "M09 relie découverte des couches, sélection géodésique, reprojection atomique et bilan des emprises à Python, au terminal, aux plans et à la fenêtre. La validation de chaque version reste décrite dans son rapport propre.",
     "Une ligne représente une procédure experte, pas un nombre de fonctions ni une promesse de parité QGIS/ArcGIS.",
     "Les références externes définissent les procédures ; les capacités Cartomize sont attestées par les symboles et chemins du dépôt.",
     "Une formule générique, une mise en page thématique ou une possibilité offerte par une dépendance non exposée ne suffit pas à déclarer une méthode disponible.",
@@ -33,13 +33,13 @@
   },
   "counts": {
     "total": 123,
-    "available": 14,
-    "partial": 46,
+    "available": 15,
+    "partial": 45,
     "absent": 63,
     "by_domain": {
       "Socle SIG et LiDAR": {
-        "available": 10,
-        "partial": 8,
+        "available": 11,
+        "partial": 7,
         "absent": 10
       },
       "Télédétection et images": {
@@ -122,50 +122,57 @@
       "scope": "G01–G03 : audit détaillé, réparation avec décisions, contrôles topologiques polygonaux/linéaires et dédoublonnage avec provenance ; API, CLI, plans, interface et cours 14."
     },
     {
-      "id": "E01",
+      "id": "M09",
       "order": 9,
+      "status": "implemented",
+      "title": "Reprojection vectorielle par lot",
+      "scope": "G04 : découverte multicouche, sélection géodésique traçable, contrôle des domaines et des sorties, bilan des emprises et lot atomique ; API, terminal, plans, fenêtre et cours 15."
+    },
+    {
+      "id": "E01",
+      "order": 10,
       "status": "in_progress",
       "title": "Socle de géotraitement et échanges raster-vecteur",
-      "scope": "Qualité G01–G03 terminée par M08. À poursuivre : reprojection par lot, harmonisation, conversion, sélection, tables, grilles, échanges raster-vecteur et lots."
+      "scope": "Qualité G01–G03 terminée par M08 et reprojection par lot G04 par M09. À poursuivre : harmonisation, conversion, sélection, tables, grilles, échanges raster-vecteur et lots."
     },
     {
       "id": "E02",
-      "order": 10,
+      "order": 11,
       "status": "proposed",
       "title": "Qualité thématique et analyses raster usuelles",
       "scope": "Échantillonnage de référence, évaluation externe, unités minimales, transitions, prédicteurs et changements continus."
     },
     {
       "id": "E03",
-      "order": 11,
+      "order": 12,
       "status": "proposed",
       "title": "Séries temporelles et profils optiques",
       "scope": "Calendrier, masques, provenance, composites, lissage ; puis phénologie, tendances et profils forêt/eau/cultures/feux."
     },
     {
       "id": "E04",
-      "order": 12,
+      "order": 13,
       "status": "proposed",
       "title": "Terrain et hydrologie explicites",
       "scope": "Conventions de relief ; surfaces contributives, exutoires, chenaux, bassins, ordres, HAND/TWI/LS et morphométrie."
     },
     {
       "id": "E05",
-      "order": 13,
+      "order": 14,
       "status": "proposed",
       "title": "Indicateurs territoriaux et statistiques spatiales",
       "scope": "Supports et dénominateurs, exposition, carroyage ; puis densités, autocorrélation, interpolation et régressions."
     },
     {
       "id": "E06",
-      "order": 14,
+      "order": 15,
       "status": "proposed",
       "title": "Réseaux, multicritère et paysage",
       "scope": "Coûts réseau et accessibilité ; critères et sensibilité ; composantes, taches et connectivité."
     },
     {
       "id": "E07",
-      "order": 15,
+      "order": 16,
       "status": "proposed",
       "title": "Modules spécialisés avec validation propre",
       "scope": "LiDAR, géoréférencement, correction atmosphérique, SAR/InSAR, apprentissage profond, hydraulique et modèles écologiques/pédoclimatiques."
@@ -543,6 +550,23 @@
       "operators": [
         "vector.deduplicate"
       ]
+    },
+    "cartomize.vector_reprojection.discover_vector_layers": {
+      "path": "src/cartomize/vector_reprojection.py",
+      "symbol": "discover_vector_layers",
+      "operators": []
+    },
+    "cartomize.vector_reprojection.inspect_reprojection": {
+      "path": "src/cartomize/vector_reprojection.py",
+      "symbol": "inspect_reprojection",
+      "operators": []
+    },
+    "cartomize.vector_reprojection.reproject_batch": {
+      "path": "src/cartomize/vector_reprojection.py",
+      "symbol": "reproject_batch",
+      "operators": [
+        "vector.reproject_batch"
+      ]
     }
   },
   "procedures": [
@@ -632,27 +656,32 @@
       "procedure": "Reprojection vectorielle par lot",
       "domain": "Socle SIG et LiDAR",
       "theme": "Coordonnées et formats",
-      "status": "partial",
+      "status": "available",
       "api": [
+        "cartomize.vector_reprojection.discover_vector_layers",
+        "cartomize.vector_reprojection.inspect_reprojection",
+        "cartomize.vector_reprojection.reproject_batch",
         "cartomize.vector.reproject",
         "cartomize.automation.processing_plan",
         "cartomize.automation.run_plan"
       ],
-      "implemented": "Reprojection d’une couche et répétition possible dans un plan explicite.",
-      "missing": [
-        "Construction automatique du lot",
-        "Choix et traçabilité de la transformation géodésique et bilan des emprises par couche."
-      ],
+      "implemented": "Découverte automatique des fichiers, dossiers et couches multiples ; inspection et sélection d’une opération géodésique par couche ; publication atomique du lot avec GeoPackage, bilan CSV, emprises avant/après et manifeste de transformation.",
+      "missing": [],
       "conditions": [
-        "Le SCR source doit être correctement déclaré."
+        "SCR source correctement déclaré ; transformations horizontales de SCR statiques à deux axes, ordre SIG x/y.",
+        "Meilleure opération exigée et approximations ballpark refusées par défaut ; opérations, précision annoncée, grilles et avertissements consignés.",
+        "Attributs et géométries relus avant publication ; valeurs Z conservées sans transformation verticale ; M et normalisations non fidèles refusés.",
+        "Domaine des SCR et de l’opération contrôlé ; absence de réparation, de densification géodésique ou de découpage automatique à l’antiméridien."
       ],
-      "next_module": "E01",
+      "next_module": null,
       "planned_fixes": [],
       "references": [
         "R014",
         "R002"
       ],
-      "completed_modules": []
+      "completed_modules": [
+        "M09"
+      ]
     },
     {
       "id": "G05",

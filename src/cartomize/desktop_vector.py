@@ -158,6 +158,7 @@ class VectorPage(VectorQualityControls, BaseVectorPage):
         self.form.labelForField(self.crs).setText('SCR des coordonnées XY' if op=='from_xy' else 'Système de coordonnées projeté')
         self.refresh_fields()
         self.update_quality_controls()
+        self.update_reprojection_controls()
 
     def job(self, options):
         op = self.operation.currentData()
@@ -228,3 +229,4 @@ class VectorPage(VectorQualityControls, BaseVectorPage):
     def restore_controls(self):
         """Restore conditional controls after loading a saved desktop session."""
         self.changed()
+        self.restore_reprojection_controls()

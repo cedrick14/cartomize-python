@@ -4,3 +4,9 @@ recursive-include docs *.md *.json
 recursive-include examples *.py
 recursive-include tests *.py
 recursive-include tests/data *.tif *.json *.md
+include tutorials/course.py tutorials/requirements.txt
+recursive-include tutorials *.md *.json
+recursive-include tutorials/notebooks *.ipynb
+recursive-include tutorials/scripts *.py
+prune tutorials/site
+prune tutorials/outputs

@@ -63,6 +63,8 @@ def _catalog():
     from .vector_quality import audit_geometries, repair_geometries
     from .vector_topology import check_topology
     from .vector_duplicates import deduplicate
+    from .vector_reprojection import reproject_batch
+    add('vector.reproject_batch', 'Reprojection vectorielle par lot', reproject_batch, 'document', 'vector')
     for key, label, function in [
         ('audit_geometries', 'Diagnostic détaillé des géométries', audit_geometries),
         ('repair_geometries', 'Réparation avec rapport des changements', repair_geometries),
@@ -199,6 +201,8 @@ def operation_catalog():
         if key=='classify':products+=['classification','confidence']
         if key in VECTOR_QUALITY_OPERATIONS:
             products += ['data', 'report', 'summary', 'issues', 'rejected']
+        if key == 'vector.reproject_batch':
+            products += ['manifest', 'report']
         if key=='classify':
             from .classification import fit_classifier
             present={p['name'] for p in parameters}
@@ -267,7 +271,7 @@ def execute_operation(operation,parameters,destination,*,workers=1,block_size=51
         if operation=='raster.reclassify':p['mapping']={float(k):v for k,v in p['mapping'].items()}
         # JSON raster assets use [path, band], accepted by the array engine.
         if 'destination' in signature.parameters:
-            p['destination']=work/'products' if operation in {'classify','cluster','hydrology','stac.download','imagery.audit','imagery.preprocess'} else work/'result.tif'
+            p['destination']=work/'products' if operation in {'classify','cluster','hydrology','stac.download','imagery.audit','imagery.preprocess','vector.reproject_batch'} else work/'result.tif'
         for name,value in [('workers',workers),('block_size',block_size),('memory_limit_mb',memory_limit_mb)]:
             if 'options' in signature.parameters or name in signature.parameters or operation=='classify' and name=='workers':p.setdefault(name,value)
         if operation=='classify' and p.get('model'):p.setdefault('training',None)
@@ -282,12 +286,26 @@ def execute_operation(operation,parameters,destination,*,workers=1,block_size=51
             raise exc.preserve(diagnostic_destination(destination),cancel=cancel) from None
         _check_cancel(cancel)
         from .vector_quality_result import VectorQualityResult
+        from .vector_reprojection import ReprojectedBatch
         quality_products = None
+        reprojection_products = None
         if isinstance(result, VectorQualityResult):
             quality_products = _write_vector_quality(result, work, cancel=cancel)
             primary = quality_products['issues' if operation == 'vector.audit_geometries' else 'data']
+        elif isinstance(result, ReprojectedBatch):
+            primary = result.manifest
+            reprojection_products = {'manifest': result.manifest, 'report': result.report, **result.layers}
         elif isinstance(result,gpd.GeoDataFrame):
-            primary=work/'result.gpkg';result.to_file(primary,driver='GPKG',index=False)
+            primary=work/'result.gpkg'
+            # A batch may feed a layer whose business identifier is named fid.
+            # Keep it as an attribute in subsequent vector operations too.
+            folded=[str(column).casefold() for column in result.columns]
+            if len(set(folded)) != len(folded):
+                raise ValueError('Les noms de champs doivent être distincts sans tenir compte de la casse pour GeoPackage.')
+            fid='_cartomize_fid'
+            while fid.casefold() in folded:
+                fid += '_'
+            result.to_file(primary,driver='GPKG',index=False,layer_options={'FID':fid})
         elif isinstance(result,(pd.DataFrame,pd.Series)):
             primary=work/'result.csv';result.to_csv(primary,index=True)
         elif isinstance(result,dict):
@@ -306,6 +324,11 @@ def execute_operation(operation,parameters,destination,*,workers=1,block_size=51
             products.update({key: str(destination / path.relative_to(work))
                              for key, path in quality_products.items()})
             record['metadata'] = json_value(result.summary)
+        elif reprojection_products is not None:
+            products.update({key: str(destination / path.relative_to(work))
+                             for key, path in reprojection_products.items()})
+            record['metadata'] = {key: result.summary[key] for key in
+                                  ('status', 'target_crs', 'layer_count', 'feature_count')}
         elif operation=='imagery.preprocess':
             document=json.loads(primary.read_text(encoding='utf-8'))
             record['metadata']={key:document[key] for key in

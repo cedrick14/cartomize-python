@@ -1,11 +1,28 @@
 # Validation du parcours
 
-Le parcours courant installe les sources **Cartomize 1.5.0** de la copie du dépôt
+Le parcours courant installe les sources **Cartomize 1.6.0** de la copie du dépôt
 utilisée. Les résultats des versions précédentes sont conservés ci-dessous avec
 leur version et leur date ; ils ne constituent pas une nouvelle exécution de
 tous les cours avec la version courante.
 
-## Résultats locaux du 26 octobre 2026 — sources 1.5.0
+## Résultats locaux du 26 octobre 2026 — sources 1.6.0
+
+Le nouveau [cours 15](notebooks/15_reprojection_vectorielle_par_lot.ipynb) a été
+exécuté dans un noyau Jupyter neuf : **8 cellules, aucune erreur, 4,22 secondes**.
+Il découvre trois couches de SCR différents, inspecte les opérations, publie
+un lot, compare les coordonnées aux équations Web Mercator, sélectionne des
+opérations explicites et réutilise une sortie nommée dans un plan de tampons.
+Il contrôle aussi le refus d’une source sans SCR et les valeurs d’un point
+publié par PROJ. Ses sorties numériques et sa figure sont enregistrées.
+
+Le registre comprend **49 opérateurs**, dont 41 reliés au parcours dans la
+[matrice pédagogique](COVERAGE.md). Le parcours autonome comprend désormais
+**14 notebooks (00 à 10 et 13 à 15), soit 89 cellules de code**. Le résultat
+ci-dessus concerne le cours 15 ; la réexécution complète est suivie dans la
+[validation de livraison 1.6.0](../docs/VALIDATION_1.6.0.json) et dans les jobs
+Windows/Ubuntu du workflow Tutoriels. Les cas privés 11 et 12 restent séparés.
+
+## Historique du 26 octobre 2026 — sources 1.5.0
 
 Le nouveau [cours 14](notebooks/14_qualite_vectorielle.ipynb) a été exécuté
 dans un véritable noyau Jupyter : **8 cellules, aucune erreur, 4,62 secondes**.
@@ -71,7 +88,7 @@ Le [workflow Tutoriels](https://github.com/cedrick14/cartomize-python/actions/ru
 | Windows, noyaux Jupyter indépendants | Cours 00 à 10 | 11 notebooks réussis |
 | Python 3.12 / IPython local, données fournies | Cours 11 et 12 | 2 notebooks réussis |
 
-Lors de cette validation historique, la construction HTML a réussi sur les deux systèmes. Les deux cas réels ont été contrôlés localement sans redistribution de leurs données ou sorties dans le dépôt. L’exécution utilisait alors le paquet publié `cartomize==1.0.1` et l’intitulé **Version 1.0**. Les dépendances courantes installent désormais la copie des sources, et les cours 13 et 14 complètent le parcours autonome.
+Lors de cette validation historique, la construction HTML a réussi sur les deux systèmes. Les deux cas réels ont été contrôlés localement sans redistribution de leurs données ou sorties dans le dépôt. L’exécution utilisait alors le paquet publié `cartomize==1.0.1` et l’intitulé **Version 1.0**. Les dépendances courantes installent désormais la copie des sources, et les cours 13 à 15 complètent le parcours autonome.
 
 ## Vérifications
 
@@ -79,7 +96,7 @@ Lors de cette validation historique, la construction HTML a réussi sur les deux
 - Les contrôles portent sur les bandes, le SCR, la résolution, les masques, les codes, les superficies, les transitions, l’égalité de deux calculs et la présence des livrables.
 - Les références de classification simulées sont séparées entre apprentissage et validation. Les scores ne constituent pas une validation sur le terrain.
 - Le cours STAC utilise un serveur HTTP local de démonstration. La disponibilité d’un catalogue distant et de Binder est hors du périmètre de ces contrôles.
-- Les cas Mvouti et okapis nécessitent les fichiers privés fournis localement. Leur validation historique est décrite ci-dessus ; ils n’ont pas été réexécutés avec la version 1.5.0 et ne sont pas exécutés par le workflow public, qui ne dispose pas du ZIP.
+- Les cas Mvouti et okapis nécessitent les fichiers privés fournis localement. Leur validation historique est décrite ci-dessus ; ils n’ont pas été réexécutés avec la version 1.6.0 et ne sont pas exécutés par le workflow public, qui ne dispose pas du ZIP.
 - L’examen des cartes vérifie les titres, légendes, tables et rendus. Les mesures liées aux données sources restent soumises aux limites indiquées dans [DATA.md](DATA.md).
 
 ## Reproduire les contrôles

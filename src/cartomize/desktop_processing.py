@@ -34,17 +34,28 @@ LABELS.update({
     'allowed_gaps': 'Trous et lacunes légitimes', 'min_area': 'Seuil de surface des anomalies (m²)',
     'keys': 'Champs définissant un doublon (liste JSON)', 'geometry': 'Comparaison géométrique',
     'keep': 'Règle de conservation', 'ascending': 'Trier par ordre croissant',
+    'target_crs': 'Système de coordonnées cible',
+    'recursive': 'Inclure les sous-dossiers',
+    'operations': 'Transformations par identifiant de couche (objet JSON)',
+    'area_of_interest': 'Emprise WGS 84 : ouest, sud, est, nord (liste JSON)',
+    'accuracy': 'Précision annoncée maximale (m)',
+    'allow_ballpark': 'Autoriser une transformation approximative',
+    'require_best': 'Exiger la meilleure transformation et ses grilles',
+    'area_policy': 'Hors du domaine de validité',
 })
 PATHS={'data','source','left','right','mask','zones','before','after','training','validation','model','valid_footprint','outlets','table','observations','aoi'}
 PATHS.update({'reference', 'allowed_gaps'})
 COMPLEX={'inputs','sources','kernel','mapping','products','indices','border_values','nodata_values','keep_values','classes','band_map','bands','predictors','rgb','start','end','bbox','collections','assets','band_order','table_dtypes'}
-COMPLEX.update({'keys', 'rules'})
+COMPLEX.update({'keys', 'rules', 'operations', 'area_of_interest'})
 CHOICES={
     'snap':[('Sur le segment le plus proche','edge'),('Sur le sommet le plus proche','node')],
     'null_keys':[('Ne pas apparier','unmatched'),('Apparier les clés manquantes','match'),('Refuser les clés manquantes','error')],
     'value_mode':[('Valeurs physiques (calibration du raster)','physical'),('Valeurs brutes (DN)','raw')],
 }
 OPERATION_CHOICES = {
+    'vector.reproject_batch': {
+        'area_policy': [('Arrêter le lot', 'error'), ('Continuer avec un avertissement', 'warn')],
+    },
     'vector.repair_geometries': {
         'method': [('Conserver les arêtes et sommets', 'linework'), ('Reconstruire les contours et trous', 'structure')],
         'missing': [('Conserver et signaler', 'keep'), ('Écarter', 'drop'), ('Interrompre', 'error')],
@@ -100,6 +111,8 @@ class OperationDialog(QDialog):
         self.add_map.setEnabled(self.allow_map and spec['output'] in {'raster','vector'});self.product.clear();self.product.addItems(spec['products'])
         for field in spec['parameters']:
             name=field['name'];default=field['default'];label=LABELS.get(name,name.replace('_',' '))+(' *' if field['required'] else '')
+            if spec['id']=='vector.reproject_batch' and name=='sources':
+                label='Fichiers, dossiers ou couches sélectionnées (liste JSON) *'
             if name in self._choices:
                 widget=QComboBox();widget.setPlaceholderText('Choisir une valeur')
                 for title,value in self._choices[name]:widget.addItem(title,value)

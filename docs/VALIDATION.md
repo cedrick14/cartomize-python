@@ -1,5 +1,48 @@
 # Tests et validation
 
+## Cartomize 1.6.0 — M09, reprojection vectorielle par lot
+
+La suite locale complète valide **940 tests, avec 2 exclusions prévues et
+aucun échec** sous Linux / Python 3.12.14. Les 74 nouvelles régressions M09
+sont incluses. Les exclusions concernent le matériel CUDA indisponible et
+le moteur QGIS natif, qui possède un contrôle distant dédié.
+
+Cette suite complète correspond au commit `51201b9`. La seule modification
+ultérieure du code ajoute un retour à la ligne dans une case à cocher. Les
+17 tests de la fenêtre, les contrôles du paquet installé et les essais réels
+sont réexécutés après ce changement ; la matrice distante couvre le commit final.
+
+Les **14 notebooks autonomes** exécutent **89 cellules** dans des noyaux neufs,
+en **50,56 s cumulées**. La wheel 1.6.0 est installée et utilisée dans un
+environnement neuf hors du dépôt : ses **14 contrôles** API/fenêtre/console
+réussissent, et ses **90 modules Python** sont identiques aux sources testées.
+
+Le [rapport M09 sur données réelles](VALIDATION_M09_REAL.json) enregistre
+**12 contrôles réussis, 0 échec**, en **6,824 s** le 26 octobre 2026.
+Les trois jeux épinglés comprennent 80 quartiers parisiens, 3 687 relevés
+miniers et 50 aires protégées de RDC. Les 10 fichiers d’entrée et les 90 modules
+Python conservent leurs empreintes pendant l’exécution.
+
+Les coordonnées Web Mercator de tous les sommets parisiens et de tous les sites
+miniers sont confrontées aux équations calculées avec NumPy, sans appel de
+référence à PROJ. Les écarts maximaux sont de **4,657 × 10⁻⁹ m** et
+**1,761 × 10⁻⁹ m**. Le SCR Mercator personnalisé des aires protégées est
+contrôlé par un appel direct séparé au même moteur PROJ. Les attributs, les
+types géométriques, les choix explicites, les sorties multicouches, les
+emprises et l’absence de publication partielle sont également vérifiés.
+La [note 1.6.0](RELEASE_1.6.0.md) précise les références et la portée.
+
+Le [cours 15](../tutorials/notebooks/15_reprojection_vectorielle_par_lot.ipynb)
+réussit dans un noyau Jupyter indépendant : **8 cellules, aucune erreur,
+4,22 s**. Le parcours autonome comprend 14 notebooks et 89 cellules.
+Les résultats de la suite complète, du parcours réexécuté et du paquet installé
+sont consignés séparément dans le [rapport de livraison](VALIDATION_1.6.0.json).
+Les contrôles distants Windows/Ubuntu et QGIS restent associés au commit testé
+dans [GitHub Actions](https://github.com/cedrick14/cartomize-python/actions).
+
+Les sections suivantes et leurs rapports conservent les preuves historiques
+de chaque version, avec leur propre code et leurs propres distributions.
+
 ## Cartomize 1.5.0 — M08, qualité vectorielle
 
 La suite locale initiale, révision

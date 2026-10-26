@@ -1,6 +1,6 @@
 # Couverture des outils
 
-Le registre comprend 48 opérateurs. Cette matrice relie 40 d’entre eux aux cours qui exécutent leurs fonctions publiques. Les huit opérateurs vectoriels ajoutés en 1.3 sont documentés dans le guide SIG et vérifiés par les tests d’intégration ; un cours dédié reste à rédiger. Elle décrit la couverture pédagogique des familles, sans prétendre tester toutes les combinaisons de paramètres. Le cours 08 montre leur insertion dans des plans ; le cours 13 exécute le prétraitement automatique M07. Le cours 14 exécute les quatre opérateurs de qualité vectorielle M08.
+Le registre comprend 49 opérateurs. Cette matrice relie 41 d’entre eux aux cours qui exécutent leurs fonctions publiques. Les huit opérateurs vectoriels ajoutés en 1.3 sont documentés dans le guide SIG et vérifiés par les tests d’intégration ; un cours dédié reste à rédiger. Elle décrit la couverture pédagogique des familles, sans prétendre tester toutes les combinaisons de paramètres. Le cours 08 montre leur insertion dans des plans ; le cours 13 exécute le prétraitement automatique M07. Le cours 14 exécute les quatre opérateurs de qualité vectorielle M08 ; le cours 15 vérifie la reprojection par lot M09 et raccorde une couche nommée à l’étape suivante.
 
 | Opérateur | Fonction | Cours |
 |---|---|---|
@@ -10,6 +10,7 @@ Le registre comprend 48 opérateurs. Cette matrice relie 40 d’entre eux aux co
 | `vector.nearest` | Jointure de proximité | [01](notebooks/01_superposition_vectorielle.ipynb) |
 | `vector.dissolve` | Dissolution | [01](notebooks/01_superposition_vectorielle.ipynb) |
 | `vector.reproject` | Reprojection vectorielle | [01](notebooks/01_superposition_vectorielle.ipynb) |
+| `vector.reproject_batch` | Reprojection multicouche et choix géodésique | [15](notebooks/15_reprojection_vectorielle_par_lot.ipynb) |
 | `vector.make_valid` | Réparation des géométries | [01](notebooks/01_superposition_vectorielle.ipynb) |
 | `vector.intersection` | Intersection | [01](notebooks/01_superposition_vectorielle.ipynb) |
 | `vector.union` | Union | [01](notebooks/01_superposition_vectorielle.ipynb) |
@@ -54,6 +55,7 @@ Les opérations `vector.select_attributes`, `vector.select_location`, `vector.ge
 | Automatisation | Évaluation, proposition, plan dépendant, recettes, variables, associations et production en série | Cours 08 |
 | Projets | Analyse, copies masquées, restauration des sources, sessions JSON/CMZ, empreintes et révisions | Cours 09 |
 | Catalogues | Recherche et téléchargement HTTP sur un service local de démonstration, manifeste et empreintes | Cours 10 |
+| Reprojection | Découverte des couches, sélection d’opérations, références numériques et sorties nommées des plans | Cours 15 |
 | Données réelles | Cinq jeux de données, emprises, atlas de concessions, groupes et audit des classes | Cours 11 et 12 |
 | Fenêtre et vues | Lancement, panneaux, inspection, comparaisons et transfert des sorties | [Guide manuel](DESKTOP_AND_EXTENSIONS.md) |
 | Moteurs externes | QGIS/ArcGIS Pro, Dask et CUDA : prérequis, exemples conditionnels et limites | [Guide des extensions](DESKTOP_AND_EXTENSIONS.md) |

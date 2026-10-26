@@ -32,5 +32,12 @@
   "hydrology": "06_terrain_reseaux",
   "routing": "06_terrain_reseaux",
   "stac.search": "10_catalogues_execution",
-  "stac.download": "10_catalogues_execution"
+  "stac.download": "10_catalogues_execution",
+  "imagery.audit": "13_diagnostic_automatique",
+  "imagery.preprocess": "13_diagnostic_automatique",
+  "vector.audit_geometries": "14_qualite_vectorielle",
+  "vector.repair_geometries": "14_qualite_vectorielle",
+  "vector.check_topology": "14_qualite_vectorielle",
+  "vector.deduplicate": "14_qualite_vectorielle",
+  "vector.reproject_batch": "15_reprojection_vectorielle_par_lot"
 }
