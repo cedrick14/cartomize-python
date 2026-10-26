@@ -34,3 +34,18 @@ attendues. La comparaison du SCR Mercator personnalisé des aires protégées
 utilise, elle, un appel direct séparé à PROJ : c’est une vérification
 d’intégration du même moteur. Les exemples UTM publiés utilisent par défaut
 GRS80 ; la comparaison WGS84 est limitée à leur précision imprimée de 0,01 m.
+
+## Harmonisation et fusion — ajout du 26 octobre 2026
+
+Le [cours 16](notebooks/16_harmonisation_fusion_vectorielle.ipynb) reprend
+le principe de la [référence R016, Esri Merge](https://doc.esri.com/en/arcgis-pro/latest/tool-reference/data-management/merge.html) :
+associer les champs de plusieurs sources à un schéma commun, réunir les
+enregistrements et conserver leur origine. La fusion maintient les géométries
+et leurs éventuels recouvrements.
+
+La lecture de contrôle utilise [SQLite et ses classes de stockage](https://www.sqlite.org/datatype3.html)
+pour distinguer les entiers, textes et valeurs nulles enregistrés. Le script
+sur données réelles examine aussi les coordonnées avec l’encodage WKB du
+[standard OGC GeoPackage](https://www.geopackage.org/spec140/#gpb_format).
+Les lignes attendues proviennent des JSON épinglés et de structures Python
+simples, sans réutiliser la fusion Cartomize comme référence.

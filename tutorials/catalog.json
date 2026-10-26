@@ -94,5 +94,11 @@
     "title": "Reprojection vectorielle par lot et contrôle des coordonnées",
     "real": false,
     "minutes": 30
+  },
+  {
+    "slug": "16_harmonisation_fusion_vectorielle",
+    "title": "Harmonisation et fusion de couches vectorielles",
+    "real": false,
+    "minutes": 30
   }
 ]

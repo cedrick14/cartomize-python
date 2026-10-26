@@ -1,6 +1,6 @@
 # Organisation du dépôt
 
-Le dépôt `cedrick14/cartomize-python` contient la bibliothèque Python autonome Cartomize et son interface graphique. Le paquet PyPI et le module Python portent le nom `cartomize`. La version des sources est **1.6.0**. L’API, les cellules Jupyter et la fenêtre de bureau partagent les mêmes modules.
+Le dépôt `cedrick14/cartomize-python` contient la bibliothèque Python autonome Cartomize et son interface graphique. Le paquet PyPI et le module Python portent le nom `cartomize`. La version des sources est **1.7.0**. L’API, les cellules Jupyter et la fenêtre de bureau partagent les mêmes modules.
 
 | Répertoire ou fichier | Contenu |
 |---|---|

@@ -18,6 +18,8 @@ class FrameModel(QAbstractTableModel):
         if not index.isValid(): return None
         value=self.frame.iat[index.row(),index.column()]
         if isinstance(value,np.generic): value=value.item()
+        if pd.api.types.is_scalar(value) and pd.isna(value):
+            return '' if role in {Qt.ItemDataRole.DisplayRole,Qt.ItemDataRole.ToolTipRole} else None
         if role==Qt.ItemDataRole.UserRole: return value if isinstance(value,(float,int,str)) else str(value)
         if role in {Qt.ItemDataRole.DisplayRole,Qt.ItemDataRole.ToolTipRole}:
             if value is None: return ''

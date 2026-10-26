@@ -28,6 +28,7 @@ import shapely
 from .imagery import _check_cancel
 from .storage import new_directory, save_json
 from .vector_quality import _finite_geometry
+from .vector_io import read_vector
 
 
 @dataclass(frozen=True)
@@ -204,7 +205,7 @@ def discover_vector_layers(sources, *, recursive=False):
 def _read(record):
     with _reject_measured_input():
         data = (record['_data'].copy() if '_data' in record else
-                gpd.read_file(record['path'], layer=record['layer']))
+                read_vector(record['path'], layer=record['layer']))
     _horizontal_crs(data.crs, record['name'])
     if CRS(data.crs) != CRS(record['source_crs']) or len(data) != record['features']:
         raise ValueError(f'{record["name"]}: the source CRS or feature count changed during discovery; inspect it again.')
@@ -433,7 +434,7 @@ def _write_layer(data, path, *, cancel=None):
     data.to_file(path, layer='features', driver='GPKG', index=False,
                  promote_to_multi=False, layer_options={'FID': fid})
     _check_cancel(cancel)
-    check = gpd.read_file(path, layer='features')
+    check = read_vector(path, layer='features')
     if len(check) != len(data) or CRS(check.crs) != CRS(data.crs):
         raise ValueError('The written layer failed feature-count/CRS verification.')
     for before, after in zip(data.geometry, check.geometry):

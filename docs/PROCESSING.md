@@ -2,7 +2,7 @@
 
 ## Registre et dépendances
 
-`operation_catalog()` décrit les 49 opérations, leurs paramètres, leur type de
+`operation_catalog()` décrit les 50 opérations, leurs paramètres, leur type de
 sortie et leurs produits secondaires. `execute_operation()` exécute une opération
 isolée. `processing_plan()` enchaîne des opérations sans imposer de carte finale.
 `plan_cartography(..., processing_steps=...)` les insère avant l’analyse du projet
@@ -224,3 +224,18 @@ couche précise du résultat d’une étape `lot` ; les identifiants sont obtenu
 `discover_vector_layers`. Le manifeste et le bilan CSV conservent les opérations
 réellement exécutées et les emprises avant/après. Le [cours 15](../tutorials/notebooks/15_reprojection_vectorielle_par_lot.ipynb)
 exécute un plan qui poursuit les sites reprojetés avec des tampons.
+
+## Harmonisation et fusion de couches
+
+`vector.merge_layers` reçoit `sources`, les correspondances `field_maps` et
+le `schema` cible. Les politiques `conversion_errors`, `missing_fields` et
+`extra_fields` sont les mêmes que dans l’API. Il produit la couche `data`,
+le `manifest`, le `report` et les `issues`. `data` est le produit principal ;
+`@fusion:data` permet de le sélectionner explicitement dans l’étape suivante.
+
+Le nouveau dossier est publié après contrôle des fichiers enregistrés.
+Chaque ligne de la couche reste reliée à sa source et à sa position d’origine.
+La fusion ne dissout ni ne dédoublonne les géométries. Le
+[guide M10](VECTOR_MERGE.md) décrit les conversions et le
+[cours 16](../tutorials/notebooks/16_harmonisation_fusion_vectorielle.ipynb)
+exécute une chaîne de fusion puis tampons.

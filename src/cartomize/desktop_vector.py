@@ -159,6 +159,7 @@ class VectorPage(VectorQualityControls, BaseVectorPage):
         self.refresh_fields()
         self.update_quality_controls()
         self.update_reprojection_controls()
+        self.update_merge_controls()
 
     def job(self, options):
         op = self.operation.currentData()
@@ -230,3 +231,4 @@ class VectorPage(VectorQualityControls, BaseVectorPage):
         """Restore conditional controls after loading a saved desktop session."""
         self.changed()
         self.restore_reprojection_controls()
+        self.restore_merge_controls()

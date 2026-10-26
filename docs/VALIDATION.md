@@ -1,5 +1,50 @@
 # Tests et validation
 
+## Cartomize 1.7.0 — M10, harmonisation et fusion de couches
+
+La suite complète finale réussit **1 074 tests, avec 2 exclusions prévues et
+aucun échec**, en **197,43 s** sous Linux / Python 3.12.14. Les **134 nouvelles
+régressions** sont incluses : 84 pour le moteur, 10 pour le terminal, les plans
+et les tableaux, 26 pour la fenêtre, et 14 pour la compatibilité du lecteur.
+Les exclusions portent sur le matériel CUDA et le moteur QGIS natif locaux.
+
+Les **15 notebooks autonomes exécutent 97 cellules** dans des noyaux neufs,
+en **47,85 s cumulées**. La wheel 1.7.0 réussit **17 contrôles** après installation
+isolée hors du dépôt. Ses **93 modules Python** sont identiques aux sources
+testées ; `pip check` et Twine strict réussissent. La suite finale et les
+notebooks utilisent les sources figées après la correction de compatibilité SQL.
+
+Le [rapport réel M10](VALIDATION_M10_REAL.json) conserve **12 contrôles réussis,
+0 échec**, en **2,535 s**, après arrêt des sources pour l’intégration, le
+26 octobre 2026 à **20 h 40 UTC**. Les empreintes des deux fichiers d’entrée
+épinglés et des **93 modules Python** restent inchangées pendant cette exécution.
+Le rapport conserve l’empreinte du script et les empreintes applicatives,
+confirmées après l’exécution ; le commit de base `4fbd322` précède M10 et ne
+désigne pas à lui seul les sources de cette validation.
+
+Les références sont calculées directement depuis les JSON sources. SQLite
+contrôle chaque attribut, son type et la provenance enregistrée ; un lecteur
+indépendant du binaire GeoPackage contrôle les coordonnées. Les **3 687 visites
+minières**, leurs **658 effectifs manquants** et leurs **44 zéros** sont conservés.
+Les **80 quartiers parisiens et 8 366 couples de coordonnées** restent identiques.
+Le contrôle de deux copies distinctes conserve leurs 160 polygones ; la fusion
+ne les dissout pas.
+
+Les variantes de schéma et la conversion volontairement invalide sont des
+entrées dérivées identifiées dans le rapport. Les politiques de refus,
+conversion vers une valeur nulle, champ absent et valeur par défaut sont
+contrôlées sans modifier les sources épinglées. La
+[note 1.7.0](RELEASE_1.7.0.md) détaille cette validation et ses limites.
+
+Le [cours 16](../tutorials/notebooks/16_harmonisation_fusion_vectorielle.ipynb)
+réussit dans un noyau Jupyter neuf : **8 cellules, aucune erreur, 3,14 s**.
+Il comprend la lecture SQLite des attributs, les deux politiques de conversion
+et une chaîne de fusion puis tampons. Ses résultats sont enregistrés.
+
+Le [rapport de livraison](VALIDATION_1.7.0.json) suit séparément la suite complète,
+les 15 notebooks autonomes et le paquet installé. Les contrôles distants restent
+attachés aux commits de la demande d’intégration dans GitHub Actions.
+
 ## Cartomize 1.6.0 — M09, reprojection vectorielle par lot
 
 La suite locale complète valide **940 tests, avec 2 exclusions prévues et

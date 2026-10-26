@@ -39,5 +39,6 @@
   "vector.repair_geometries": "14_qualite_vectorielle",
   "vector.check_topology": "14_qualite_vectorielle",
   "vector.deduplicate": "14_qualite_vectorielle",
-  "vector.reproject_batch": "15_reprojection_vectorielle_par_lot"
+  "vector.reproject_batch": "15_reprojection_vectorielle_par_lot",
+  "vector.merge_layers": "16_harmonisation_fusion_vectorielle"
 }

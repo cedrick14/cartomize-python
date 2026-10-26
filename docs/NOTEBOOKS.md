@@ -1,6 +1,6 @@
 # Utilisation dans Jupyter
 
-Cartomize possède un seul moteur Python. Les cellules d’un notebook peuvent appeler ses fonctions sans interface graphique ; un notebook local peut aussi ouvrir la fenêtre de bureau si les dépendances graphiques sont installées. Les sources de ce dépôt correspondent à la version **1.6.0**.
+Cartomize possède un seul moteur Python. Les cellules d’un notebook peuvent appeler ses fonctions sans interface graphique ; un notebook local peut aussi ouvrir la fenêtre de bureau si les dépendances graphiques sont installées. Les sources de ce dépôt correspondent à la version **1.7.0**.
 
 ## 1. Appeler les modules depuis les cellules
 
@@ -124,3 +124,9 @@ L’installation d’une version publiée depuis PyPI reste possible ; sa versio
 Le [cours 14](../tutorials/notebooks/14_qualite_vectorielle.ipynb) exécute huit cellules sur des données simulées pour auditer et réparer les géométries, traiter les doublons et contrôler la topologie. Le code utilise les mêmes fonctions que la fenêtre et vérifie leurs produits dans une chaîne complète.
 
 Le [cours 15](../tutorials/notebooks/15_reprojection_vectorielle_par_lot.ipynb) découvre un lot multicouche, examine les opérations géodésiques, reprojette les données et poursuit une couche précise dans un plan. Ses huit cellules génèrent toutes leurs entrées et vérifient les coordonnées avec une référence numérique distincte.
+
+Le [cours 16](../tutorials/notebooks/16_harmonisation_fusion_vectorielle.ipynb)
+harmonise deux relevés villageois simulés, contrôle les types et valeurs nulles,
+conserve la provenance et poursuit la couche fusionnée dans un plan. Ses huit
+cellules comprennent une lecture SQLite du résultat et une conversion invalide
+traitée par les deux politiques explicites.

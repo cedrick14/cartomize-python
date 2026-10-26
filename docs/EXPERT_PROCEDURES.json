@@ -1,7 +1,7 @@
 {
   "schema": "cartomize.expert_procedures.v1",
   "date": "2026-10-26",
-  "source_version": "1.6.0",
+  "source_version": "1.7.0",
   "source_state": "reviewed_source",
   "baseline_commit": "ad4d1d7a89557e347b9a322f73c32205807c077a",
   "inventory": {
@@ -17,9 +17,9 @@
     ]
   },
   "scope": [
-    "Correspondance de l’inventaire expert avec Cartomize 1.6.0 ; modules M01–M08 et reprojection vectorielle par lot M09 (G04) implémentés dans leurs périmètres.",
+    "Correspondance de l’inventaire expert avec Cartomize 1.7.0 ; modules M01 à M10 implémentés dans leurs périmètres explicites.",
     "baseline_commit identifie le point de départ du dépôt avant les compléments ; il ne désigne pas un commit final de publication de la version 1.3.0.",
-    "M09 relie découverte des couches, sélection géodésique, reprojection atomique et bilan des emprises à Python, au terminal, aux plans et à la fenêtre. La validation de chaque version reste décrite dans son rapport propre.",
+    "M10 relie inspection des schémas, correspondances de champs, conversions contrôlées, fusion avec provenance et publication atomique à Python, au terminal, aux plans et à la fenêtre. La validation de chaque version reste décrite dans son rapport propre.",
     "Une ligne représente une procédure experte, pas un nombre de fonctions ni une promesse de parité QGIS/ArcGIS.",
     "Les références externes définissent les procédures ; les capacités Cartomize sont attestées par les symboles et chemins du dépôt.",
     "Une formule générique, une mise en page thématique ou une possibilité offerte par une dépendance non exposée ne suffit pas à déclarer une méthode disponible.",
@@ -33,14 +33,14 @@
   },
   "counts": {
     "total": 123,
-    "available": 15,
+    "available": 16,
     "partial": 45,
-    "absent": 63,
+    "absent": 62,
     "by_domain": {
       "Socle SIG et LiDAR": {
-        "available": 11,
+        "available": 12,
         "partial": 7,
-        "absent": 10
+        "absent": 9
       },
       "Télédétection et images": {
         "available": 3,
@@ -129,50 +129,57 @@
       "scope": "G04 : découverte multicouche, sélection géodésique traçable, contrôle des domaines et des sorties, bilan des emprises et lot atomique ; API, terminal, plans, fenêtre et cours 15."
     },
     {
-      "id": "E01",
+      "id": "M10",
       "order": 10,
+      "status": "implemented",
+      "title": "Harmonisation et fusion de couches",
+      "scope": "G05 : inspection et correspondance des schémas, types/conversions/manquants explicites, concaténation avec provenance et contrôle des sorties ; API, terminal, plans, fenêtre et cours 16."
+    },
+    {
+      "id": "E01",
+      "order": 11,
       "status": "in_progress",
       "title": "Socle de géotraitement et échanges raster-vecteur",
-      "scope": "Qualité G01–G03 terminée par M08 et reprojection par lot G04 par M09. À poursuivre : harmonisation, conversion, sélection, tables, grilles, échanges raster-vecteur et lots."
+      "scope": "G01–G03 terminées par M08, reprojection G04 par M09, harmonisation/fusion G05 par M10. À poursuivre : conversion, sélection, tables, grilles, échanges raster-vecteur et lots."
     },
     {
       "id": "E02",
-      "order": 11,
+      "order": 12,
       "status": "proposed",
       "title": "Qualité thématique et analyses raster usuelles",
       "scope": "Échantillonnage de référence, évaluation externe, unités minimales, transitions, prédicteurs et changements continus."
     },
     {
       "id": "E03",
-      "order": 12,
+      "order": 13,
       "status": "proposed",
       "title": "Séries temporelles et profils optiques",
       "scope": "Calendrier, masques, provenance, composites, lissage ; puis phénologie, tendances et profils forêt/eau/cultures/feux."
     },
     {
       "id": "E04",
-      "order": 13,
+      "order": 14,
       "status": "proposed",
       "title": "Terrain et hydrologie explicites",
       "scope": "Conventions de relief ; surfaces contributives, exutoires, chenaux, bassins, ordres, HAND/TWI/LS et morphométrie."
     },
     {
       "id": "E05",
-      "order": 14,
+      "order": 15,
       "status": "proposed",
       "title": "Indicateurs territoriaux et statistiques spatiales",
       "scope": "Supports et dénominateurs, exposition, carroyage ; puis densités, autocorrélation, interpolation et régressions."
     },
     {
       "id": "E06",
-      "order": 15,
+      "order": 16,
       "status": "proposed",
       "title": "Réseaux, multicritère et paysage",
       "scope": "Coûts réseau et accessibilité ; critères et sensibilité ; composantes, taches et connectivité."
     },
     {
       "id": "E07",
-      "order": 16,
+      "order": 17,
       "status": "proposed",
       "title": "Modules spécialisés avec validation propre",
       "scope": "LiDAR, géoréférencement, correction atmosphérique, SAR/InSAR, apprentissage profond, hydraulique et modèles écologiques/pédoclimatiques."
@@ -567,6 +574,18 @@
       "operators": [
         "vector.reproject_batch"
       ]
+    },
+    "cartomize.vector_merge.inspect_merge": {
+      "path": "src/cartomize/vector_merge.py",
+      "symbol": "inspect_merge",
+      "operators": []
+    },
+    "cartomize.vector_merge.merge_layers": {
+      "path": "src/cartomize/vector_merge.py",
+      "symbol": "merge_layers",
+      "operators": [
+        "vector.merge_layers"
+      ]
     }
   },
   "procedures": [
@@ -688,23 +707,27 @@
       "procedure": "Harmonisation et fusion de couches",
       "domain": "Socle SIG et LiDAR",
       "theme": "Coordonnées et formats",
-      "status": "absent",
-      "api": [],
-      "implemented": "Aucune opération dédiée d’harmonisation et de fusion de plusieurs schémas vectoriels.",
-      "missing": [
-        "Correspondance des champs et types",
-        "Politique de conversion et de valeurs manquantes",
-        "Fusion avec provenance."
+      "status": "available",
+      "api": [
+        "cartomize.vector_merge.inspect_merge",
+        "cartomize.vector_merge.merge_layers"
       ],
+      "implemented": "Inspection des schémas, correspondances par source, types et règles de valeurs manquantes explicites ; concaténation avec provenance par ligne, bilan des conversions et publication atomique d’un GeoPackage relu.",
+      "missing": [],
       "conditions": [
-        "Une union géométrique ne remplace pas une concaténation de couches harmonisées."
+        "Correspondances champ source → champ cible ; collisions refusées et suppressions explicites. Types texte, int64, float64, booléen, date et date/heure selon les règles documentées.",
+        "Conversions invalides refusées par défaut ; remplacement par une valeur nulle seulement sur demande et consigné. Valeurs par défaut et nullabilité contrôlées.",
+        "SCR commun exigé sans cible explicite ; reprojection éventuelle déléguée à M09 avec ses limites géodésiques.",
+        "Les lignes, géométries et leur provenance sont conservées ; aucune union géométrique, dissolution ni déduplication implicite."
       ],
-      "next_module": "E01",
+      "next_module": null,
       "planned_fixes": [],
       "references": [
         "R016"
       ],
-      "completed_modules": []
+      "completed_modules": [
+        "M10"
+      ]
     },
     {
       "id": "G06",
