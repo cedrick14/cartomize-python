@@ -3,8 +3,9 @@
 ## Cartomize 1.4.0 — module M07, validation locale du 26 octobre 2026
 
 La suite complète passe **722 tests**, avec deux essais conditionnels ignorés
-(CUDA et QGIS natif), sous Linux / Python 3.12.14. Le cours 13 corrigé passe
-dans un noyau Jupyter neuf, avec **7 cellules de code exécutées**.
+(CUDA et QGIS natif), sous Linux / Python 3.12.14. Les douze cours autonomes,
+00 à 10 et 13, passent dans des noyaux Jupyter neufs, avec **73 cellules de code
+exécutées**. Le cours 00 indique explicitement sa couverture partielle acceptée.
 
 Le module automatique est aussi vérifié avec un extrait Sentinel-2 réel du
 Mayombe : **16 384 pixels utiles**, calibration confrontée aux fenêtres du même
@@ -23,6 +24,15 @@ La wheel 1.4.0 est installée avec l’option graphique dans un environnement ne
 L’import provient de `site-packages`, hors du dépôt : contrôle de couverture et
 mosaïque automatiques, calculs raster/vectoriels, 20 pages graphiques, trois
 thèmes, exports, projet et noyau de console passent les contrôles.
+
+Après cette suite locale complète, les derniers essais CI ont révélé un
+débordement typographique du formulaire sur Windows et l’acceptation implicite
+de données partielles dans le cours 00. Le cours est corrigé et les douze
+notebooks sont réexécutés. L’ajustement du formulaire passe ensuite **24 tests
+GUI concernés** et **8 cas de géométrie** avec les métriques Qt habituelles et
+celles reproduisant exactement le débordement Windows. Les libellés et boutons
+restent intégralement lisibles. La wheel reconstruite est installée et vérifiée
+à nouveau ; la matrice complète finale est celle du commit publié dans GitHub.
 
 ## Cartomize 1.3.0 — validation locale du 26 octobre 2026
 

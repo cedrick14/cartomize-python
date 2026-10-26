@@ -33,17 +33,28 @@
       "QGIS runtime not configured"
     ],
     "command": "QT_QPA_PLATFORM=offscreen MPLBACKEND=Agg OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 python -m pytest --timeout=90 --disable-warnings",
-    "network_regressions": "Actual local HTTP server: polygon STAC search, pagination, bounded downloads, QA companions, broken chunked transfers and invalid status lines; eight HTTP failure cases preserve diagnostics and previous useful acquisitions."
+    "network_regressions": "Actual local HTTP server: polygon STAC search, pagination, bounded downloads, QA companions, broken chunked transfers and invalid status lines; eight HTTP failure cases preserve diagnostics and previous useful acquisitions.",
+    "source_stage": "Full local suite before the final GUI typography adjustment; the affected GUI tests were rerun afterward."
   },
   "notebooks": {
-    "passed": 1,
+    "passed": 12,
     "failed": 0,
-    "executed_code_cells": 7,
+    "executed_code_cells": 73,
     "slugs": [
+      "00_premiere_carte",
+      "01_superposition_vectorielle",
+      "02_pretraitement_multispectral",
+      "03_indices_algebre",
+      "04_classification",
+      "05_surfaces_changements",
+      "06_terrain_reseaux",
+      "07_mise_en_page_atlas",
+      "08_automatisation",
+      "09_projets_controle",
+      "10_catalogues_execution",
       "13_diagnostic_automatique"
     ],
-    "method": "Fresh real Jupyter kernel; automatic refusal, valid mosaic, NDVI and zonal statistics.",
-    "other_notebooks": "The complete autonomous course is executed by the Linux and Windows tutorial CI workflows; historical local results are in VALIDATION_1.3.0.json.",
+    "method": "Fresh real Jupyter kernel per autonomous lesson; courses 00 through 10 and 13. Course 00 explicitly reports its accepted partial coverage.",
     "html_exported": 14,
     "excluded": [
       "Private courses 11 and 12 require Tuto.zip."
@@ -86,8 +97,8 @@
     "wheel_build": "passed",
     "wheel_twine_strict": "passed",
     "wheel": "cartomize-1.4.0-py3-none-any.whl",
-    "wheel_bytes": 398501,
-    "wheel_sha256": "8a71eab073771fc06074bdaf8ce4829130e72e083fe47a2d8de1d2366bdf8e35",
+    "wheel_bytes": 398883,
+    "wheel_sha256": "089fd17ce697de01432d986978abdb5651d9297b9182292cf2892a53f515b068",
     "source_archive_check": "scripts/check_release.py: modules, metadata, documentation, tests and all real/reference data files verified.",
     "source_archive_build": "passed",
     "twine_strict": "passed",
@@ -112,7 +123,7 @@
     "method": "Clean virtual environment, final wheel installed with gui extra, isolated Python outside source checkout."
   },
   "desktop_review": {
-    "platform": "Qt offscreen on Linux",
+    "platform": "Qt offscreen and minimal on Linux",
     "window_size": [
       1440,
       940
@@ -128,7 +139,16 @@
       "optional STAC catalogue"
     ],
     "real_raster_rendered": true,
-    "browse_and_execute_controls_accessible": true
+    "browse_and_execute_controls_accessible": true,
+    "fonts": "Default proportional font and wide Qt fallback metrics reproducing Windows CI.",
+    "styles": [
+      "Windows",
+      "Fusion"
+    ],
+    "geometry_cases": 8,
+    "buttons_and_labels_fully_visible": true,
+    "fallback_form_minimum_width_at_16px": 358,
+    "fallback_viewport_width_at_16px": 362
   },
   "not_validated_locally": [
     "Native CUDA calculations",
@@ -137,5 +157,15 @@
     "Private catalogue authentication",
     "Binder availability and continuous availability of remote STAC providers"
   ],
-  "scope_limit": "Optical imagery preparation with compatible scenes. Atmospheric correction of level-1 products, SAR chains and remaining thematic procedures keep their own inventory status."
+  "scope_limit": "Optical imagery preparation with compatible scenes. Atmospheric correction of level-1 products, SAR chains and remaining thematic procedures keep their own inventory status.",
+  "follow_up": {
+    "reason": "Initial CI identified an implicit partial-coverage assumption in course 00 and a form overflow with wide fallback fonts on Windows.",
+    "changes": [
+      "Course 00 explicitly accepts its nonempty partial coverage, checks the report and labels the map as partial.",
+      "Wrap full button, checkbox, title and form captions; bound combo minimum widths while preserving full choices and tooltips.",
+      "Strengthen geometry assertions to verify full control/text visibility and report actionable width measurements."
+    ],
+    "local_validation": "All 12 autonomous notebooks passed. After the typography-only GUI correction, 24 affected GUI regressions and 8 geometry cases passed across offscreen/minimal and Windows/Fusion at 12/16 px; the rebuilt wheel was installed and verified again.",
+    "remote_ci": "Use checks attached to the final PR head. Earlier failed runs remain part of GitHub history."
+  }
 }

@@ -20,6 +20,8 @@ class PreparationPage(Page):
     def __init__(self):
         super().__init__("Prétraitement multispectral",
             "Contrôler la couverture, retenir les scènes nécessaires et préparer les images de la zone d’étude.")
+        self.findChild(QLabel, "pageTitle").setWordWrap(True)
+        self.parameter_card.setTitle("Données et options")
         self.preparation_mode = QComboBox()
         self.preparation_mode.addItem("Automatique : contrôler et préparer", "automatic")
         self.preparation_mode.addItem("Expert : choisir les opérations", "expert")
@@ -41,13 +43,13 @@ class PreparationPage(Page):
             self.mode.setItemData(index, self.mode.itemText(index), Qt.ItemDataRole.ToolTipRole)
         self.form.addRow("Identification des bandes", self.mode)
         self.form.addRow("Répertoire des scènes", self.source)
-        select = QPushButton("Sélectionner les bandes…")
-        clear = QPushButton("Utiliser le répertoire")
+        select = QPushButton("Sélectionner\nles bandes…")
+        clear = QPushButton("Utiliser le\nrépertoire")
         select.clicked.connect(self.select_files)
         clear.clicked.connect(self.clear_files)
         selection_controls=QWidget();selection_row=QVBoxLayout(selection_controls);selection_row.setContentsMargins(0,0,0,0)
         selection_row.addWidget(select);selection_row.addWidget(clear);self.form.addRow(selection_controls)
-        inspect = QPushButton("Analyser les bandes")
+        inspect = QPushButton("Analyser\nles bandes")
         inspect.clicked.connect(self.inspect_inputs)
         self.inventory = QLabel("Sélectionner les bandes ou analyser un répertoire.")
         self.inventory.setWordWrap(True)
@@ -73,8 +75,8 @@ class PreparationPage(Page):
         mask_controls = QWidget()
         mask_row = QVBoxLayout(mask_controls)
         mask_row.setContentsMargins(0, 0, 0, 0)
-        quality_button = QPushButton("Associer un masque…")
-        saturation_button = QPushButton("Associer la saturation…")
+        quality_button = QPushButton("Associer\nun masque…")
+        saturation_button = QPushButton("Associer la\nsaturation…")
         quality_button.clicked.connect(lambda: self.select_mask(1))
         saturation_button.clicked.connect(lambda: self.select_mask(3))
         mask_row.addWidget(quality_button)
@@ -86,10 +88,10 @@ class PreparationPage(Page):
         self.coverage_threshold.setRange(.01, 100.)
         self.coverage_threshold.setDecimals(2)
         self.form.addRow("Couverture utile minimale (%)", self.coverage_threshold)
-        self.allow_partial = QCheckBox("Accepter moins que le seuil")
+        self.allow_partial = QCheckBox("Accepter moins\nque le seuil")
         self.allow_partial.setToolTip("Autoriser explicitement une couverture utile insuffisante. Le résultat conserve les lacunes en NoData et porte la mention de couverture partielle ; un résultat sans pixel utile reste refusé.")
         self.form.addRow(self.allow_partial)
-        self.catalog_enabled = QCheckBox("Compléter depuis un catalogue")
+        self.catalog_enabled = QCheckBox("Compléter depuis\nun catalogue")
         self.catalog_enabled.setToolTip("Si la couverture est insuffisante, rechercher et télécharger les scènes dans le catalogue STAC indiqué, dans les limites choisies. Sans fichier local, renseigner les bandes à obtenir.")
         self.form.addRow(self.catalog_enabled)
         self.catalog_endpoint = QLineEdit()
@@ -114,9 +116,9 @@ class PreparationPage(Page):
                                ("Téléchargement maximal (Mo)", self.catalog_max_mb),
                                ("Délai par requête (s)", self.catalog_timeout)]:
             self.form.addRow(label, control)
-        self.audit_button = QPushButton("Diagnostiquer la couverture")
+        self.audit_button = QPushButton("Diagnostiquer\nla couverture")
         self.audit_button.clicked.connect(self.diagnose_coverage)
-        self.apply_audit_button = QPushButton("Appliquer la sélection proposée")
+        self.apply_audit_button = QPushButton("Appliquer la\nsélection\nproposée")
         self.apply_audit_button.setEnabled(False)
         self.apply_audit_button.clicked.connect(self.apply_audit_proposal)
         audit_controls = QWidget()
@@ -140,15 +142,15 @@ class PreparationPage(Page):
         self._next_action = None
         self._audit_generation = 0
         self._pending_audit_generation = None
-        self.mosaic = QCheckBox("Mosaïque des scènes")
+        self.mosaic = QCheckBox("Mosaïque des\nscènes")
         self.mosaic.setChecked(True)
-        self.multiband = QCheckBox("Assemblage multibande")
+        self.multiband = QCheckBox("Assemblage\nmultibande")
         self.multiband.setToolTip('Conserver le GeoTIFF scientifique multibande.')
         self.multiband.setChecked(True)
-        self.clip = QCheckBox("Extraction par masque")
-        self.colour = QCheckBox("Composition colorée")
+        self.clip = QCheckBox("Extraction\npar masque")
+        self.colour = QCheckBox("Composition\ncolorée")
         self.colour.setToolTip('Enregistrer la visualisation dans un GeoTIFF séparé des valeurs scientifiques.')
-        self.separate = QCheckBox("Extraction des bandes")
+        self.separate = QCheckBox("Extraction\ndes bandes")
         self.separate.setToolTip('Enregistrer un GeoTIFF distinct par bande.')
         for control in (self.mosaic, self.multiband, self.clip, self.colour, self.separate):
             self.form.addRow(control)
@@ -166,11 +168,11 @@ class PreparationPage(Page):
         for label,value in [('Plus proche voisin','nearest'),('Bilinéaire','bilinear'),('Cubique','cubic'),('Moyenne','average')]:self.resampling.addItem(label,value)
         self.overlap = QComboBox()
         self.overlap.addItem('Première scène valide','first');self.overlap.addItem('Dernière scène valide','last')
-        self.saturation = QCheckBox('Masquer les pixels saturés');self.saturation.setChecked(True)
+        self.saturation = QCheckBox('Masquer les\npixels saturés');self.saturation.setChecked(True)
         self.saturation.setToolTip('Appliquer le masque de saturation lorsqu’il est disponible.')
-        self.clouds = QCheckBox("Appliquer les masques QA/SCL")
+        self.clouds = QCheckBox("Appliquer les\nmasques QA/SCL")
         self.clouds.setChecked(True)
-        self.dates = QCheckBox("Autoriser le mélange des dates")
+        self.dates = QCheckBox("Autoriser le\nmélange des dates")
         self.dates.setToolTip("Autoriser une mosaïque multitemporelle ou des scènes dont la date d’acquisition est inconnue.")
         for label, control in [("Système de coordonnées cible", self.crs), ("Résolution (m)", self.resolution),
                                ("Rééchantillonnage spectral", self.resampling), ("Recouvrement des scènes", self.overlap), ("Saturation", self.saturation), ("Masque de qualité", self.clouds), ("Dates d’acquisition", self.dates)]:
@@ -182,6 +184,23 @@ class PreparationPage(Page):
         self.summary = QLabel()
         self.summary.setWordWrap(True)
         self.form.addRow(self.summary)
+        # Native/fallback fonts can be much wider than the current system font.
+        # Keep full captions readable vertically instead of forcing the entire
+        # parameter page beyond its viewport. Combo choices remain available in
+        # the popup and tooltip even for long user-defined spectral names.
+        for row in range(self.form.rowCount()):
+            item = self.form.itemAt(row, QFormLayout.ItemRole.LabelRole)
+            if item is not None and isinstance(item.widget(), QLabel):
+                item.widget().setWordWrap(True)
+        for choice in (self.rgb_red, self.rgb_green, self.rgb_blue,
+                       self.resampling, self.overlap):
+            choice.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
+            choice.setMinimumContentsLength(12)
+            choice.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+            for index in range(choice.count()):
+                choice.setItemData(index, choice.itemText(index), Qt.ItemDataRole.ToolTipRole)
+            choice.currentTextChanged.connect(choice.setToolTip)
+            choice.setToolTip(choice.currentText())
         self.layout.addStretch()
         self.assets.itemChanged.connect(self.refresh_bands)
         self.quality_masks.itemChanged.connect(self.mask_changed)
@@ -293,6 +312,8 @@ class PreparationPage(Page):
             control.addItem("Sélectionner une bande", None)
             for name in names:
                 control.addItem(name, name)
+            for index in range(control.count()):
+                control.setItemData(index, control.itemText(index), Qt.ItemDataRole.ToolTipRole)
             index = control.findData(previous)
             control.setCurrentIndex(max(0, index))
 

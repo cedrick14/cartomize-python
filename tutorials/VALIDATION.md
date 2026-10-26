@@ -7,15 +7,23 @@ tous les cours avec la version courante.
 
 ## Résultats locaux du 26 octobre 2026 — sources 1.4.0
 
-Le [cours 13](notebooks/13_diagnostic_automatique.ipynb) a été exécuté dans un
-noyau Jupyter réel sous Linux / Python 3.12.14 : **7 cellules de code exécutées,
-aucune erreur**. Ses sorties enregistrées indiquent Cartomize 1.4.0.
+Les cours **00 à 10 et 13** ont été exécutés dans des noyaux Jupyter réels
+indépendants sous Linux / Python 3.12.14 : **12 notebooks, 73 cellules de code,
+aucune erreur**. Les sorties corrigées des cours 00 et 13 sont enregistrées ;
+les sorties historiques des autres fichiers sont conservées.
 
-Le cours utilise maintenant le [module M07](../docs/IMAGERY_AUTOMATIC.md) : la
+Le [cours 13](notebooks/13_diagnostic_automatique.ipynb), avec ses sept cellules,
+utilise maintenant le [module M07](../docs/IMAGERY_AUTOMATIC.md) : la
 première zone, couverte à **83,28 %** en données utiles, est refusée avec un
 diagnostic conservé. Un second cas pédagogique distinct atteint **100 %** avec
 deux scènes ; le moteur sélectionne la mosaïque, puis les cellules calculent le
 NDVI et les statistiques zonales. Le registre courant comporte **44 opérateurs**.
+
+Le cours 00 accepte explicitement les données pédagogiques partielles avec
+`allow_partial=True`. Le seuil reste 100 %, le rapport vérifie `status="partial"`
+et `threshold_met=False`, et le sous-titre de la carte annonce cette couverture
+partielle. Cette acceptation pédagogique ne modifie pas le comportement strict
+du module pour les autres utilisateurs.
 
 La suite logicielle locale de cette version a également réussi : **722 tests
 réussis, 2 ignorés**, en **163,27 secondes**. Les tests ignorés nécessitent CUDA
@@ -23,9 +31,10 @@ ou le runtime QGIS absent de cet environnement. Ce bilan ne décrit pas une
 exécution Windows ni une disponibilité vérifiée de Binder ou de catalogues
 distants. Voir la [validation courante](../docs/VALIDATION.md).
 
-Les validations des autres cours présentées dans les sections suivantes restent
-celles de leurs versions respectives. Les données privées des cours 11 et 12
-n’ont pas été fournies pour cette vérification 1.4.0.
+Les résultats des sections suivantes restent ceux de leurs versions respectives.
+Les données privées des cours 11 et 12 n’ont pas été fournies pour cette
+vérification 1.4.0. L’édition HTML des 14 cours est construite, en conservant les
+sorties historiques de ces deux cours privés.
 
 ## Historique du 26 octobre 2026 — sources 1.3.0
 

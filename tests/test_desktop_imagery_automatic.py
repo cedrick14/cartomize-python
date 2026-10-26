@@ -13,9 +13,10 @@ from rasterio.transform import from_origin
 from shapely.geometry import box
 
 pytest.importorskip('PySide6')
-from PySide6.QtCore import QEventLoop, QTimer, QSettings, QPoint
+from PySide6.QtCore import QEventLoop, QTimer, QSettings, QPoint, Qt
 from PySide6.QtTest import QTest
-from PySide6.QtWidgets import QApplication, QPushButton, QStyleFactory
+from PySide6.QtWidgets import (QApplication, QAbstractButton, QLabel,
+                              QPushButton, QStyleFactory, QWidget)
 
 import cartomize as cm
 from cartomize.desktop import CartomizeWindow
@@ -338,7 +339,22 @@ def test_automatic_controls_fit_the_window(application, tmp_path, monkeypatch, f
         QTest.qWait(50)
         scroll = window.stack.currentWidget()
         viewport = scroll.viewport()
-        assert scroll.horizontalScrollBar().maximum() == 0
+        assert window.size().toTuple() == (1440, 940)
+        assert scroll.horizontalScrollBar().maximum() == 0, _width_diagnostic(window, page, viewport)
+        for control in page.findChildren(QAbstractButton):
+            if control.isVisible() and control.text():
+                left = control.mapTo(viewport, QPoint(0, 0)).x()
+                assert 0 <= left < left + control.width() <= viewport.width(), control.text()
+                assert control.width() >= control.minimumSizeHint().width(), control.text()
+                assert control.height() >= control.minimumSizeHint().height(), control.text()
+        for label in page.findChildren(QLabel):
+            if label.isVisible() and label.wordWrap() and label.text():
+                assert label.height() >= label.heightForWidth(label.width()), label.text()
+        for choice in (page.rgb_red, page.rgb_green, page.rgb_blue,
+                       page.resampling, page.overlap):
+            assert choice.toolTip() == choice.currentText()
+            for index in range(choice.count()):
+                assert choice.itemData(index, Qt.ItemDataRole.ToolTipRole) == choice.itemText(index)
         for field in (page.source, page.aoi, page.output):
             for button in field.findChildren(QPushButton):
                 left = button.mapTo(viewport, QPoint(0, 0)).x()
@@ -346,6 +362,21 @@ def test_automatic_controls_fit_the_window(application, tmp_path, monkeypatch, f
     finally:
         close(window, application)
         application.setStyle(previous_style)
+
+
+def _width_diagnostic(window, page, viewport):
+    """Make failures on native styles/font fallbacks actionable in CI logs."""
+    controls = []
+    for widget in [page] + page.findChildren(QWidget):
+        if widget.isVisible():
+            caption = (widget.text() if hasattr(widget, 'text') else
+                       widget.title() if hasattr(widget, 'title') else widget.objectName())
+            controls.append(dict(kind=type(widget).__name__, text=caption,
+                size=widget.size().toTuple(), minimum=widget.minimumSize().toTuple(),
+                hint=widget.minimumSizeHint().toTuple(), font=widget.font().toString()))
+    return dict(viewport=viewport.size().toTuple(), controls_panel=window.controls_panel.size().toTuple(),
+                page=page.size().toTuple(), form=page.form.minimumSize().toTuple(),
+                widest=sorted(controls, key=lambda item: max(item['hint'][0], item['minimum'][0]), reverse=True)[:20])
 
 
 def test_cancellation_during_automatic_diagnostic_preserves_no_product(application, write_raster, tmp_path, monkeypatch):

@@ -109,7 +109,9 @@ contrôles distants attachés au commit dans
 
 - Suite complète locale Linux/Python 3.12 : **722 tests réussis, 2 ignorés**
   pour les environnements matériels CUDA et natif QGIS indisponibles localement.
-- Cours 13 : **7 cellules exécutées** dans un noyau Jupyter neuf.
+- Parcours Jupyter : **12 notebooks et 73 cellules exécutés**, avec un noyau
+  neuf par cours. Le cours 00 accepte et signale sa couverture partielle ;
+  les sept cellules du cours 13 exercent le refus et une mosaïque complète.
 - Scène Sentinel réelle : **16 384 pixels utiles sur 16 384**, masque SCL,
   calibration et NDVI vérifiés ; même résultat depuis le travailleur de la fenêtre.
 - Zone étendue de 20 m : **256 pixels manquants** détectés ; production refusée
