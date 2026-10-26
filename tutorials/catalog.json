@@ -82,5 +82,11 @@
     "title": "Diagnostic et préparation automatiques",
     "real": false,
     "minutes": 25
+  },
+  {
+    "slug": "14_qualite_vectorielle",
+    "title": "Qualité vectorielle : géométries, topologie et doublons",
+    "real": false,
+    "minutes": 30
   }
 ]

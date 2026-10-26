@@ -60,6 +60,16 @@ def _catalog():
     add('vector.join_attributes','Jointure attributaire',table_join,'vector','vector')
     add('vector.from_xy','Points depuis un tableau XY',table_points,'vector','vector')
     add('vector.validate','Diagnostic des géométries',vector.validate,'document','vector')
+    from .vector_quality import audit_geometries, repair_geometries
+    from .vector_topology import check_topology
+    from .vector_duplicates import deduplicate
+    for key, label, function in [
+        ('audit_geometries', 'Diagnostic détaillé des géométries', audit_geometries),
+        ('repair_geometries', 'Réparation avec rapport des changements', repair_geometries),
+        ('check_topology', 'Contrôle topologique', check_topology),
+        ('deduplicate', 'Traitement des doublons', deduplicate),
+    ]:
+        add('vector.' + key, label, function, 'vector', 'vector')
     from functools import partial
     for mode,label in [('intersection','Intersection'),('union','Union'),('difference','Différence'),('symmetric_difference','Différence symétrique')]:
         add('vector.'+mode,label,partial(vector.overlay,how=mode),'vector','vector')
@@ -129,6 +139,44 @@ _ENGINE = {'workers':1,'block_size':512,'memory_limit_mb':512,'align':False,'res
 BLOCK_OPERATIONS={'calculate','indices','reduce','focal','terrain','convolve'}
 CUDA_OPERATIONS={'calculate','indices','reduce'}
 _HIDDEN = {'destination','overwrite','progress','cancel','stage','options','kwargs','how_fixed','quantity'}
+VECTOR_QUALITY_OPERATIONS = {
+    'vector.audit_geometries', 'vector.repair_geometries',
+    'vector.check_topology', 'vector.deduplicate',
+}
+
+
+def _write_vector_quality(result, work, *, cancel=None):
+    """Write related products inside the caller's atomic output directory.
+
+    GPKG's internal feature id is deliberately named outside the source schema:
+    an input attribute called ``fid`` remains an ordinary business identifier.
+    """
+    products = {}
+    for name, layer in (
+        ('data', result.data), ('issues', result.issues), ('rejected', result.rejected),
+    ):
+        _check_cancel(cancel)
+        if layer is None:
+            layer = result.data.iloc[:0].copy()
+        if name != 'data' and layer is result.data:
+            products[name] = products['data']
+            continue
+        folded = [str(column).casefold() for column in layer.columns]
+        if len(set(folded)) != len(folded):
+            raise ValueError('Les noms de champs doivent être distincts sans tenir compte de la casse pour GeoPackage.')
+        fid = '_cartomize_fid'
+        while fid.casefold() in folded:
+            fid += '_'
+        path = work / (name + '.gpkg')
+        layer.to_file(path, driver='GPKG', index=False, layer='features',
+                      layer_options={'FID': fid})
+        products[name] = path
+    _check_cancel(cancel)
+    result.report.to_csv(work / 'report.csv', index=False, encoding='utf-8-sig')
+    products['report'] = work / 'report.csv'
+    save_json(result.summary, work / 'summary.json')
+    products['summary'] = work / 'summary.json'
+    return products
 
 
 def operation_catalog():
@@ -149,6 +197,8 @@ def operation_catalog():
         if key=='imagery.preprocess':products+=['audit','coverage','gaps','preparation','multiband','source_index','composition','report']
         if key=='prepare':products+=['result_source_index']
         if key=='classify':products+=['classification','confidence']
+        if key in VECTOR_QUALITY_OPERATIONS:
+            products += ['data', 'report', 'summary', 'issues', 'rejected']
         if key=='classify':
             from .classification import fit_classifier
             present={p['name'] for p in parameters}
@@ -231,7 +281,12 @@ def execute_operation(operation,parameters,destination,*,workers=1,block_size=51
             # diagnostic outside it before rollback removes all science files.
             raise exc.preserve(diagnostic_destination(destination),cancel=cancel) from None
         _check_cancel(cancel)
-        if isinstance(result,gpd.GeoDataFrame):
+        from .vector_quality_result import VectorQualityResult
+        quality_products = None
+        if isinstance(result, VectorQualityResult):
+            quality_products = _write_vector_quality(result, work, cancel=cancel)
+            primary = quality_products['issues' if operation == 'vector.audit_geometries' else 'data']
+        elif isinstance(result,gpd.GeoDataFrame):
             primary=work/'result.gpkg';result.to_file(primary,driver='GPKG',index=False)
         elif isinstance(result,(pd.DataFrame,pd.Series)):
             primary=work/'result.csv';result.to_csv(primary,index=True)
@@ -247,7 +302,11 @@ def execute_operation(operation,parameters,destination,*,workers=1,block_size=51
         metadata=getattr(result,'attrs',{}).get('cartomize')
         if metadata is not None:record['metadata']=json_value(metadata)
         products={'primary':record['primary']}
-        if operation=='imagery.preprocess':
+        if quality_products is not None:
+            products.update({key: str(destination / path.relative_to(work))
+                             for key, path in quality_products.items()})
+            record['metadata'] = json_value(result.summary)
+        elif operation=='imagery.preprocess':
             document=json.loads(primary.read_text(encoding='utf-8'))
             record['metadata']={key:document[key] for key in
                 ('status','usable_percent','threshold_met','allow_partial','coverage_threshold',

@@ -26,12 +26,36 @@ LABELS={'data':'Couche source','source':'Raster ou couche source','left':'Couche
         'value_mode':'Valeurs utilisées','prefix':'Préfixe des champs de résultat','snap':'Rattachement au réseau',
         'include_coverage':'Mesurer la couverture de chaque zone','max_zone_pixels':'Limite de pixels candidats par zone',
         'all_touched':'Inclure tous les pixels touchés par la zone'}
+LABELS.update({
+    'id_field': 'Identifiant unique des entités', 'method': 'Méthode de réparation',
+    'missing': 'Géométries manquantes', 'empty': 'Géométries vides',
+    'type_changes': 'Changements de type géométrique', 'keep_collapsed': 'Conserver les composantes effondrées',
+    'rules': 'Règles topologiques (liste JSON)', 'reference': 'Emprise de référence',
+    'allowed_gaps': 'Trous et lacunes légitimes', 'min_area': 'Seuil de surface des anomalies (m²)',
+    'keys': 'Champs définissant un doublon (liste JSON)', 'geometry': 'Comparaison géométrique',
+    'keep': 'Règle de conservation', 'ascending': 'Trier par ordre croissant',
+})
 PATHS={'data','source','left','right','mask','zones','before','after','training','validation','model','valid_footprint','outlets','table','observations','aoi'}
+PATHS.update({'reference', 'allowed_gaps'})
 COMPLEX={'inputs','sources','kernel','mapping','products','indices','border_values','nodata_values','keep_values','classes','band_map','bands','predictors','rgb','start','end','bbox','collections','assets','band_order','table_dtypes'}
+COMPLEX.update({'keys', 'rules'})
 CHOICES={
     'snap':[('Sur le segment le plus proche','edge'),('Sur le sommet le plus proche','node')],
     'null_keys':[('Ne pas apparier','unmatched'),('Apparier les clés manquantes','match'),('Refuser les clés manquantes','error')],
     'value_mode':[('Valeurs physiques (calibration du raster)','physical'),('Valeurs brutes (DN)','raw')],
+}
+OPERATION_CHOICES = {
+    'vector.repair_geometries': {
+        'method': [('Conserver les arêtes et sommets', 'linework'), ('Reconstruire les contours et trous', 'structure')],
+        'missing': [('Conserver et signaler', 'keep'), ('Écarter', 'drop'), ('Interrompre', 'error')],
+        'empty': [('Conserver et signaler', 'keep'), ('Écarter', 'drop'), ('Interrompre', 'error')],
+        'type_changes': [('Accepter et signaler', 'allow'), ('Écarter', 'drop'), ('Interrompre', 'error')],
+    },
+    'vector.deduplicate': {
+        'null_keys': [('Considérer comme distinctes', 'distinct'), ('Regrouper', 'match'), ('Refuser', 'error')],
+        'geometry': [('Ne pas comparer', 'none'), ('Strictement identique', 'exact'), ('Égalité topologique', 'topological')],
+        'keep': [('Conserver le premier', 'first'), ('Conserver le dernier', 'last'), ('Écarter tout le groupe', 'none')],
+    },
 }
 
 
@@ -57,7 +81,7 @@ class OperationDialog(QDialog):
             for name,value in record['parameters'].items():
                 if name in self.controls:
                     widget=self.controls[name]
-                    if name in CHOICES:
+                    if name in self._choices:
                         index=widget.findData(value)
                         if index<0:
                             self._invalid_choices[name]=value
@@ -72,12 +96,13 @@ class OperationDialog(QDialog):
     def changed(self):
         while self.form.rowCount():self.form.removeRow(0)
         self.controls={};self._explicit_nulls=set();self._invalid_choices={};spec=operation_spec(self.operation.currentData())
+        self._choices = {**CHOICES, **OPERATION_CHOICES.get(spec['id'], {})}
         self.add_map.setEnabled(self.allow_map and spec['output'] in {'raster','vector'});self.product.clear();self.product.addItems(spec['products'])
         for field in spec['parameters']:
             name=field['name'];default=field['default'];label=LABELS.get(name,name.replace('_',' '))+(' *' if field['required'] else '')
-            if name in CHOICES:
+            if name in self._choices:
                 widget=QComboBox();widget.setPlaceholderText('Choisir une valeur')
-                for title,value in CHOICES[name]:widget.addItem(title,value)
+                for title,value in self._choices[name]:widget.addItem(title,value)
                 widget.setCurrentIndex(widget.findData(default));row=widget
             elif isinstance(default,bool):widget=QCheckBox();widget.setChecked(default);row=widget
             else:
@@ -101,7 +126,7 @@ class OperationDialog(QDialog):
         parameters={};spec=operation_spec(self.operation.currentData())
         for field in spec['parameters']:
             name=field['name'];widget=self.controls[name]
-            if name in CHOICES:
+            if name in self._choices:
                 if widget.currentIndex()<0:
                     detail=f' (valeur enregistrée non reconnue : {self._invalid_choices[name]!r})' if name in self._invalid_choices else ''
                     raise ValueError('Choisir '+LABELS.get(name,name)+detail)

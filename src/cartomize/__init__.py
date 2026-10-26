@@ -29,7 +29,7 @@ from .relations import analyze_relations
 from .automation import plan_cartography,run_plan,propose_layouts
 from .mapops import snapshot_project,compare_snapshots,record_review,verify_review
 
-__version__ = "1.4.0"
+__version__ = "1.5.0"
 __display_version__ = ".".join(__version__.split(".")[:2])
 
 
@@ -86,3 +86,9 @@ from .vector_workflows import (select_attributes, select_location, geometry_oper
                                spatial_summary, join_attributes, latest_records)
 __all__ += ['select_attributes', 'select_location', 'geometry_operation',
             'spatial_summary', 'join_attributes', 'latest_records']
+from .vector_quality_result import VectorQualityResult
+from .vector_quality import audit_geometries, repair_geometries
+from .vector_topology import check_topology
+from .vector_duplicates import deduplicate
+__all__ += ['VectorQualityResult', 'audit_geometries', 'repair_geometries',
+            'check_topology', 'deduplicate']

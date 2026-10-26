@@ -1,7 +1,7 @@
 {
   "schema": "cartomize.expert_procedures.v1",
   "date": "2026-10-26",
-  "source_version": "1.4.0",
+  "source_version": "1.5.0",
   "source_state": "reviewed_source",
   "baseline_commit": "ad4d1d7a89557e347b9a322f73c32205807c077a",
   "inventory": {
@@ -17,7 +17,7 @@
     ]
   },
   "scope": [
-    "Correspondance de l’inventaire expert avec Cartomize 1.4.0 ; compléments M01–M06 et chaîne automatique d’imagerie M07 implémentés dans leurs périmètres.",
+    "Correspondance de l’inventaire expert avec Cartomize 1.5.0 ; modules M01–M07 et qualité vectorielle M08 (G01–G03) implémentés dans leurs périmètres.",
     "baseline_commit identifie le point de départ du dépôt avant les compléments ; il ne désigne pas un commit final de publication de la version 1.3.0.",
     "M07 relie le contrôle de couverture à la production, aux catalogues STAC, aux chaînes et à la fenêtre. La validation de chaque version reste décrite dans son rapport propre.",
     "Une ligne représente une procédure experte, pas un nombre de fonctions ni une promesse de parité QGIS/ArcGIS.",
@@ -33,14 +33,14 @@
   },
   "counts": {
     "total": 123,
-    "available": 11,
-    "partial": 48,
-    "absent": 64,
+    "available": 14,
+    "partial": 46,
+    "absent": 63,
     "by_domain": {
       "Socle SIG et LiDAR": {
-        "available": 7,
-        "partial": 10,
-        "absent": 11
+        "available": 10,
+        "partial": 8,
+        "absent": 10
       },
       "Télédétection et images": {
         "available": 3,
@@ -115,50 +115,57 @@
       "scope": "Import, calibration et masques STAC/locaux ; diagnostic sur grille fixe ; sélection, complément borné par catalogue, décision de mosaïque et seuil obligatoire ; erreurs avec diagnostics conservés ; API, terminal, plans, Jupyter et fenêtre."
     },
     {
-      "id": "E01",
+      "id": "M08",
       "order": 8,
-      "status": "proposed",
+      "status": "implemented",
+      "title": "Qualité des données vectorielles",
+      "scope": "G01–G03 : audit détaillé, réparation avec décisions, contrôles topologiques polygonaux/linéaires et dédoublonnage avec provenance ; API, CLI, plans, interface et cours 14."
+    },
+    {
+      "id": "E01",
+      "order": 9,
+      "status": "in_progress",
       "title": "Socle de géotraitement et échanges raster-vecteur",
-      "scope": "Rapports qualité, doublons, tables et lots ; grilles, échantillonnage raster aux points, rasterisation et polygonisation."
+      "scope": "Qualité G01–G03 terminée par M08. À poursuivre : reprojection par lot, harmonisation, conversion, sélection, tables, grilles, échanges raster-vecteur et lots."
     },
     {
       "id": "E02",
-      "order": 9,
+      "order": 10,
       "status": "proposed",
       "title": "Qualité thématique et analyses raster usuelles",
       "scope": "Échantillonnage de référence, évaluation externe, unités minimales, transitions, prédicteurs et changements continus."
     },
     {
       "id": "E03",
-      "order": 10,
+      "order": 11,
       "status": "proposed",
       "title": "Séries temporelles et profils optiques",
       "scope": "Calendrier, masques, provenance, composites, lissage ; puis phénologie, tendances et profils forêt/eau/cultures/feux."
     },
     {
       "id": "E04",
-      "order": 11,
+      "order": 12,
       "status": "proposed",
       "title": "Terrain et hydrologie explicites",
       "scope": "Conventions de relief ; surfaces contributives, exutoires, chenaux, bassins, ordres, HAND/TWI/LS et morphométrie."
     },
     {
       "id": "E05",
-      "order": 12,
+      "order": 13,
       "status": "proposed",
       "title": "Indicateurs territoriaux et statistiques spatiales",
       "scope": "Supports et dénominateurs, exposition, carroyage ; puis densités, autocorrélation, interpolation et régressions."
     },
     {
       "id": "E06",
-      "order": 13,
+      "order": 14,
       "status": "proposed",
       "title": "Réseaux, multicritère et paysage",
       "scope": "Coûts réseau et accessibilité ; critères et sensibilité ; composantes, taches et connectivité."
     },
     {
       "id": "E07",
-      "order": 14,
+      "order": 15,
       "status": "proposed",
       "title": "Modules spécialisés avec validation propre",
       "scope": "LiDAR, géoréférencement, correction atmosphérique, SAR/InSAR, apprentissage profond, hydraulique et modèles écologiques/pédoclimatiques."
@@ -508,6 +515,34 @@
       "operators": [
         "imagery.preprocess"
       ]
+    },
+    "cartomize.vector_quality.audit_geometries": {
+      "path": "src/cartomize/vector_quality.py",
+      "symbol": "audit_geometries",
+      "operators": [
+        "vector.audit_geometries"
+      ]
+    },
+    "cartomize.vector_quality.repair_geometries": {
+      "path": "src/cartomize/vector_quality.py",
+      "symbol": "repair_geometries",
+      "operators": [
+        "vector.repair_geometries"
+      ]
+    },
+    "cartomize.vector_topology.check_topology": {
+      "path": "src/cartomize/vector_topology.py",
+      "symbol": "check_topology",
+      "operators": [
+        "vector.check_topology"
+      ]
+    },
+    "cartomize.vector_duplicates.deduplicate": {
+      "path": "src/cartomize/vector_duplicates.py",
+      "symbol": "deduplicate",
+      "operators": [
+        "vector.deduplicate"
+      ]
     }
   },
   "procedures": [
@@ -516,74 +551,80 @@
       "procedure": "Contrôle et réparation des géométries",
       "domain": "Socle SIG et LiDAR",
       "theme": "Qualité des données",
-      "status": "partial",
+      "status": "available",
       "api": [
-        "cartomize.vector.validate",
-        "cartomize.vector.make_valid"
+        "cartomize.vector_quality.audit_geometries",
+        "cartomize.vector_quality.repair_geometries"
       ],
-      "implemented": "Comptage complet des géométries absentes, vides, invalides et exactement dupliquées ; réparation GEOS.",
-      "missing": [
-        "Table des erreurs par identifiant",
-        "Rapport des changements avant et après réparation et choix des règles de traitement."
-      ],
+      "implemented": "Audit par identifiant : validité, motifs GEOS, géométries manquantes, vides, non finies et doublons exacts. Réparation linework ou structure avec rapport avant/après, surfaces/longueurs, types, décisions et couche des exclusions.",
+      "missing": [],
       "conditions": [
-        "Les doublons sont comparés par WKB exact ; la réparation peut changer le type géométrique."
+        "Identifiant métier unique et renseigné, ou position source explicite ; attributs, ordre et SCR conservés.",
+        "Politiques keep/drop/error pour manquants/vides et allow/drop/error pour changements de type. Une réparation encore invalide ou non finie est refusée.",
+        "Mesures en m²/m dans un SCR projeté choisi ; indisponibles en géographique sans metric_crs. Pas de déplacement par tolérance.",
+        "structure exige Shapely >= 2.1 et GEOS >= 3.10 ; linework fonctionne avec Shapely >= 2.0."
       ],
-      "next_module": "E01",
+      "next_module": null,
       "planned_fixes": [],
       "references": [
         "R001",
         "R013"
       ],
-      "completed_modules": []
+      "completed_modules": [
+        "M08"
+      ]
     },
     {
       "id": "G02",
       "procedure": "Contrôle topologique d’une couverture",
       "domain": "Socle SIG et LiDAR",
       "theme": "Qualité des données",
-      "status": "absent",
-      "api": [],
-      "implemented": "Aucun contrôleur topologique de couverture ou de réseau.",
-      "missing": [
-        "Règles de chevauchement, lacunes, raccordement et tolérance",
-        "Géométries et table des violations."
+      "status": "available",
+      "api": [
+        "cartomize.vector_topology.check_topology"
       ],
+      "implemented": "Contrôles polygonaux : doublons, chevauchements, lacunes et dépassements de référence. Contrôles linéaires : doublons, portions superposées, extrémités non raccordées et croisements non nœudés. Couche et table des violations avec identifiants et mesures.",
+      "missing": [],
       "conditions": [
-        "La validité individuelle et le comptage de doublons de G01 ne contrôlent pas ces relations."
+        "SCR projeté ou metric_crs explicite ; source valide et finie ; diagnostics restitués dans le SCR source.",
+        "Référence obligatoire pour gaps/outside ; allowed_gaps exclut les trous légitimes. min_area en m² filtre les anomalies de surface.",
+        "Tolérance en mètres pour dangles seulement ; aucune correction ni création de nœuds implicite.",
+        "Une impasse peut être légitime ; chevauchements mesurés par paire, sans les confondre avec une surface union."
       ],
-      "next_module": "E01",
+      "next_module": null,
       "planned_fixes": [],
       "references": [
         "R004"
       ],
-      "completed_modules": []
+      "completed_modules": [
+        "M08"
+      ]
     },
     {
       "id": "G03",
       "procedure": "Détection et traitement des doublons",
       "domain": "Socle SIG et LiDAR",
       "theme": "Qualité des données",
-      "status": "partial",
+      "status": "available",
       "api": [
-        "cartomize.vector.validate",
-        "cartomize.vector_workflows.latest_records"
+        "cartomize.vector_duplicates.deduplicate"
       ],
-      "implemented": "Comptage des géométries exactement répétées ; conservation du dernier relevé complet par identifiant et date.",
-      "missing": [
-        "Déduplication générale selon plusieurs clés et règles",
-        "Export des groupes supprimés et journal des décisions."
-      ],
+      "implemented": "Dédoublonnage par clés, géométrie WKB exacte ou égalité topologique, éventuellement combinés. Conservation première/dernière selon tri stable ou exclusion de tous les membres répétés. Correspondance complète des groupes, décisions et couche des lignes écartées.",
+      "missing": [],
       "conditions": [
-        "latest_records exige identifiants et dates renseignés ; à date égale, le dernier enregistrement dans l’ordre source est conservé."
+        "Les critères sont explicites ; conservation d’un enregistrement entier sans agrégation des attributs.",
+        "Clés manquantes distinctes par défaut ; match/error explicites. Géométries absentes/vides distinctes si elles interviennent dans le critère.",
+        "Égalité topologique XY indépendante de l’ordre des sommets ; coordonnées présentes finies et géométries valides exigées. WKB exact inclut ordre et dimensions.",
+        "Ordre source, attributs, identifiants entiers et index conservés ; égalités de tri départagées par position source."
       ],
-      "next_module": "E01",
+      "next_module": null,
       "planned_fixes": [],
       "references": [
         "R002"
       ],
       "completed_modules": [
-        "M02"
+        "M02",
+        "M08"
       ]
     },
     {

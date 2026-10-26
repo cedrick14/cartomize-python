@@ -1,5 +1,20 @@
 # Tests et validation
 
+## Cartomize 1.5.0 — M08, qualité vectorielle
+
+**865 tests réussis, 2 exclus, 0 échec**, en 176,94 s sur Python 3.12.
+Les 136 tests ajoutés pour G01–G03 et leurs interfaces sont inclus dans ce total.
+Le cours 14 exécute huit cellules et les essais sur trois jeux réels épinglés
+réussissent leurs onze contrôles. La wheel est installée dans un environnement
+neuf hors des sources, puis utilisée par l’API, la fenêtre et sa console.
+
+Les preuves et conventions figurent dans la [note 1.5.0](RELEASE_1.5.0.md),
+le [rapport machine](VALIDATION_1.5.0.json) et le
+[rapport sur données réelles](VALIDATION_M08_REAL.json). Les états de GitHub
+Actions restent attachés à la demande d’intégration et ne sont pas assimilés
+aux résultats locaux. Les validations 1.4.0 et antérieures suivent ci-dessous.
+
+
 ## Cartomize 1.4.0 — module M07, validation locale du 26 octobre 2026
 
 La suite complète locale initiale a validé **722 tests**, avec deux essais conditionnels ignorés

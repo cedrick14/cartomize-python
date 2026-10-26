@@ -1,6 +1,6 @@
 # Cartomize
 
-**Version 1.4.0**
+**Version 1.5.0**
 
 Cartomize provides a Python API, a command-line interface and a desktop application for geospatial processing and cartographic production. It runs independently of QGIS and ArcGIS Pro. Native project bridges are optional.
 
@@ -18,7 +18,7 @@ python -m cartomize gui
 For a downloaded wheel:
 
 ```bash
-python -m pip install "./cartomize-1.4.0-py3-none-any.whl[gui]"
+python -m pip install "./cartomize-1.5.0-py3-none-any.whl[gui]"
 ```
 
 For the current GitHub sources:
@@ -55,15 +55,17 @@ Imported files are available for viewing and transfer to compatible processing t
 |---|---|
 | Satellite imagery | Exact grid coverage diagnostics, scene recommendations, band import, calibration, quality masking, mosaics, multiband assembly, clipping and RGB composition |
 | Raster | Algebra, 18 spectral indices, focal and zonal statistics, reductions, reclassification and change matrices |
-| Vector | Overlay, spatial joins, buffers, clipping, dissolution, reprojection, measurement and geometry repair |
+| Vector | Geometry audits and repairs, polygon/line topology, duplicate selection, overlay, spatial joins, buffers, clipping, dissolution, reprojection and measurement |
 | Classification | Random forests, extra trees, K-means, validation and saved models |
 | Terrain and networks | Terrain derivatives, convolution, D8 drainage, watersheds and shortest paths |
 | Cartography | 24 templates, symbology, labels, legends, scale bars, multiple frames, atlases and PDF/PNG/SVG export |
-| Automation | 44 registered operators, processing plans, reusable recipes, batch production and saved sessions |
+| Automation | 48 registered operators, processing plans, reusable recipes, batch production and saved sessions |
 
 Optional Dask and CUDA execution is available for supported operators. Native GIS bridges and CUDA hardware execution require the corresponding runtime.
 
-Version 1.4.0 adds a complete automatic optical-imagery workflow: a fixed-grid coverage check controls scene selection, mosaicking and optional bounded STAC replenishment. Blocked runs preserve actionable diagnostics, and partial output requires an explicit policy. STAC scientific bands, QA/SCL, saturation and calibration metadata are connected through the same engine in Python, the CLI, plans and the desktop. See the [automatic workflow](https://github.com/cedrick14/cartomize-python/blob/main/docs/IMAGERY_AUTOMATIC.md).
+Version 1.5.0 adds row-level geometry audits and repairs, polygon and line topology checks, and explicit duplicate selection. Each operation keeps decision tables, retained and rejected records, and source identifiers across the API, CLI, processing plans and desktop. See the [vector quality guide](https://github.com/cedrick14/cartomize-python/blob/main/docs/VECTOR_QUALITY.md).
+
+Version 1.4.0 added a complete automatic optical-imagery workflow: a fixed-grid coverage check controls scene selection, mosaicking and optional bounded STAC replenishment. Blocked runs preserve actionable diagnostics, and partial output requires an explicit policy. STAC scientific bands, QA/SCL, saturation and calibration metadata are connected through the same engine in Python, the CLI, plans and the desktop. See the [automatic workflow](https://github.com/cedrick14/cartomize-python/blob/main/docs/IMAGERY_AUTOMATIC.md).
 
 Version 1.3.0 also preserves large integer vector keys and typed classification labels, applies raster scale/offset in zonal statistics by default, and attaches route endpoints to the nearest segment by default. Explicit raw-value and vertex-snapping modes remain available. See the [release and migration notes](https://github.com/cedrick14/cartomize-python/blob/main/docs/RELEASE_1.3.0.md).
 

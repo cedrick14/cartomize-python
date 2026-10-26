@@ -1,6 +1,6 @@
 # Couverture des outils
 
-Le registre comprend 44 opérateurs. Cette matrice relie 36 d’entre eux aux cours qui exécutent leurs fonctions publiques. Les huit opérateurs vectoriels ajoutés en 1.3 sont documentés dans le guide SIG et vérifiés par les tests d’intégration ; un cours dédié reste à rédiger. Elle décrit la couverture pédagogique des familles, sans prétendre tester toutes les combinaisons de paramètres. Le cours 08 montre leur insertion dans des plans ; le cours 13 exécute le prétraitement automatique M07.
+Le registre comprend 48 opérateurs. Cette matrice relie 40 d’entre eux aux cours qui exécutent leurs fonctions publiques. Les huit opérateurs vectoriels ajoutés en 1.3 sont documentés dans le guide SIG et vérifiés par les tests d’intégration ; un cours dédié reste à rédiger. Elle décrit la couverture pédagogique des familles, sans prétendre tester toutes les combinaisons de paramètres. Le cours 08 montre leur insertion dans des plans ; le cours 13 exécute le prétraitement automatique M07. Le cours 14 exécute les quatre opérateurs de qualité vectorielle M08.
 
 | Opérateur | Fonction | Cours |
 |---|---|---|
@@ -59,3 +59,7 @@ Les opérations `vector.select_attributes`, `vector.select_location`, `vector.ge
 | Moteurs externes | QGIS/ArcGIS Pro, Dask et CUDA : prérequis, exemples conditionnels et limites | [Guide des extensions](DESKTOP_AND_EXTENSIONS.md) |
 
 Les exercices autonomes n’exécutent pas QGIS, ArcGIS Pro ni CUDA. Le service STAC de démonstration ne vérifie pas la disponibilité d’un fournisseur distant. Les 24 maquettes sont inventoriées ; la planche du cours 07 illustre le paramétrage des éléments.
+
+| Opérateurs de qualité vectorielle | Cours |
+|---|---|
+| `vector.audit_geometries`, `vector.repair_geometries`, `vector.check_topology`, `vector.deduplicate` | [14 — Qualité vectorielle](notebooks/14_qualite_vectorielle.ipynb) |

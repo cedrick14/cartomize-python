@@ -2,7 +2,7 @@
 
 Cartomize associe une bibliothèque Python, une interface graphique et des commandes pour le traitement géospatial et la production cartographique.
 
-La version des sources est **1.4.0**. La bibliothèque, les cellules Jupyter, les commandes du terminal et l’interface de bureau appellent les mêmes traitements. Cette version ferme le parcours automatique des images optiques compatibles : import, calibration et masques, couverture obligatoire, choix des scènes, mosaïque et compléments STAC facultatifs. Voir la [note de version](docs/RELEASE_1.4.0.md) pour les changements de comportement.
+La version des sources est **1.5.0**. La bibliothèque, les cellules Jupyter, les commandes du terminal et l’interface de bureau appellent les mêmes traitements. Cette version ajoute le contrôle et la réparation détaillés des géométries, la topologie polygonale/linéaire et le traitement traçable des doublons. Le prétraitement automatique des images optiques de la version 1.4.0 reste intégré. Voir la [note de version](docs/RELEASE_1.5.0.md) pour les changements de comportement.
 
 ## Installation
 
@@ -71,7 +71,7 @@ fenetre = cm.launch()
 
 Pour ouvrir cette fenêtre depuis un notebook local, installer `.[notebook]`, redémarrer le noyau puis appeler `cm.launch()`. Les notebooks distants peuvent utiliser l’API sans ouvrir de fenêtre native.
 
-Les versions publiées sont indiquées sur [PyPI](https://pypi.org/project/cartomize/). La présence de 1.4.0 dans ce dépôt ne signifie pas sa publication sur cet index. Le [guide d’installation](docs/WORKBENCH.md) décrit également l’installation d’un paquet wheel.
+Les versions publiées sont indiquées sur [PyPI](https://pypi.org/project/cartomize/). La présence de 1.5.0 dans ce dépôt ne signifie pas sa publication sur cet index. Le [guide d’installation](docs/WORKBENCH.md) décrit également l’installation d’un paquet wheel.
 
 ## Espace de travail
 
@@ -88,10 +88,10 @@ Les cartes proposent zoom, déplacement, valeurs de pixels, légendes, métadonn
 | Préparation multispectrale | Diagnostic de couverture et de lacunes, proposition de scènes, calibration, masques QA/SCL, mosaïque, assemblage multibande, extraction, composition colorée, export des bandes |
 | Raster | 18 indices spectraux, calculatrice, reclassification, statistiques focales, zonales et multirasters, superficies, transitions |
 | Classification | Forêts aléatoires, arbres extrêmement aléatoires, K-moyennes, validation et modèles enregistrés |
-| Vecteur | Sélections, superpositions, jointures, synthèses par zone, découpage, tampons, dissolution avec agrégation, mesures, reprojection, réparation, géométries dérivées, coordonnées XY et derniers relevés |
+| Vecteur | Qualité avec rapports, topologie, doublons, sélections, superpositions, jointures, synthèses par zone, découpage, tampons, dissolution avec agrégation, mesures, reprojection, réparation, géométries dérivées, coordonnées XY et derniers relevés |
 | Terrain et réseaux | Dérivées topographiques, convolution, drainage D8, bassins versants et plus court chemin |
 | Cartographie | Couches, symbologie, étiquettes, 24 maquettes, cadres, légendes, échelles, atlas, PDF/PNG/SVG |
-| Automatisation | Plans, 44 opérateurs chaînables, recettes et production en série |
+| Automatisation | Plans, 48 opérateurs chaînables, recettes et production en série |
 | Projets | Sessions JSON, archives CMZ, catalogue des résultats et restauration des vues |
 
 ## Exemple Python
@@ -112,7 +112,9 @@ Le [parcours automatique](docs/IMAGERY_AUTOMATIC.md) applique le seuil de couver
 
 Le [diagnostic d’imagerie](docs/IMAGERY_AUDIT.md) mesure séparément l’emprise, la présence des bandes et les pixels utilisables après les masques. Il propose une scène unique, une mosaïque ou la recherche de scènes complémentaires. Le [tutoriel 13](tutorials/notebooks/13_diagnostic_automatique.ipynb) exécute cette décision puis le prétraitement, le NDVI et les statistiques zonales sur des données simulées.
 
-L’[inventaire de 123 procédures](docs/EXPERT_PROCEDURES.md), également disponible en [JSON](docs/EXPERT_PROCEDURES.json), relie les procédures QGIS/ArcGIS aux fonctions réellement présentes : **11 disponibles, 48 partielles et 64 absentes**. Ces statuts portent sur des procédures expertes complètes ; ils ne sont pas un comptage des opérateurs du logiciel. Les fonctions partielles gardent leurs limites explicites, notamment pour le radar, les corrections atmosphériques de niveau 1, la validation avancée et les réseaux soumis à des restrictions.
+L’[inventaire de 123 procédures](docs/EXPERT_PROCEDURES.md), également disponible en [JSON](docs/EXPERT_PROCEDURES.json), relie les procédures QGIS/ArcGIS aux fonctions réellement présentes : **14 disponibles, 46 partielles et 63 absentes**. Ces statuts portent sur des procédures expertes complètes ; ils ne sont pas un comptage des opérateurs du logiciel. Les fonctions partielles gardent leurs limites explicites, notamment pour le radar, les corrections atmosphériques de niveau 1, la validation avancée et les réseaux soumis à des restrictions.
+
+Le [module M08](docs/VECTOR_QUALITY.md) et le [cours 14](tutorials/notebooks/14_qualite_vectorielle.ipynb) exécutent les procédures G01–G03 depuis Python, Jupyter et l’interface. Chaque opération conserve les diagnostics et les entités écartées.
 
 ## Projets réels
 
@@ -138,7 +140,7 @@ python -m pytest
 python -m build
 python -m twine check --strict dist/*
 python scripts/check_release.py dist
-python scripts/verify_installed_release.py --wheel dist/cartomize-1.4.0-py3-none-any.whl --output reports/installed.json
+python scripts/verify_installed_release.py --wheel dist/cartomize-1.5.0-py3-none-any.whl --output reports/installed.json
 ```
 
 La validation automatise les contrôles Windows et Linux, les traitements, l’interface, les projets, les exports, la console et une installation isolée du paquet construit. Les essais CUDA et QGIS natif demandent leurs environnements respectifs. Les résultats sont associés aux versions, aux données et aux commits inscrits dans les rapports.

@@ -1,4 +1,4 @@
-# Espace de travail Cartomize 1.4.0
+# Espace de travail Cartomize 1.5.0
 
 ## Installation
 
@@ -14,7 +14,7 @@ python -m cartomize gui
 Depuis le paquet wheel de la version :
 
 ```bash
-python -m pip install "./cartomize-1.4.0-py3-none-any.whl[gui]"
+python -m pip install "./cartomize-1.5.0-py3-none-any.whl[gui]"
 python -m cartomize gui
 ```
 
@@ -30,7 +30,7 @@ L’interface ne nécessite pas QGIS ni ArcGIS Pro. Une installation de QGIS ne 
 
 **Explorateur de projet** : fichiers locaux, dossier de travail et importation. Le bouton Parent remonte d’un niveau. Un double-clic ouvre un fichier compatible. Une archive CMZ ou un fichier `.cartomize.json` ouvre le projet correspondant.
 
-**Traitements** : catalogue par catégories et recherche sans distinction de casse ou d’accents. Le menu Traitements donne aussi accès à toutes les pages. Le registre commun comprend 44 opérateurs utilisables dans les chaînes.
+**Traitements** : catalogue par catégories et recherche sans distinction de casse ou d’accents. Le menu Traitements donne aussi accès à toutes les pages. Le registre commun comprend 48 opérateurs utilisables dans les chaînes.
 
 **Carte et résultats** : onglets raster, vectoriels, tableaux, graphiques, PDF et SVG. Les données chargées restent accessibles après fermeture de leur onglet.
 

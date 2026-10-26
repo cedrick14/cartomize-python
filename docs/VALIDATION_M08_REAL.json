@@ -1,0 +1,332 @@
+{
+  "schema": "cartomize.validation_m08_real.v1",
+  "generated_at_utc": "2026-10-26T16:19:20.278604+00:00",
+  "cartomize_version": "1.5.0",
+  "repository_head_at_validation": "d840b6d2930fd578b7cdf2423452cffcae9585fa",
+  "validation_script_sha256": "715ce070dd8d9ec3145b09471bb55ecc03991ddc8ba5086b1b9876b37a7dd3ec",
+  "code_state": "Validation of the working implementation; module SHA-256 values identify the exact tested source bytes.",
+  "tested_source_sha256": {
+    "src/cartomize/vector_quality.py": "980940218bd5dc71dd6d704dbc5d27ffa4d9534a743a86c11a69365d385b4927",
+    "src/cartomize/vector_topology.py": "0c315c3bdde4881d4ca172a0207dd1cd9f6780b9c75362c8c118dfb286f96f78",
+    "src/cartomize/vector_duplicates.py": "f1f04533c777b32b9bea63670b861eb69f3548be52a5d83ca979bd25e0452406",
+    "src/cartomize/vector_quality_result.py": "164682a472bcfc7c21c6379bab7e3c82456008aeeab0dbfbea4f4ff8f27b0142"
+  },
+  "runtime": {
+    "python": "3.12.14",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+    "packages": {
+      "geopandas": "1.2.0",
+      "shapely": "2.2.0",
+      "pandas": "3.1.0",
+      "numpy": "2.5.4",
+      "pyproj": "3.8.0",
+      "pyogrio": "0.13.0"
+    },
+    "geos": "3.14.1"
+  },
+  "source_repository": "https://github.com/jorisvandenbossche/geopandas-tutorial",
+  "source_commit": "72c7f3168e1e4e257caf84eb7b3fcaa47ade09c0",
+  "sources": [
+    {
+      "file_name": "paris_districts.geojson",
+      "url": "https://raw.githubusercontent.com/jorisvandenbossche/geopandas-tutorial/72c7f3168e1e4e257caf84eb7b3fcaa47ade09c0/data/paris_districts.geojson",
+      "bytes": 370905,
+      "sha256": "db65faf397e8876e9a62cdb722bc8c0897e9f9e4db4daa5c01a7e7d7883d626b",
+      "matches_prior_validation_sha256": true
+    },
+    {
+      "file_name": "cod_mines_curated_all_opendata_p_ipis.geojson",
+      "url": "https://raw.githubusercontent.com/jorisvandenbossche/geopandas-tutorial/72c7f3168e1e4e257caf84eb7b3fcaa47ade09c0/data/cod_mines_curated_all_opendata_p_ipis.geojson",
+      "bytes": 6544746,
+      "sha256": "1fccfe863bdbe6d7ebc6808bd7484c09a832c35a0e4816611004dd05223cd842",
+      "matches_prior_validation_sha256": true
+    },
+    {
+      "file_name": "cod_conservation.zip",
+      "url": "https://raw.githubusercontent.com/jorisvandenbossche/geopandas-tutorial/72c7f3168e1e4e257caf84eb7b3fcaa47ade09c0/data/cod_conservation.zip",
+      "bytes": 1511770,
+      "sha256": "af5f5300833296390930106fef971e7442da663d67e499538681908958a914b4",
+      "matches_prior_validation_sha256": true
+    }
+  ],
+  "input_dataset_scope": "Historical external teaching snapshots already used in the project. No current protected-area or mining inventory is claimed. Original data are not committed.",
+  "method": "Independent validation script written for this run; downloaded code was not executed. Geometry comparisons share GeoPandas/GEOS with Cartomize and are integration/consistency checks, not an independent certification of GEOS.",
+  "passed": 11,
+  "failed": 0,
+  "duration_seconds": 5.764,
+  "checks": [
+    {
+      "name": "Pinned input hashes and expected feature counts",
+      "status": "passed",
+      "parks": 50,
+      "mine_visits": 3687,
+      "paris_districts": 80
+    },
+    {
+      "name": "G01 audit of RDC protected areas",
+      "status": "passed",
+      "invalid_rows": [
+        1
+      ],
+      "source_geometry_types": {
+        "Polygon": 44,
+        "MultiPolygon": 6
+      },
+      "missing": 0,
+      "empty": 0,
+      "reference": "Direct GeoPandas validity, area and length; shared GEOS engine",
+      "summary": {
+        "schema": "cartomize.vector_quality.v1",
+        "operation": "audit_geometries",
+        "input_features": 50,
+        "crs": "PROJCS[\"RDC_Mercator\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Mercator_2SP\"],PARAMETER[\"standard_parallel_1\",5],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]",
+        "id_field": null,
+        "identifier_source": "source_row",
+        "source_row_base": 0,
+        "missing_geometries": 0,
+        "empty_geometries": 0,
+        "nonfinite_geometries": 0,
+        "invalid_geometries": 1,
+        "duplicate_geometries": 0,
+        "geometry_types": {
+          "Polygon": 44,
+          "MultiPolygon": 6
+        },
+        "duplicate_rule": "Exact WKB including coordinate and component order; missing and empty geometries excluded.",
+        "coordinate_policy": "No snapping or tolerance; GEOS planar validity rules.",
+        "shapely_version": "2.2.0",
+        "geos_version": "3.14.1",
+        "measurement_crs": "PROJCS[\"RDC_Mercator\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Mercator_2SP\"],PARAMETER[\"standard_parallel_1\",5],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]",
+        "measurements_available": true,
+        "area_unit": "m2",
+        "length_unit": "m",
+        "metres_per_coordinate_unit": 1.0,
+        "measurement_note": "Planar measures in the stated projected CRS. Measures before repair describe the supplied geometry; an invalid polygon's area is not a validated surface.",
+        "output_features": 50,
+        "issue_features": 1
+      }
+    },
+    {
+      "name": "G01 repair, full-record preservation and before/after measurements",
+      "status": "passed",
+      "input_features": 50,
+      "retained_features": 50,
+      "valid_before": 49,
+      "valid_after": 50,
+      "unchanged_valid_geometry_wkb": 49,
+      "changed_features": [
+        {
+          "source_row": 1,
+          "feature_id": 1,
+          "decision": "repaired",
+          "retained": true,
+          "geometry_changed": true,
+          "type_changed": false,
+          "duplicate_of_row": null,
+          "before_geometry_type": "Polygon",
+          "after_geometry_type": "Polygon",
+          "before_missing": false,
+          "after_missing": false,
+          "before_empty": false,
+          "after_empty": false,
+          "before_nonfinite": false,
+          "after_nonfinite": false,
+          "before_valid": false,
+          "after_valid": true,
+          "before_reason": "Ring Self-intersection[3136110.1916 -376451.376800001]",
+          "after_reason": "Valid Geometry",
+          "before_area_m2": 6009095140.825681,
+          "after_area_m2": 6009095140.825677,
+          "area_delta_m2": -3.814697265625e-06,
+          "before_length_m": 726569.1506007913,
+          "after_length_m": 726569.1506007914,
+          "length_delta_m": 1.1641532182693481e-10,
+          "collapsed": false,
+          "after_collection": false,
+          "protected_area_name": "Réserve naturelle d'Itombwe"
+        }
+      ],
+      "area_before_m2": 263701611791.03976,
+      "area_after_m2": 263701611791.03976,
+      "reference": "Direct shapely.make_valid only on invalid geometries; shared GEOS engine",
+      "measurement_note": "Planar measures in the source RDC Mercator projection, metres; an invalid pre-repair area is not a validated surface."
+    },
+    {
+      "name": "G03 distinct mine visits by site and date: none",
+      "status": "passed",
+      "input_features": 3687,
+      "output_features": 3687,
+      "removed_features": 0,
+      "repeated_site_records": 1284,
+      "criteria": {
+        "keys": [
+          "pcode",
+          "visit_date"
+        ],
+        "geometry": "none"
+      },
+      "reference": "pandas.duplicated on site code and visit date; every distinct dated visit remains"
+    },
+    {
+      "name": "G03 distinct mine visits by site and date: exact",
+      "status": "passed",
+      "input_features": 3687,
+      "output_features": 3687,
+      "removed_features": 0,
+      "repeated_site_records": 1284,
+      "criteria": {
+        "keys": [
+          "pcode",
+          "visit_date"
+        ],
+        "geometry": "exact"
+      },
+      "reference": "pandas.duplicated on site code and visit date; every distinct dated visit remains"
+    },
+    {
+      "name": "G03 distinct mine visits by site and date: topological",
+      "status": "passed",
+      "input_features": 3687,
+      "output_features": 3687,
+      "removed_features": 0,
+      "repeated_site_records": 1284,
+      "criteria": {
+        "keys": [
+          "pcode",
+          "visit_date"
+        ],
+        "geometry": "topological"
+      },
+      "reference": "pandas.duplicated on site code and visit date; every distinct dated visit remains"
+    },
+    {
+      "name": "G03 geometry-only rules and complete deletion journal",
+      "status": "passed",
+      "cases": [
+        {
+          "geometry": "exact",
+          "keep": "first",
+          "output_features": 2403,
+          "removed_features": 1284,
+          "duplicate_groups": 738,
+          "duplicate_features": 2022
+        },
+        {
+          "geometry": "exact",
+          "keep": "last",
+          "output_features": 2403,
+          "removed_features": 1284,
+          "duplicate_groups": 738,
+          "duplicate_features": 2022
+        },
+        {
+          "geometry": "exact",
+          "keep": "none",
+          "output_features": 1665,
+          "removed_features": 2022,
+          "duplicate_groups": 738,
+          "duplicate_features": 2022
+        },
+        {
+          "geometry": "topological",
+          "keep": "first",
+          "output_features": 2403,
+          "removed_features": 1284,
+          "duplicate_groups": 738,
+          "duplicate_features": 2022
+        },
+        {
+          "geometry": "topological",
+          "keep": "last",
+          "output_features": 2403,
+          "removed_features": 1284,
+          "duplicate_groups": 738,
+          "duplicate_features": 2022
+        },
+        {
+          "geometry": "topological",
+          "keep": "none",
+          "output_features": 1665,
+          "removed_features": 2022,
+          "duplicate_groups": 738,
+          "duplicate_features": 2022
+        }
+      ],
+      "reference": "pandas.duplicated on point WKB; exact WKB equality and XY equality coincide for these finite 2D points",
+      "interpretation": "Coincident sites or repeated visits may be legitimate; geometry-only removal is an explicit rule, not a recommended survey cleaning policy."
+    },
+    {
+      "name": "G03 most recent complete visit per site",
+      "status": "passed",
+      "retained_sites": 2403,
+      "removed_prior_visits": 1284,
+      "missing_worker_counts_retained": 292,
+      "reference": "pandas stable date sort, drop_duplicates(pcode, keep=last), then source order",
+      "semantics": "Whole original rows retained, including unknown measurements; no cross-date aggregation."
+    },
+    {
+      "name": "G02 Paris pairwise overlap audit in EPSG:2154",
+      "status": "passed",
+      "features": 80,
+      "pairs_checked_by_reference": 3160,
+      "overlap_pairs": 2,
+      "overlap_parts": 7,
+      "pairwise_area_m2": 0.05632437944182338,
+      "minimum_part_area_m2": 8.581348719035112e-05,
+      "maximum_part_area_m2": 0.02303745939255991,
+      "reference": "Exhaustive loop on all 3160 feature pairs with direct Shapely intersections; same GEOS engine, different candidate enumeration",
+      "interpretation": "Positive shared areas are observations under the exact chosen rule. Tiny slivers and other overlaps require source-resolution and domain review; the report does not declare every overlap a data error.",
+      "overlap_sum_note": "Sum of pairwise overlaps, not unique covered area.",
+      "summary": {
+        "schema": "cartomize.vector_topology.v1",
+        "operation": "check_topology",
+        "input_features": 80,
+        "geometry_family": "polygon",
+        "empty_input": false,
+        "id_field": "id",
+        "identifier_policy": "attribute",
+        "source_crs": "EPSG:2154",
+        "measurement_crs": "EPSG:2154",
+        "coordinate_unit_to_metre": 1.0,
+        "dimensions": "XY",
+        "rules": [
+          "overlaps"
+        ],
+        "tolerance_m": 0.0,
+        "tolerance_applies_to": "dangles only; no snapping",
+        "min_area_m2": 0.0,
+        "area_comparison": "strictly greater than min_area",
+        "violations": 7,
+        "counts": {
+          "overlaps": 7
+        },
+        "ignored_small_parts": {
+          "overlaps": 0
+        },
+        "reference_area_m2": null,
+        "allowed_gap_area_m2": null,
+        "geometry_modified": false,
+        "overlap_measurement": "pairwise; summing can count the same area or length more than once",
+        "dangle_interpretation": "candidate connectivity issue; legitimate dead ends require expert interpretation",
+        "crossing_convention": "point intersection lacking a coordinate vertex on at least one original line part"
+      }
+    },
+    {
+      "name": "G02 explicit one-square-metre overlap threshold",
+      "status": "passed",
+      "min_area_m2": 1.0,
+      "overlap_parts": 0,
+      "ignored_small_parts": {
+        "overlaps": 7
+      },
+      "threshold_comparison": "strictly greater than 1 square metre; does not modify geometries"
+    },
+    {
+      "name": "Source tables, source file bytes and tested code unchanged throughout validation",
+      "status": "passed",
+      "inputs_checked": 3,
+      "sha256_source_files_checked": 3,
+      "tested_modules": 4
+    }
+  ]
+}
