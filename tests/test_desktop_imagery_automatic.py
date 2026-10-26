@@ -15,7 +15,7 @@ from shapely.geometry import box
 pytest.importorskip('PySide6')
 from PySide6.QtCore import QEventLoop, QTimer, QSettings, QPoint, Qt
 from PySide6.QtTest import QTest
-from PySide6.QtWidgets import (QApplication, QAbstractButton, QLabel,
+from PySide6.QtWidgets import (QApplication, QAbstractButton, QAbstractSpinBox, QLabel,
                               QPushButton, QStyleFactory, QWidget)
 
 import cartomize as cm
@@ -323,7 +323,8 @@ def test_coverage_policy_and_diagnostics_reach_the_processing_page(application, 
 
 @pytest.mark.parametrize('font_size', [12, 16])
 @pytest.mark.parametrize('style', QStyleFactory.keys())
-def test_automatic_controls_fit_the_window(application, tmp_path, monkeypatch, font_size, style):
+@pytest.mark.parametrize('spin_button_space', [0, 28], ids=['native', 'wide-spin-buttons'])
+def test_automatic_controls_fit_the_window(application, tmp_path, monkeypatch, font_size, style, spin_button_space):
     import cartomize.desktop as desktop
     previous_style = application.style().objectName()
     application.setStyle(style)
@@ -337,10 +338,18 @@ def test_automatic_controls_fit_the_window(application, tmp_path, monkeypatch, f
         window.resize(1440, 940)
         window.show()
         QTest.qWait(50)
+        if spin_button_space:
+            # Windows 11 adds more room for native spin buttons than the Linux
+            # styles. Exercise that constraint even when this style is absent.
+            for control in page.findChildren(QAbstractSpinBox):
+                control.setMinimumWidth(control.minimumSizeHint().width() + spin_button_space)
+            QTest.qWait(50)
         scroll = window.stack.currentWidget()
         viewport = scroll.viewport()
         assert window.size().toTuple() == (1440, 940)
-        assert scroll.horizontalScrollBar().maximum() == 0, _width_diagnostic(window, page, viewport)
+        if scroll.horizontalScrollBar().maximum():
+            print(_width_diagnostic(window, page, viewport))
+        assert scroll.horizontalScrollBar().maximum() == 0
         for control in page.findChildren(QAbstractButton):
             if control.isVisible() and control.text():
                 left = control.mapTo(viewport, QPoint(0, 0)).x()
@@ -374,9 +383,10 @@ def _width_diagnostic(window, page, viewport):
             controls.append(dict(kind=type(widget).__name__, text=caption,
                 size=widget.size().toTuple(), minimum=widget.minimumSize().toTuple(),
                 hint=widget.minimumSizeHint().toTuple(), font=widget.font().toString()))
-    return dict(viewport=viewport.size().toTuple(), controls_panel=window.controls_panel.size().toTuple(),
+    return json.dumps(dict(viewport=viewport.size().toTuple(), controls_panel=window.controls_panel.size().toTuple(),
                 page=page.size().toTuple(), form=page.form.minimumSize().toTuple(),
-                widest=sorted(controls, key=lambda item: max(item['hint'][0], item['minimum'][0]), reverse=True)[:20])
+                widest=sorted(controls, key=lambda item: max(item['hint'][0], item['minimum'][0]), reverse=True)[:20]),
+                ensure_ascii=False, indent=2)
 
 
 def test_cancellation_during_automatic_diagnostic_preserves_no_product(application, write_raster, tmp_path, monkeypatch):

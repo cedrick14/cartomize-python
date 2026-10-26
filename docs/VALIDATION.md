@@ -28,10 +28,11 @@ thèmes, exports, projet et noyau de console passent les contrôles.
 Après cette suite locale complète, les derniers essais CI ont révélé un
 débordement typographique du formulaire sur Windows et l’acceptation implicite
 de données partielles dans le cours 00. Le cours est corrigé et les douze
-notebooks sont réexécutés. L’ajustement du formulaire passe ensuite **24 tests
-GUI concernés** et **8 cas de géométrie** avec les métriques Qt habituelles et
+notebooks sont réexécutés. L’ajustement du formulaire passe ensuite **28 tests
+GUI concernés** et **16 cas de géométrie** avec les métriques Qt habituelles et
 celles reproduisant exactement le débordement Windows. Les libellés et boutons
-restent intégralement lisibles. La wheel reconstruite est installée et vérifiée
+restent intégralement lisibles, y compris avec les marges supplémentaires des
+champs numériques de Windows 11. La wheel reconstruite est installée et vérifiée
 à nouveau ; la matrice complète finale est celle du commit publié dans GitHub.
 
 ## Cartomize 1.3.0 — validation locale du 26 octobre 2026

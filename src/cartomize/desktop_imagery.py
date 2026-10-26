@@ -162,7 +162,7 @@ class PreparationPage(Page):
         self.crs = QLineEdit()
         self.crs.setPlaceholderText("Automatique ; exemple : EPSG:32733")
         self.resolution = spin(0, 0, 100000)
-        self.resolution.setSpecialValueText("Résolution native")
+        self.resolution.setSpecialValueText("Native")
         self.resolution.setToolTip("Sans résolution explicite, conserver la résolution native la plus grossière des bandes sélectionnées. Une recherche sans images locales exige une résolution choisie.")
         self.resampling = QComboBox()
         for label,value in [('Plus proche voisin','nearest'),('Bilinéaire','bilinear'),('Cubique','cubic'),('Moyenne','average')]:self.resampling.addItem(label,value)

@@ -97,8 +97,8 @@
     "wheel_build": "passed",
     "wheel_twine_strict": "passed",
     "wheel": "cartomize-1.4.0-py3-none-any.whl",
-    "wheel_bytes": 398883,
-    "wheel_sha256": "089fd17ce697de01432d986978abdb5651d9297b9182292cf2892a53f515b068",
+    "wheel_bytes": 398880,
+    "wheel_sha256": "81951807de67372f17189854a3c22db6a2f69057997ece6357589b935c155efb",
     "source_archive_check": "scripts/check_release.py: modules, metadata, documentation, tests and all real/reference data files verified.",
     "source_archive_build": "passed",
     "twine_strict": "passed",
@@ -145,10 +145,12 @@
       "Windows",
       "Fusion"
     ],
-    "geometry_cases": 8,
+    "geometry_cases": 16,
     "buttons_and_labels_fully_visible": true,
-    "fallback_form_minimum_width_at_16px": 358,
-    "fallback_viewport_width_at_16px": 362
+    "fallback_form_minimum_width_at_16px": 314,
+    "fallback_viewport_width_at_16px": 362,
+    "fallback_page_minimum_width_at_16px": 346,
+    "extra_numeric_control_width_px": 28
   },
   "not_validated_locally": [
     "Native CUDA calculations",
@@ -163,9 +165,10 @@
     "changes": [
       "Course 00 explicitly accepts its nonempty partial coverage, checks the report and labels the map as partial.",
       "Wrap full button, checkbox, title and form captions; bound combo minimum widths while preserving full choices and tooltips.",
+      "Use Native in the labelled resolution field so Windows 11 numeric-control margins fit; reproduce the extra 28 px explicitly in geometry tests.",
       "Strengthen geometry assertions to verify full control/text visibility and report actionable width measurements."
     ],
-    "local_validation": "All 12 autonomous notebooks passed. After the typography-only GUI correction, 24 affected GUI regressions and 8 geometry cases passed across offscreen/minimal and Windows/Fusion at 12/16 px; the rebuilt wheel was installed and verified again.",
+    "local_validation": "All 12 autonomous notebooks passed. After the typography-only GUI correction, 28 affected GUI regressions and 16 geometry cases passed across offscreen/minimal and Windows/Fusion at 12/16 px, including an extra 28 px for numeric controls; the rebuilt wheel was installed and verified again.",
     "remote_ci": "Use checks attached to the final PR head. Earlier failed runs remain part of GitHub history."
   }
 }
