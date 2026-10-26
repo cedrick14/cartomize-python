@@ -2,7 +2,9 @@
 
 ## Cartomize 1.5.0 — M08, qualité vectorielle
 
-**865 tests réussis, 2 exclus, 0 échec**, en 176,94 s sur Python 3.12.
+La suite locale initiale, révision
+[93954d9](https://github.com/cedrick14/cartomize-python/commit/93954d934d6e2c82330f54fce06ea63577ea7ba3),
+compte **865 tests réussis, 2 exclus, 0 échec**, en 176,94 s sur Python 3.12.
 Les 136 tests ajoutés pour G01–G03 et leurs interfaces sont inclus dans ce total.
 Le cours 14 exécute huit cellules et les essais sur trois jeux réels épinglés
 réussissent leurs onze contrôles. La wheel est installée dans un environnement
@@ -13,6 +15,20 @@ le [rapport machine](VALIDATION_1.5.0.json) et le
 [rapport sur données réelles](VALIDATION_M08_REAL.json). Les états de GitHub
 Actions restent attachés à la demande d’intégration et ne sont pas assimilés
 aux résultats locaux. Les validations 1.4.0 et antérieures suivent ci-dessous.
+
+Les premiers contrôles Windows ont révélé un débordement horizontal d’un pixel
+dans le formulaire compact de qualité vectorielle à 12 px. La révision
+[b71f28a](https://github.com/cedrick14/cartomize-python/commit/b71f28acd620dcdc0de4011754fb0314b9e55b4e)
+aligne le cadre natif des panneaux sur le thème sans bordure et conserve
+l’exigence d’absence de défilement horizontal. **18 tests graphiques ciblés**
+passent après cette correction, en 17,437 s, sans échec ni exclusion.
+La wheel reconstruite est installée et vérifiée dans un nouvel environnement
+hors des sources. Le rapport machine distingue ces contrôles de la suite
+locale initiale et en conserve les empreintes. La
+[matrice Windows/Ubuntu et QGIS de cette révision](https://github.com/cedrick14/cartomize-python/actions/runs/40361991135)
+conserve les journaux d’exécution ; les conclusions vérifiées sont regroupées
+dans la [demande d’intégration nº 5](https://github.com/cedrick14/cartomize-python/pull/5),
+avec les contrôles des notebooks Windows/Ubuntu.
 
 
 ## Cartomize 1.4.0 — module M07, validation locale du 26 octobre 2026

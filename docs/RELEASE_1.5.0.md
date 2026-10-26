@@ -37,17 +37,36 @@ une erreur métier.
 
 | Vérification | Résultat |
 |---|---|
-| Suite complète locale, Python 3.12 | **865 tests réussis**, 2 exclusions, 0 échec, 176,94 s |
+| Suite complète locale initiale, Python 3.12, révision `93954d9` | **865 tests réussis**, 2 exclusions, 0 échec, 176,94 s |
 | Tests ajoutés pour M08 et son intégration | **136 tests**, inclus dans la suite complète |
 | Notebook 14 | **8 cellules exécutées**, 4,62 s |
 | Données réelles épinglées | **11 contrôles réussis**, aucune mutation des sources |
 | Paquet wheel installé dans un environnement neuf | Interface, 20 rubriques, trois thèmes, console, prétraitement optique, qualité vectorielle, exports et réouverture du projet réussis |
+| Correction du cadre des panneaux, révision `b71f28a` | **18 tests graphiques ciblés réussis**, 0 exclusion, 0 échec, 17,437 s ; wheel reconstruite et vérifiée hors des sources |
 
 Les deux exclusions locales concernent CUDA sans matériel compatible et le
 runtime QGIS natif non configuré. Les contrôles Windows/Ubuntu et QGIS de
 GitHub Actions sont associés à la demande d’intégration, séparément de ces
 résultats locaux. Le [rapport machine](VALIDATION_1.5.0.json) conserve les
 empreintes des modules testés et du paquet installé.
+
+### Ajustement des panneaux sous Windows
+
+Les premiers contrôles GitHub ont détecté un débordement horizontal d’un pixel
+dans le formulaire compact de qualité vectorielle, avec le texte à 12 px.
+La révision [b71f28a](https://github.com/cedrick14/cartomize-python/commit/b71f28acd620dcdc0de4011754fb0314b9e55b4e)
+retire explicitement le cadre natif des panneaux défilants, conformément au
+thème sans bordure. Le contrôle exige toujours l’absence de défilement horizontal
+et affiche désormais les dimensions du panneau en cas d’échec.
+
+Les 18 vérifications locales concernées passent après cette correction.
+La wheel reconstruite a également été installée et exécutée dans un nouvel
+environnement, hors des sources. Les 865 tests du tableau restent ceux de la
+suite locale initiale ; les identifiants des deux révisions sont conservés dans
+le rapport machine. La [matrice GitHub de la révision corrigée](https://github.com/cedrick14/cartomize-python/actions/runs/40361991135)
+conserve les journaux Windows/Ubuntu et QGIS. Les conclusions vérifiées et les
+contrôles des notebooks sont consignés dans la
+[demande d’intégration nº 5](https://github.com/cedrick14/cartomize-python/pull/5).
 
 ### Données réelles
 

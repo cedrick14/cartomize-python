@@ -4,7 +4,7 @@
   "date": "2026-10-26",
   "baseline_commit": "d840b6d2930fd578b7cdf2423452cffcae9585fa",
   "scope": "M08 : G01, G02 et G03 ; API, terminal, chaînes, interface et paquet installé.",
-  "source_identity": "Working implementation identified by the complete Python module SHA-256 map below; baseline_commit is the integrated M07 base, not the final M08 commit.",
+  "source_identity": "The complete Python module SHA-256 map identifies source_commit after the Windows tool-panel frame correction. The initial local full suite, notebook, real-data and desktop records retain their own source_commit; baseline_commit is the integrated M07 base. Windows follow-up checks and the rebuilt installed wheel are recorded separately.",
   "source_sha256": {
     "src/cartomize/__init__.py": "c5559f478b2a8e6cd345435899f6cebbe63f6b0efa1b7d79ab84f729ea1db8a3",
     "src/cartomize/__main__.py": "79ee6f134c5c5193377cf9b189cbdcc3e2095e49ba9cec310114441c15a917c4",
@@ -32,7 +32,7 @@
     "src/cartomize/color.py": "f896198f7e4cd2968c5b25c60817c24e1fb6999d68f243b492d9831ddcb0e610",
     "src/cartomize/composition.py": "7ad56e4fd743ffba5c8b89bc9b94d0475d341c32283c24d259c734482cddc2c2",
     "src/cartomize/cuda.py": "717f58fc1073683e3cf70b7dccf70cc6db5f763a766bedb02f3888ec31a7d2e8",
-    "src/cartomize/desktop.py": "51f4632204e7975d73a876babeb4cd6596ba4a33b31a63ec6bd7902790db011d",
+    "src/cartomize/desktop.py": "8087736f771d8c2944a9adab0f7dc1be4d5b5a3a539e815ac21554478816ccbe",
     "src/cartomize/desktop_adaptive.py": "2eb8772e3e01e61d0f01844955413577c461d6780179f9fc3adb9a10141b532b",
     "src/cartomize/desktop_assistant.py": "8f2fbf5b1937f0681b8ce755469d3f193fdfc549987441f6fbcf0b6371d52b01",
     "src/cartomize/desktop_canvas.py": "23563da064504a02cf93d563f21c119fa5921645903a6b64771f25bd2ae5a323",
@@ -107,13 +107,16 @@
     "skips": [
       "No CUDA device/runtime",
       "Native QGIS runtime not configured locally"
-    ]
+    ],
+    "source_commit": "93954d934d6e2c82330f54fce06ea63577ea7ba3",
+    "scope": "Historical complete local suite before the Windows native-frame correction; not a new full-suite execution of the follow-up commit."
   },
   "notebook": {
     "notebook": "14_qualite_vectorielle.ipynb",
     "status": "passed",
     "code_cells": 8,
-    "seconds": 4.62
+    "seconds": 4.62,
+    "source_commit": "93954d934d6e2c82330f54fce06ea63577ea7ba3"
   },
   "real_data": {
     "status": "passed",
@@ -126,9 +129,74 @@
       "3687 historical mining visits in RDC",
       "80 Paris districts"
     ],
-    "scope": "Pinned historical teaching datasets; independent candidate enumeration and pandas comparisons, shared GEOS engine explicitly disclosed."
+    "scope": "Pinned historical teaching datasets; independent candidate enumeration and pandas comparisons, shared GEOS engine explicitly disclosed.",
+    "source_commit": "93954d934d6e2c82330f54fce06ea63577ea7ba3"
   },
   "installed_wheel": {
+    "status": "passed",
+    "version": "1.5.0",
+    "python": "3.12.14",
+    "checks": [
+      "installed desktop and 20 tool pages",
+      "light dark and system appearance",
+      "GeoTIFF import and NDVI calculation",
+      "installed imagery coverage audit: 5 usable pixels of 8, gap rasters and recommendation",
+      "automatic preparation: 62.5% refused with persistent gaps; complementary scene produces exactly 100%",
+      "calibrated zonal statistics: mean 1.5, sum 7.5 and observed coverage 62.5%",
+      "installed vector quality: invalid polygon repaired, exact areas 16 then 12 m2, duplicate removed, clean topology",
+      "installed quality bundle: all related products readable and business fid attribute retained",
+      "GeoPackage import and 200 m vector buffer",
+      "PDF PNG and SVG map exports",
+      "project save and reopen",
+      "installed Python console kernel"
+    ],
+    "source_commit": "b71f28acd620dcdc0de4011754fb0314b9e55b4e",
+    "isolated_from_sources": true,
+    "filename": "cartomize-1.5.0-py3-none-any.whl",
+    "sha256": "123983de7f1cd07a9ee71f8078948a616ae7f0aae2ea6d6708496145e1bc88b3"
+  },
+  "desktop": {
+    "status": "passed",
+    "checks": [
+      "Quality jobs execute through actual Qt worker",
+      "Result layers and reports registered in workspace",
+      "Saved editable field text restored",
+      "Compact window at 12 and 16 px without horizontal overflow",
+      "Method, null, empty, type-change and duplicate policies captured before starting worker"
+    ],
+    "source_commit": "93954d934d6e2c82330f54fce06ea63577ea7ba3",
+    "scope": "Initial local offscreen desktop checks; the separate follow-up records the Windows layout correction."
+  },
+  "inventory": {
+    "total": 123,
+    "available": 14,
+    "partial": 46,
+    "absent": 63,
+    "newly_available": [
+      "G01",
+      "G02",
+      "G03"
+    ],
+    "registered_operations": 48
+  },
+  "continuous_integration": {
+    "pull_request": "https://github.com/cedrick14/cartomize-python/pull/5",
+    "source_commit": "b71f28acd620dcdc0de4011754fb0314b9e55b4e",
+    "status": "tracked_on_pull_request",
+    "workflow_run_id": 40361991135,
+    "workflow_run_url": "https://github.com/cedrick14/cartomize-python/actions/runs/40361991135",
+    "scope": "Windows/Ubuntu Python 3.11/3.12 and native QGIS. Live conclusions and subsequent documentation-only revisions are recorded on pull request #5; this file preserves source and installed-package provenance.",
+    "initial_run": {
+      "source_commit": "93954d934d6e2c82330f54fce06ea63577ea7ba3",
+      "status": "failure",
+      "workflow_run_id": 40359828793,
+      "workflow_run_url": "https://github.com/cedrick14/cartomize-python/actions/runs/40359828793",
+      "reason": "Windows compact quality form horizontal overflow; both Ubuntu jobs and native QGIS passed."
+    }
+  },
+  "pypi_publication": false,
+  "source_commit": "b71f28acd620dcdc0de4011754fb0314b9e55b4e",
+  "previous_installed_wheel": {
     "status": "passed",
     "version": "1.5.0",
     "python": "3.12.14",
@@ -148,30 +216,26 @@
       "installed Python console kernel"
     ],
     "filename": "cartomize-1.5.0-py3-none-any.whl",
-    "sha256": "c4fd8c2c07f4bd970806c39ac7bb80f87fadb3ed27cdb783ca2702023298a0cc"
+    "sha256": "c4fd8c2c07f4bd970806c39ac7bb80f87fadb3ed27cdb783ca2702023298a0cc",
+    "source_commit": "93954d934d6e2c82330f54fce06ea63577ea7ba3"
   },
-  "desktop": {
-    "status": "passed",
-    "checks": [
-      "Quality jobs execute through actual Qt worker",
-      "Result layers and reports registered in workspace",
-      "Saved editable field text restored",
-      "Compact window at 12 and 16 px without horizontal overflow",
-      "Method, null, empty, type-change and duplicate policies captured before starting worker"
-    ]
-  },
-  "inventory": {
-    "total": 123,
-    "available": 14,
-    "partial": 46,
-    "absent": 63,
-    "newly_available": [
-      "G01",
-      "G02",
-      "G03"
-    ],
-    "registered_operations": 48
-  },
-  "continuous_integration": "GitHub Actions results are tracked separately on the M08 pull request; this report records local and installed-package checks.",
-  "pypi_publication": false
+  "windows_layout_followup": {
+    "source_commit": "b71f28acd620dcdc0de4011754fb0314b9e55b4e",
+    "issue": "The initial GitHub Windows jobs reported a 1 px horizontal overflow in the compact quality form at font size 12.",
+    "change": "Explicit NoFrame on inner tool-page QScrollArea widgets aligns native frame geometry with the borderless desktop theme; the existing zero-overflow assertion is retained and now reports geometry diagnostics.",
+    "local_suite": {
+      "status": "passed",
+      "passed": 18,
+      "skipped": 0,
+      "failed": 0,
+      "errors": 0,
+      "seconds": 17.437,
+      "test_files": [
+        "tests/test_vector_quality_interfaces.py",
+        "tests/test_desktop_workbench.py",
+        "tests/test_workbench_viewports.py"
+      ],
+      "scope": "Targeted local offscreen GUI checks after the correction; Windows confirmation is recorded in continuous_integration."
+    }
+  }
 }
