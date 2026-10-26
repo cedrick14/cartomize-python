@@ -97,7 +97,8 @@ def test_best_single_scene_uses_the_expert_coverage_threshold(write_raster, tmp_
     result = audit_imagery(scenes, tmp_path / "audit", aoi=_aoi(right=300050),
                            mask_clouds=False, coverage_threshold=80)
     assert result.report["usable_percent"] == 80
-    assert result.report["coverage_status"] == "complete"
+    assert result.report["coverage_status"] == "partial"
+    assert result.report["threshold_met"] is True
     assert result.report["recommended_action"] == "single_scene"
     assert result.report["recommended_scene_ids"] == ["A"]
     assert result.report["mosaic_recommended"] is False

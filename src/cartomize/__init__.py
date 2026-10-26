@@ -29,7 +29,7 @@ from .relations import analyze_relations
 from .automation import plan_cartography,run_plan,propose_layouts
 from .mapops import snapshot_project,compare_snapshots,record_review,verify_review
 
-__version__ = "1.3.0"
+__version__ = "1.4.0"
 __display_version__ = ".".join(__version__.split(".")[:2])
 
 
@@ -80,6 +80,8 @@ from .imagery_pipeline import ImageryProducts, process_imagery, split_bands
 __all__ += ["ImageryProducts", "process_imagery", "split_bands"]
 from .imagery_audit import ImageryAudit, audit_imagery
 __all__ += ["ImageryAudit", "audit_imagery"]
+from .imagery_automatic import PreprocessedImagery, ImageryCoverageError, preprocess_imagery
+__all__ += ["PreprocessedImagery", "ImageryCoverageError", "preprocess_imagery"]
 from .vector_workflows import (select_attributes, select_location, geometry_operation,
                                spatial_summary, join_attributes, latest_records)
 __all__ += ['select_attributes', 'select_location', 'geometry_operation',

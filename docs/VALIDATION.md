@@ -1,5 +1,49 @@
 # Tests et validation
 
+## Cartomize 1.4.0 — module M07, validation locale du 26 octobre 2026
+
+La suite complète locale initiale a validé **722 tests**, avec deux essais conditionnels ignorés
+(CUDA et QGIS natif), sous Linux / Python 3.12.14. Les douze cours autonomes,
+00 à 10 et 13, passent dans des noyaux Jupyter neufs, avec **73 cellules de code
+exécutées**. Le cours 00 indique explicitement sa couverture partielle acceptée.
+
+Le module automatique est aussi vérifié avec un extrait Sentinel-2 réel du
+Mayombe : **16 384 pixels utiles**, calibration confrontée aux fenêtres du même
+produit dans une seconde collection et NDVI exact à la précision numérique
+attendue. Le même extrait traverse le travailleur de la fenêtre. Une zone
+agrandie laisse **256 pixels manquants** : la production est refusée et le
+diagnostic reste accessible. Les fichiers de référence et leur provenance sont
+inclus dans [tests/data/sentinel2_mvouti](../tests/data/sentinel2_mvouti/README.md).
+
+La [note 1.4.0](RELEASE_1.4.0.md), le [guide M07](IMAGERY_AUTOMATIC.md) et le
+[rapport machine](VALIDATION_1.4.0.json) détaillent la portée, les résultats et
+la reproduction. Les contrôles Windows, Linux et QGIS distants sont identifiés
+par les commits dans [GitHub Actions](https://github.com/cedrick14/cartomize-python/actions).
+
+La wheel 1.4.0 est installée avec l’option graphique dans un environnement neuf.
+L’import provient de `site-packages`, hors du dépôt : contrôle de couverture et
+mosaïque automatiques, calculs raster/vectoriels, 20 pages graphiques, trois
+thèmes, exports, projet et noyau de console passent les contrôles.
+
+Après cette suite locale complète, les derniers essais CI ont révélé un
+débordement typographique du formulaire sur Windows et l’acceptation implicite
+de données partielles dans le cours 00. Le cours est corrigé et les douze
+notebooks sont réexécutés. L’ajustement du formulaire passe ensuite **28 tests
+GUI concernés** et **16 cas de géométrie** avec les métriques Qt habituelles et
+celles reproduisant exactement le débordement Windows. Les libellés et boutons
+restent intégralement lisibles, y compris avec les marges supplémentaires des
+champs numériques de Windows 11. La wheel reconstruite est installée et vérifiée
+à nouveau ; la matrice complète finale est celle du commit publié dans GitHub.
+
+Un contrôle supplémentaire a révélé un échec intermittent lors de la récupération
+d’un bouton interne de la barre d’outils. Les libellés sont désormais définis
+sur les actions Qt, ce qui supprime cette récupération et les conserve après
+activation ou désactivation. **21 cas ciblés** valident les actions, le diagnostic
+d’images, l’espace de travail et le cycle de vie de la fenêtre. Ils comprennent
+six créations/destructions avec clic sur Exécuter, dont trois avec le retour
+Qt inattendu observé en CI. La wheel issue de cette correction est reconstruite,
+installée et vérifiée à nouveau hors des sources.
+
 ## Cartomize 1.3.0 — validation locale du 26 octobre 2026
 
 Les sources complétées passent **626 tests**, avec deux essais conditionnels ignorés (CUDA et QGIS natif), sous Linux / Python 3.12.14. Les douze notebooks autonomes passent également dans de vrais noyaux Jupyter, soit 73 cellules de code. La wheel construite est installée dans un environnement neuf et vérifiée hors du dépôt : calculs, 20 pages graphiques, exports, projet et console.
@@ -43,7 +87,11 @@ Les tests graphiques utilisent `QT_QPA_PLATFORM=offscreen` sur les machines sans
 
 ## Portée
 
-Les tests utilisent des données synthétiques et des résultats de référence. Ils vérifient le comportement logiciel sans constituer une validation thématique sur le terrain ni une mesure de performance sur de grandes scènes.
+Les tests utilisent des données synthétiques et des résultats de référence,
+ainsi qu’un petit extrait public Sentinel-2 et ses références indépendantes à
+partir de la version 1.4.0. Ils vérifient le comportement logiciel sans
+constituer une validation thématique sur le terrain ni une mesure de
+performance sur de grandes scènes.
 
 Les contrôles graphiques hors écran ne couvrent pas toutes les configurations de bureau. La passerelle ArcGIS Pro nécessite une validation dans une installation licenciée. Le test CUDA matériel est ignoré lorsqu’aucun GPU compatible n’est accessible.
 

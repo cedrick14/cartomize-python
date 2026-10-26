@@ -3,3 +3,4 @@ recursive-include scripts *.py
 recursive-include docs *.md *.json
 recursive-include examples *.py
 recursive-include tests *.py
+recursive-include tests/data *.tif *.json *.md

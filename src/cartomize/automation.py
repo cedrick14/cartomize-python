@@ -36,12 +36,18 @@ def plan_cartography(inputs,*,goal='general',data_kind='layers',aoi=None,title='
                      target_crs=None,repair=True,relations=True,atlas_zones=None,atlas_field=None,
                      allow_mixed_dates=False,layers=(),processing_steps=(),mask_clouds=True,
                      band_order=None,composition='natural',resolution=None,
-                     validation=None,label_column=None,group_column=None):
+                     validation=None,label_column=None,group_column=None,
+                     coverage_threshold=100.,allow_partial=False,catalog=None):
     """Build a serializable dependency graph without modifying input files.
 
     For ``data_kind='scenes'``, ``band_order=None`` preserves imported bands,
     ``composition=None`` omits the display branch and ``resolution`` sets the
     common projected grid spacing. Classification always uses scientific data.
+    With a study area, the scene branch audits coverage and automatically
+    selects/mosaics scenes before any dependent analysis or map. Coverage below
+    ``coverage_threshold`` stops the plan unless ``allow_partial=True``. A
+    catalogue may supplement local scenes within its explicit search limits.
+    Without an AOI, the existing full-extent preparation has no coverage claim.
     """
     if classification not in {None,'supervised','unsupervised'}:raise ValueError('Mode de classification inconnu.')
     assessment=assess_project(inputs,data_kind=data_kind,goal=goal,aoi=aoi)
@@ -52,7 +58,12 @@ def plan_cartography(inputs,*,goal='general',data_kind='layers',aoi=None,title='
         failures=[i for i in extra['issues'] if i['severity']=='error' and not (repair and i['code']=='invalid_geometry')]
         if failures:raise ValueError('; '.join(i['message'] for i in failures))
         assessment['layers'].extend(extra['layers'])
-    nodes=[];layers=[];scientific=None
+    nodes=[];layers=[];scientific=None;scientific_product=None
+    def scientific_input():
+        if scientific is None:raise ValueError('Aucun raster scientifique disponible.')
+        if scientific.startswith('step_'):
+            return '@'+scientific+(':'+scientific_product if scientific_product else '')
+        return scientific
     def add(operation,parameters,requires=()):
         ident=f'step_{len(nodes)+1:02d}'
         while any(n['id']==ident for n in nodes):ident+='_'
@@ -81,11 +92,20 @@ def plan_cartography(inputs,*,goal='general',data_kind='layers',aoi=None,title='
         channels=COMPOSITIONS.get(composition) if isinstance(composition,str) else composition
         if composition is not None and (channels is None or len(channels)!=3 or any(not ((isinstance(b,str) and b in bands) or (type(b) is int and 1<=b<=len(bands))) for b in channels)):
             raise ValueError('La composition nécessite trois bandes disponibles. Choisir une autre composition ou composition=None.')
-        scientific=add('prepare',dict(sources=assessment['inputs'],aoi=aoi,crs=target_crs,allow_mixed_dates=allow_mixed_dates,bands=bands,mask_clouds=mask_clouds,resolution=resolution))
-        if composition is not None:
-            rgb=add('composite',dict(source='@'+scientific,bands=list(channels)),[scientific]);layers.append(dict(data='@'+rgb,role='background',rgb='native',name='Image satellite'))
+        if aoi is not None:
+            scientific=add('process',dict(operator='imagery.preprocess',arguments=dict(
+                sources=assessment['inputs'],aoi=aoi,target_crs=target_crs,
+                allow_mixed_dates=allow_mixed_dates,band_order=bands,mask_clouds=mask_clouds,
+                resolution=resolution,coverage_threshold=coverage_threshold,
+                allow_partial=allow_partial,catalog=catalog)))
+            scientific_product='multiband'
         else:
-            layers.append(dict(data='@'+scientific,role='background',name='Multibande scientifique'))
+            if catalog is not None:raise ValueError('Définir une zone d’étude pour compléter les scènes depuis un catalogue.')
+            scientific=add('prepare',dict(sources=assessment['inputs'],aoi=aoi,crs=target_crs,allow_mixed_dates=allow_mixed_dates,bands=bands,mask_clouds=mask_clouds,resolution=resolution))
+        if composition is not None:
+            rgb=add('composite',dict(source=scientific_input(),bands=list(channels)),[scientific]);layers.append(dict(data='@'+rgb,role='background',rgb='native',name='Image satellite'))
+        else:
+            layers.append(dict(data=scientific_input(),role='background',name='Multibande scientifique'))
     for record in assessment['layers']:
         item=dict(record['options'],data=record['source'],name=record['name'],kind=record['kind'])
         if record['kind']=='vector' and record['diagnostic']['invalid_geometries']:
@@ -99,12 +119,12 @@ def plan_cartography(inputs,*,goal='general',data_kind='layers',aoi=None,title='
     if classification:
         if scientific is None:raise ValueError('Ajouter un raster multispectral ou des scènes pour la classification.')
         if classification=='supervised' and not training:raise ValueError('La classification supervisée nécessite des échantillons de référence.')
-        reference='@'+scientific if scientific.startswith('step_') else scientific
+        reference=scientific_input()
         node=add('classify' if classification=='supervised' else 'cluster',dict(source=reference,training=str(training) if training else None,class_column=class_column,validation=str(validation) if validation else None,label_column=label_column,group_column=group_column),[scientific] if scientific.startswith('step_') else [])
         layers.append(dict(data='@'+node,role='landcover',name='Occupation du sol' if classification=='supervised' else 'Groupes spectraux'))
     if indices:
         if scientific is None:raise ValueError('Ajouter un raster scientifique pour les indices.')
-        node=add('indices',dict(source='@'+scientific if scientific.startswith('step_') else scientific,indices=list(indices)),[scientific] if scientific.startswith('step_') else [])
+        node=add('indices',dict(source=scientific_input(),indices=list(indices)),[scientific] if scientific.startswith('step_') else [])
         # Indices remain analytical products; do not obscure the chosen thematic map.
     # User steps are placed after scientific preparation and before cartography.
     # Stable explicit identifiers allow later operators to consume earlier products.
@@ -113,7 +133,7 @@ def plan_cartography(inputs,*,goal='general',data_kind='layers',aoi=None,title='
     def substitute(value):
         if isinstance(value,str) and value=='@scientific':
             if scientific is None:raise ValueError('Aucun raster scientifique disponible.')
-            return '@'+scientific if scientific.startswith('step_') else scientific
+            return scientific_input()
         if isinstance(value,dict):return {k:substitute(v) for k,v in value.items()}
         if isinstance(value,(list,tuple)):return [substitute(v) for v in value]
         return value
@@ -188,7 +208,7 @@ def run_plan(plan,destination,*,dpi=150,formats=('pdf','png'),workers=1,block_si
     validate_plan(plan)
     if not formats or any(f not in {'pdf','png','svg'} for f in formats):raise ValueError('Formats : PDF, PNG ou SVG.')
     nodes=plan['nodes']
-    results={};products={};assets=[];ledger=[];mapping=None;destination=Path(destination).resolve()
+    results={};products={};assets=[];ledger=[];mapping=None;imagery_preprocessing={};destination=Path(destination).resolve()
     def resolve(value):
         if isinstance(value,str) and value.startswith('@'):
             key,sep,product=value[1:].partition(':')
@@ -207,10 +227,20 @@ def run_plan(plan,destination,*,dpi=150,formats=('pdf','png'),workers=1,block_si
             callback=lambda done,total:progress(number*100+int(done/max(1,total)*100),len(nodes)*100) if progress else None
             if op=='process':
                 from .processing import execute_operation,operation_spec
+                from .imagery_automatic import ImageryCoverageError,diagnostic_destination
                 spec=operation_spec(parameters['operator'])
                 if stage:stage(spec['label'])
-                product=execute_operation(parameters['operator'],parameters['arguments'],work/ident,workers=workers,block_size=block_size,memory_limit_mb=memory_limit_mb,execution=execution,scheduler_address=scheduler_address,device=device,progress=callback,cancel=cancel)
+                try:
+                    product=execute_operation(parameters['operator'],parameters['arguments'],work/ident,workers=workers,block_size=block_size,memory_limit_mb=memory_limit_mb,execution=execution,scheduler_address=scheduler_address,device=device,progress=callback,cancel=cancel)
+                except ImageryCoverageError as exc:
+                    # Preserve only the actionable diagnostic outside the plan
+                    # before its atomic directory is rolled back. Later steps
+                    # must never consume a preparation below the chosen limit.
+                    raise exc.preserve(diagnostic_destination(destination),cancel=cancel) from None
                 result=product['primary'];products[ident]=product['products']
+                if parameters['operator']=='imagery.preprocess':
+                    imagery_preprocessing[ident]={**product.get('metadata',{}),
+                        'manifest':product['primary'],'audit':product['products'].get('audit')}
                 if product['kind'] in {'vector','raster'}:assets.append(dict(data=result,kind=product['kind'],name=spec['label']))
             elif op=='prepare':
                 result=cm.prepare_imagery(cm.discover_scenes(parameters['sources']),work/f'{ident}.tif',aoi=parameters['aoi'],target_crs=parameters['crs'],
@@ -256,7 +286,10 @@ def run_plan(plan,destination,*,dpi=150,formats=('pdf','png'),workers=1,block_si
         if mapping is not None:
             from .session import map_document
             document=publish(map_document(mapping));save_json(document,work/'map.json')
+        coverage_status=('partial' if any(item['status']=='partial' for item in imagery_preprocessing.values())
+                         else 'complete') if imagery_preprocessing else None
         record=publish(dict(schema='cartomize.automation.result.v1',plan=plan,steps=ledger,layers=assets,
+                    imagery_preprocessing=imagery_preprocessing,coverage_status=coverage_status,
                     results={key:str(value) for key,value in results.items() if isinstance(value,(str,Path))},products=products,map_file=str(work/'map.json') if mapping else None,map_config=ui_config if mapping else None,quality_report=str(work/'quality.json') if mapping else None,
                     outputs=[str(work/f'carte.{fmt}') for fmt in formats] if mapping else []))
         save_json(record,work/'automation.json');_check_cancel(cancel)

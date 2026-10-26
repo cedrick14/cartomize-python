@@ -6,8 +6,10 @@ os.environ.setdefault('QT_QPA_PLATFORM', 'offscreen')
 import numpy as np
 import pytest
 pytest.importorskip('PySide6')
-from PySide6.QtCore import QEventLoop, QPoint, QSettings, QTimer
-from PySide6.QtWidgets import QApplication, QBoxLayout
+from PySide6.QtCore import QCoreApplication, QEvent, QEventLoop, QPoint, QSettings, QTimer, Qt
+from PySide6.QtTest import QSignalSpy, QTest
+from PySide6.QtWidgets import QApplication, QBoxLayout, QLabel, QToolBar, QToolButton, QWidgetItem
+from shiboken6 import isValid
 from cartomize.desktop import CartomizeWindow
 
 
@@ -86,3 +88,66 @@ def test_console_and_restored_layout_keep_controls_reachable(compact_window):
     window._workbench.bottom_tabs.setCurrentWidget(window._workbench.logs)
     app.processEvents()
     assert window.workspace.height() >= 360
+
+
+def test_compact_toolbar_labels_survive_action_updates(compact_window):
+    _, window = compact_window
+    workbench = window._workbench
+    buttons = {button.defaultAction(): button for button in workbench.toolbar.findChildren(QToolButton)}
+    for key, label, menu, shortcut in [
+        ('open', 'Ouvrir', 'Ouvrir un projet', 'Ctrl+O'),
+        ('save', 'Enregistrer', 'Enregistrer le projet', 'Ctrl+S'),
+        ('import', 'Importer', 'Importer des données', 'Ctrl+I'),
+        ('run', 'Exécuter', 'Exécuter le traitement', 'F5'),
+    ]:
+        action = workbench.actions[key]
+        button = buttons[action]
+        for enabled in (False, True, False, True):
+            action.setEnabled(enabled)
+            assert button.isEnabled() == enabled
+            assert button.text() == label
+            assert button.toolTip() == menu
+            assert action.text() == menu
+            assert action.shortcut().toString() == shortcut
+
+
+@pytest.mark.parametrize('unexpected_wrapper', [False, True])
+def test_toolbar_actions_survive_window_recreation(tmp_path, monkeypatch, unexpected_wrapper):
+    """Keep Qt-owned button lookup out of construction and exercise real actions."""
+    import cartomize.desktop as desktop
+    app = QApplication.instance() or QApplication([])
+    monkeypatch.setattr(desktop, 'QSettings',
+        lambda *args: QSettings(str(tmp_path / 'preferences.ini'), QSettings.Format.IniFormat))
+    lookups = []
+    if unexpected_wrapper:
+        # Reproduce the return type seen in CI without corrupting native objects.
+        marker = QLabel('Layout item, not a toolbar control')
+        layout_item = QWidgetItem(marker)
+        def widget_for_action(toolbar, action):
+            lookups.append(action)
+            return layout_item
+        monkeypatch.setattr(QToolBar, 'widgetForAction', widget_for_action)
+    for _ in range(3):
+        window = desktop.CartomizeWindow()
+        try:
+            window.select_tool('prepare')
+            window.show()
+            QTest.qWait(10)
+            action = window._workbench.actions['run']
+            button = next(control for control in window._workbench.toolbar.findChildren(QToolButton)
+                          if control.defaultAction() is action)
+            triggered = QSignalSpy(action.triggered)
+            clicked = QSignalSpy(window.run_button.clicked)
+            QTest.mouseClick(button, Qt.MouseButton.LeftButton)
+            assert triggered.count() == clicked.count() == 1
+            assert window.thread is None  # Missing imagery inputs stop at validation.
+            assert button.text() == 'Exécuter'
+            assert action.shortcut().toString() == 'F5'
+        finally:
+            window.close()
+            QCoreApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
+            app.processEvents()
+        assert not isValid(window)
+        assert not isValid(action)
+        assert not isValid(button)
+    assert not lookups

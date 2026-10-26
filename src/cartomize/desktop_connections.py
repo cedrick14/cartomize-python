@@ -67,6 +67,10 @@ class ProjectConnections:
         self.select_tool(target);self.status.setText('Résultat transmis : '+Path(path).name)
     def collect_result(self,path):
         path=Path(path)
+        record=None
+        if path.suffix.lower()=='.json' and path.is_file() and path.stat().st_size<=16*1024*1024:
+            try:record=json.loads(path.read_text(encoding='utf-8'))
+            except (OSError,ValueError):pass
         if path.suffix.lower() in RASTERS|VECTORS:
             layer=dict(data=path)
             if path.suffix.lower() in RASTERS:
@@ -80,11 +84,15 @@ class ProjectConnections:
             self.register_result(layer)
             confidence=path.parent/'confidence.tif'
             if path.name=='classification.tif' and confidence.is_file():self.register_result(dict(data=confidence))
-        elif path.name=='imagery.json':
-            record=json.loads(path.read_text(encoding='utf-8'))
+        elif path.name=='imagery.json' or (isinstance(record,dict) and record.get('schema')=='cartomize.imagery.automatic.v1'):
+            if record is None:record=json.loads(path.read_text(encoding='utf-8'))
+            if record.get('status')=='partial':self._result_partial_coverage=True
+            if record.get('schema')=='cartomize.imagery.automatic.v1' and record.get('audit'):
+                self.collect_result(record['audit'])
+            suffix=' ; couverture partielle' if record.get('status')=='partial' else ''
             for product in record['products']:
                 if product['multiband']:
-                    self.register_result(dict(data=product['multiband'],name='Multibande ; '+', '.join(product['scenes'])))
+                    self.register_result(dict(data=product['multiband'],name='Multibande ; '+', '.join(product['scenes'])+suffix))
                     self.tool('composite').source.edit.setText(product['multiband'])
                     self.tool('indices').source.edit.setText(product['multiband'])
                     self.tool('classification').source.edit.setText(product['multiband'])
@@ -109,10 +117,20 @@ class ProjectConnections:
             for layer in cm.load_project(path).layers:self.register_result(layer)
         elif path.name=='automation.json':
             record=json.loads(path.read_text(encoding='utf-8'))
+            if record.get('coverage_status')=='partial':self._result_partial_coverage=True
+            for products in record.get('products',{}).values():
+                primary=products.get('primary') if isinstance(products,dict) else None
+                if not isinstance(primary,str):continue
+                candidate=Path(primary);candidate=candidate if candidate.is_absolute() else path.parent/candidate
+                if candidate.suffix.lower()!='.json' or not candidate.is_file() or candidate.stat().st_size>16*1024*1024:continue
+                child=json.loads(candidate.read_text(encoding='utf-8'))
+                if isinstance(child,dict) and child.get('schema')=='cartomize.imagery.automatic.v1':self.collect_result(candidate)
             for layer in record['layers']:self.register_result(layer)
             self.production_config=record.get('map_config');self.resume_button.setVisible(bool(self.production_config))
         elif path.name=='production.json':
             record=json.loads(path.read_text(encoding='utf-8'))
+            if record.get('preprocessing'):
+                self.collect_result(path.parent/record['preprocessing'])
             scientific=path.parent/record['multiband'];display=path.parent/record['composite']
             self.register_result(dict(data=scientific));self.register_result(dict(data=display,rgb='native',role='background',name='Image satellite'))
             self.tool('composite').source.edit.setText(str(scientific));self.tool('indices').source.edit.setText(str(scientific))

@@ -33,7 +33,8 @@ def _analysis_checks(cm, root):
         dst.set_band_unit(1,'reflectance')
     zones=gpd.GeoDataFrame({'zone':['partly_outside']},
         geometry=[box(300000,9499980,300040,9500000)],crs=32733)
-    scene=cm.Scene('installed-probe',{'red':cm.Band(source,scale=scale,offset=offset,unit='reflectance')},sensor='custom')
+    scene=cm.Scene('installed-probe',{'red':cm.Band(source,scale=scale,offset=offset,unit='reflectance')},
+                   sensor='custom',acquired='2026-10-26')
     # The diagnostic requires a new directory. A temporary workspace also lets
     # the installed probe be rerun without stale diagnostic products.
     with tempfile.TemporaryDirectory(prefix='coverage-probe-',dir=root) as temporary:
@@ -60,6 +61,29 @@ def _analysis_checks(cm, root):
         with rasterio.open(audit.gaps) as src:
             np.testing.assert_array_equal(src.read(1),[[0,0,2,1],[0,0,0,1]])
 
+        blocked=Path(temporary)/'blocked'
+        try:
+            cm.preprocess_imagery([scene],blocked,aoi=zones,mask_clouds=False,max_pixels=8)
+        except cm.ImageryCoverageError as error:
+            assert error.report['usable_percent']==62.5
+            assert error.manifest.is_file() and error.diagnostic.gaps.is_file()
+            assert not blocked.exists()
+        else:
+            raise AssertionError('The installed automatic workflow accepted insufficient coverage.')
+        extra=Path(temporary)/'complement.tif'
+        with rasterio.open(extra,'w',driver='GTiff',width=4,height=2,count=1,dtype='int16',
+                           crs=32733,transform=from_origin(300000,9500000,10,10),nodata=-9999) as dst:
+            dst.write(np.where(present, -9999, 9000).astype('int16'),1)
+        complement=cm.Scene('complement',{'red':cm.Band(extra,scale=scale,offset=offset,unit='reflectance')},
+                             sensor='custom',acquired='2026-10-26')
+        automatic=cm.preprocess_imagery([scene,complement],Path(temporary)/'automatic',
+            aoi=zones,mask_clouds=False,max_pixels=8)
+        assert automatic.report['status']=='complete' and automatic.report['mosaic']
+        assert automatic.report['usable_percent']==100
+        with rasterio.open(automatic.products[0]['multiband']) as src:
+            np.testing.assert_allclose(src.read(1),[[-.5,.5,8.5,8.5],[1.5,2.5,3.5,8.5]])
+            assert src.read_masks(1).min()==255
+
     statistics=cm.raster.zonal_stats(source,zones,value_mode='physical',include_coverage=True,
                                     block_size=1,max_zone_pixels=8)
     row=statistics.iloc[0]
@@ -72,6 +96,7 @@ def _analysis_checks(cm, root):
     assert metadata['applied_scale']==scale and metadata['applied_offset']==offset
     assert metadata['unit']=='reflectance'
     return ['installed imagery coverage audit: 5 usable pixels of 8, gap rasters and recommendation',
+            'automatic preparation: 62.5% refused with persistent gaps; complementary scene produces exactly 100%',
             'calibrated zonal statistics: mean 1.5, sum 7.5 and observed coverage 62.5%']
 
 

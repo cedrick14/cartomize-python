@@ -81,6 +81,28 @@ def main(argv=None):
     audit.add_argument("--all-touched", action="store_true")
     audit.add_argument("--max-pixels", type=int, default=250_000_000)
     audit.add_argument("--coverage-threshold", type=float, default=100.)
+    automatic = subs.add_parser("preprocess-imagery", help="Audit coverage, select scenes and prepare imagery automatically")
+    automatic.add_argument("source", help="Scene directory/manifest, or '-' for a catalogue-only search")
+    automatic.add_argument("destination", help="New directory for the automatic workflow and its products")
+    automatic.add_argument("--aoi", required=True, help="Polygon study area")
+    automatic.add_argument("--bands", help="Comma-separated semantic band names; required for a catalogue-only search")
+    automatic.add_argument("--crs")
+    automatic.add_argument("--resolution", type=float, help="Common diagnostic and production pixel size in metres")
+    automatic.add_argument("--overlap", choices=["first", "last"], default="first")
+    automatic.add_argument("--resampling", choices=["nearest", "bilinear", "cubic", "average"], default="nearest")
+    automatic.add_argument("--coverage-threshold", type=float, default=100., help="Minimum usable AOI coverage in percent")
+    automatic.add_argument("--allow-partial", action="store_true", help="Explicitly allow nonempty coverage below the requested threshold")
+    automatic.add_argument("--without-cloud-mask", action="store_true")
+    automatic.add_argument("--without-saturation-mask", action="store_true")
+    automatic.add_argument("--allow-mixed-dates", action="store_true")
+    automatic.add_argument("--all-touched", action="store_true")
+    automatic.add_argument("--max-pixels", type=int, default=250_000_000)
+    automatic.add_argument("--separate-bands", action="store_true")
+    automatic.add_argument("--without-multiband", action="store_true")
+    automatic.add_argument("--rgb", choices=list(COMPOSITIONS), help="Optional separate colour composition")
+    automatic.add_argument("--percentiles", type=float, nargs=2, default=(2., 98.), metavar=("LOW", "HIGH"))
+    automatic.add_argument("--gamma", type=float, default=1.)
+    automatic.add_argument("--catalog", help="JSON catalogue configuration: endpoint, collections, dates and download limits")
     prepare = subs.add_parser("prepare", help="Mosaic, calibrate, stack and clip spectral scenes")
     prepare.add_argument("source"); prepare.add_argument("destination")
     prepare.add_argument("--bands", required=True, help="Comma-separated semantic names: blue,green,red,nir")
@@ -122,6 +144,9 @@ def main(argv=None):
     operation.add_argument('operation');operation.add_argument('parameters',help='JSON parameter file');operation.add_argument('destination');operation.add_argument('--workers',type=int,default=1)
     planning.add_argument('--steps',help='JSON file containing additional processing steps')
     planning.add_argument('--without-cloud-mask',action='store_true')
+    planning.add_argument('--coverage-threshold',type=float,default=100.,help='Minimum usable scene coverage when --aoi is provided')
+    planning.add_argument('--allow-partial',action='store_true',help='Explicitly accept scene coverage below the requested threshold')
+    planning.add_argument('--catalog',help='JSON catalogue configuration for supplementing local scenes in the study area')
     for command in (operation,execute):
         command.add_argument('--block-size',type=int,default=512);command.add_argument('--memory-limit-mb',type=int,default=512)
     for command in (calc,index,focal_parser,reduction,terrain_parser,convolution,operation,execute):
@@ -132,6 +157,7 @@ def main(argv=None):
     validation.add_argument('project');validation.add_argument('destination');validation.add_argument('--python',required=True);validation.add_argument('--layout');validation.add_argument('--engine',choices=['qgis','arcgis'])
     args = parser.parse_args(argv)
     execution={key:getattr(args,key) for key in ('execution','scheduler_address','device') if hasattr(args,key)}
+    from .imagery_automatic import ImageryCoverageError
     try:
         if args.command=='engines':
             from .execution import execution_capabilities
@@ -152,7 +178,7 @@ def main(argv=None):
             elif args.command=='cluster':output=cm.cluster_raster(args.source,args.destination,clusters=args.clusters)
             elif args.command=='terrain':output=cm.terrain(args.source,args.destination,products=args.products.split(','),z_factor=args.z_factor,workers=args.workers,**execution)
             elif args.command=='convolve':output=cm.convolve(args.source,args.destination,json.loads(args.kernel),normalize=args.normalize,**execution)
-            elif args.command=='plan':output=save_json(cm.plan_cartography(args.sources,goal=args.goal,data_kind=args.kind,aoi=args.aoi,title=args.title,credits=args.credits,training=args.training,classification=args.classification,class_column=args.class_column,indices=[i for i in args.indices.split(',') if i],layers=args.layer,atlas_zones=args.atlas_zones,atlas_field=args.atlas_field,processing_steps=json.loads(Path(args.steps).read_text(encoding='utf-8')) if args.steps else [],mask_clouds=not args.without_cloud_mask),args.destination)
+            elif args.command=='plan':output=save_json(cm.plan_cartography(args.sources,goal=args.goal,data_kind=args.kind,aoi=args.aoi,title=args.title,credits=args.credits,training=args.training,classification=args.classification,class_column=args.class_column,indices=[i for i in args.indices.split(',') if i],layers=args.layer,atlas_zones=args.atlas_zones,atlas_field=args.atlas_field,processing_steps=json.loads(Path(args.steps).read_text(encoding='utf-8')) if args.steps else [],mask_clouds=not args.without_cloud_mask,coverage_threshold=args.coverage_threshold,allow_partial=args.allow_partial,catalog=args.catalog),args.destination)
             elif args.command=='run-plan':output=cm.run_plan(args.plan,args.destination,dpi=args.dpi,workers=args.workers,block_size=args.block_size,memory_limit_mb=args.memory_limit_mb,**execution)
             elif args.command=='recipe':output=cm.run_recipe(args.recipe,args.destination,variables=json.loads(args.variables),bindings=json.loads(args.bindings))
             elif args.command=='batch':output=cm.run_batch(args.manifest,args.destination,bindings=json.loads(args.bindings),reviewed=args.reviewed,continue_on_error=args.continue_on_error)
@@ -197,6 +223,20 @@ def main(argv=None):
                 allow_mixed_dates=args.allow_mixed_dates, all_touched=args.all_touched,
                 max_pixels=args.max_pixels, coverage_threshold=args.coverage_threshold)
             result = product.report
+        elif args.command == "preprocess-imagery":
+            from .imagery_automatic import preprocess_imagery
+            product = preprocess_imagery([] if args.source == '-' else args.source,
+                args.destination, aoi=args.aoi,
+                band_order=[b.strip() for b in args.bands.split(",")] if args.bands else None,
+                target_crs=args.crs, resolution=args.resolution, overlap=args.overlap,
+                resampling=args.resampling, coverage_threshold=args.coverage_threshold,
+                allow_partial=args.allow_partial, mask_clouds=not args.without_cloud_mask,
+                mask_saturation=not args.without_saturation_mask,
+                allow_mixed_dates=args.allow_mixed_dates, all_touched=args.all_touched,
+                max_pixels=args.max_pixels, multiband=not args.without_multiband,
+                separate_bands=args.separate_bands, composition=args.rgb,
+                percentiles=args.percentiles, gamma=args.gamma, catalog=args.catalog)
+            result = {**product.report, 'output': str(product.manifest)}
         elif args.command == "prepare":
             product = prepare_imagery(args.source,args.destination,aoi=args.aoi,
                       band_order=[b.strip() for b in args.bands.split(",")],target_crs=args.crs,
@@ -215,6 +255,13 @@ def main(argv=None):
                       .export(args.destination, dpi=args.dpi, overwrite=args.overwrite))}
         print(json.dumps(_json_value(result), ensure_ascii=False, indent=2, allow_nan=False))
         return 0
+    except ImageryCoverageError as exc:
+        error = dict(error='insufficient_coverage', message=str(exc),
+                     diagnostic=str(exc.manifest), coverage=str(exc.diagnostic.coverage),
+                     gaps=str(exc.diagnostic.gaps), report=exc.report,
+                     workflow=exc.workflow_report)
+        print(json.dumps(_json_value(error), ensure_ascii=False, indent=2, allow_nan=False), file=sys.stderr)
+        return 2
     except (ValueError, OSError, KeyError, ImportError, RuntimeError) as exc:
         print(f"cartomize: {exc}", file=sys.stderr)
         return 2

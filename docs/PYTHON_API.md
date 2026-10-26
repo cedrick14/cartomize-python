@@ -4,6 +4,29 @@ Les exemples utilisent des chemins de données à adapter au projet. Les traitem
 
 Les scripts et les cellules Jupyter appellent cette même API, sans dépendance à Qt. Voir [l’installation et les noyaux Jupyter](NOTEBOOKS.md). Les changements de valeurs par défaut de la version 1.3.0 sont décrits dans la [note de version](RELEASE_1.3.0.md).
 
+## Prétraitement automatique avec contrôle de couverture
+
+```python
+import cartomize as cm
+
+try:
+    images = cm.preprocess_imagery(
+        "donnees/scenes", "resultats/automatique_01",
+        aoi="zone_etude.gpkg", band_order=["red", "nir"],
+        coverage_threshold=100, allow_partial=False,
+    )
+except cm.ImageryCoverageError as erreur:
+    print(erreur.manifest, erreur.diagnostic.gaps)
+else:
+    cm.spectral_indices(images.products[0]["multiband"], "ndvi.tif", ["NDVI"])
+```
+
+Le moteur sélectionne les scènes, décide de la mosaïque et bloque la production
+si le seuil n’est pas atteint. `allow_partial=True` accepte explicitement une
+couverture non vide inférieure au seuil ; son statut reste partiel. Un catalogue
+STAC facultatif peut compléter les données. Voir le [module M07](IMAGERY_AUTOMATIC.md)
+pour les entrées, les produits, la politique de couverture et les commandes.
+
 ## Diagnostic des scènes et couverture zonale
 
 ```python
@@ -71,6 +94,12 @@ Le répertoire de production doit être nouveau. Les produits sont préparés
 ensemble avant leur enregistrement final. La reconnaissance automatique
 couvre Landsat C2 L2 SR et Sentinel-2 L2A; d'autres données peuvent être
 fournies en Python par des objets `Scene` et `Band` explicites.
+
+Avec `aoi`, cette production utilise le contrôle automatique de couverture,
+100 % par défaut, avant de rendre la carte. Elle accepte `coverage_threshold`,
+`allow_partial` et `catalog`. Les chemins `production.multiband` et
+`production.maps` désignent les produits publiés, y compris lorsque la
+préparation est rangée dans un sous-dossier.
 
 ## Algèbre raster et indices spectraux
 

@@ -100,8 +100,24 @@ def _catalog():
             resampling=resampling,mask_clouds=mask_clouds,mask_saturation=mask_saturation,
             allow_mixed_dates=allow_mixed_dates,all_touched=all_touched,max_pixels=max_pixels,
             coverage_threshold=coverage_threshold,progress=progress,cancel=cancel).manifest
+    def imagery_preprocessing(sources,destination,*,aoi,band_order=None,target_crs=None,
+                              resolution=None,overlap='first',resampling='nearest',
+                              mask_clouds=True,mask_saturation=True,allow_mixed_dates=False,
+                              all_touched=False,max_pixels=250_000_000,coverage_threshold=100.,
+                              allow_partial=False,multiband=True,separate_bands=False,
+                              composition=None,percentiles=(2,98),gamma=1.,catalog=None,
+                              progress=None,cancel=None):
+        from .imagery_automatic import preprocess_imagery
+        return preprocess_imagery(sources,destination,aoi=aoi,band_order=band_order,
+            target_crs=target_crs,resolution=resolution,overlap=overlap,resampling=resampling,
+            mask_clouds=mask_clouds,mask_saturation=mask_saturation,
+            allow_mixed_dates=allow_mixed_dates,all_touched=all_touched,max_pixels=max_pixels,
+            coverage_threshold=coverage_threshold,allow_partial=allow_partial,
+            multiband=multiband,separate_bands=separate_bands,composition=composition,
+            percentiles=percentiles,gamma=gamma,catalog=catalog,progress=progress,cancel=cancel).manifest
     add('prepare','Prétraitement multispectral',preparation,'raster','prepare')
     add('imagery.audit','Diagnostic de couverture des images',imagery_audit,'document','prepare')
+    add('imagery.preprocess','Prétraitement automatique avec contrôle de couverture',imagery_preprocessing,'document','prepare')
     add('hydrology','Analyse hydrologique D8',hydrology,'raster','processing')
     add('routing','Plus court chemin',shortest_path,'vector','processing')
     add('stac.search','Recherche de scènes STAC',search_stac,'document','processing')
@@ -130,6 +146,7 @@ def operation_catalog():
         if key in CUDA_OPERATIONS:parameters.append(dict(name='device',required=False,default='cpu'))
         if key=='hydrology':products+=['filled','direction','accumulation','streams','watersheds']
         if key=='imagery.audit':products+=['coverage','gaps']
+        if key=='imagery.preprocess':products+=['audit','coverage','gaps','preparation','multiband','source_index','composition','report']
         if key=='prepare':products+=['result_source_index']
         if key=='classify':products+=['classification','confidence']
         if key=='classify':
@@ -200,13 +217,20 @@ def execute_operation(operation,parameters,destination,*,workers=1,block_size=51
         if operation=='raster.reclassify':p['mapping']={float(k):v for k,v in p['mapping'].items()}
         # JSON raster assets use [path, band], accepted by the array engine.
         if 'destination' in signature.parameters:
-            p['destination']=work/'products' if operation in {'classify','cluster','hydrology','stac.download','imagery.audit'} else work/'result.tif'
+            p['destination']=work/'products' if operation in {'classify','cluster','hydrology','stac.download','imagery.audit','imagery.preprocess'} else work/'result.tif'
         for name,value in [('workers',workers),('block_size',block_size),('memory_limit_mb',memory_limit_mb)]:
             if 'options' in signature.parameters or name in signature.parameters or operation=='classify' and name=='workers':p.setdefault(name,value)
         if operation=='classify' and p.get('model'):p.setdefault('training',None)
         for name,value in [('progress',progress),('cancel',cancel)]:
             if name in signature.parameters or 'options' in signature.parameters:p[name]=value
-        result=function(**p);_check_cancel(cancel)
+        from .imagery_automatic import ImageryCoverageError, diagnostic_destination
+        try:
+            result=function(**p)
+        except ImageryCoverageError as exc:
+            # The operation directory is still temporary here. Keep the
+            # diagnostic outside it before rollback removes all science files.
+            raise exc.preserve(diagnostic_destination(destination),cancel=cancel) from None
+        _check_cancel(cancel)
         if isinstance(result,gpd.GeoDataFrame):
             primary=work/'result.gpkg';result.to_file(primary,driver='GPKG',index=False)
         elif isinstance(result,(pd.DataFrame,pd.Series)):
@@ -223,11 +247,31 @@ def execute_operation(operation,parameters,destination,*,workers=1,block_size=51
         metadata=getattr(result,'attrs',{}).get('cartomize')
         if metadata is not None:record['metadata']=json_value(metadata)
         products={'primary':record['primary']}
-        for path in sorted(work.rglob('*')):
-            if path.is_file() and path.suffix.lower() in {'.tif','.gpkg','.csv'}:
-                key=path.stem
-                if key in products and products[key]!=str(destination/path.relative_to(work)):raise ValueError('Produits intermédiaires de même nom : '+key)
-                products[key]=str(destination/path.relative_to(work))
+        if operation=='imagery.preprocess':
+            document=json.loads(primary.read_text(encoding='utf-8'))
+            record['metadata']={key:document[key] for key in
+                ('status','usable_percent','threshold_met','allow_partial','coverage_threshold',
+                 'selected_scene_ids','mosaic') if key in document}
+            def named_product(name,value):
+                if value is None:return
+                path=Path(value)
+                if not path.is_file():raise RuntimeError('Produit du prétraitement absent : '+name)
+                products[name]=str(destination/path.relative_to(work))
+            for key in ('audit','coverage','gaps','preparation'):
+                named_product(key,document.get(key))
+            prepared=document.get('products',[])
+            for number,item in enumerate(prepared,1):
+                prefix='' if len(prepared)==1 else f'product_{number}_'
+                for key in ('multiband','source_index','composition','report'):
+                    named_product(prefix+key,item.get(key))
+                for index,band in item.get('bands',{}).items():
+                    named_product(prefix+'band_'+str(index),band['path'])
+        else:
+            for path in sorted(work.rglob('*')):
+                if path.is_file() and path.suffix.lower() in {'.tif','.gpkg','.csv'}:
+                    key=path.stem
+                    if key in products and products[key]!=str(destination/path.relative_to(work)):raise ValueError('Produits intermédiaires de même nom : '+key)
+                    products[key]=str(destination/path.relative_to(work))
         record['products']=products
         from .storage import relocate_products
         save_json(record,work/'operation.json')

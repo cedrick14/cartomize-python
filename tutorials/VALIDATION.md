@@ -1,8 +1,42 @@
 # Validation du parcours
 
-Le parcours courant installe les sources **Cartomize 1.3.0** de la copie du dépôt utilisée. Les résultats historiques ci-dessous concernent le paquet 1.0.1 et sont conservés avec leur date ; ils ne constituent pas une validation de la version courante. Voir aussi la [validation 1.3.0](../docs/RELEASE_1.3.0.md).
+Le parcours courant installe les sources **Cartomize 1.4.0** de la copie du dépôt
+utilisée. Les résultats des versions précédentes sont conservés ci-dessous avec
+leur version et leur date ; ils ne constituent pas une nouvelle exécution de
+tous les cours avec la version courante.
 
-## Résultats locaux du 26 octobre 2026 — sources 1.3.0
+## Résultats locaux du 26 octobre 2026 — sources 1.4.0
+
+Les cours **00 à 10 et 13** ont été exécutés dans des noyaux Jupyter réels
+indépendants sous Linux / Python 3.12.14 : **12 notebooks, 73 cellules de code,
+aucune erreur**. Les sorties corrigées des cours 00 et 13 sont enregistrées ;
+les sorties historiques des autres fichiers sont conservées.
+
+Le [cours 13](notebooks/13_diagnostic_automatique.ipynb), avec ses sept cellules,
+utilise maintenant le [module M07](../docs/IMAGERY_AUTOMATIC.md) : la
+première zone, couverte à **83,28 %** en données utiles, est refusée avec un
+diagnostic conservé. Un second cas pédagogique distinct atteint **100 %** avec
+deux scènes ; le moteur sélectionne la mosaïque, puis les cellules calculent le
+NDVI et les statistiques zonales. Le registre courant comporte **44 opérateurs**.
+
+Le cours 00 accepte explicitement les données pédagogiques partielles avec
+`allow_partial=True`. Le seuil reste 100 %, le rapport vérifie `status="partial"`
+et `threshold_met=False`, et le sous-titre de la carte annonce cette couverture
+partielle. Cette acceptation pédagogique ne modifie pas le comportement strict
+du module pour les autres utilisateurs.
+
+La suite logicielle locale de cette version a également réussi : **722 tests
+réussis, 2 ignorés**, en **163,27 secondes**. Les tests ignorés nécessitent CUDA
+ou le runtime QGIS absent de cet environnement. Ce bilan ne décrit pas une
+exécution Windows ni une disponibilité vérifiée de Binder ou de catalogues
+distants. Voir la [validation courante](../docs/VALIDATION.md).
+
+Les résultats des sections suivantes restent ceux de leurs versions respectives.
+Les données privées des cours 11 et 12 n’ont pas été fournies pour cette
+vérification 1.4.0. L’édition HTML des 14 cours est construite, en conservant les
+sorties historiques de ces deux cours privés.
+
+## Historique du 26 octobre 2026 — sources 1.3.0
 
 Sous Linux / Python 3.12.14, les cours **00 à 10 et 13** passent dans des noyaux Jupyter réels et indépendants : **12 notebooks, 73 cellules de code exécutées, aucun échec**. Les onze cours existants représentent 66 cellules ; le nouveau diagnostic en représente sept. Les fichiers des cours 00–07, 09 et 10 ont été vérifiés sans réécrire leurs sorties enregistrées. Les cours 08 et 13 conservent leurs nouvelles sorties.
 
@@ -10,7 +44,7 @@ Le cours 08 vérifie désormais la présence des opérateurs utiles et l’unici
 
 L’édition HTML des 14 cours a été construite. Les cours privés 11 et 12 n’ont pas été réexécutés lors de cette vérification ; leurs données n’étaient pas fournies dans cet environnement. La disponibilité de Binder n’est pas testée. Le [rapport machine de la version](../docs/VALIDATION_1.3.0.json) conserve le périmètre des essais locaux ; les résultats Windows du parcours restent ceux des jobs GitHub Actions associés au commit.
 
-## Résultats du 26 septembre 2026
+## Historique du 26 septembre 2026 — paquet 1.0.1
 
 Commit du parcours : `08d711189b77451f9c79e026063193e06dee6aa6`.
 
@@ -30,7 +64,7 @@ Lors de cette validation historique, la construction HTML a réussi sur les deux
 - Les contrôles portent sur les bandes, le SCR, la résolution, les masques, les codes, les superficies, les transitions, l’égalité de deux calculs et la présence des livrables.
 - Les références de classification simulées sont séparées entre apprentissage et validation. Les scores ne constituent pas une validation sur le terrain.
 - Le cours STAC utilise un serveur HTTP local de démonstration. La disponibilité d’un catalogue distant et de Binder est hors du périmètre de ces contrôles.
-- Les cas Mvouti et okapis sont exécutés localement avec les fichiers fournis. Ils ne sont pas exécutés par le workflow public, qui ne dispose pas du ZIP.
+- Les cas Mvouti et okapis nécessitent les fichiers privés fournis localement. Leur validation historique est décrite ci-dessus ; ils n’ont pas été réexécutés avec la version 1.4.0 et ne sont pas exécutés par le workflow public, qui ne dispose pas du ZIP.
 - L’examen des cartes vérifie les titres, légendes, tables et rendus. Les mesures liées aux données sources restent soumises aux limites indiquées dans [DATA.md](DATA.md).
 
 ## Reproduire les contrôles

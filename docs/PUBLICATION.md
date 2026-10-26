@@ -1,6 +1,6 @@
 # Distribution et publication
 
-Cette fiche conserve les preuves de la publication **1.0.1 du 26 septembre 2026**. Pour les sources actuelles **1.3.0**, leur installation et leur validation, consulter la [note de version](RELEASE_1.3.0.md). Une construction ou une modification GitHub ne publie pas automatiquement une nouvelle version sur PyPI.
+Cette fiche conserve les preuves de la publication **1.0.1 du 26 septembre 2026**. Pour les sources actuelles **1.4.0**, leur installation et leur validation, consulter la [note de version](RELEASE_1.4.0.md). Une construction ou une modification GitHub ne publie pas automatiquement une nouvelle version sur PyPI.
 
 Paquet : `cartomize`. Version de l’application : **1.0**. Révision du paquet : **1.0.1**. Auteur : ONDON NKOUA Cédrick Belmich.
 

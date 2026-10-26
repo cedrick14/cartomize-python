@@ -19,3 +19,10 @@ The unchanged Cartomize icon in `cartomize/assets/cartomize.png` comes from
 `cartomize_qgis/icon.png` in the same repository, original commit
 `4790f0e152834725d989e336199f799782bc3680`. The Cartomize name and visual identity
 are attributed to Cartomize / ONDON NKOUA Cédrick Belmich.
+
+The regression samples in `tests/data/sentinel2_mvouti` contain modified
+Copernicus Sentinel data 2026. They are native pixel windows of public
+Sentinel-2 products distributed through Earth Search, including independent
+reference windows of the same ESA product. Their data terms, source URLs and
+checksums are recorded in that directory's `README.md` and `provenance.json`;
+the software license does not replace the Copernicus data terms.

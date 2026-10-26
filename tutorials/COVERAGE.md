@@ -1,6 +1,6 @@
 # Couverture des outils
 
-Le registre comprend 43 opérateurs. Cette matrice relie 35 d’entre eux aux cours qui exécutent leurs fonctions publiques. Les huit opérateurs vectoriels ajoutés en 1.3 sont documentés dans le guide SIG et vérifiés par les tests d’intégration ; un cours dédié reste à rédiger. Elle décrit la couverture pédagogique des familles, sans prétendre tester toutes les combinaisons de paramètres. Le cours 08 montre leur insertion dans des plans.
+Le registre comprend 44 opérateurs. Cette matrice relie 36 d’entre eux aux cours qui exécutent leurs fonctions publiques. Les huit opérateurs vectoriels ajoutés en 1.3 sont documentés dans le guide SIG et vérifiés par les tests d’intégration ; un cours dédié reste à rédiger. Elle décrit la couverture pédagogique des familles, sans prétendre tester toutes les combinaisons de paramètres. Le cours 08 montre leur insertion dans des plans ; le cours 13 exécute le prétraitement automatique M07.
 
 | Opérateur | Fonction | Cours |
 |---|---|---|
@@ -38,8 +38,8 @@ Le registre comprend 43 opérateurs. Cette matrice relie 35 d’entre eux aux co
 | `routing` | Plus court chemin | [06](notebooks/06_terrain_reseaux.ipynb) |
 | `stac.search` | Recherche de scènes STAC | [10](notebooks/10_catalogues_execution.ipynb) |
 | `stac.download` | Téléchargement des scènes STAC | [10](notebooks/10_catalogues_execution.ipynb) |
-
 | `imagery.audit` | Diagnostic de couverture et de lacunes | [13](notebooks/13_diagnostic_automatique.ipynb) |
+| `imagery.preprocess` | Diagnostic, sélection et préparation automatique | [13](notebooks/13_diagnostic_automatique.ipynb) |
 
 Les opérations `vector.select_attributes`, `vector.select_location`, `vector.geometry_operation`, `vector.spatial_summary`, `vector.join_attributes`, `vector.latest_records`, `vector.from_xy` et `vector.validate` sont décrites dans [SIG_WORKFLOWS.md](../docs/SIG_WORKFLOWS.md). Leur chaîne est exercée dans [test_vector_registry.py](../tests/test_vector_registry.py).
 
