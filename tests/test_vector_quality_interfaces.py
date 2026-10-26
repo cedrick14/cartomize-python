@@ -184,6 +184,8 @@ def test_desktop_quality_worker_captures_rules_and_restores_controls(tmp_path):
 def test_quality_forms_fit_compact_window(font_size, tmp_path, monkeypatch):
     app = application()
     from PySide6.QtCore import QSettings
+    from PySide6.QtTest import QTest
+    from PySide6.QtWidgets import QWidget
     import cartomize.desktop as desktop
     monkeypatch.setattr(desktop, 'QSettings', lambda *args:
                         QSettings(str(tmp_path / 'settings.ini'), QSettings.Format.IniFormat))
@@ -199,15 +201,35 @@ def test_quality_forms_fit_compact_window(font_size, tmp_path, monkeypatch):
             inner = window.stack.currentWidget()
             inner.ensureWidgetVisible(page.output)
             app.processEvents()
-            assert inner.horizontalScrollBar().maximum() == 0, {
+            initial_range = inner.horizontalScrollBar().maximum()
+            initial_geometry = (inner.viewport().size().toTuple(), page.size().toTuple())
+            # Native resize events and the zero-delay dock adjustment are
+            # asynchronous. Inspect the rendered layout, as the other compact
+            # form checks do, after Qt has delivered those pending events.
+            QTest.qWait(50)
+            inner.ensureWidgetVisible(page.output)
+            app.processEvents()
+            geometry = {
                 'operation': operation,
                 'style': app.style().objectName(),
                 'viewport': inner.viewport().size().toTuple(),
                 'page': page.size().toTuple(),
+                'minimum_size': page.minimumSize().toTuple(),
                 'minimum_hint': page.minimumSizeHint().toTuple(),
                 'layout_minimum': page.layout.minimumSize().toTuple(),
                 'frame_width': inner.frameWidth(),
+                'initial_range': initial_range,
+                'initial_geometry': initial_geometry,
+                'settled_range': inner.horizontalScrollBar().maximum(),
             }
+            if initial_range or geometry['settled_range']:
+                geometry['widest_controls'] = sorted([
+                    (child.minimumSizeHint().width(), child.width(), type(child).__name__,
+                     getattr(child, 'text', lambda: '')()[:80])
+                    for child in page.findChildren(QWidget) if child.isVisible()
+                ], reverse=True)[:8]
+                print('Quality form geometry: ' + json.dumps(geometry, ensure_ascii=False))
+            assert inner.horizontalScrollBar().maximum() == 0, json.dumps(geometry)
             assert page.output.isVisible()
             assert window.run_button.isVisible()
     finally:
