@@ -558,7 +558,12 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
         self.tool_pages={key:self.tool_pages[key] for key in order}
         self.pages=list(self.tool_pages.values());titles=['Assistant cartographique' if key=='assistant' else TOOL_LABELS[key] for key in self.tool_pages]
         for title,page in zip(titles,self.pages):
-            self.navigation.addItem(title);scroll=QScrollArea();scroll.setWidgetResizable(True);scroll.setWidget(page);self.stack.addWidget(scroll)
+            self.navigation.addItem(title)
+            scroll=QScrollArea()
+            # These panels are borderless in the theme. Explicitly remove the
+            # native frame too, so Windows and Qt agree on the viewport width.
+            scroll.setFrameShape(QScrollArea.Shape.NoFrame)
+            scroll.setWidgetResizable(True);scroll.setWidget(page);self.stack.addWidget(scroll)
             for form in page.findChildren(QFormLayout):form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.WrapAllRows)
             # Read-only diagnostics remain visible within their tool panels.
             if isinstance(page,MappingPage):

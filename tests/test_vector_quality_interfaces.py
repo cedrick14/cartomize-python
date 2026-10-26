@@ -199,7 +199,15 @@ def test_quality_forms_fit_compact_window(font_size, tmp_path, monkeypatch):
             inner = window.stack.currentWidget()
             inner.ensureWidgetVisible(page.output)
             app.processEvents()
-            assert inner.horizontalScrollBar().maximum() == 0
+            assert inner.horizontalScrollBar().maximum() == 0, {
+                'operation': operation,
+                'style': app.style().objectName(),
+                'viewport': inner.viewport().size().toTuple(),
+                'page': page.size().toTuple(),
+                'minimum_hint': page.minimumSizeHint().toTuple(),
+                'layout_minimum': page.layout.minimumSize().toTuple(),
+                'frame_width': inner.frameWidth(),
+            }
             assert page.output.isVisible()
             assert window.run_button.isVisible()
     finally:
