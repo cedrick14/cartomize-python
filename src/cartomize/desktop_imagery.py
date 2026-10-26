@@ -4,9 +4,10 @@ import json
 from pathlib import Path
 
 import rasterio
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Slot
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFormLayout, QHeaderView,
-    QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem, QFileDialog, QWidget, QHBoxLayout, QVBoxLayout)
+    QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem, QFileDialog,
+    QWidget, QVBoxLayout, QSizePolicy)
 
 import cartomize as cm
 from .desktop import Page, PathField, RASTER_FILTER, VECTOR_FILTER, spin, real
@@ -18,19 +19,33 @@ class PreparationPage(Page):
 
     def __init__(self):
         super().__init__("Prétraitement multispectral",
-            "Sélection des scènes et des bandes, mosaïque, assemblage multibande, extraction par masque et composition colorée.")
+            "Contrôler la couverture, retenir les scènes nécessaires et préparer les images de la zone d’étude.")
+        self.preparation_mode = QComboBox()
+        self.preparation_mode.addItem("Automatique : contrôler et préparer", "automatic")
+        self.preparation_mode.addItem("Expert : choisir les opérations", "expert")
+        self.preparation_mode.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
+        self.preparation_mode.setMinimumContentsLength(15)
+        self.preparation_mode.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        self.preparation_mode.setToolTip("Automatique : diagnostic recalculé à chaque lancement, sélection des scènes et mosaïque selon la couverture. Expert : choix explicite des opérations sans imposer le seuil de couverture.")
+        self.form.addRow("Mode de préparation", self.preparation_mode)
         self.files = []
         self.source = PathField("directory")
         self.mode = QComboBox()
         self.mode.addItem("Landsat, Sentinel-2 ou manifeste de scènes", "auto")
         self.mode.addItem("Bandes personnalisées : correspondance manuelle", "manual")
+        self.mode.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
+        self.mode.setMinimumContentsLength(15)
+        self.mode.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        self.mode.setToolTip("Reconnaissance des produits Landsat/Sentinel-2 et des manifestes, ou correspondance manuelle de fichiers personnalisés.")
+        for index in range(self.mode.count()):
+            self.mode.setItemData(index, self.mode.itemText(index), Qt.ItemDataRole.ToolTipRole)
         self.form.addRow("Identification des bandes", self.mode)
         self.form.addRow("Répertoire des scènes", self.source)
         select = QPushButton("Sélectionner les bandes…")
         clear = QPushButton("Utiliser le répertoire")
         select.clicked.connect(self.select_files)
         clear.clicked.connect(self.clear_files)
-        selection_controls=QWidget();selection_row=QHBoxLayout(selection_controls);selection_row.setContentsMargins(0,0,0,0)
+        selection_controls=QWidget();selection_row=QVBoxLayout(selection_controls);selection_row.setContentsMargins(0,0,0,0)
         selection_row.addWidget(select);selection_row.addWidget(clear);self.form.addRow(selection_controls)
         inspect = QPushButton("Analyser les bandes")
         inspect.clicked.connect(self.inspect_inputs)
@@ -47,12 +62,58 @@ class PreparationPage(Page):
         note = QLabel("Cocher les bandes à traiter. En mode personnalisé, renseigner le même identifiant de scène pour les bandes d’une acquisition et le même nom spectral entre scènes (red, green, blue, nir…). Vérifier les facteurs de calibration.")
         note.setWordWrap(True)
         self.form.addRow(note)
+        self.quality_masks = QTableWidget(0, 4)
+        self.quality_masks.setHorizontalHeaderLabels(["Scène", "Qualité", "Type", "Saturation"])
+        self.quality_masks.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.quality_masks.verticalHeader().hide()
+        self.quality_masks.setToolTip("Sélectionner une scène pour associer ses fichiers de qualité et de saturation. Les chemins complets s’affichent au survol. Le type de masque est choisi dans la troisième colonne.")
+        self.quality_masks.setMinimumHeight(90)
+        self.quality_masks.setMaximumHeight(155)
+        self.form.addRow("Masques associés aux scènes", self.quality_masks)
+        mask_controls = QWidget()
+        mask_row = QVBoxLayout(mask_controls)
+        mask_row.setContentsMargins(0, 0, 0, 0)
+        quality_button = QPushButton("Associer un masque…")
+        saturation_button = QPushButton("Associer la saturation…")
+        quality_button.clicked.connect(lambda: self.select_mask(1))
+        saturation_button.clicked.connect(lambda: self.select_mask(3))
+        mask_row.addWidget(quality_button)
+        mask_row.addWidget(saturation_button)
+        self.form.addRow(mask_controls)
         self.aoi = PathField(filter=VECTOR_FILTER)
         self.form.addRow("Couche de délimitation", self.aoi)
         self.coverage_threshold = real(100.)
         self.coverage_threshold.setRange(.01, 100.)
         self.coverage_threshold.setDecimals(2)
         self.form.addRow("Couverture utile minimale (%)", self.coverage_threshold)
+        self.allow_partial = QCheckBox("Accepter moins que le seuil")
+        self.allow_partial.setToolTip("Autoriser explicitement une couverture utile insuffisante. Le résultat conserve les lacunes en NoData et porte la mention de couverture partielle ; un résultat sans pixel utile reste refusé.")
+        self.form.addRow(self.allow_partial)
+        self.catalog_enabled = QCheckBox("Compléter depuis un catalogue")
+        self.catalog_enabled.setToolTip("Si la couverture est insuffisante, rechercher et télécharger les scènes dans le catalogue STAC indiqué, dans les limites choisies. Sans fichier local, renseigner les bandes à obtenir.")
+        self.form.addRow(self.catalog_enabled)
+        self.catalog_endpoint = QLineEdit()
+        self.catalog_endpoint.setPlaceholderText("Adresse du service STAC")
+        self.catalog_collections = QLineEdit()
+        self.catalog_collections.setPlaceholderText("Identifiants séparés par des virgules")
+        self.catalog_dates = QLineEdit()
+        self.catalog_dates.setPlaceholderText("2026-08-01/2026-08-31")
+        self.catalog_bands = QLineEdit()
+        self.catalog_bands.setPlaceholderText("Exemple : blue,green,red,nir")
+        self.catalog_max_items = spin(10, 1, 1000)
+        self.catalog_max_mb = spin(1000, 1, 1_000_000)
+        self.catalog_timeout = spin(60, 1, 300)
+        self._catalog_fields = [self.catalog_endpoint, self.catalog_collections, self.catalog_dates,
+                                self.catalog_bands, self.catalog_max_items, self.catalog_max_mb,
+                                self.catalog_timeout]
+        for label, control in [("Catalogue STAC", self.catalog_endpoint),
+                               ("Collections", self.catalog_collections),
+                               ("Période de recherche", self.catalog_dates),
+                               ("Bandes à obtenir", self.catalog_bands),
+                               ("Nombre maximal de scènes", self.catalog_max_items),
+                               ("Téléchargement maximal (Mo)", self.catalog_max_mb),
+                               ("Délai par requête (s)", self.catalog_timeout)]:
+            self.form.addRow(label, control)
         self.audit_button = QPushButton("Diagnostiquer la couverture")
         self.audit_button.clicked.connect(self.diagnose_coverage)
         self.apply_audit_button = QPushButton("Appliquer la sélection proposée")
@@ -99,15 +160,17 @@ class PreparationPage(Page):
         self.crs = QLineEdit()
         self.crs.setPlaceholderText("Automatique ; exemple : EPSG:32733")
         self.resolution = spin(0, 0, 100000)
-        self.resolution.setSpecialValueText("Résolution native la plus grossière")
+        self.resolution.setSpecialValueText("Résolution native")
+        self.resolution.setToolTip("Sans résolution explicite, conserver la résolution native la plus grossière des bandes sélectionnées. Une recherche sans images locales exige une résolution choisie.")
         self.resampling = QComboBox()
         for label,value in [('Plus proche voisin','nearest'),('Bilinéaire','bilinear'),('Cubique','cubic'),('Moyenne','average')]:self.resampling.addItem(label,value)
         self.overlap = QComboBox()
         self.overlap.addItem('Première scène valide','first');self.overlap.addItem('Dernière scène valide','last')
-        self.saturation = QCheckBox('Appliquer le masque de saturation disponible');self.saturation.setChecked(True)
+        self.saturation = QCheckBox('Masquer les pixels saturés');self.saturation.setChecked(True)
+        self.saturation.setToolTip('Appliquer le masque de saturation lorsqu’il est disponible.')
         self.clouds = QCheckBox("Appliquer les masques QA/SCL")
         self.clouds.setChecked(True)
-        self.dates = QCheckBox("Autoriser les dates différentes ou inconnues")
+        self.dates = QCheckBox("Autoriser le mélange des dates")
         self.dates.setToolTip("Autoriser une mosaïque multitemporelle ou des scènes dont la date d’acquisition est inconnue.")
         for label, control in [("Système de coordonnées cible", self.crs), ("Résolution (m)", self.resolution),
                                ("Rééchantillonnage spectral", self.resampling), ("Recouvrement des scènes", self.overlap), ("Saturation", self.saturation), ("Masque de qualité", self.clouds), ("Dates d’acquisition", self.dates)]:
@@ -121,6 +184,18 @@ class PreparationPage(Page):
         self.form.addRow(self.summary)
         self.layout.addStretch()
         self.assets.itemChanged.connect(self.refresh_bands)
+        self.quality_masks.itemChanged.connect(self.mask_changed)
+        self.preparation_mode.currentIndexChanged.connect(self.refresh_options)
+        self.preparation_mode.currentIndexChanged.connect(self.invalidate_diagnostic)
+        self.allow_partial.toggled.connect(self.refresh_options)
+        self.catalog_enabled.toggled.connect(self.refresh_options)
+        self.catalog_enabled.toggled.connect(self.refresh_bands)
+        self.catalog_bands.textChanged.connect(self.refresh_bands)
+        for control in self._catalog_fields:
+            if isinstance(control, QLineEdit):
+                control.textChanged.connect(self.invalidate_diagnostic)
+            else:
+                control.valueChanged.connect(self.invalidate_diagnostic)
         self.source.edit.textChanged.connect(self.invalidate_inputs)
         self.mode.currentIndexChanged.connect(self.invalidate_inputs)
         self.aoi.edit.textChanged.connect(lambda text: self.clip.setChecked(bool(text.strip())))
@@ -161,6 +236,7 @@ class PreparationPage(Page):
 
     def load_inputs(self):
         self.assets.setRowCount(0)
+        self.quality_masks.setRowCount(0)
         sources = list(self.files) if self.files else self.source.text()
         if not sources:
             raise ValueError("Sélectionner les bandes ou le répertoire des scènes.")
@@ -180,7 +256,6 @@ class PreparationPage(Page):
             if not bands:
                 raise ValueError("Aucune bande raster trouvée.")
             scenes = [cm.Scene("scene_1", {key: band for key, (_, band) in bands.items()}, sensor="custom")]
-            self.clouds.setChecked(False)
         self.assets.blockSignals(True)
         for scene in scenes:
             metadata = asdict(scene)
@@ -207,8 +282,11 @@ class PreparationPage(Page):
 
     def refresh_bands(self, *_):
         self.invalidate_diagnostic()
+        self.refresh_masks()
         names = list(dict.fromkeys(self.assets.item(row, 2).text().strip() for row in range(self.assets.rowCount())
             if self.assets.item(row, 2) and self.assets.cellWidget(row, 0) and self.assets.cellWidget(row, 0).isChecked()))
+        if self.catalog_enabled.isChecked() and self.catalog_bands.text().strip():
+            names = list(dict.fromkeys(name.strip() for name in self.catalog_bands.text().split(',') if name.strip()))
         for control, default in [(self.rgb_red, "red"), (self.rgb_green, "green"), (self.rgb_blue, "blue")]:
             previous = control.currentData() or default
             control.clear()
@@ -218,15 +296,103 @@ class PreparationPage(Page):
             index = control.findData(previous)
             control.setCurrentIndex(max(0, index))
 
+    def mask_parameters(self):
+        masks = {}
+        for row in range(self.quality_masks.rowCount()):
+            scene = self.quality_masks.item(row, 0).text()
+            quality = self.quality_masks.item(row, 1).text().strip()
+            kind = self.quality_masks.cellWidget(row, 2).currentData()
+            saturation = self.quality_masks.item(row, 3).text().strip()
+            masks[scene] = dict(quality=quality or None, quality_kind=kind if quality else None,
+                                saturation=saturation or None)
+        return masks
+
+    def mask_changed(self, item):
+        if item is not None and item.toolTip() != item.text():
+            self.quality_masks.blockSignals(True)
+            item.setToolTip(item.text())
+            self.quality_masks.blockSignals(False)
+        self.invalidate_diagnostic()
+
+    def refresh_masks(self):
+        """Keep each scene's explicit masks when its band selection changes."""
+        previous = self.mask_parameters()
+        scenes = {}
+        for row in range(self.assets.rowCount()):
+            name = self.assets.item(row, 1)
+            asset = self.assets.item(row, 3)
+            if name is None or asset is None or not name.text().strip():
+                continue
+            scene_id = name.text().strip()
+            scenes.setdefault(scene_id, previous.get(scene_id, asset.data(Qt.ItemDataRole.UserRole)['scene']))
+        self.quality_masks.blockSignals(True)
+        self.quality_masks.setRowCount(0)
+        for scene_id, metadata in scenes.items():
+            row = self.quality_masks.rowCount()
+            self.quality_masks.insertRow(row)
+            label = QTableWidgetItem(scene_id)
+            label.setToolTip(scene_id)
+            label.setFlags(label.flags() & ~Qt.ItemFlag.ItemIsEditable)
+            self.quality_masks.setItem(row, 0, label)
+            self.quality_masks.setItem(row, 1, QTableWidgetItem(str(metadata.get('quality') or '')))
+            self.quality_masks.item(row, 1).setToolTip(str(metadata.get('quality') or ''))
+            choice = QComboBox()
+            for text, kind in [("Choisir le type", None), ("Pixels non nuls valides", 'valid_mask'),
+                               ("Landsat QA_PIXEL", 'landsat_qa'), ("Sentinel-2 SCL", 'sentinel_scl')]:
+                choice.addItem(text, kind)
+                choice.setItemData(choice.count() - 1, text, Qt.ItemDataRole.ToolTipRole)
+            choice.setCurrentIndex(max(0, choice.findData(metadata.get('quality_kind'))))
+            choice.setMinimumContentsLength(6)
+            choice.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
+            choice.setToolTip(choice.currentText())
+            choice.currentTextChanged.connect(choice.setToolTip)
+            choice.currentIndexChanged.connect(self.invalidate_diagnostic)
+            self.quality_masks.setCellWidget(row, 2, choice)
+            self.quality_masks.setItem(row, 3, QTableWidgetItem(str(metadata.get('saturation') or '')))
+            self.quality_masks.item(row, 3).setToolTip(str(metadata.get('saturation') or ''))
+        self.quality_masks.blockSignals(False)
+
+    def select_mask(self, column):
+        row = self.quality_masks.currentRow()
+        if row < 0 and self.quality_masks.rowCount() == 1:
+            row = 0
+        if row < 0:
+            self.inventory.setText("Sélectionner une scène dans le tableau des masques.")
+            return
+        title = "Masque de qualité" if column == 1 else "Masque de saturation Landsat"
+        path = QFileDialog.getOpenFileName(self, title, filter=RASTER_FILTER)[0]
+        if path:
+            self.quality_masks.item(row, column).setText(path)
+
     def refresh_options(self, *_):
+        automatic = self.preparation_mode.currentData() == 'automatic'
+        self.mosaic.setEnabled(not automatic)
+        self.clip.setEnabled(not automatic)
+        self.allow_partial.setEnabled(automatic)
+        self.catalog_enabled.setEnabled(automatic)
+        for control in self._catalog_fields:
+            control.setEnabled(automatic and self.catalog_enabled.isChecked())
+            control.setVisible(self.catalog_enabled.isChecked())
+            self.form.labelForField(control).setVisible(self.catalog_enabled.isChecked())
         for control in (self.rgb_red, self.rgb_green, self.rgb_blue):
             control.setEnabled(self.colour.isChecked())
-        self.summary.setText("Sortie : " + ("scènes assemblées" if self.mosaic.isChecked() else "un dossier par scène") +
-            ". Les bandes scientifiques et la composition colorée sont enregistrées dans des fichiers distincts. Le dossier de résultats doit être nouveau.")
+        if automatic:
+            policy = ("Une couverture sous le seuil est explicitement acceptée et sera signalée."
+                      if self.allow_partial.isChecked() else "Une couverture sous le seuil arrête la préparation et conserve le diagnostic.")
+            self.summary.setText("À chaque lancement : contrôle des données, nouveau diagnostic, choix des scènes, mosaïque si nécessaire et découpage à la zone. " + policy +
+                " Les produits scientifiques et la composition colorée restent distincts. Choisir un nouveau dossier de résultats.")
+        else:
+            self.summary.setText("Mode expert : " + ("scènes assemblées" if self.mosaic.isChecked() else "un dossier par scène") +
+                ". Le seuil de couverture n’est pas imposé à la production. Le diagnostic reste disponible séparément. Les bandes scientifiques et la composition colorée sont enregistrées dans des fichiers distincts.")
 
     def restore_controls(self):
         for row in range(self.assets.rowCount()):
             self.assets.cellWidget(row, 0).toggled.connect(self.refresh_bands)
+        for row in range(self.quality_masks.rowCount()):
+            choice = self.quality_masks.cellWidget(row, 2)
+            choice.currentIndexChanged.connect(self.invalidate_diagnostic)
+            choice.setToolTip(choice.currentText())
+            choice.currentTextChanged.connect(choice.setToolTip)
         self.refresh_options()
         self.invalidate_diagnostic()
 
@@ -286,6 +452,9 @@ class PreparationPage(Page):
         if path.suffix.lower() != '.json':
             return
         record = json.loads(path.read_text(encoding='utf-8'))
+        if record.get('schema') == 'cartomize.imagery.automatic.v1':
+            self.show_automatic_result(path, record)
+            return
         if record.get('schema') != 'cartomize.imagery.audit.v1':
             return
         if self._pending_audit_generation != self._audit_generation:
@@ -323,6 +492,36 @@ class PreparationPage(Page):
         self.coverage_scenes.setVisible(bool(record.get('scenes')))
         self.apply_audit_button.setEnabled(bool(record.get('recommended_scene_ids')))
 
+    def show_automatic_result(self, path, record):
+        current = self._pending_audit_generation == self._audit_generation
+        audit_path = record.get('audit')
+        if audit_path:
+            self.show_result(audit_path)
+        if not current:
+            return
+        partial = record.get('status') == 'partial'
+        label = "Préparation terminée avec couverture partielle" if partial else "Préparation terminée : zone entièrement couverte"
+        selected = ', '.join(record.get('selected_scene_ids', [])) or 'Consulter le rapport'
+        coverage = (self._audit_report or {}).get('usable_percent', record.get('usable_percent', 0.))
+        percentage = f'{coverage:.2f}'.replace('.', ',')
+        threshold = f"{record.get('coverage_threshold', self.coverage_threshold.value()):.2f}".replace('.', ',')
+        policy = ("Seuil demandé atteint." if record.get('threshold_met') else
+                  "Résultat sous le seuil accepté explicitement ; les lacunes restent sans données.")
+        self.coverage_summary.setText(f"{label}.\nCouverture utile : {percentage} % ; seuil : {threshold} %.\n"
+                                      f"{policy}\nScènes retenues : {selected}.\n"
+                                      "Diagnostic, cartes de lacunes et résultats disponibles dans le projet.")
+        self.apply_audit_button.setEnabled(False)
+        if partial:
+            window = self.window()
+            if hasattr(window, 'status'):
+                window.status.setText("Traitement terminé avec couverture partielle : " + str(path))
+                window.workspace.activity.setText("Traitement terminé avec couverture partielle.")
+
+    @Slot(str)
+    def show_rejected_coverage(self, path):
+        """Keep the selected tool's coverage explanation after a rejected run."""
+        self.show_result(path)
+
     def apply_audit_proposal(self):
         report = self._audit_report
         if not report:
@@ -347,12 +546,16 @@ class PreparationPage(Page):
 
     def selected_scenes(self):
         groups = {}
+        masks = self.mask_parameters()
         for row in range(self.assets.rowCount()):
             if not self.assets.cellWidget(row, 0).isChecked():
                 continue
             scene, name, path, index, scale, offset, date = [self.assets.item(row, col).text().strip() for col in range(1, 8)]
             raw = self.assets.item(row, 3).data(Qt.ItemDataRole.UserRole)
             metadata = {**raw["scene"], "scene_id": scene, "acquired": date or None}
+            metadata.update(masks.get(scene, {}))
+            if metadata.get('quality') and not metadata.get('quality_kind'):
+                raise ValueError("Choisir le type du masque de qualité pour la scène : " + scene)
             group = groups.setdefault(scene, dict(metadata=metadata, bands={}))
             if group["metadata"] != metadata:
                 raise ValueError("Métadonnées différentes pour une même scène : " + scene)
@@ -364,21 +567,59 @@ class PreparationPage(Page):
             raise ValueError("Cocher au moins une bande.")
         return [cm.Scene(bands=value["bands"], **value["metadata"]) for value in groups.values()]
 
+    def catalog_parameters(self):
+        if not self.catalog_enabled.isChecked():
+            return None
+        endpoint = self.catalog_endpoint.text().strip()
+        if not endpoint:
+            raise ValueError("Renseigner l’adresse du catalogue STAC pour rechercher des scènes.")
+        collections = [value.strip() for value in self.catalog_collections.text().split(',') if value.strip()]
+        return dict(endpoint=endpoint, collections=collections,
+                    datetime_range=self.catalog_dates.text().strip() or None,
+                    max_items=self.catalog_max_items.value(),
+                    max_bytes=self.catalog_max_mb.value() * 1_000_000,
+                    timeout=self.catalog_timeout.value())
+
     def job(self, options):
         if self._next_action == 'audit':
             return self.audit_job()
-        if not self.assets.rowCount():
+        automatic = self.preparation_mode.currentData() == 'automatic'
+        catalog = self.catalog_parameters() if automatic else None
+        if not self.assets.rowCount() and (self.files or self.source.text()):
             self.load_inputs()
-        scenes = self.selected_scenes()
-        if self.clip.isChecked() and not self.aoi.text():
+        scenes = self.selected_scenes() if self.assets.rowCount() else []
+        if not scenes and catalog is None:
+            raise ValueError("Sélectionner les bandes ou le répertoire des scènes.")
+        if automatic and not self.aoi.text():
+            raise ValueError("Sélectionner la zone d’étude pour le prétraitement automatique.")
+        if not automatic and self.clip.isChecked() and not self.aoi.text():
             raise ValueError("Charger la couche de délimitation pour l’extraction par masque.")
+        band_order = None
+        if catalog is not None:
+            band_order = tuple(name.strip() for name in self.catalog_bands.text().split(',') if name.strip()) or None
+            if not scenes and not band_order:
+                raise ValueError("Renseigner les bandes à obtenir pour une recherche sans images locales (par exemple red,nir).")
+            if not scenes and (not self.crs.text().strip() or not self.resolution.value()):
+                raise ValueError("Renseigner le système projeté cible et la résolution pour une recherche sans images locales.")
+        missing_masks = [scene.scene_id for scene in scenes if scene.quality is None]
+        if self.clouds.isChecked() and missing_masks:
+            raise ValueError("Associer un masque de qualité aux scènes : " + ', '.join(missing_masks) +
+                             ". Sans masque disponible, désactiver explicitement l’application des masques QA/SCL.")
         rgb = tuple(control.currentData() for control in (self.rgb_red, self.rgb_green, self.rgb_blue)) if self.colour.isChecked() else None
         if rgb and None in rgb:
             raise ValueError("Affecter une bande à chacun des trois canaux rouge, vert et bleu.")
         destination = self.result_destination()
-        kwargs = dict(aoi=self.aoi.text() if self.clip.isChecked() else None, mosaic=self.mosaic.isChecked(),
+        kwargs = dict(aoi=self.aoi.text() if automatic or self.clip.isChecked() else None,
             multiband=self.multiband.isChecked(), separate_bands=self.separate.isChecked(), composition=rgb,
             target_crs=self.crs.text().strip() or None, resolution=self.resolution.value() or None,
             mask_clouds=self.clouds.isChecked(), mask_saturation=self.saturation.isChecked(), resampling=self.resampling.currentData(), overlap=self.overlap.currentData(), allow_mixed_dates=self.dates.isChecked())
-        return lambda progress, cancel, stage: cm.process_imagery(scenes, destination,
+        if not automatic:
+            kwargs['mosaic'] = self.mosaic.isChecked()
+            return lambda progress, cancel, stage: cm.process_imagery(scenes, destination,
+                progress=progress, cancel=cancel, stage=stage, **kwargs).manifest
+        kwargs.update(coverage_threshold=self.coverage_threshold.value(), allow_partial=self.allow_partial.isChecked(),
+                      catalog=catalog, band_order=band_order)
+        self.invalidate_diagnostic()
+        self._pending_audit_generation = self._audit_generation
+        return lambda progress, cancel, stage: cm.preprocess_imagery(scenes, destination,
             progress=progress, cancel=cancel, stage=stage, **kwargs).manifest

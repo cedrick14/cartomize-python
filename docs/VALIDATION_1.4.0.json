@@ -1,0 +1,141 @@
+{
+  "schema": "cartomize.release_validation.v1",
+  "source_version": "1.4.0",
+  "date": "2026-10-26",
+  "baseline_commit": "243417da4cebafceaef58ec94db510529f910da9",
+  "scope": "Completed module M07, local Linux validation of final source and installed wheel; remote CI attached separately to the published commit.",
+  "environment": {
+    "system": "Linux",
+    "python": "3.12.14",
+    "dependencies": {
+      "rasterio": "1.5.2",
+      "geopandas": "1.2.0",
+      "shapely": "2.2.0",
+      "pyproj": "3.8.0",
+      "numpy": "2.5.4",
+      "pandas": "3.1.0",
+      "scipy": "1.18.1",
+      "scikit-learn": "1.9.1",
+      "PySide6-Essentials": "6.9.3",
+      "pytest": "9.1.1",
+      "nbclient": "0.11.0",
+      "ipykernel": "7.4.0"
+    }
+  },
+  "tests": {
+    "collected": 724,
+    "passed": 722,
+    "skipped": 2,
+    "failed": 0,
+    "seconds": 163.27,
+    "skipped_reasons": [
+      "CUDA device/runtime unavailable",
+      "QGIS runtime not configured"
+    ],
+    "command": "QT_QPA_PLATFORM=offscreen MPLBACKEND=Agg OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 python -m pytest --timeout=90 --disable-warnings",
+    "network_regressions": "Actual local HTTP server: polygon STAC search, pagination, bounded downloads, QA companions, broken chunked transfers and invalid status lines; eight HTTP failure cases preserve diagnostics and previous useful acquisitions."
+  },
+  "notebooks": {
+    "passed": 1,
+    "failed": 0,
+    "executed_code_cells": 7,
+    "slugs": [
+      "13_diagnostic_automatique"
+    ],
+    "method": "Fresh real Jupyter kernel; automatic refusal, valid mosaic, NDVI and zonal statistics.",
+    "other_notebooks": "The complete autonomous course is executed by the Linux and Windows tutorial CI workflows; historical local results are in VALIDATION_1.3.0.json.",
+    "html_exported": 14,
+    "excluded": [
+      "Private courses 11 and 12 require Tuto.zip."
+    ]
+  },
+  "real_sentinel": {
+    "fixture": "tests/data/sentinel2_mvouti",
+    "source_item": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2C_33MTR_20260721_0_L2A",
+    "reference_item": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T33MTR_20260721T093314_L2A",
+    "same_esa_product": "S2C_MSIL2A_20260721T092031_N0512_R093_T33MTR_20260721T143510.SAFE",
+    "native_grid": {
+      "crs": "EPSG:32733",
+      "resolution": 10,
+      "width": 128,
+      "height": 128
+    },
+    "valid_pixels": 16384,
+    "usable_percent": 100,
+    "independent_reference_values_compared": 32768,
+    "reference_minus_legacy_dn": 1000,
+    "effective_calibration": {
+      "scale": 0.0001,
+      "offset": 0
+    },
+    "reference_means": {
+      "red": 0.07378505859375001,
+      "nir": 0.2001044860839844
+    },
+    "gui_worker": "passed with the same real scene, quality mask, calibration, scientific output and transfer to indices",
+    "missing_strip": {
+      "added_width_m": 20,
+      "missing_pixels": 256,
+      "production": "refused",
+      "diagnostic": "preserved"
+    },
+    "attribution": "Contains modified Copernicus Sentinel data 2026",
+    "license": "https://sentinels.copernicus.eu/documents/247904/690755/Sentinel_Data_Legal_Notice"
+  },
+  "distribution": {
+    "wheel_build": "passed",
+    "wheel_twine_strict": "passed",
+    "wheel": "cartomize-1.4.0-py3-none-any.whl",
+    "wheel_bytes": 398501,
+    "wheel_sha256": "8a71eab073771fc06074bdaf8ce4829130e72e083fe47a2d8de1d2366bdf8e35",
+    "source_archive_check": "scripts/check_release.py: modules, metadata, documentation, tests and all real/reference data files verified.",
+    "source_archive_build": "passed",
+    "twine_strict": "passed",
+    "archive_content_checks": "passed"
+  },
+  "isolated_install": {
+    "status": "passed",
+    "python": "3.12.14",
+    "pip_check": "passed",
+    "checks": [
+      "installed desktop and 20 tool pages",
+      "light dark and system appearance",
+      "GeoTIFF import and NDVI calculation",
+      "installed imagery coverage audit: 5 usable pixels of 8, gap rasters and recommendation",
+      "automatic preparation: 62.5% refused with persistent gaps; complementary scene produces exactly 100%",
+      "calibrated zonal statistics: mean 1.5, sum 7.5 and observed coverage 62.5%",
+      "GeoPackage import and 200 m vector buffer",
+      "PDF PNG and SVG map exports",
+      "project save and reopen",
+      "installed Python console kernel"
+    ],
+    "method": "Clean virtual environment, final wheel installed with gui extra, isolated Python outside source checkout."
+  },
+  "desktop_review": {
+    "platform": "Qt offscreen on Linux",
+    "window_size": [
+      1440,
+      940
+    ],
+    "font_sizes": [
+      12,
+      16
+    ],
+    "imagery_form_horizontal_scroll": 0,
+    "views": [
+      "scene and mask assignment",
+      "coverage policy",
+      "optional STAC catalogue"
+    ],
+    "real_raster_rendered": true,
+    "browse_and_execute_controls_accessible": true
+  },
+  "not_validated_locally": [
+    "Native CUDA calculations",
+    "Native QGIS/ArcPy in this local environment",
+    "Whole-scene memory/performance benchmarks",
+    "Private catalogue authentication",
+    "Binder availability and continuous availability of remote STAC providers"
+  ],
+  "scope_limit": "Optical imagery preparation with compatible scenes. Atmospheric correction of level-1 products, SAR chains and remaining thematic procedures keep their own inventory status."
+}

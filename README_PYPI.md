@@ -1,6 +1,6 @@
 # Cartomize
 
-**Version 1.3.0**
+**Version 1.4.0**
 
 Cartomize provides a Python API, a command-line interface and a desktop application for geospatial processing and cartographic production. It runs independently of QGIS and ArcGIS Pro. Native project bridges are optional.
 
@@ -18,7 +18,7 @@ python -m cartomize gui
 For a downloaded wheel:
 
 ```bash
-python -m pip install "./cartomize-1.3.0-py3-none-any.whl[gui]"
+python -m pip install "./cartomize-1.4.0-py3-none-any.whl[gui]"
 ```
 
 For the current GitHub sources:
@@ -59,9 +59,11 @@ Imported files are available for viewing and transfer to compatible processing t
 | Classification | Random forests, extra trees, K-means, validation and saved models |
 | Terrain and networks | Terrain derivatives, convolution, D8 drainage, watersheds and shortest paths |
 | Cartography | 24 templates, symbology, labels, legends, scale bars, multiple frames, atlases and PDF/PNG/SVG export |
-| Automation | 43 registered operators, processing plans, reusable recipes, batch production and saved sessions |
+| Automation | 44 registered operators, processing plans, reusable recipes, batch production and saved sessions |
 
 Optional Dask and CUDA execution is available for supported operators. Native GIS bridges and CUDA hardware execution require the corresponding runtime.
+
+Version 1.4.0 adds a complete automatic optical-imagery workflow: a fixed-grid coverage check controls scene selection, mosaicking and optional bounded STAC replenishment. Blocked runs preserve actionable diagnostics, and partial output requires an explicit policy. STAC scientific bands, QA/SCL, saturation and calibration metadata are connected through the same engine in Python, the CLI, plans and the desktop. See the [automatic workflow](https://github.com/cedrick14/cartomize-python/blob/main/docs/IMAGERY_AUTOMATIC.md).
 
 Version 1.3.0 also preserves large integer vector keys and typed classification labels, applies raster scale/offset in zonal statistics by default, and attaches route endpoints to the nearest segment by default. Explicit raw-value and vertex-snapping modes remain available. See the [release and migration notes](https://github.com/cedrick14/cartomize-python/blob/main/docs/RELEASE_1.3.0.md).
 

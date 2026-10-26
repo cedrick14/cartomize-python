@@ -67,6 +67,7 @@ def test_selected_bands_pipeline_and_portable_session(application, write_raster,
         assert src.tags()['source_bands']=='(4, 3, 2)'
     expected_products = {record['products'][0]['multiband'], record['products'][0]['composition'],
                          record['products'][0]['source_index'],
+                         record['coverage'], record['gaps'],
                          *(band['path'] for band in record['products'][0]['bands'].values())}
     assert {layer['data'] for layer in restored.results} == expected_products
     assert record['products'][0]['report'] in restored.workspace.records
@@ -80,7 +81,9 @@ def test_manual_bands_and_unchecked_mosaic(application, write_raster, tmp_path):
     files=[str(write_raster(name+'.tif',np.full((2,2),value,dtype='float32')))
            for name,value in [('a_red',0),('a_nir',2),('b_red',10),('b_nir',12)]]
     window=CartomizeWindow();window.select_tool('prepare');page=window.tool('prepare')
+    page.preparation_mode.setCurrentIndex(page.preparation_mode.findData('expert'))
     page.mode.setCurrentIndex(1);page.files=files;page.load_inputs()
+    page.clouds.setChecked(False)
     for row in range(4):
         page.assets.item(row,1).setText('A' if row<2 else 'B')
         page.assets.item(row,2).setText('red' if row%2==0 else 'nir')

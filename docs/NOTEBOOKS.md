@@ -1,6 +1,6 @@
 # Utilisation dans Jupyter
 
-Cartomize possède un seul moteur Python. Les cellules d’un notebook peuvent appeler ses fonctions sans interface graphique ; un notebook local peut aussi ouvrir la fenêtre de bureau si les dépendances graphiques sont installées. Les sources de ce dépôt correspondent à la version **1.3.0**.
+Cartomize possède un seul moteur Python. Les cellules d’un notebook peuvent appeler ses fonctions sans interface graphique ; un notebook local peut aussi ouvrir la fenêtre de bureau si les dépendances graphiques sont installées. Les sources de ce dépôt correspondent à la version **1.4.0**.
 
 ## 1. Appeler les modules depuis les cellules
 
@@ -33,16 +33,32 @@ Redémarrer le noyau après installation ou modification de modules déjà impor
 ```python
 import cartomize as cm
 
-diagnostic = cm.audit_imagery(
-    "donnees/scenes", "resultats/diagnostic_01",
-    aoi="donnees/zone_etude.gpkg",
-    band_order=["red", "nir"],
-)
-print(diagnostic.report["usable_percent"])
-print(diagnostic.report["recommended_action"])
+try:
+    images = cm.preprocess_imagery(
+        "donnees/scenes", "resultats/pretraitement_01",
+        aoi="donnees/zone_etude.gpkg",
+        band_order=["red", "nir"], coverage_threshold=100,
+    )
+except cm.ImageryCoverageError as erreur:
+    print(erreur.report["usable_percent"], erreur.diagnostic.gaps)
+else:
+    print(images.report["status"], images.report["selected_scene_ids"])
+    print(images.products[0]["multiband"])
 ```
 
-Les chemins désignent ici les données de l’étude ; le dossier de diagnostic doit être nouveau. Pour un exemple immédiatement exécutable sur des données générées, ouvrir le [cours 13 — diagnostic et préparation automatiques](../tutorials/notebooks/13_diagnostic_automatique.ipynb). Les [règles de qualité, dates et couverture](IMAGERY_AUDIT.md) restent applicables depuis les cellules.
+Les chemins désignent ici les données de l’étude ; le dossier de résultat doit
+être nouveau. Le [module M07](IMAGERY_AUTOMATIC.md) contrôle la couverture et
+effectue la sélection et la mosaïque dans le même appel. `audit_imagery()` reste
+disponible pour un diagnostic seul.
+
+Pour un exemple immédiatement exécutable sur des données générées, ouvrir le
+[cours 13 — diagnostic et préparation automatiques](../tutorials/notebooks/13_diagnostic_automatique.ipynb).
+Ses **sept cellules de code ont été exécutées avec Cartomize 1.4.0** : arrêt
+pour couverture insuffisante, diagnostic conservé, mosaïque complète, NDVI et
+statistiques zonales. Le [rapport du parcours](../tutorials/VALIDATION.md)
+distingue cette exécution des validations des versions précédentes. Les
+[règles de qualité, dates et couverture](IMAGERY_AUDIT.md) s’appliquent aussi
+depuis les cellules.
 
 ## 2. Ouvrir la fenêtre depuis un notebook local
 

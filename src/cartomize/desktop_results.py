@@ -336,7 +336,7 @@ class ResultsWorkspace(QWidget):
                 return candidate.resolve() if candidate.suffix.lower() in SUPPORTED and candidate.is_file() else None
             for key in ('outputs','maps'):
                 primary.extend(p for value in record.get(key,[]) if (p:=valid(value)))
-            if record.get('schema')=='cartomize.imagery.result.v1' or path.name=='imagery.json':
+            if record.get('schema') in {'cartomize.imagery.result.v1','cartomize.imagery.automatic.v1'} or path.name=='imagery.json':
                 for product in record.get('products',[]):
                     for key in ('composition','multiband'):
                         if p:=valid(product.get(key)): primary.append(p)
@@ -348,7 +348,14 @@ class ResultsWorkspace(QWidget):
                     if p:=valid(product.get('report')):
                         self.register(dict(data=str(p),name='Rapport de préparation ; '+', '.join(product.get('scenes',[]))))
                         products.append(p)
-            if record.get('schema')=='cartomize.imagery.audit.v1':
+            if record.get('schema')=='cartomize.imagery.automatic.v1':
+                if p:=valid(record.get('audit')):
+                    self.register(dict(data=str(p),name='Diagnostic de couverture avant production'))
+                    products.append(p)
+                if p:=valid(record.get('preparation')):
+                    self.register(dict(data=str(p),name='Rapport des produits préparés'))
+                    products.append(p)
+            if record.get('schema') in {'cartomize.imagery.audit.v1','cartomize.imagery.automatic.v1'}:
                 for key,label in [('coverage','Couverture : emprise, données et qualité'),('gaps','Lacunes de couverture utile')]:
                     if p:=valid(record.get(key)):
                         self.register(dict(data=str(p),purpose='diagnostic',name=label))

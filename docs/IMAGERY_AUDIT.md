@@ -6,6 +6,10 @@ et ces données restent-elles utilisables après les masques de qualité ?
 Il utilise les mêmes bandes, la même grille cible et les mêmes règles de
 validité que le moteur de préparation multispectrale.
 
+`audit_imagery()` réalise ce diagnostic seul. Le [mode automatique M07](IMAGERY_AUTOMATIC.md)
+le raccorde à la sélection, au contrôle du seuil et à la production avec
+`preprocess_imagery()` ; c’est le mode par défaut de la fenêtre depuis la version 1.4.0.
+
 ## Depuis Python ou un notebook
 
 ```python
@@ -86,18 +90,34 @@ défaut) : scène unique suffisante, mosaïque nécessaire, ou scènes compléme
 à rechercher. Une couverture nulle est un résultat de diagnostic valide ; elle
 ne produit pas une image scientifique artificiellement remplie.
 
+`threshold_met` indique si ce seuil est atteint. `coverage_status` décrit la
+couverture réelle : `empty` sans pixel utilisable, `complete` à 100 %, `partial`
+entre les deux. Une couverture de 85 % avec un seuil de 80 % reste donc
+`partial`, avec `threshold_met=True`. Ce découplage est explicite depuis la
+version 1.4.0 ; les anciens rapports pouvaient employer `complete` pour
+indiquer seulement l’atteinte du seuil demandé.
+
 Le diagnostic est publié dans un dossier neuf. L'annulation ou une erreur ne
-publie pas de dossier partiel. La production d'images reste une action distincte,
-avec les réglages de l'expert. Recalculer le diagnostic après modification des
-fichiers source, des bandes, de la zone, de la résolution ou des masques.
+publie pas de dossier partiel. Avec cet appel de diagnostic seul, la production
+d’images reste une action distincte. En mode automatique, le contrôle est
+recalculé pendant chaque préparation et conditionne sa poursuite. Un diagnostic
+ancien ne garantit pas l’état de fichiers ou de paramètres modifiés.
 
 ## Dans l'interface
 
-La page **Prétraitement multispectral** propose le diagnostic sur les scènes et
-bandes sélectionnées. Les calculs utilisent le travailleur en arrière-plan et
-peuvent être annulés. Le rapport et les cartes sont accessibles dans les
-résultats du projet. L'application de la proposition ajuste la sélection des
-scènes et l'option de mosaïque ; les autres paramètres restent consultables.
+La page **Prétraitement multispectral** propose **Automatique : contrôler et
+préparer** par défaut. **Exécuter** vérifie la couverture, choisit les scènes
+et la mosaïque, puis applique le seuil indiqué. **Accepter moins que le seuil**
+est une décision explicite ; les résultats incomplets conservent leur statut
+partiel. Un catalogue peut rechercher les compléments manquants.
+
+**Diagnostiquer la couverture** reste disponible pour examiner les données
+avant une production. **Appliquer la sélection proposée** ajuste les scènes
+cochées ; ce geste ne dispense pas le mode automatique de recalculer le contrôle.
+Le mode **Expert : choisir les opérations** conserve la préparation manuelle.
+Les calculs fonctionnent en arrière-plan et peuvent être annulés. Le rapport
+et les cartes sont accessibles dans les résultats, y compris lorsqu’un manque
+de couverture bloque la production scientifique.
 
 Après préparation, l'index de provenance des scènes et le rapport de traitement
 accompagnent les produits scientifiques et les compositions colorées.

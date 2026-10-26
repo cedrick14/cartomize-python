@@ -2,7 +2,7 @@
 
 ## Registre et dépendances
 
-`operation_catalog()` décrit les 43 opérations, leurs paramètres, leur type de
+`operation_catalog()` décrit les 44 opérations, leurs paramètres, leur type de
 sortie et leurs produits secondaires. `execute_operation()` exécute une opération
 isolée. `processing_plan()` enchaîne des opérations sans imposer de carte finale.
 `plan_cartography(..., processing_steps=...)` les insère avant l’analyse du projet
@@ -48,6 +48,33 @@ cartomize process terrain parametres.json resultat --workers 4
 cartomize plan plan.json mnt.tif --steps etapes.json --title "Relief"
 cartomize run-plan plan.json production --workers 4 --block-size 512
 ```
+
+## Prétraitement automatique des images
+
+L’opérateur `imagery.preprocess` applique le [module M07](IMAGERY_AUTOMATIC.md) :
+diagnostic, compléments STAC facultatifs, sélection des scènes, décision de
+mosaïque, contrôle du seuil et préparation. Il exige `sources` et `aoi`.
+`coverage_threshold=100` et `allow_partial=False` sont les valeurs par défaut.
+Le produit principal est un manifeste JSON ; `@images:multiband` désigne le
+GeoTIFF scientifique d’une étape nommée `images`. Les sorties `coverage`, `gaps`
+et `audit` restent accessibles indépendamment de l’image.
+
+Une couverture insuffisante lève `ImageryCoverageError`, interrompt les étapes
+dépendantes et conserve un diagnostic dans un dossier voisin du résultat
+demandé. Les dossiers scientifiques du plan ne sont pas publiés. Un résultat
+partiel volontaire est identifié dans le manifeste et les métadonnées de
+l’opération.
+
+```bash
+cartomize preprocess-imagery scenes resultat --aoi zone.gpkg --bands red,nir
+cartomize process imagery.preprocess parametres.json resultat
+cartomize plan plan.json scenes --kind scenes --aoi zone.gpkg --coverage-threshold 100
+```
+
+Les plans cartographiques construits avec des scènes et une zone d’étude
+utilisent aussi cet opérateur. Leurs dépendances scientifiques sont résolues
+vers le produit multibande. Sans zone d’étude, la préparation historique sur
+l’étendue des scènes est conservée, sans contrôle de couverture territoriale.
 
 ## Hydrologie
 
@@ -127,13 +154,20 @@ globale d’octets, un délai et l’annulation contrôlent le transfert. Les m�
 privés d’authentification ou de signature d’URL propres aux fournisseurs ne sont
 pas fournis par la bibliothèque.
 
+`intersects=geometrie_geojson` recherche sur la géométrie réelle en WGS84,
+avec une requête POST. Ce paramètre est exclusif de `bbox`.
+
 `discover_scenes()` accepte les fichiers STAC Item/FeatureCollection locaux et
 les dossiers téléchargés contenant `scenes.json`. Les rôles spectraux et les
 coefficients proviennent des métadonnées `bands`, `eo:bands` et `raster:bands`.
 Une calibration absente est signalée ; les unités d’origine sont conservées.
 Ne pas assimiler ces valeurs à une réflectance sans information du producteur.
-Le masque QA/SCL reste explicite ; `mask_clouds=False` doit être demandé lorsque
-le produit n’en possède pas.
+Les profils Landsat C2 L2 et Sentinel-2 L2A raccordent automatiquement leurs
+masques QA/SCL lorsqu’ils sont présents. Le téléchargement sélectionne aussi
+les compagnons nécessaires avec `include_companions=True`, valeur par défaut.
+Les correspondances particulières passent par `band_mapping`, `quality_asset`,
+`quality_kind` et `saturation_asset`. `mask_clouds=False` reste un choix explicite
+lorsque le produit ne possède pas de masque ; son absence n’est pas masquée.
 
 Un manifeste `cartomize.scenes.v1` décrit aussi les données d’un capteur quelconque :
 

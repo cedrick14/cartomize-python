@@ -104,6 +104,7 @@ def test_preparation_page_progress_and_cancellation(application,write_raster,tmp
     write_raster(f"{prefix}_QA_PIXEL.TIF",np.full((2,2),64,dtype="uint16"),nodata=0)
     from cartomize.desktop import CartomizeWindow
     window=CartomizeWindow();window.select_tool('prepare');page=window.tool('prepare')
+    page.preparation_mode.setCurrentIndex(page.preparation_mode.findData('expert'))
     page.source.edit.setText(str(tmp_path));page.output.edit.setText(str(tmp_path/"prepared.tif"))
     window.start();finish(window)
     assert Path(window.output_path).is_file()
@@ -152,19 +153,20 @@ def test_default_workflow_produces_multiband_rgb_and_map(application,write_raste
     assert window.status.text().startswith("Traitement terminé"),window.status.text()
     out=tmp_path/"production"
     assert Path(window.output_path)==out/"production.json"
-    with rasterio.open(out/"multibande.tif") as src:
+    production=json.loads((out/"production.json").read_text(encoding='utf-8'))
+    scientific=out/production['multiband']
+    with rasterio.open(scientific) as src:
         assert src.count==4 and src.width==4 and src.descriptions==("blue","green","red","nir")
         np.testing.assert_allclose(src.read(3),14000*.0000275-.2,atol=1e-7)
     with rasterio.open(out/"composition_coloree.tif") as src:
         assert src.count==4 and src.dtypes==("uint8",)*4
     assert (out/"carte.pdf").stat().st_size>1000
     assert (out/"carte.png").stat().st_size>1000
-    manifest=json.loads((out/"multibande.json").read_text())
-    assert manifest["product"]==str(out/"multibande.tif")
+    manifest=json.loads((out/production['preparation']).read_text(encoding='utf-8'))
+    assert manifest["product"]==str(scientific)
     assert ".cartomize-production-" not in (out/"production.json").read_text()
     plan=json.loads((out/"production.json").read_text())["layer_plan"]
     assert plan[-1]["role"]=="localities" and plan[-1]["labels"]=="nom"
-    production=json.loads((out/"production.json").read_text())
     assert production["template"] and production["north_arrow"] is False
     assert window.progress.value()==100 and window.folder_button.isEnabled()
     window.resume_production();config=window.tool('mapping').capture_map()

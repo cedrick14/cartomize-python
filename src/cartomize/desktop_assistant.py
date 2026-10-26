@@ -4,7 +4,7 @@ from pathlib import Path
 from PySide6.QtCore import Signal,Qt
 from PySide6.QtWidgets import (QWidget,QHBoxLayout,QComboBox,QListWidget,QPushButton,
     QFileDialog,QLineEdit,QLabel,QTableWidget,QTableWidgetItem,QHeaderView,QCheckBox,QPlainTextEdit,QTabWidget,QFormLayout)
-from .desktop import Page,PathField,VECTOR_FILTER,spin
+from .desktop import Page,PathField,VECTOR_FILTER,spin,real
 from .assistant import assess_project,GOALS
 
 
@@ -55,8 +55,13 @@ class AssistantPage(Page):
         self.resolution=spin(0,0,100000);self.resolution.setSpecialValueText('Résolution native la plus grossière')
         self.extra_layers=QPlainTextEdit();self.extra_layers.setPlaceholderText('Un fichier par ligne : routes, limites, localités…');self.extra_layers.setMaximumHeight(70)
         self.atlas_zones=PathField(filter=VECTOR_FILTER);self.atlas_field=QLineEdit();self.dates=QCheckBox('Autoriser une mosaïque multitemporelle');self.clouds=QCheckBox('Appliquer les masques QA/SCL');self.clouds.setChecked(True)
+        self.coverage_threshold=real(100.);self.coverage_threshold.setRange(.01,100.);self.coverage_threshold.setDecimals(2)
+        self.allow_partial=QCheckBox('Accepter moins que le seuil')
+        self.allow_partial.setToolTip('Pour les scènes avec une zone d’étude, autoriser explicitement un résultat sous le seuil de couverture utile. Les lacunes restent sans données et le résultat est signalé comme partiel.')
         self.output=PathField('directory');self.name=QLineEdit('production');self.proposals=QComboBox();self.proposals.setMinimumWidth(360);self.execution_plan=None
         for label,widget in [('Couches complémentaires',self.extra_layers),('Classification',self.classification),('Échantillons',self.training),('Champ des classes',self.class_column),('Champ des libellés',self.label_column),('Groupes de validation',self.group_column),('Échantillons de validation',self.validation),('Bandes à conserver',self.spectral_bands),('Composition colorée',self.composition),('Résolution (m)',self.resolution),('Indices spectraux',self.indices),('Sources et crédits',self.credits),('Index de l’atlas',self.atlas_zones),('Nom des pages',self.atlas_field),('Dates',self.dates),('Qualité des scènes',self.clouds)]:self.form.addRow(label,widget)
+        self.form.addRow('Couverture utile minimale (%)',self.coverage_threshold)
+        self.form.addRow('Couverture sous le seuil',self.allow_partial)
         from .desktop_processing import ProcessingSteps
         self.processing_steps=ProcessingSteps();self.tabs.addTab(self.processing_steps,'Chaîne de traitements')
         self.form=outer_form
@@ -72,7 +77,7 @@ class AssistantPage(Page):
         self.kind.currentIndexChanged.connect(self.scene_options);self.scene_options()
         self.layout.addStretch()
     def scene_options(self):
-        for widget in (self.spectral_bands,self.composition,self.resolution):widget.setEnabled(self.kind.currentData()=='scenes')
+        for widget in (self.spectral_bands,self.composition,self.resolution,self.coverage_threshold,self.allow_partial):widget.setEnabled(self.kind.currentData()=='scenes')
     def add_files(self):
         paths=QFileDialog.getOpenFileNames(self,'Données géographiques',filter='Données SIG (*.tif *.tiff *.jp2 *.vrt *.img *.gpkg *.shp *.geojson *.json)')[0]
         self.inputs.addItems(paths)
@@ -91,7 +96,15 @@ class AssistantPage(Page):
     def show_result(self,path):
         document=json.loads(Path(path).read_text(encoding='utf-8'))
         if document.get('schema')=='cartomize.automation.result.v1':
-            self.findings.setText('Production achevée. Les couches et la mise en page sont disponibles dans les résultats.');return
+            messages=['Production achevée avec couverture partielle.' if document.get('coverage_status')=='partial'
+                      else 'Production achevée.']
+            for ident,coverage in document.get('imagery_preprocessing',{}).items():
+                useful=f"{coverage['usable_percent']:.2f}".replace('.',',')
+                threshold=f"{coverage['coverage_threshold']:.2f}".replace('.',',')
+                policy='seuil atteint' if coverage['threshold_met'] else 'couverture sous le seuil acceptée explicitement'
+                messages.append(f'{ident} : couverture utile {useful} % ; seuil {threshold} % ; {policy}.')
+            messages.append('Les diagnostics, les couches et la mise en page sont disponibles dans les résultats.')
+            self.findings.setText('\n'.join(messages));return
         if document.get('schema')=='cartomize.automation.v1':
             self.execution_plan=document;self.proposals.clear()
             for item in document['proposals']:self.proposals.addItem(item['name']+' ; '+str(item['score']),item['id'])
@@ -122,7 +135,7 @@ class AssistantPage(Page):
         if self.assessment and 0<=row<len(self.assessment['steps']):self.openRequested.emit(self.assessment['steps'][row]['tool'],self.assessment)
 
     def plan_parameters(self):
-        return dict(inputs=[self.inputs.item(i).text() for i in range(self.inputs.count())],goal=self.goal.currentData(),data_kind=self.kind.currentData(),aoi=self.aoi.text() or None,title=self.title.text(),credits=self.credits.text(),classification=self.classification.currentData(),training=self.training.text() or None,class_column=self.class_column.text(),indices=[x.strip().upper() for x in self.indices.text().split(',') if x.strip()],layers=[x.strip() for x in self.extra_layers.toPlainText().splitlines() if x.strip()],atlas_zones=self.atlas_zones.text() or None,atlas_field=self.atlas_field.text() or None,allow_mixed_dates=self.dates.isChecked(),processing_steps=self.processing_steps.records(),mask_clouds=self.clouds.isChecked(),band_order=[b.strip() for b in self.spectral_bands.text().split(',') if b.strip()] or None,composition=self.composition.currentData(),resolution=self.resolution.value() or None,validation=self.validation.text() or None,label_column=self.label_column.text() or None,group_column=self.group_column.text() or None)
+        return dict(inputs=[self.inputs.item(i).text() for i in range(self.inputs.count())],goal=self.goal.currentData(),data_kind=self.kind.currentData(),aoi=self.aoi.text() or None,title=self.title.text(),credits=self.credits.text(),classification=self.classification.currentData(),training=self.training.text() or None,class_column=self.class_column.text(),indices=[x.strip().upper() for x in self.indices.text().split(',') if x.strip()],layers=[x.strip() for x in self.extra_layers.toPlainText().splitlines() if x.strip()],atlas_zones=self.atlas_zones.text() or None,atlas_field=self.atlas_field.text() or None,allow_mixed_dates=self.dates.isChecked(),processing_steps=self.processing_steps.records(),mask_clouds=self.clouds.isChecked(),band_order=[b.strip() for b in self.spectral_bands.text().split(',') if b.strip()] or None,composition=self.composition.currentData(),resolution=self.resolution.value() or None,validation=self.validation.text() or None,label_column=self.label_column.text() or None,group_column=self.group_column.text() or None,coverage_threshold=self.coverage_threshold.value(),allow_partial=self.allow_partial.isChecked())
     def plan_job(self):
         parameters=self.plan_parameters();destination=self.directory/'plan.json'
         def run(progress,cancel):

@@ -396,8 +396,12 @@ class WorkflowPage(Page):
         self.resolution=spin(0,0,100000);self.resolution.setSpecialValueText("Résolution native la plus grossière")
         self.clouds=QCheckBox("Appliquer les masques QA/SCL");self.clouds.setChecked(True)
         self.dates=QCheckBox("Autoriser une mosaïque multitemporelle")
+        self.coverage_threshold=real(100.);self.coverage_threshold.setRange(.01,100.);self.coverage_threshold.setDecimals(2)
+        self.allow_partial=QCheckBox("Accepter moins que le seuil")
+        self.allow_partial.setToolTip("Avec une zone d’étude, autoriser explicitement une couverture utile sous le seuil demandé. Le rapport et l’état du traitement indiquent la couverture partielle.")
         for label,widget in [("Système de coordonnées cible",self.crs),("Bandes spectrales",self.bands),
-            ("Résolution (m)",self.resolution),("Masque de qualité",self.clouds),("Dates d’acquisition",self.dates)]:form.addRow(label,widget)
+            ("Résolution (m)",self.resolution),("Masque de qualité",self.clouds),("Dates d’acquisition",self.dates),
+            ("Couverture utile minimale (%)",self.coverage_threshold),("Couverture sous le seuil",self.allow_partial)]:form.addRow(label,widget)
         note=QLabel("Calibration radiométrique et masque de qualité avant rééchantillonnage. Les scènes sont alignées sur une grille commune. Les bandes nécessaires à la composition colorée sont ajoutées à la sélection.")
         note.setWordWrap(True);note.setObjectName("muted");form.addRow(note)
         output=QWidget();form=QFormLayout(output);tabs.addTab(output,"Restitution cartographique")
@@ -444,12 +448,20 @@ class WorkflowPage(Page):
         kwargs=dict(layers=layers,aoi=self.aoi.text() or None,band_order=[b.strip() for b in self.bands.text().split(",") if b.strip()] or None,
             target_crs=self.crs.text().strip() or None,resolution=self.resolution.value() or None,
             mask_clouds=self.clouds.isChecked(),allow_mixed_dates=self.dates.isChecked(),composition=self.rgb.currentData(),
+            coverage_threshold=self.coverage_threshold.value(),allow_partial=self.allow_partial.isChecked(),
             title=self.title.text(),credits=self.credits.text(),formats=self.format.currentData(),dpi=self.dpi.value(),
             template=layout["template"],page_format=layout["format"],orientation=layout["orientation"],subtitle=self.subtitle.text(),
             legend=layout["legend"],scale_bar=layout["scale"],north_arrow=layout["north"])
         self.result_map_config=dict(layers=layers,rgb=None,aoi=kwargs['aoi'],layout=layout,
             options=dict(title=kwargs['title'],subtitle=kwargs['subtitle'],credits=kwargs['credits'],crs=kwargs['target_crs']))
         return lambda progress,cancel,stage:cm.cartographic_workflow(source,destination,progress=progress,cancel=cancel,stage=stage,**kwargs).manifest
+
+    def show_result(self,path):
+        import json
+        record=json.loads(Path(path).read_text(encoding='utf-8'))
+        if record.get('coverage_status')=='partial':
+            self.window().status.setText('Traitement terminé avec couverture partielle : '+str(path))
+            self.window().workspace.activity.setText('Traitement terminé avec couverture partielle.')
 
 
 class CompositePage(Page):
@@ -467,7 +479,7 @@ class CompositePage(Page):
 
 
 class Worker(QThread):
-    progress=Signal(int,int);succeeded=Signal(str);failed=Signal(str);cancelled=Signal();stage=Signal(str)
+    progress=Signal(int,int);succeeded=Signal(str);failed=Signal(str);cancelled=Signal();stage=Signal(str);diagnostic_ready=Signal(str)
     def __init__(self,job,event,parent=None,staged=False):super().__init__(parent);self.job=job;self.cancel_event=event;self.staged=staged
     @Slot()
     def run(self):
@@ -475,6 +487,9 @@ class Worker(QThread):
             args=(self.progress.emit,self.cancel_event,self.stage.emit) if self.staged else (self.progress.emit,self.cancel_event)
             self.succeeded.emit(str(self.job(*args)))
         except cm.ProcessingCancelled:self.cancelled.emit()
+        except cm.ImageryCoverageError as exc:
+            self.diagnostic_ready.emit(str(exc.manifest))
+            self.failed.emit(str(exc))
         except Exception as exc:self.failed.emit(str(exc))
 
 
@@ -643,6 +658,7 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
         self.worker.progress.connect(self.show_progress);self.worker.stage.connect(self.status.setText);self.worker.succeeded.connect(self.completed)
         self.worker.stage.connect(self.workspace.activity.setText)
         self.worker.failed.connect(self.failed);self.worker.cancelled.connect(self.cancelled)
+        self.worker.diagnostic_ready.connect(self.show_failed_diagnostic)
         self.thread.finished.connect(self.cleaned);self.thread.finished.connect(self.thread.deleteLater)
         self.run_button.setEnabled(False);self.navigation.setEnabled(False);self.stack.setEnabled(False);self.settings.setEnabled(False)
         self.results_box.setEnabled(False)
@@ -666,8 +682,19 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
             self.status.setText("Traitement terminé : "+path);self.folder_button.setEnabled(True)
             page=self.pages[self.stack.currentIndex()]
             if hasattr(page,"show_result"):page.show_result(path)
+            self._result_partial_coverage=False
             self.collect_result(path)
             self.workspace.show_output(path)
+            if self._result_partial_coverage:
+                self.status.setText("Traitement terminé avec couverture partielle : "+path)
+                self.workspace.activity.setText('Traitement terminé avec couverture partielle.')
+    @Slot(str)
+    def show_failed_diagnostic(self,path):
+        self.output_path=path;self.folder_button.setEnabled(True)
+        page=self.pages[self.stack.currentIndex()]
+        if hasattr(page,'show_rejected_coverage'):page.show_rejected_coverage(path)
+        self.collect_result(path)
+        self.workspace.show_output(path)
     @Slot(str)
     def failed(self,error):
         self.progress.setRange(0,100);self.progress.setValue(0);self.status.setText("Échec du traitement : "+error)

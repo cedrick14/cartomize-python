@@ -1,7 +1,7 @@
 {
   "schema": "cartomize.expert_procedures.v1",
   "date": "2026-10-26",
-  "source_version": "1.3.0",
+  "source_version": "1.4.0",
   "source_state": "reviewed_source",
   "baseline_commit": "ad4d1d7a89557e347b9a322f73c32205807c077a",
   "inventory": {
@@ -17,9 +17,9 @@
     ]
   },
   "scope": [
-    "Correspondance de l’inventaire expert du 2026-10-26 avec les fichiers sources examinés de Cartomize 1.3.0 ; modules M01 à M06 implémentés.",
+    "Correspondance de l’inventaire expert avec Cartomize 1.4.0 ; compléments M01–M06 et chaîne automatique d’imagerie M07 implémentés dans leurs périmètres.",
     "baseline_commit identifie le point de départ du dépôt avant les compléments ; il ne désigne pas un commit final de publication de la version 1.3.0.",
-    "M06 est validé localement pour l’installation isolée, l’API/Jupyter et la fenêtre ; résultats dans VALIDATION_1.3.0.json. La publication GitHub et les contrôles distants sont des étapes séparées.",
+    "M07 relie le contrôle de couverture à la production, aux catalogues STAC, aux chaînes et à la fenêtre. La validation de chaque version reste décrite dans son rapport propre.",
     "Une ligne représente une procédure experte, pas un nombre de fonctions ni une promesse de parité QGIS/ArcGIS.",
     "Les références externes définissent les procédures ; les capacités Cartomize sont attestées par les symboles et chemins du dépôt.",
     "Une formule générique, une mise en page thématique ou une possibilité offerte par une dépendance non exposée ne suffit pas à déclarer une méthode disponible.",
@@ -108,50 +108,57 @@
       "scope": "Installation commune depuis les sources ; API sans Qt, fenêtre et noyaux Jupyter vérifiés ; paramètres restaurés sans perte, cours13 et paquet installé isolément. Résultats : VALIDATION_1.3.0.json."
     },
     {
-      "id": "E01",
+      "id": "M07",
       "order": 7,
+      "status": "implemented",
+      "title": "Prétraitement automatique complet des images optiques compatibles",
+      "scope": "Import, calibration et masques STAC/locaux ; diagnostic sur grille fixe ; sélection, complément borné par catalogue, décision de mosaïque et seuil obligatoire ; erreurs avec diagnostics conservés ; API, terminal, plans, Jupyter et fenêtre."
+    },
+    {
+      "id": "E01",
+      "order": 8,
       "status": "proposed",
       "title": "Socle de géotraitement et échanges raster-vecteur",
       "scope": "Rapports qualité, doublons, tables et lots ; grilles, échantillonnage raster aux points, rasterisation et polygonisation."
     },
     {
       "id": "E02",
-      "order": 8,
+      "order": 9,
       "status": "proposed",
       "title": "Qualité thématique et analyses raster usuelles",
       "scope": "Échantillonnage de référence, évaluation externe, unités minimales, transitions, prédicteurs et changements continus."
     },
     {
       "id": "E03",
-      "order": 9,
+      "order": 10,
       "status": "proposed",
       "title": "Séries temporelles et profils optiques",
       "scope": "Calendrier, masques, provenance, composites, lissage ; puis phénologie, tendances et profils forêt/eau/cultures/feux."
     },
     {
       "id": "E04",
-      "order": 10,
+      "order": 11,
       "status": "proposed",
       "title": "Terrain et hydrologie explicites",
       "scope": "Conventions de relief ; surfaces contributives, exutoires, chenaux, bassins, ordres, HAND/TWI/LS et morphométrie."
     },
     {
       "id": "E05",
-      "order": 11,
+      "order": 12,
       "status": "proposed",
       "title": "Indicateurs territoriaux et statistiques spatiales",
       "scope": "Supports et dénominateurs, exposition, carroyage ; puis densités, autocorrélation, interpolation et régressions."
     },
     {
       "id": "E06",
-      "order": 12,
+      "order": 13,
       "status": "proposed",
       "title": "Réseaux, multicritère et paysage",
       "scope": "Coûts réseau et accessibilité ; critères et sensibilité ; composantes, taches et connectivité."
     },
     {
       "id": "E07",
-      "order": 13,
+      "order": 14,
       "status": "proposed",
       "title": "Modules spécialisés avec validation propre",
       "scope": "LiDAR, géoréférencement, correction atmosphérique, SAR/InSAR, apprentissage profond, hydraulique et modèles écologiques/pédoclimatiques."
@@ -493,6 +500,13 @@
       "symbol": "spatial_summary",
       "operators": [
         "vector.spatial_summary"
+      ]
+    },
+    "cartomize.imagery_automatic.preprocess_imagery": {
+      "path": "src/cartomize/imagery_automatic.py",
+      "symbol": "preprocess_imagery",
+      "operators": [
+        "imagery.preprocess"
       ]
     }
   },
@@ -1194,7 +1208,7 @@
         "cartomize.scenes.discover_scenes",
         "cartomize.imagery_audit.audit_imagery"
       ],
-      "implemented": "Diagnostic des emprises, données présentes et pixels utiles communs aux bandes ; cartes de lacunes et recommandation de scènes ; résolution affine et dates contrôlées.",
+      "implemented": "Diagnostic des emprises, données présentes et pixels utiles communs aux bandes ; cartes de lacunes et recommandation de scènes ; résolution affine et dates contrôlées. Le statut complete signifie désormais 100 % de couverture réelle ; threshold_met décrit séparément le respect du seuil choisi.",
       "missing": [],
       "conditions": [
         "Landsat C2 L2 et Sentinel-2 L2A reconnus ; autres produits via métadonnées/manifeste explicite",
@@ -1210,7 +1224,8 @@
         "R034"
       ],
       "completed_modules": [
-        "M01"
+        "M01",
+        "M07"
       ]
     },
     {
@@ -1222,15 +1237,19 @@
       "api": [
         "cartomize.imagery.prepare_imagery",
         "cartomize.imagery_pipeline.process_imagery",
-        "cartomize.imagery_pipeline.split_bands"
+        "cartomize.imagery_pipeline.split_bands",
+        "cartomize.imagery_automatic.preprocess_imagery"
       ],
-      "implemented": "Calibration, masques, grille commune, mosaïque spectrale, multibande, découpage et rapport de couverture avec index de provenance.",
+      "implemented": "Chaîne automatique : validation des bandes et masques, diagnostic sur grille fixe, sélection d’une scène suffisante ou mosaïque, complément facultatif par catalogue STAC borné, calibration, découpage, multibande et provenance. Une couverture insuffisante bloque la production et les étapes suivantes sauf acceptation explicite d’un résultat partiel non vide.",
       "missing": [],
       "conditions": [
         "Scènes optiques compatibles ; dates différentes ou inconnues contrôlées et mélange autorisé explicitement",
         "La résolution tient compte des axes affines natifs, y compris tournés, ou de la grille proposée par GDAL lors d’une reprojection",
         "Priorité first ou last commune à toutes les bandes ; pas d’équilibrage radiométrique intercapteurs",
-        "Une sortie sans aucun pixel valide est refusée."
+        "Une sortie sans aucun pixel valide est refusée.",
+        "Le seuil est de 100 % par défaut ; un résultat réellement partiel reste identifié comme tel même si le seuil choisi est inférieur.",
+        "La recherche complémentaire exige un catalogue configuré et respecte les limites de scènes et d’octets. Authentification ou signature d’URL propres au fournisseur à configurer en amont.",
+        "Landsat C2 L2 et Sentinel-2 L2A : rôles spectraux, QA/SCL, saturation et calibration sont raccordés selon leurs métadonnées. Autres produits : description explicite."
       ],
       "next_module": null,
       "planned_fixes": [],
@@ -1240,7 +1259,8 @@
         "R044"
       ],
       "completed_modules": [
-        "M01"
+        "M01",
+        "M07"
       ]
     },
     {

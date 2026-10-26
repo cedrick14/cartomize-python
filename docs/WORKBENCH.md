@@ -1,4 +1,4 @@
-# Espace de travail Cartomize 1.3
+# Espace de travail Cartomize 1.4.0
 
 ## Installation
 
@@ -14,7 +14,7 @@ python -m cartomize gui
 Depuis le paquet wheel de la version :
 
 ```bash
-python -m pip install "./cartomize-1.3.0-py3-none-any.whl[gui]"
+python -m pip install "./cartomize-1.4.0-py3-none-any.whl[gui]"
 python -m cartomize gui
 ```
 
@@ -30,7 +30,7 @@ L’interface ne nécessite pas QGIS ni ArcGIS Pro. Une installation de QGIS ne 
 
 **Explorateur de projet** : fichiers locaux, dossier de travail et importation. Le bouton Parent remonte d’un niveau. Un double-clic ouvre un fichier compatible. Une archive CMZ ou un fichier `.cartomize.json` ouvre le projet correspondant.
 
-**Traitements** : catalogue par catégories et recherche sans distinction de casse ou d’accents. Le menu Traitements donne aussi accès à toutes les pages.
+**Traitements** : catalogue par catégories et recherche sans distinction de casse ou d’accents. Le menu Traitements donne aussi accès à toutes les pages. Le registre commun comprend 44 opérateurs utilisables dans les chaînes.
 
 **Carte et résultats** : onglets raster, vectoriels, tableaux, graphiques, PDF et SVG. Les données chargées restent accessibles après fermeture de leur onglet.
 
@@ -47,6 +47,21 @@ L’interface ne nécessite pas QGIS ni ArcGIS Pro. Une installation de QGIS ne 
 5. Ouvrir le résultat, le comparer ou le transmettre au traitement suivant.
 
 La préparation multispectrale conserve son tableau de scènes et de bandes. La mise en page conserve la configuration des couches, les cadres, la légende, l’échelle et les formats d’export. Les instructions détaillées de chaque domaine restent disponibles dans [DESKTOP.md](DESKTOP.md) et [SIG_WORKFLOWS.md](SIG_WORKFLOWS.md).
+
+### Préparation automatique des images
+
+Le [module M07](IMAGERY_AUTOMATIC.md) est le mode par défaut du prétraitement
+multispectral. Sélectionner les bandes et la zone d’étude, fixer la couverture
+utile minimale, puis exécuter : le moteur recalcule le diagnostic, choisit les
+scènes, décide de la mosaïque et prépare les sorties. Un catalogue STAC facultatif
+permet de chercher des compléments dans les limites configurées.
+
+Le seuil vaut 100 % par défaut. Un manque de couverture conserve un diagnostic
+et ses cartes de lacunes, sans publier les images prétraitées. **Accepter moins
+que le seuil** autorise explicitement un résultat non vide partiel ; son état
+reste affiché. Le mode **Expert : choisir les opérations** conserve les choix
+manuels. Les plans et la production cartographique avec zone d’étude appliquent
+le même contrôle avant les analyses et les cartes.
 
 ## Apparence
 

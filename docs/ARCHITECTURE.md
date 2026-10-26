@@ -13,7 +13,7 @@ natifs Esri et une boîte à outils Python ArcPy. La bibliothèque reprend les
 modules Python indépendants d'ArcPy et les maquettes de cette édition.
 Les dix modules repris sont conservés dans `_core`, à usage interne.
 Leur version interne 10.5.1 exprime leur provenance; la version du
-paquet est 1.3.0. Les fichiers originaux ne sont pas modifiés.
+paquet est 1.4.0. Les fichiers originaux ne sont pas modifiés.
 
 ## Fonctionnalités
 
@@ -26,7 +26,7 @@ paquet est 1.3.0. Les fichiers originaux ne sont pas modifiés.
 | Géométrie | GeoPandas/Shapely : clip, overlay, sjoin, dissolve, buffer, réparation et audit |
 | Mesures | Distances en mètres, surfaces m²/ha/km² et conversion des unités projetées |
 | Raster | NDVI/différence normalisée, reclassification, découpage, reprojection, statistiques zonales, surfaces et transitions |
-| Imagerie | Découverte des scènes, calibration, masques, mosaïque cohérente, multibande, AOI, compositions RGB/RGBA et traçabilité |
+| Imagerie | Découverte des scènes, contrôle de couverture, sélection et compléments STAC facultatifs, calibration, masques, mosaïque cohérente, multibande, AOI, compositions RGB/RGBA et traçabilité |
 | Superposition | Ordre par rôle, styles des routes/limites/localités et explication par layer_plan |
 | Algèbre raster | Interpréteur AST sans exécution Python, traitement par blocs, lecture commune et calculs concurrents |
 | Indices spectraux | 18 formules documentées, paramètres et registre extensible |
@@ -41,11 +41,12 @@ paquet est 1.3.0. Les fichiers originaux ne sont pas modifiés.
 - CRS explicite, entrées copiées pour les opérations vectorielles.
 - Masques déclarés prioritaires; le diagnostic individuel reste en lecture seule. La préparation du projet applique les fonds périphériques retenus dans des copies réversibles.
 - Écritures raster temporaires puis remplacement atomique de chaque fichier, sources protégées. Les trois fichiers d’un produit multiscène sont remplacés successivement; une panne système pendant cette phase peut interrompre l’enregistrement du groupe de fichiers.
+- Le module automatique M07 prépare ses produits dans un nouveau dossier temporaire, vérifie leur couverture puis publie le dossier complet. Une couverture refusée conserve un diagnostic distinct sans publier le produit scientifique.
 - Les grands calculs NDVI/reclassification et comptages sont lus par fenêtres.
 - Les exports utilisent des images raster rééchantillonnées à 2048 pixels par
   dimension par défaut. `max_raster_size` ajuste cette limite d'affichage.
 - La taille physique A4/A3 n'est pas recadrée à l'export.
-- Aucun téléchargement de fond de carte, télémétrie, connexion ou envoi de données automatique.
+- Aucun téléchargement de fond de carte ni télémétrie. Les accès STAC nécessitent une demande explicite ou un catalogue configuré pour compléter la couverture ; les recherches transmettent la zone et les filtres choisis au fournisseur.
 
 ## Limites explicites
 

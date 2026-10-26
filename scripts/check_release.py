@@ -19,7 +19,7 @@ required_modules=(
     'desktop_console','desktop_kernel','desktop_explorer','desktop_session',
     'desktop_tools','desktop_processing','imagery_audit','imagery','scenes','quality',
     'nodata','raster','relations','vector','vector_workflows','classification',
-    'routing','processing','storage','cli',
+    'routing','processing','storage','cli','imagery_automatic','catalogs','automation','workflow',
 )
 directory=Path(sys.argv[1]) if len(sys.argv)>1 else root/'pypi-dist'
 expected={f'{name}-{version}-py3-none-any.whl',f'{name}-{version}.tar.gz'}
@@ -56,6 +56,14 @@ with tarfile.open(directory/f'{name}-{version}.tar.gz') as archive:
                  'tests/test_vector_workflows.py','tests/test_vector_data_integrity.py',
                  'tests/test_classification_integrity.py','tests/test_routing_integrity.py',
                  'docs/IMAGERY_AUDIT.md','docs/RASTER_STATISTICS.md','docs/CLASSIFICATION.md',
+                 'docs/IMAGERY_AUTOMATIC.md','docs/RELEASE_1.4.0.md','docs/VALIDATION_1.4.0.json',
+                 'tests/test_catalog_quality.py','tests/test_imagery_automatic.py',
+                 'tests/test_imagery_automatic_interfaces.py','tests/test_desktop_imagery_automatic.py',
+                 'tests/test_real_sentinel.py','tests/data/sentinel2_mvouti/scenes.json',
+                 'tests/data/sentinel2_mvouti/provenance.json','tests/data/sentinel2_mvouti/README.md',
+                 'tests/data/sentinel2_mvouti/red.tif','tests/data/sentinel2_mvouti/nir.tif',
+                 'tests/data/sentinel2_mvouti/scl.tif','tests/data/sentinel2_mvouti/reference/red.tif',
+                 'tests/data/sentinel2_mvouti/reference/nir.tif',
                  'docs/EXPERT_PROCEDURES.md','docs/EXPERT_PROCEDURES.json',
                  'scripts/check_startup.py','scripts/check_release.py','scripts/verify_installed_release.py'):
         assert f'{name}-{version}/{file}' in names,file

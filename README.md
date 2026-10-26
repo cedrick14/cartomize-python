@@ -2,7 +2,7 @@
 
 Cartomize associe une bibliothèque Python, une interface graphique et des commandes pour le traitement géospatial et la production cartographique.
 
-La version des sources est **1.3.0**. La bibliothèque, les cellules Jupyter, les commandes du terminal et l’interface de bureau appellent les mêmes traitements. Cette version ajoute le diagnostic de couverture des scènes et complète les modules vectoriels, les statistiques zonales, la classification, le routage et leur automatisation. Voir la [note de version](docs/RELEASE_1.3.0.md) pour les changements de comportement.
+La version des sources est **1.4.0**. La bibliothèque, les cellules Jupyter, les commandes du terminal et l’interface de bureau appellent les mêmes traitements. Cette version ferme le parcours automatique des images optiques compatibles : import, calibration et masques, couverture obligatoire, choix des scènes, mosaïque et compléments STAC facultatifs. Voir la [note de version](docs/RELEASE_1.4.0.md) pour les changements de comportement.
 
 ## Installation
 
@@ -42,10 +42,11 @@ Les fonctions s’utilisent directement dans un script ou une cellule :
 ```python
 import cartomize as cm
 print(cm.__version__)
-diagnostic = cm.audit_imagery(
-    "donnees/scenes", "resultats/diagnostic_01", aoi="zone_etude.gpkg"
+resultat = cm.preprocess_imagery(
+    "donnees/scenes", "resultats/preparation_01", aoi="zone_etude.gpkg",
+    band_order=["red", "nir"], coverage_threshold=100.0,
 )
-print(diagnostic.report["recommended_action"])
+print(resultat.report["status"], resultat.report["usable_percent"])
 ```
 
 Qt est facultatif pour ces calculs. Pour installer Jupyter et le parcours exécutable depuis les mêmes sources : `python -m pip install -r tutorials/requirements.txt`. Le [guide Jupyter](docs/NOTEBOOKS.md) explique le choix du noyau et l’installation dans un environnement existant.
@@ -70,7 +71,7 @@ fenetre = cm.launch()
 
 Pour ouvrir cette fenêtre depuis un notebook local, installer `.[notebook]`, redémarrer le noyau puis appeler `cm.launch()`. Les notebooks distants peuvent utiliser l’API sans ouvrir de fenêtre native.
 
-Les versions publiées sont indiquées sur [PyPI](https://pypi.org/project/cartomize/). La présence de 1.3.0 dans ce dépôt ne signifie pas sa publication sur cet index. Le [guide d’installation](docs/WORKBENCH.md) décrit également l’installation d’un paquet wheel.
+Les versions publiées sont indiquées sur [PyPI](https://pypi.org/project/cartomize/). La présence de 1.4.0 dans ce dépôt ne signifie pas sa publication sur cet index. Le [guide d’installation](docs/WORKBENCH.md) décrit également l’installation d’un paquet wheel.
 
 ## Espace de travail
 
@@ -90,7 +91,7 @@ Les cartes proposent zoom, déplacement, valeurs de pixels, légendes, métadonn
 | Vecteur | Sélections, superpositions, jointures, synthèses par zone, découpage, tampons, dissolution avec agrégation, mesures, reprojection, réparation, géométries dérivées, coordonnées XY et derniers relevés |
 | Terrain et réseaux | Dérivées topographiques, convolution, drainage D8, bassins versants et plus court chemin |
 | Cartographie | Couches, symbologie, étiquettes, 24 maquettes, cadres, légendes, échelles, atlas, PDF/PNG/SVG |
-| Automatisation | Plans, 43 opérateurs chaînables, recettes et production en série |
+| Automatisation | Plans, 44 opérateurs chaînables, recettes et production en série |
 | Projets | Sessions JSON, archives CMZ, catalogue des résultats et restauration des vues |
 
 ## Exemple Python
@@ -106,6 +107,8 @@ carte.export("villages.pdf", dpi=300)
 Les opérations vectorielles utilisent les objets GeoPandas. Les fichiers GeoTIFF conservent leurs valeurs scientifiques séparément des réglages d’affichage.
 
 ## Couverture et procédures expertes
+
+Le [parcours automatique](docs/IMAGERY_AUTOMATIC.md) applique le seuil de couverture avant de produire les images. Il sélectionne les scènes, effectue la mosaïque utile et peut rechercher des compléments dans un catalogue configuré, avec limites de téléchargement. Un refus conserve les cartes des lacunes ; une couverture partielle acceptée reste identifiée.
 
 Le [diagnostic d’imagerie](docs/IMAGERY_AUDIT.md) mesure séparément l’emprise, la présence des bandes et les pixels utilisables après les masques. Il propose une scène unique, une mosaïque ou la recherche de scènes complémentaires. Le [tutoriel 13](tutorials/notebooks/13_diagnostic_automatique.ipynb) exécute cette décision puis le prétraitement, le NDVI et les statistiques zonales sur des données simulées.
 
@@ -135,7 +138,7 @@ python -m pytest
 python -m build
 python -m twine check --strict dist/*
 python scripts/check_release.py dist
-python scripts/verify_installed_release.py --wheel dist/cartomize-1.3.0-py3-none-any.whl --output reports/installed.json
+python scripts/verify_installed_release.py --wheel dist/cartomize-1.4.0-py3-none-any.whl --output reports/installed.json
 ```
 
 La validation automatise les contrôles Windows et Linux, les traitements, l’interface, les projets, les exports, la console et une installation isolée du paquet construit. Les essais CUDA et QGIS natif demandent leurs environnements respectifs. Les résultats sont associés aux versions, aux données et aux commits inscrits dans les rapports.

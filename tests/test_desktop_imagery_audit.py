@@ -49,6 +49,7 @@ def configure(window, write_raster, tmp_path):
     page.mode.setCurrentIndex(1)
     page.files = files
     page.load_inputs()
+    page.clouds.setChecked(False)
     for row in range(4):
         page.assets.item(row, 1).setText('A' if row < 2 else 'B')
         page.assets.item(row, 2).setText('red' if row % 2 == 0 else 'nir')
