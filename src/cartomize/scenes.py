@@ -50,8 +50,11 @@ class Scene:
     def __post_init__(self):
         if not self.scene_id or not self.sensor or not self.bands:
             raise ValueError("Scene id, sensor and bands are required.")
-        if self.acquired:
-            date.fromisoformat(self.acquired)
+        if self.acquired is not None:
+            if not isinstance(self.acquired,str):
+                raise ValueError("Acquisition date must be ISO date text or None.")
+            acquired=self.acquired.strip()
+            object.__setattr__(self,"acquired",date.fromisoformat(acquired).isoformat() if acquired else None)
         if self.quality is not None and self.quality_kind not in {"landsat_qa", "sentinel_scl", "valid_mask"}:
             raise ValueError("Declare the quality mask kind.")
         if any(not isinstance(k, str) or not k for k in self.bands):

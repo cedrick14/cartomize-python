@@ -14,7 +14,7 @@ from rasterio.enums import Resampling
 from rasterio.features import geometry_mask
 from rasterio.transform import from_origin
 from rasterio.vrt import WarpedVRT
-from rasterio.warp import calculate_default_transform, transform_bounds
+from rasterio.warp import transform_bounds
 from pyproj import CRS
 
 from .scenes import Scene, Band, discover_scenes
@@ -130,15 +130,32 @@ def _plan_imagery(scenes, *, aoi=None, band_order=None, target_crs=None,
                     raise ValueError(f"No source CRS: {asset.path}")
                 if crs is None:crs=CRS.from_user_input(src.crs)
                 factor=linear_factor(crs)
-                transform,_,_=calculate_default_transform(src.crs,crs,src.width,src.height,*src.bounds)
-                native_resolution=max(abs(transform.a),abs(transform.e))*factor
-                bounds=transform_bounds(src.crs,crs,*src.bounds,densify_pts=21)
+                if not np.isfinite(tuple(src.transform)).all() or src.transform.determinant == 0:
+                    raise ValueError(f"Source needs a finite, invertible affine grid: {asset.path}")
+                if CRS.from_user_input(src.crs)==crs:
+                    native_transform=src.transform
+                    resolution_method='native_affine'
+                else:
+                    # GDAL must see the actual source affine, including rotation.
+                    # Inferring a grid from its enclosing rectangle changes the
+                    # apparent pixel size of rotated or sheared images.
+                    with WarpedVRT(src,crs=crs) as proposed:
+                        native_transform=proposed.transform
+                    resolution_method='gdal_suggested_warp'
+                native_resolution=max(math.hypot(native_transform.a,native_transform.d),
+                                      math.hypot(native_transform.b,native_transform.e))*factor
+                if not np.isfinite(native_resolution) or native_resolution<=0:
+                    raise ValueError(f"Cannot determine a finite source resolution: {asset.path}")
+                corners=[src.transform*point for point in ((0,0),(src.width,0),(src.width,src.height),(0,src.height))]
+                source_bounds=(min(x for x,y in corners),min(y for x,y in corners),
+                               max(x for x,y in corners),max(y for x,y in corners))
+                bounds=transform_bounds(src.crs,crs,*source_bounds,densify_pts=21)
                 if not np.isfinite(bounds).all():
                     raise ValueError("The chosen projection cannot represent a scene extent.")
                 records.append({"scene":scene.scene_id,"band":name,"path":str(Path(asset.path).resolve()),
                                 "index":asset.index,"scale":asset.scale,"offset":asset.offset,"unit":asset.unit,
                                 "declared_nodata":("NaN" if asset.nodata is not None and np.isnan(asset.nodata) else asset.nodata),"source_crs":str(src.crs),
-                                "resolution_m":native_resolution,"bounds":bounds,
+                                "resolution_m":native_resolution,"resolution_method":resolution_method,"bounds":bounds,
                                 "size_bytes":Path(asset.path).stat().st_size})
         sources.extend(p for p in (scene.quality,scene.saturation) if p)
     for name in names:

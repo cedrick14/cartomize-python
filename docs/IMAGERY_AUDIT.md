@@ -31,6 +31,16 @@ Les fichiers standard Landsat C2 L2 et Sentinel-2 L2A doivent conserver les
 métadonnées et masques requis. Pour des données dépourvues de masque de qualité,
 `mask_clouds=False` est un choix explicite à documenter.
 
+La résolution par défaut conserve la longueur des axes des pixels natifs lorsque
+le SCR est inchangé, y compris pour les images tournées. En cas de reprojection,
+elle provient de la grille proposée par GDAL à partir de la transformation affine
+réelle. La résolution sélectionnée la plus grossière est retenue ; une valeur
+explicite en mètres permet de fixer la grille de l’étude.
+
+Les dates ISO sont normalisées. Une date vide est inconnue : plusieurs scènes
+sans date exigent `allow_mixed_dates=True`, comme des acquisitions de dates
+différentes. Cette autorisation exprime un choix multitemporel et reste enregistrée.
+
 ## Depuis le terminal
 
 ```bash
