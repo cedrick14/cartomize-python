@@ -11,7 +11,7 @@ try:
     from PySide6.QtWidgets import (QApplication,QMainWindow,QWidget,QHBoxLayout,QVBoxLayout,
         QFormLayout,QLabel,QLineEdit,QPushButton,QFileDialog,QListWidget,QListWidgetItem,
         QStackedWidget,QComboBox,QSpinBox,QDoubleSpinBox,QCheckBox,QPlainTextEdit,
-        QTableWidget,QTableWidgetItem,QHeaderView,QProgressBar,QMessageBox,QGroupBox,QScrollArea,QTabWidget,QSplitter,QToolButton,QListView,QDockWidget)
+        QTableWidget,QTableWidgetItem,QHeaderView,QProgressBar,QMessageBox,QGroupBox,QScrollArea,QTabWidget,QSplitter,QToolButton,QListView,QDockWidget,QSizePolicy)
 except ImportError as exc:
     raise ImportError('Interface graphique indisponible. Installer : python -m pip install "cartomize[gui]"') from exc
 
@@ -60,12 +60,51 @@ class Page(QWidget):
         super().__init__();self.layout=QVBoxLayout(self)
         heading=QLabel(title);heading.setObjectName("pageTitle");heading.setWordWrap(True)
         detail=QLabel(description);detail.setWordWrap(True);detail.setObjectName("description")
-        self.layout.addWidget(heading);self.layout.addWidget(detail)
-        self.parameter_card=QGroupBox('Données et paramètres');self.parameter_card.setObjectName('parameterCard')
+        self.page_help=self.context_help(description,heading=heading,content=detail)
+        self.layout.addWidget(self.page_help)
+        self.parameter_card=QGroupBox('Paramètres');self.parameter_card.setObjectName('parameterCard')
         self.form=QFormLayout(self.parameter_card);self.form.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
         self.form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.WrapAllRows)
         self.layout.addWidget(self.parameter_card)
         self.output=PathField("save","GeoTIFF (*.tif)")
+    @staticmethod
+    def context_help(text,*,subject="Cet outil",heading=None,summary=None,content=None):
+        """Keep explanatory text available without hiding operational messages."""
+        section=QWidget();section.setObjectName("contextHelp")
+        section.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Maximum)
+        layout=QVBoxLayout(section);layout.setContentsMargins(0,0,0,0);layout.setSpacing(3)
+        row=QHBoxLayout();row.setContentsMargins(0,0,0,0)
+        if heading is not None:
+            row.addWidget(heading,1)
+        elif summary:
+            note=QLabel(summary);note.setWordWrap(True);note.setTextFormat(Qt.TextFormat.PlainText)
+            note.setObjectName("helpSummary");row.addWidget(note,1)
+        button=QToolButton();button.setObjectName("helpToggle");button.setText("Aide")
+        button.setCheckable(True);button.setAutoRaise(True)
+        button.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        button.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
+        button.setArrowType(Qt.ArrowType.RightArrow)
+        button.setAccessibleName("Aide : "+subject)
+        button.setToolTip("Afficher l’aide : "+subject)
+        row.addWidget(button)
+        if heading is None and not summary:row.addStretch()
+        layout.addLayout(row)
+        detail=content if content is not None else QLabel(text)
+        if content is None:detail.setObjectName("helpText")
+        detail.setWordWrap(True);detail.setTextFormat(Qt.TextFormat.PlainText)
+        detail.setSizePolicy(QSizePolicy.Policy.Ignored,QSizePolicy.Policy.Preferred)
+        detail.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse|Qt.TextInteractionFlag.TextSelectableByKeyboard)
+        detail.hide();layout.addWidget(detail)
+        def expanded(checked):
+            detail.setVisible(checked)
+            button.setArrowType(Qt.ArrowType.DownArrow if checked else Qt.ArrowType.RightArrow)
+            button.setToolTip(("Masquer" if checked else "Afficher")+" l’aide : "+subject)
+        button.toggled.connect(expanded)
+        return section
+    def add_help(self,text,*,subject="Cet outil",summary=None,form=None):
+        section=self.context_help(text,subject=subject,summary=summary)
+        (self.form if form is None else form).addRow(section)
+        return section
     def finish(self):
         self.form.addRow("Fichier de sortie",self.output);self.layout.addStretch()
     def destination(self):
@@ -152,7 +191,7 @@ class CalculatorPage(Page):
         add.clicked.connect(self.browse);remove.clicked.connect(self.remove)
         self.expression=QPlainTextEdit();self.expression.setPlaceholderText("(nir - red) / (nir + red)")
         self.expression.setMaximumHeight(115);self.form.addRow("Expression",self.expression)
-        self.form.addRow(QLabel("Fonctions : where, coalesce, sqrt, log, exp, minimum, maximum, mean, median, std, bitand."))
+        self.add_help("Fonctions : where, coalesce, sqrt, log, exp, minimum, maximum, mean, median, std, bitand.",subject="Fonctions de la calculatrice")
         self.align=QCheckBox("Aligner les entrées sur la grille du premier raster");self.form.addRow("Grille",self.align)
         self.finish()
     def browse(self):
@@ -257,9 +296,10 @@ class MappingPage(Page):
         for label,widget in [("Titre",self.title),("Sous-titre",self.subtitle),("Sources et auteur",self.credits)]:form.addRow(label,widget)
         form.addRow(self.layout_settings)
         frames_tab=QWidget();form=QFormLayout(frames_tab);self.tabs.addTab(frames_tab,"Cadres et contenus")
-        detail=QLabel("Les emprises utilisent le système de coordonnées de chaque cadre. Sans réglage, l’emprise et les couches de la carte sont utilisées.")
-        detail.setWordWrap(True);form.addRow(detail);form.addRow(self.layout_settings.frames)
-        form.addRow(QLabel("Contenus facultatifs des emplacements de la maquette : textes, tableaux CSV et graphiques."))
+        self.add_help("Les emprises utilisent le système de coordonnées de chaque cadre. Sans réglage, l’emprise et les couches de la carte sont utilisées.",
+            subject="Emprises des cadres",summary="Emprises dans le SCR de chaque cadre.",form=form)
+        form.addRow(self.layout_settings.frames)
+        self.add_help("Contenus facultatifs des emplacements de la maquette : textes, tableaux CSV et graphiques.",subject="Contenus de la maquette",form=form)
         form.addRow(self.layout_settings.elements)
         geometry_tab=QWidget();geometry_form=QVBoxLayout(geometry_tab);geometry_form.addWidget(self.layout_settings.items);self.tabs.addTab(geometry_tab,"Géométrie des éléments")
         self.output.filter="Document PDF (*.pdf);;Image PNG (*.png);;Image SVG (*.svg)"
@@ -346,8 +386,8 @@ class AtlasPage(MappingPage):
         self.atlas_format=QComboBox();self.atlas_format.addItems(["pdf","png","svg"])
         self.padding=spin(8,0,100);self.padding.setSuffix(" %")
         for label,widget in [("Couche d’index",self.zones),("Champ du nom des pages",self.name_column),("Format d’export",self.atlas_format),("Marge autour des entités",self.padding)]:form.addRow(label,widget)
-        detail=QLabel("Chaque entité définit l’emprise principale d’une page. Les cadres ayant une emprise explicite conservent leur cadrage.")
-        detail.setWordWrap(True);form.addRow(detail)
+        self.add_help("Chaque entité définit l’emprise principale d’une page. Les cadres ayant une emprise explicite conservent leur cadrage.",
+            subject="Cadrage de l’atlas",summary="Cadres à emprise explicite conservés.",form=form)
         self.output.mode="directory";self.form.labelForField(self.output).setText("Répertoire de sortie")
         self.tabs.setCurrentIndex(0)
     def job(self,options):
@@ -367,9 +407,8 @@ class WorkflowPage(Page):
     def __init__(self):
         super().__init__("Production cartographique automatisée",
             "Des scènes satellites à la carte : traitement multispectral, superposition des couches et mise en page.")
-        sequence=QLabel("1. Importation des scènes   2. Mosaïque   3. Assemblage multibande\n"
-                        "4. Extraction par masque   5. Composition colorée   6. Mise en page")
-        sequence.setObjectName("sequence");sequence.setWordWrap(True);self.form.addRow(sequence)
+        self.add_help("1. Importation des scènes   2. Mosaïque   3. Assemblage multibande\n"
+                      "4. Extraction par masque   5. Composition colorée   6. Mise en page",subject="Étapes de production")
         tabs=QTabWidget();self.tabs=tabs;self.form.addRow(tabs)
         self.data_tab=QWidget();data=QFormLayout(self.data_tab);tabs.addTab(self.data_tab,"Données")
         self.source=PathField("directory");data.addRow("Répertoire des scènes",self.source)

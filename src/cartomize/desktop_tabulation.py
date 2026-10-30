@@ -72,12 +72,11 @@ class TabulationControls:
             _row(form, title, control)
         form.addRow(self.tabulation_policy_note)
         self.tabulation_folder = QLineEdit('croisement_zonages')
-        _row(form, 'Dossier des résultats', self.tabulation_folder)
-        note = QLabel('Les polygones de même zone ou catégorie sont réunis. '
+        _row(form, 'Nouveau dossier des résultats', self.tabulation_folder)
+        self.add_help('Les polygones de même zone ou catégorie sont réunis. '
                       'Les tableaux incluent les surfaces nulles et un bilan de couverture par zone. '
-                      'Choisir un nouveau dossier de résultats.')
-        note.setWordWrap(True)
-        form.addRow(note)
+                      'Choisir un nouveau dossier de résultats.',
+            subject='Regroupement et tableaux',summary='Zones et catégories regroupées par identifiant.',form=form)
         self.tabulation_result_path = QLineEdit(self)
         self.tabulation_result_path.hide()
         self.tabulation_result_status = QLabel('Lancer le croisement pour consulter les résultats.')

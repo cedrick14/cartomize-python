@@ -1,0 +1,85 @@
+name: Dynamic desktop workspace
+
+on:
+  pull_request:
+    paths:
+      - 'src/cartomize/desktop*.py'
+      - 'tests/test_desktop*.py'
+      - 'tests/test_result*.py'
+      - 'scripts/capture_dynamic_workspace.py'
+      - '.github/workflows/dynamic-workspace.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dynamic-workspace-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    env:
+      MPLBACKEND: Agg
+      PYTHONFAULTHANDLER: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install native Linux windowing libraries
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libegl1 libopengl0 xvfb libxkbcommon-x11-0 libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxcb-shape0 libxcb-xinerama0 libxcb-image0 libxcb-render-util0
+      - name: Install desktop and notebook dependencies
+        run: |
+          python -m pip install -q -e ".[dev,notebook]" pytest-timeout
+          python -m pip check
+      - name: Exercise native Linux panel gestures and view lifecycle
+        if: runner.os == 'Linux'
+        env:
+          QT_QPA_PLATFORM: xcb
+        run: >-
+          xvfb-run -a -s "-screen 0 1920x1200x24"
+          python -m pytest tests/test_desktop_docking.py tests/test_result_docking.py
+          tests/test_desktop_help.py tests/test_desktop_workbench.py
+          tests/test_desktop_adaptive.py tests/test_results_workspace.py
+          tests/test_desktop_imagery.py -q --timeout=90 --junitxml=reports/native-desktop.xml
+      - name: Exercise native Windows panel gestures and view lifecycle
+        if: runner.os == 'Windows'
+        env:
+          QT_QPA_PLATFORM: windows
+        run: >-
+          python -m pytest tests/test_desktop_docking.py tests/test_result_docking.py
+          tests/test_desktop_help.py tests/test_desktop_workbench.py
+          tests/test_desktop_adaptive.py tests/test_results_workspace.py
+          tests/test_desktop_imagery.py -q --timeout=90 --junitxml=reports/native-desktop.xml
+      - name: Capture Linux panes, placement guides and themes
+        if: runner.os == 'Linux'
+        env:
+          QT_QPA_PLATFORM: xcb
+        run: >-
+          xvfb-run -a -s "-screen 0 1920x1200x24"
+          python scripts/capture_dynamic_workspace.py --output reports/dynamic-workspace
+      - name: Capture Windows panes, placement guides and themes
+        if: runner.os == 'Windows'
+        env:
+          QT_QPA_PLATFORM: windows
+        run: python scripts/capture_dynamic_workspace.py --output reports/dynamic-workspace
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dynamic-workspace-${{ runner.os }}-py3.12
+          path: reports/
+          if-no-files-found: warn
+          retention-days: 30

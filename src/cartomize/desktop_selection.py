@@ -118,16 +118,16 @@ class SelectionControls:
         self.selection_mask = PathField(filter=VECTOR_FILTER)
         self.selection_mask_layer = _combo([('Choisir la couche', None)])
         self.selection_predicate = _combo(PREDICATES)
-        self.selection_spatial_note = QLabel(
-            'La relation compare chaque géométrie source à la réunion de toutes les géométries du masque. '
-            'Les recouvrements du masque ne dupliquent pas les objets. Les géométries source vides ou '
-            'manquantes ne satisfont aucune relation spatiale.')
+        self.selection_spatial_note = QLabel('Relation au masque fusionné ; source vide : aucune correspondance.')
         self.selection_spatial_note.setWordWrap(True)
         for title, control in [('Fichier du masque', self.selection_mask),
                                ('Couche du masque', self.selection_mask_layer),
                                ('Relation de la source au masque', self.selection_predicate)]:
             _row(spatial, title, control)
         spatial.addRow(self.selection_spatial_note)
+        self.add_help('La relation compare chaque géométrie source à la réunion de toutes les géométries du masque. '
+            'Les recouvrements du masque ne dupliquent pas les objets. Les géométries source vides ou '
+            'manquantes ne satisfont aucune relation spatiale.',subject='Relation spatiale',form=spatial)
         form.addRow(self.selection_spatial_section)
         self.selection_combination = _combo([('Les deux blocs (ET)', 'and'),
                                             ('Au moins un bloc (OU)', 'or')])
@@ -137,11 +137,10 @@ class SelectionControls:
         form.addRow(self.selection_invert)
         self.selection_folder = QLineEdit('extraction_vectorielle')
         _row(form, 'Nouveau dossier des résultats', self.selection_folder)
-        note = QLabel('Les objets retenus et exclus gardent leurs attributs, géométries et ordre source. '
+        self.add_help('Les objets retenus et exclus gardent leurs attributs, géométries et ordre source. '
                       'Le rapport indique les critères satisfaits et le motif de chaque décision. '
-                      'Les rangs de ligne commencent à zéro. Le dossier de résultats doit être nouveau.')
-        note.setWordWrap(True)
-        form.addRow(note)
+                      'Les rangs de ligne commencent à zéro. Le dossier de résultats doit être nouveau.',
+            subject='Résultats de l’extraction',form=form)
 
         self.selection_result_path = QLineEdit(self)
         self.selection_result_path.hide()

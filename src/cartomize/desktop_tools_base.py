@@ -166,8 +166,7 @@ class RasterToolsPage(Page):
             choice.currentTextChanged.connect(choice.setToolTip);choice.setToolTip(choice.currentText())
         self.max_zone_pixels=spin(250_000_000,1,2_147_483_647);self.max_zone_pixels.setGroupSeparatorShown(True)
         self.max_zone_pixels.setToolTip('Limite du nombre de pixels de la fenêtre examinée par zone ; la partie hors du raster est incluse si la couverture est demandée.')
-        self.zonal_note=QLabel('Valeur physique = valeur brute × facteur + décalage des métadonnées de la bande ; sans calibration, facteur 1 et décalage 0. '
-            'Les pixels NoData ou masqués sont exclus ; un zéro valide est conservé. La couverture mesure la part de pixels valides sur toute la zone, y compris sa partie hors du raster.')
+        self.zonal_note=QLabel('NoData exclus ; zéro valide conservé. Couverture calculée sur toute la zone.')
         self.zonal_note.setWordWrap(True)
         for label,widget in [('Opération',self.operation),('Raster source',self.source),('Bande',self.band),('Masque ou raster de comparaison',self.secondary),
             ('Système de coordonnées cible',self.crs),('Résolution (unités du système cible)',self.resolution),('Rééchantillonnage',self.resampling),
@@ -176,6 +175,9 @@ class RasterToolsPage(Page):
             ('Inclusion des pixels',self.all_touched),('Limite de pixels candidats par zone',self.max_zone_pixels)]:
             self.form.addRow(label,widget);self.form.labelForField(widget).setWordWrap(True)
         self.form.addRow(self.zonal_note)
+        self.zonal_help=self.add_help('Valeur physique = valeur brute × facteur + décalage des métadonnées de la bande ; sans calibration, facteur 1 et décalage 0. '
+            'Les pixels NoData ou masqués sont exclus ; un zéro valide est conservé. La couverture mesure la part de pixels valides sur toute la zone, y compris sa partie hors du raster.',
+            subject='Calibration et couverture des zones')
         self.finish();self.operation.currentIndexChanged.connect(self.changed);self.changed()
     def changed(self):
         op=self.operation.currentData()
@@ -184,7 +186,7 @@ class RasterToolsPage(Page):
             self.value_mode:op=='zonal_stats',self.zonal_prefix:op=='zonal_stats',self.include_coverage:op=='zonal_stats',
             self.all_touched:op in {'clip','zonal_stats'},self.max_zone_pixels:op=='zonal_stats'}
         for widget,visible in show.items():widget.setVisible(visible);self.form.labelForField(widget).setVisible(visible)
-        self.zonal_note.setVisible(op=='zonal_stats');self.cancellable=op=='zonal_stats'
+        self.zonal_note.setVisible(op=='zonal_stats');self.zonal_help.setVisible(op=='zonal_stats');self.cancellable=op=='zonal_stats'
         self.secondary.filter=RASTER_FILTER if op=='change_matrix' else VECTOR_FILTER
         self.output.filter='Tableau CSV (*.csv)' if op in {'class_areas','change_matrix'} else 'GeoPackage (*.gpkg);;GeoJSON (*.geojson)' if op=='zonal_stats' else 'GeoTIFF (*.tif)'
         suffix='.csv' if op in {'class_areas','change_matrix'} else '.gpkg' if op=='zonal_stats' else '.tif'

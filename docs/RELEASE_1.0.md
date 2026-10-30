@@ -1,4 +1,4 @@
-# Cartomize 1.0 — Édition consolidée
+# Cartomize 1.0 — Espace de travail dynamique
 
 Édition du 30 octobre 2026, préparée pour la démonstration du 1er novembre 2026.
 
@@ -7,10 +7,37 @@
 Cette édition réunit le code de la branche principale après l’intégration de
 G12 (base `c81e798b24da8bbb902f77f49008bb556c71e784`) et les corrections du
 parcours de démonstration. Le numéro du paquet et `cartomize.__version__`
-sont tous deux **1.0**. Le wheel porte l’identifiant de construction `20261030`
-(`cartomize-1.0-20261030-py3-none-any.whl`) afin de le distinguer du fichier
-historique ; cet identifiant ne change pas le numéro de version. L’interface
+sont tous deux **1.0**. Le wheel porte l’identifiant de construction `2026103001`
+(`cartomize-1.0-2026103001-py3-none-any.whl`) afin de distinguer la correction
+de l’interface de la construction précédente ; cet identifiant ne change pas le numéro de version. L’interface
 et Python utilisent le même moteur.
+
+## Interface dynamique
+
+La disposition initiale et les thèmes sont conservés. L’explorateur, le
+catalogue, les paramètres, la console et les vues de résultat deviennent
+des panneaux déplaçables et redimensionnables.
+
+- **Placement guidé** : déplacer une barre de titre affiche les positions
+  possibles, l’aperçu de la destination et le regroupement en onglets.
+- **Détacher et agrandir** : un panneau peut devenir une fenêtre indépendante,
+  être maximisé puis réancré. Les résultats retrouvent les onglets centraux
+  avec « Réintégrer dans les vues ».
+- **Conserver le travail** : le déplacement conserve les paramètres saisis,
+  les cartes et leurs réglages. Les résultats rafraîchis retrouvent leur
+  emplacement et leur groupe.
+- **Retrouver la disposition** : F11 agrandit la vue centrale, Échap restaure
+  l’affichage ou annule le déplacement. Le menu Affichage permet de rouvrir
+  un panneau masqué et de restaurer l’organisation initiale.
+- **Alléger les formulaires** : les descriptions longues sont repliées dans
+  Aide. Les commandes, unités, diagnostics et erreurs restent accessibles.
+
+La disposition locale est mémorisée entre les lancements. Les projets
+enregistrent les positions des vues avec des propriétés JSON contrôlées.
+Le [guide pratique](https://github.com/cedrick14/cartomize-python/blob/main/docs/DYNAMIC_WORKSPACE.md)
+détaille ces commandes ; la démonstration fournit les mêmes indications.
+
+## Modules réunis
 
 | Ensemble | Contenu |
 |---|---|
@@ -55,7 +82,8 @@ et `cartomize-1.0-presentation.zip`, qui rassemble les guides, le notebook 22
 et des scènes pédagogiques synthétiques prêtes à charger dans l’interface.
 Décompresser le ZIP et suivre `LISEZ_MOI.md`.
 
-L’ancienne publication PyPI portant déjà le numéro **1.0** est différente.
-Installer le fichier de cette livraison ou ses sources pour obtenir cette
-édition. Voir [PUBLICATION.md](https://github.com/cedrick14/cartomize-python/blob/main/docs/PUBLICATION.md) avant toute publication sur
-l’index ou suppression d’une ancienne distribution.
+Si une construction précédente de **1.0** est déjà installée, utiliser
+`--force-reinstall --no-cache-dir` puis vérifier `Build: 2026103001`, ou
+installer directement le wheel de cette livraison. Le
+[suivi de publication](https://github.com/cedrick14/cartomize-python/blob/main/docs/PUBLICATION.md)
+indique les fichiers disponibles et les vérifications exécutées.

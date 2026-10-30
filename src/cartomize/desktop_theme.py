@@ -60,6 +60,12 @@ def apply_theme(window, *_):
         QMenu::separator { height: 1px; background: %(line)s; margin: 4px 8px; }
         QDockWidget { border: 0; }
         QDockWidget::title { background: %(panel)s; padding: 7px; font-weight: 600; }
+        QWidget#dockPanelTitle { background: %(panel)s; border-bottom: 1px solid %(line)s; }
+        QLabel#dockPanelLabel { background: transparent; font-weight: 600; }
+        QToolButton#dockPanelAction { padding: 2px; border: 0; border-radius: 3px; }
+        QToolButton#dockPanelAction:hover { background: %(selected)s; }
+        QMainWindow::separator { background: %(line)s; width: 5px; height: 5px; }
+        QMainWindow::separator:hover { background: %(accent)s; }
         QSplitter::handle { background: %(line)s; width: 5px; height: 5px; }
         QLineEdit, QPlainTextEdit, QTableWidget, QTableView, QListWidget, QTreeWidget,
         QTreeView, QComboBox, QSpinBox, QDoubleSpinBox, QAbstractItemView {
@@ -98,3 +104,5 @@ def apply_theme(window, *_):
         QScrollBar::add-line, QScrollBar::sub-line { width: 0; height: 0; }
         QScrollBar::add-page, QScrollBar::sub-page { background: transparent; }
     ''' % c)
+    if hasattr(window, 'dock_manager'):
+        window.dock_manager._sync_titles()

@@ -102,9 +102,11 @@ class ConversionPage(Page):
                                ('Encodage des caractères', self.encoding), ('Nom de la couche de sortie', self.output_layer),
                                ('Noms des champs', self.field_map)]:
             _row(vector, title, control)
-        self.vector_note = QLabel('Tous les objets et champs sont conservés. Pour un Shapefile, choisir des noms de champs compatibles et examiner le rapport.')
+        self.vector_note = QLabel('Shapefile : vérifier les noms de champs et le rapport.')
         self.vector_note.setWordWrap(True)
         vector.addRow(self.vector_note)
+        self.add_help('Tous les objets et champs sont conservés. Pour un Shapefile, choisir des noms de champs compatibles et examiner le rapport.',
+            subject='Champs et formats vectoriels',form=vector)
         self.form.addRow(self.vector_section)
 
         self.raster_section = QWidget()
@@ -130,9 +132,8 @@ class ConversionPage(Page):
                                ('Pyramides de résolution', self.overviews_mode), ('Facteurs des pyramides', self.overviews),
                                ('Rééchantillonnage des pyramides', self.resampling)]:
             _row(raster, title, control)
-        note = QLabel('La grille et les coordonnées sont conservées. Le rééchantillonnage concerne les pyramides ; choisir le plus proche voisin ou la valeur majoritaire pour des classes.')
-        note.setWordWrap(True)
-        raster.addRow(note)
+        self.add_help('La grille et les coordonnées sont conservées. Le rééchantillonnage concerne les pyramides ; choisir le plus proche voisin ou la valeur majoritaire pour des classes.',
+            subject='Grille et pyramides',summary='Classes : plus proche voisin ou valeur majoritaire.',form=raster)
         self.form.addRow(self.raster_section)
 
         self.loss_policy = _combo(LOSS_POLICIES)

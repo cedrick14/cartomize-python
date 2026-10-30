@@ -1,16 +1,24 @@
 # Espace de travail intégré : Cartomize 1.0
 
-La fenêtre principale comprend deux panneaux redimensionnables. Le panneau **Contrôle et traitements**, à gauche, contient le catalogue d’outils, les cartes de paramètres, les options et les commandes d’exécution. Le panneau **Visualisation des résultats**, à droite, rassemble les cartes, couches, tableaux, graphiques et rapports dans des onglets. L’icône conserve les couleurs de Cartomize ; les commandes utilisent une présentation neutre.
+La disposition initiale place **l’explorateur et le catalogue à gauche, les vues au centre, les paramètres à droite et la console en bas**. Les cartes, couches, tableaux, graphiques et rapports s’ouvrent dans les onglets centraux. Chaque vue peut ensuite être détachée, ancrée sur un côté ou regroupée avec un autre panneau. Ce guide et le [guide de l’espace de travail dynamique](DYNAMIC_WORKSPACE.md) décrivent la construction **2026103001** de la version publique **1.0** ; l’état de distribution est suivi dans [PUBLICATION.md](PUBLICATION.md).
 
 ## Configurer et exécuter
 
-1. Rechercher ou sélectionner un outil dans le catalogue. Le bouton **Outils** replie le catalogue pour agrandir le formulaire.
-2. Importer les données, cocher les opérations nécessaires et définir les paramètres. Les formulaires défilent indépendamment de la vue de résultats.
+1. Rechercher ou sélectionner un outil dans le catalogue de gauche.
+2. Importer les données, cocher les opérations nécessaires et définir les paramètres à droite. Les formulaires défilent indépendamment des vues. **Aide** ouvre les explications repliées ; les unités, les choix, les erreurs et les diagnostics restent visibles.
 3. Ouvrir **Paramètres de calcul et de sortie** lorsque ces réglages sont disponibles, puis lancer le traitement.
 4. Consulter la progression. Les résultats précédents restent navigables pendant le calcul.
-5. À la fin du traitement, le résultat est affiché dans le panneau de droite. Les fichiers d’un traitement transactionnel sont affichés après sa réussite, pas pendant leur écriture.
+5. À la fin du traitement, le résultat s’ouvre dans une vue centrale. Les fichiers d’un traitement transactionnel sont affichés après sa réussite, pas pendant leur écriture.
 
-Les aperçus et les contrôles cartographiques s’ouvrent dans ce panneau. L’exécution n’ouvre pas de fenêtre de résultat indépendante. Les dialogues de choix de fichiers ou de paramétrage explicitement demandés restent disponibles.
+Les aperçus et les contrôles cartographiques s’ouvrent aussi dans cet espace. **Détacher** permet d’afficher une vue dans une fenêtre indépendante tout en conservant ses réglages et son résultat.
+
+## Placer et agrandir une vue
+
+Ouvrir le menu de l’onglet pour **Détacher**, **Agrandir** ou **Fermer** la vue. Une fois détachée, faire glisser sa barre de titre : les guides indiquent les quatre côtés et le centre d’un panneau pour le regrouper en onglets. Le menu **Positionner** offre les mêmes choix de côté et **Grouper avec**. **Échap** annule le déplacement.
+
+La commande **Réintégrer dans les vues** ramène le résultat aux onglets centraux. **Agrandir**, puis **Rétablir**, permet de consacrer temporairement l’espace à une vue. **F11** agrandit l’espace central ; **F11** ou **Échap** retrouve le placement précédent.
+
+**Affichage** rouvre les panneaux de l’application. **Affichage > Rétablir la disposition** réintègre les vues détachées et remet les panneaux à leur place initiale. Les fichiers et leurs valeurs sont conservés.
 
 ## Explorer les résultats
 
@@ -28,7 +36,7 @@ Les aperçus et les contrôles cartographiques s’ouvrent dans ce panneau. L’
 
 La molette contrôle le zoom ; le glissement déplace la vue. **Étendue** revient au cadrage initial. **1:1** règle une unité du document sur un pixel logique de l’écran ; pour un raster, il s’agit d’un pixel source. **Actualiser** relit le résultat. Cliquer sur un raster affiche la ligne, la colonne et les valeurs stockées des bandes sélectionnées ; les valeurs NoData sont identifiées explicitement.
 
-**Affichage** donne accès aux bandes et aux palettes, y compris dans une comparaison. **Informations** affiche la légende et les métadonnées : système de coordonnées, résolution, dimensions, type numérique, unités, descriptions des bandes, facteurs radiométriques et pyramides disponibles. Une orientation et une échelle géodésique approximative au centre de la vue sont dessinées pour les couches géoréférencées. L’habillage définitif appartient à la carte exportée.
+**Style** donne accès aux bandes et aux palettes, y compris dans une comparaison. **Infos** affiche la légende et les métadonnées : système de coordonnées, résolution, dimensions, type numérique, unités, descriptions des bandes, facteurs radiométriques et pyramides disponibles. Une orientation et une échelle géodésique approximative au centre de la vue sont dessinées pour les couches géoréférencées. L’habillage définitif appartient à la carte exportée.
 
 Les rasters scientifiques sont séparés de leur représentation. Le contraste automatique utilise des percentiles 2–98 % calculés sur un échantillon fixe par bande ; il ne change pas lors d’un simple déplacement. Le choix d’une palette, d’un contraste ou d’une interpolation ne réécrit jamais les pixels scientifiques. Les codes de classification restent discrets et la valeur zéro reste visible lorsqu’elle est valide.
 
@@ -40,7 +48,7 @@ Sélectionner **Comparer** après avoir chargé au moins deux cartes ou couches.
 - Pour un PDF, un SVG ou une image sans géoréférencement, la comparaison reste visuelle et la synchronisation géographique est désactivée.
 - **Échelle colorimétrique commune** applique les mêmes limites et la même palette à deux rasters continus compatibles avec ce mode. Vérifier qu’ils représentent la même grandeur et les mêmes unités. Cette option ne calibre ni n’harmonise automatiquement des capteurs différents.
 
-Plusieurs comparaisons et documents peuvent être ouverts. Huit onglets sont conservés simultanément pour limiter la mémoire ; les résultats des onglets fermés restent dans le catalogue et peuvent être rouverts. Les fichiers ne sont pas supprimés.
+Plusieurs comparaisons et documents peuvent être ouverts. Huit vues actives sont conservées simultanément, en comptant les onglets centraux et les vues détachées. Les résultats des vues fermées restent dans le catalogue et peuvent être rouverts. Les fichiers ne sont pas supprimés.
 
 ## Tableaux, graphiques et rapports
 
@@ -52,7 +60,9 @@ Les rapports de classification conservent leurs matrices de confusion et leurs i
 
 ## Enregistrer un projet
 
-Les sessions enregistrent les résultats, les onglets ouverts, les comparaisons, les bandes, les palettes, les emprises et la largeur des panneaux. Un projet portable emporte les fichiers référencés. Les anciennes sessions restent lisibles.
+Les sessions enregistrent les résultats, les vues ouvertes, les comparaisons, les bandes, les palettes et les emprises. Elles conservent aussi le placement des vues : onglet central ou panneau, côté d’ancrage, regroupement, fenêtre détachée et dimensions. Rouvrir le projet restaure ce placement avec les vues disponibles. Un projet portable emporte les fichiers référencés. Les anciennes sessions restent lisibles.
+
+La disposition des panneaux de l’application est mémorisée localement entre les lancements, avec le thème et la taille du texte. Les thèmes **Clair**, **Sombre** et **Système** et les tailles de **11 à 16 pixels** restent disponibles.
 
 Les aperçus et contrôles temporaires ne sont pas des exports persistants ; ils sont exclus des références de session pour ne pas créer de sources manquantes après fermeture. Exporter la carte pour la conserver. Les tableaux se rouvrent à leur première page.
 

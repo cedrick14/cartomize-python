@@ -102,9 +102,8 @@ class BatchReprojectionControls:
                 form.addRow(caption, control)
             else:
                 form.addRow(control)
-        note = QLabel('Chaque couche conserve ses attributs. Le rapport indique les emprises avant/après, la transformation et ses grilles. Les coordonnées Z sont conservées ; le traitement est horizontal.')
-        note.setWordWrap(True)
-        form.addRow(note)
+        self.add_help('Chaque couche conserve ses attributs. Le rapport indique les emprises avant/après, la transformation et ses grilles. Les coordonnées Z sont conservées ; le traitement est horizontal.',
+            subject='Données et rapport de reprojection',summary='Transformation horizontale ; Z conservé.',form=form)
         self.form.insertRow(self.form.rowCount() - 1, self.batch_section)
         self.operation.addItem('Reprojection vectorielle par lot', 'reproject_batch')
         self.batch_layers.currentRowChanged.connect(self.show_reprojection_layer)

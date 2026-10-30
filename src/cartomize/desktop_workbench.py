@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
 )
 
 from .desktop_console import ConsolePanel, EnvironmentPanel
+from .desktop_docking import DockController, LAYOUT_VERSION
 from .desktop_theme import apply_theme
 
 
@@ -46,11 +47,12 @@ class Workbench(QObject):
         self._catalogue_signature = None
         self.actions = {}
         self._closed = False
+        window.dock_manager = DockController(window)
         self._build_workspace()
         self._build_bottom_panel()
         self._build_actions()
         self._configure_imports()
-        self._default_docks = window.saveState(2)
+        self._default_docks = window.saveState(LAYOUT_VERSION)
         self.restore_layout()
         QApplication.instance().styleHints().colorSchemeChanged.connect(self.system_theme_changed)
         window.installEventFilter(self)
@@ -71,16 +73,20 @@ class Workbench(QObject):
         old_root.hide()
         self._retired_header = old_root
         w.workspace_splitter.insertWidget(0, w.workspace)
-        w.workspace.setMinimumWidth(420)
-        w.controls_panel.setMinimumWidth(350)
-        w.controls_panel.setMaximumWidth(750)
+        w.workspace.setMinimumWidth(360)
+        w.controls_panel.setMinimumWidth(320)
+        w.controls_panel.setMaximumWidth(16777215)
+        self.parameters_dock = QDockWidget('Paramètres', w)
+        self.parameters_dock.setObjectName('toolParametersDock')
+        self.parameters_dock.setWidget(w.controls_panel)
+        w.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.parameters_dock)
+        w.parameters_dock = self.parameters_dock
+        w.dock_manager.register(self.parameters_dock)
         w.workspace_splitter.setStretchFactor(0, 1)
-        w.workspace_splitter.setStretchFactor(1, 0)
-        w.workspace_splitter.setSizes([800, 390])
         w.controls_panel.layout().setContentsMargins(8, 6, 8, 6)
         for label in w.controls_panel.findChildren(QLabel):
             if label.objectName() == 'panelTitle':
-                label.setText('Paramètres')
+                label.hide()
         w.catalogue_toggle.hide()
         w.navigation.setMinimumHeight(150)
         w.navigation.setWordWrap(True)
@@ -103,14 +109,17 @@ class Workbench(QObject):
         self.tools_dock.setAllowedAreas(Qt.DockWidgetArea.LeftDockWidgetArea | Qt.DockWidgetArea.RightDockWidgetArea)
         w.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.tools_dock)
         w.project_explorer.setMinimumWidth(210)
-        w.project_explorer.setMaximumWidth(750)
+        w.project_explorer.setMaximumWidth(16777215)
         w.project_explorer.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetClosable |
                                       QDockWidget.DockWidgetFeature.DockWidgetMovable |
                                       QDockWidget.DockWidgetFeature.DockWidgetFloatable)
         w.splitDockWidget(w.project_explorer, self.tools_dock, Qt.Orientation.Vertical)
+        w.dock_manager.register(w.project_explorer)
+        w.dock_manager.register(self.tools_dock)
         w.setDockNestingEnabled(True)
         self.filter_tools('')
         w.resizeDocks([w.project_explorer], [230], Qt.Orientation.Horizontal)
+        w.resizeDocks([self.parameters_dock], [390], Qt.Orientation.Horizontal)
         w.resizeDocks([w.project_explorer, self.tools_dock], [210, 330], Qt.Orientation.Vertical)
         w.status.setMaximumHeight(36)
         w.statusBar().addWidget(w.status, 1)
@@ -118,6 +127,8 @@ class Workbench(QObject):
         w.statusBar().addPermanentWidget(w.progress)
         w.setCorner(Qt.Corner.BottomLeftCorner, Qt.DockWidgetArea.BottomDockWidgetArea)
         w.setCorner(Qt.Corner.BottomRightCorner, Qt.DockWidgetArea.BottomDockWidgetArea)
+        w.navigation.currentRowChanged.connect(lambda *_: self.show_parameters())
+        w.navigation.itemClicked.connect(lambda *_: self.show_parameters())
 
     def _build_bottom_panel(self):
         w = self.window
@@ -145,6 +156,7 @@ class Workbench(QObject):
         self.bottom_dock.setWidget(self.bottom_tabs)
         self.bottom_dock.setMinimumHeight(170)
         w.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, self.bottom_dock)
+        w.dock_manager.register(self.bottom_dock)
         w.resizeDocks([self.bottom_dock], [230], Qt.Orientation.Vertical)
         # Public references for embedding applications and automated GUI checks.
         w.console_panel = self.console
@@ -179,8 +191,10 @@ class Workbench(QObject):
         edit.addAction(self.action('undo', 'Annuler la modification', w.undo_session, 'Ctrl+Z'))
         edit.addAction(self.action('redo', 'Rétablir la modification', w.redo_session, 'Ctrl+Shift+Z'))
         views = w.menuBar().addMenu('Affichage')
-        for dock in (w.project_explorer, self.tools_dock, self.bottom_dock):
+        for dock in (w.project_explorer, self.tools_dock, self.parameters_dock, self.bottom_dock):
             views.addAction(dock.toggleViewAction())
+        views.addAction(self.action('focus_view', 'Agrandir la vue',
+                                    lambda: w.dock_manager.focus(), 'F11'))
         views.addAction(self.action('console', 'Console Python', self.show_console, 'Ctrl+`'))
         views.addAction(self.action('reset_layout', 'Rétablir la disposition', self.reset_layout))
         tools = w.menuBar().addMenu('Traitements')
@@ -300,23 +314,27 @@ class Workbench(QObject):
             return
         self.category.setCurrentIndex(0)
         self.window.tool_search.clear()
-        self.tools_dock.show()
+        self.window.dock_manager.show(self.tools_dock)
+        self.show_parameters()
         self.window.select_tool(key)
         self.window.navigation.scrollToItem(self.window.navigation.currentItem())
 
+    def show_parameters(self):
+        self.window.dock_manager.show(self.parameters_dock)
+
     def focus_search(self):
-        self.tools_dock.show()
+        self.window.dock_manager.show(self.tools_dock)
         self.window.tool_search.setFocus()
         self.window.tool_search.selectAll()
 
     def show_console(self):
-        self.bottom_dock.show()
+        self.window.dock_manager.show(self.bottom_dock)
         self.bottom_tabs.setCurrentWidget(self.console)
         self.console.editor.setFocus()
 
     def show_environment(self):
         self.environment.refresh()
-        self.bottom_dock.show()
+        self.window.dock_manager.show(self.bottom_dock)
         self.bottom_tabs.setCurrentWidget(self.environment)
 
     def open_loaded(self, item, column=0):
@@ -394,21 +412,33 @@ class Workbench(QObject):
         state = w._preferences.value('workbench/docks')
         if isinstance(geometry, QByteArray):
             w.restoreGeometry(geometry)
-        if isinstance(state, QByteArray):
-            w.restoreState(state, 2)
+        if isinstance(state, QByteArray) and state.size() <= 1024 * 1024:
+            restored = w.restoreState(state, LAYOUT_VERSION)
+            if not restored:
+                restored = w.restoreState(state, 2)
+            w.dock_manager.user_layout = bool(restored)
+        for dock in w.dock_manager.docks:
+            w.dock_manager.ensure_visible(dock)
         directory = w._preferences.value('workbench/directory', '')
         if directory and Path(str(directory)).is_dir():
             w.project_explorer.set_directory(directory)
 
     def reset_layout(self):
         w = self.window
-        w.restoreState(self._default_docks, 2)
-        for dock in (w.project_explorer, self.tools_dock, self.bottom_dock):
+        w.dock_manager.cancel_drag()
+        w.dock_manager.reset_focus()
+        for document in tuple(w.workspace.detached_docks):
+            w.workspace.reattach_document(document)
+        w.restoreState(self._default_docks, LAYOUT_VERSION)
+        for dock in (w.project_explorer, self.tools_dock, self.parameters_dock, self.bottom_dock):
             dock.setFloating(False)
             dock.show()
-        w.workspace_splitter.setSizes([800, 390])
         w.resizeDocks([w.project_explorer], [230], Qt.Orientation.Horizontal)
+        w.resizeDocks([self.parameters_dock], [390], Qt.Orientation.Horizontal)
         w.resizeDocks([self.bottom_dock], [230], Qt.Orientation.Vertical)
+        w.dock_manager.user_layout = False
+        if hasattr(w, '_adaptive_workspace'):
+            w._adaptive_workspace.schedule()
 
     def shutdown(self):
         if self._closed:
@@ -417,8 +447,9 @@ class Workbench(QObject):
         self.timer.stop()
         self.console.shutdown()
         w = self.window
+        w.dock_manager.shutdown()
         w._preferences.setValue('workbench/geometry', w.saveGeometry())
-        w._preferences.setValue('workbench/docks', w.saveState(2))
+        w._preferences.setValue('workbench/docks', w.saveState(LAYOUT_VERSION))
         w._preferences.setValue('workbench/directory', w.project_explorer.path_label.text())
 
     def eventFilter(self, watched, event):

@@ -1,5 +1,20 @@
 # Distribution de l’édition consolidée 1.0
 
+## Correction de l’interface — construction 2026103001
+
+Cette construction conserve la version publique **1.0** et ajoute les panneaux
+dynamiques, les repères de placement et les aides repliées. Son wheel est
+`cartomize-1.0-2026103001-py3-none-any.whl`. **La validation et la publication de
+cette correction sont en cours.** Les preuves ci-dessous concernent pour
+l’instant la construction précédente `20261030`.
+
+Le nouvel identifiant permet d’ajouter un fichier à la release `1.0` recréée
+le 30 octobre, sans supprimer à nouveau cette release. Après publication,
+l’installation d’une précédente construction `1.0` demande une réinstallation
+explicite ; le champ `WHEEL` attendu sera `Build: 2026103001`.
+
+## Publication initiale de l’édition consolidée
+
 **État au 30 octobre 2026 : publiée sur PyPI et disponible sur GitHub.** L’édition consolidée **Cartomize 1.0**, construction **20261030**, réunit les modules terminés jusqu’à G12. La release historique `1.0` a été supprimée, puis remplacée sur PyPI par la roue `cartomize-1.0-20261030-py3-none-any.whl`. Les sources complètes et le dossier de présentation sont conservés dans la [livraison GitHub](https://github.com/cedrick14/cartomize-python/releases/tag/cartomize-1.0-20261030). Les preuves de publication et le suivi de l’installation figurent plus bas.
 
 Le paquet reste `cartomize`. Sa version publique, la version des métadonnées et `cartomize.__version__` sont toutes **`1.0`**. Le numéro de construction de la roue, **`20261030`**, distingue les nouveaux fichiers des distributions historiques sans changer la version publique.
@@ -50,7 +65,8 @@ python scripts/build_demo_delivery.py --dist-dir pypi-dist --output delivery-dis
 ```
 
 Après les contrôles de construction et Windows Conda, le workflow peut publier
-la livraison complète sous le tag GitHub `cartomize-1.0-20261030`. Cette action
+la livraison complète sous un tag GitHub dérivé de la version et du numéro
+de construction : `cartomize-1.0-2026103001` pour la correction de l’interface. Cette action
 demande un commit sur `main` contenant `[publish delivery]`, ou l’option manuelle
 `delivery` sur `main`. Elle est indépendante de l’envoi PyPI ; le tag ne correspond
 pas au déclencheur `python-v*`. La création de la release GitHub ne modifie donc

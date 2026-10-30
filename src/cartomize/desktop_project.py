@@ -40,9 +40,9 @@ class ProjectPage(Page):
         add.clicked.connect(self.browse);remove.clicked.connect(lambda:self.layers.removeRow(self.layers.currentRow()))
         open_project.clicked.connect(self.open_project);self.form.addRow(buttons)
         self.auto=QCheckBox('Détecter les valeurs de fond en périphérie');self.auto.setChecked(True);self.form.addRow(self.auto)
-        note=QLabel('Les masques NoData déclarés sont conservés. Les fonds détectés sont masqués dans des copies. '
-                    'Les rasters binaires 0/1 restent inchangés. Les valeurs supplémentaires s’appliquent à toute l’image ; séparer les codes par des virgules.')
-        note.setWordWrap(True);self.form.addRow(note)
+        self.add_help('Les masques NoData déclarés sont conservés. Les fonds détectés sont masqués dans des copies. '
+                      'Les rasters binaires 0/1 restent inchangés. Les valeurs supplémentaires s’appliquent à toute l’image ; séparer les codes par des virgules.',
+                      subject='Masques et valeurs de fond',summary='NoData supplémentaires : appliqués à toute l’image.')
         self.footprint=PathField(filter='Emprise valide (*.gpkg *.geojson *.shp)');self.form.addRow('Emprise valide (facultatif)',self.footprint)
         self.directory=PathField('directory');self.name=QLineEdit('analyse_projet')
         self.form.addRow('Répertoire de sortie',self.directory);self.form.addRow('Nouveau répertoire de préparation',self.name)

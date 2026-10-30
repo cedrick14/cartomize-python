@@ -54,7 +54,7 @@ python -m pip install --index-url https://pypi.org/simple "cartomize[notebook]==
 python -m jupyter lab
 ```
 
-Les notebooks et les données synthétiques de démonstration sont fournis dans la [livraison GitHub](https://github.com/cedrick14/cartomize-python/releases/tag/cartomize-1.0-20261030). Le [guide Jupyter](docs/NOTEBOOKS.md) explique le choix du noyau et l’installation dans un environnement existant.
+Les notebooks et les données synthétiques de démonstration sont fournis dans la [livraison GitHub](https://github.com/cedrick14/cartomize-python/releases/latest). Le [guide Jupyter](docs/NOTEBOOKS.md) explique le choix du noyau et l’installation dans un environnement existant.
 
 ### Interface de bureau sans code
 
@@ -76,15 +76,23 @@ fenetre = cm.launch()
 
 Pour ouvrir cette fenêtre depuis un notebook local, installer l’option `cartomize[notebook]==1.0` avec la commande ci-dessus, redémarrer le noyau puis appeler `cm.launch()`. Les notebooks distants peuvent utiliser l’API sans ouvrir de fenêtre native.
 
-L’édition consolidée **Cartomize 1.0**, construction **20261030**, est disponible sur [PyPI](https://pypi.org/project/cartomize/1.0/). La version publique reste `1.0` ; le fichier installé porte `Build: 20261030`. Les sources complètes, le wheel et le dossier de présentation sont conservés dans la [livraison GitHub](https://github.com/cedrick14/cartomize-python/releases/tag/cartomize-1.0-20261030). Le [suivi de publication](docs/PUBLICATION.md) explique la vérification de la construction et la réinstallation explicite d’une ancienne édition `1.0`. Le [guide de démonstration](docs/DEMONSTRATION_1.0.md) donne également les commandes d’installation du wheel téléchargé.
+L’espace de travail dynamique correspond à la construction **2026103001** de **Cartomize 1.0**. La version publique reste `1.0` ; le fichier installé doit porter `Build: 2026103001`. Le [suivi de publication](docs/PUBLICATION.md) indique sa disponibilité sur PyPI et GitHub. Pour remplacer une installation antérieure portant déjà le numéro `1.0`, utiliser une réinstallation explicite :
+
+```bash
+python -m pip install --index-url https://pypi.org/simple --force-reinstall --no-cache-dir "cartomize[notebook]==1.0"
+```
+
+Le [guide de démonstration](docs/DEMONSTRATION_1.0.md) donne également les commandes d’installation du wheel téléchargé et la vérification de sa construction.
 
 ## Espace de travail
 
-L’explorateur ouvre les fichiers locaux et les projets Cartomize. Le catalogue classe les 21 pages de traitement par domaine et propose une recherche. Les paramètres restent à droite de la carte. Les résultats s’ouvrent dans des onglets intégrés.
+L’explorateur ouvre les fichiers locaux et les projets Cartomize. Le catalogue classe les 21 pages de traitement par domaine et propose une recherche. Par défaut, les paramètres sont à droite de la carte et les résultats s’ouvrent dans des onglets intégrés.
+
+Les panneaux et les vues de résultat se détachent, se redimensionnent, s’agrandissent et se réancrent. Pendant le déplacement d’une barre de titre, des repères indiquent les positions disponibles et l’emplacement retenu. Les panneaux peuvent aussi être regroupés en onglets. **F11** agrandit la vue centrale, **Échap** rétablit la disposition ou annule un déplacement ; **Affichage → Rétablir la disposition** retrouve l’organisation initiale. Les valeurs des formulaires et l’état des cartes sont conservés. Voir le [guide de l’espace dynamique](docs/DYNAMIC_WORKSPACE.md).
 
 Le panneau inférieur réunit la console Python, les journaux, les données chargées et le diagnostic de l’environnement. La console utilise un processus distinct pour permettre l’interruption du code sans fermer l’application. Les thèmes Clair, Sombre et Système, la taille du texte et la disposition des panneaux sont mémorisés.
 
-Les cartes proposent zoom, déplacement, valeurs de pixels, légendes, métadonnées et comparaison avec emprises liées. Les projets enregistrés dans l’ancienne disposition restent lisibles.
+Les cartes proposent zoom, déplacement, valeurs de pixels, légendes, métadonnées et comparaison avec emprises liées. Les descriptions longues sont repliées dans **Aide** ; les unités, contrôles et messages de traitement restent visibles. Les projets enregistrés dans l’ancienne disposition restent lisibles.
 
 ## Fonctionnalités
 
@@ -163,7 +171,7 @@ python -m pytest
 python -m build
 python -m twine check --strict dist/*
 python scripts/check_release.py dist
-python scripts/verify_installed_release.py --wheel dist/cartomize-1.0-20261030-py3-none-any.whl --output reports/installed.json
+python scripts/verify_installed_release.py --wheel dist/cartomize-1.0-2026103001-py3-none-any.whl --output reports/installed.json
 ```
 
 La validation automatise les contrôles Windows et Linux, les traitements, l’interface, les projets, les exports, la console et une installation isolée du paquet construit. Les essais CUDA et QGIS natif demandent leurs environnements respectifs. Les résultats sont associés aux versions, aux données et aux commits inscrits dans les rapports.

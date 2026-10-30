@@ -17,10 +17,9 @@ class AssistantPage(Page):
         super().__init__('Assistant cartographique','Définir l’objectif, contrôler les données, préparer les images, effectuer les analyses puis composer et vérifier la carte.')
         self.directory=Path(directory);self.assessment=None
         outer_form=self.form
-        sequence=QLabel('Imagerie : importation, préparation multibande, analyses, cartographie.\n'
-                        'Couches : diagnostic, préparation, superposition, mise en page.\n'
-                        'La composition colorée définit l’affichage des bandes spectrales.')
-        sequence.setWordWrap(True);sequence.setObjectName('sequence');outer_form.addRow(sequence)
+        self.add_help('Imagerie : importation, préparation multibande, analyses, cartographie.\n'
+                      'Couches : diagnostic, préparation, superposition, mise en page.\n'
+                      'La composition colorée définit l’affichage des bandes spectrales.',subject='Parcours cartographique',form=outer_form)
         self.tabs=QTabWidget();outer_form.addRow(self.tabs)
         project_tab=QWidget();self.form=QFormLayout(project_tab);self.tabs.addTab(project_tab,'Données')
         processing_tab=QWidget();processing_form=QFormLayout(processing_tab);self.tabs.addTab(processing_tab,'Traitements complémentaires')

@@ -129,23 +129,23 @@ class MergeControls:
         self.merge_remove_field_button.clicked.connect(self.remove_merge_field)
         schema_buttons.addWidget(self.merge_add_field_button, 0, 0)
         schema_buttons.addWidget(self.merge_remove_field_button, 1, 0)
-        schema_note = QLabel('Le type choisi définit la conversion. « Null » autorise une absence après conversion et application du défaut. Pour un texte vide par défaut, choisir « Valeur » et laisser sa cellule vide.')
-        schema_note.setWordWrap(True)
+        schema_note = self.context_help('Le type choisi définit la conversion. « Null » autorise une absence après conversion et application du défaut. Pour un texte vide par défaut, choisir « Valeur » et laisser sa cellule vide.',
+            subject='Types, valeurs nulles et défauts')
         self.merge_mapping = _table(['Source', 'Type', 'Cible'], 160)
         for column, width in enumerate((115, 80, 140)):
             self.merge_mapping.setColumnWidth(column, width)
-        mapping_note = QLabel('Choisir ou saisir le nom cible de chaque champ. « Écarter » exclut explicitement un champ. Les correspondances sont conservées séparément pour chaque couche.')
-        mapping_note.setWordWrap(True)
+        mapping_note = self.context_help('Choisir ou saisir le nom cible de chaque champ. « Écarter » exclut explicitement un champ. Les correspondances sont conservées séparément pour chaque couche.',
+            subject='Correspondance des champs',summary='« Écarter » exclut le champ.')
         self.merge_conversion_errors = _combo([('Arrêter', 'error'), ('Mettre à NULL', 'null')], 'error')
         self.merge_missing_fields = _combo([('Créer des valeurs NULL', 'null'), ('Arrêter', 'error')], 'null')
         self.merge_extra_fields = _combo([('Arrêter', 'error'), ('Écarter les champs', 'drop')], 'error')
         self.merge_target_crs = QLineEdit()
         self.merge_target_crs.setPlaceholderText('Vide : les SCR doivent être identiques')
-        crs_note = QLabel('Une cible explicite utilise les contrôles géodésiques stricts. Pour examiner et choisir les transformations, préparer les couches avec la reprojection par lot.')
-        crs_note.setWordWrap(True)
+        crs_note = self.context_help('Une cible explicite utilise les contrôles géodésiques stricts. Pour examiner et choisir les transformations, préparer les couches avec la reprojection par lot.',
+            subject='Transformation du SCR cible',summary='SCR cible : contrôles géodésiques stricts.')
         self.merge_folder = QLineEdit('fusion_vectorielle')
-        note = QLabel('La fusion conserve toutes les lignes et leurs géométries, dans l’ordre des couches. Elle ajoute la provenance et un rapport des conversions. Les recouvrements et doublons sont conservés.')
-        note.setWordWrap(True)
+        note = self.context_help('La fusion conserve toutes les lignes et leurs géométries, dans l’ordre des couches. Elle ajoute la provenance et un rapport des conversions. Les recouvrements et doublons sont conservés.',
+            subject='Données fusionnées',summary='Recouvrements et doublons conservés.')
         for title, control in [
             ('Fichiers et dossiers sources', self.merge_sources), ('', actions),
             ('Recherche des sources', self.merge_recursive), ('', self.merge_inspect_button),
