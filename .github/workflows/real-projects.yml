@@ -8,10 +8,12 @@ on:
       - 'scripts/real_project_data.py'
       - 'scripts/validate_real_projects.py'
       - 'scripts/validate_vector_selection_real.py'
+      - 'scripts/validate_vector_tabulation_real.py'
       - 'scripts/validate_vector_quality_real.py'
       - 'scripts/project_comparisons.py'
       - 'tests/test_project_comparisons.py'
       - 'tests/test_g07_real_oracle.py'
+      - 'tests/test_g09_real_oracle.py'
       - '.github/workflows/real-projects.yml'
   pull_request:
     paths:
@@ -19,10 +21,12 @@ on:
       - 'scripts/real_project_data.py'
       - 'scripts/validate_real_projects.py'
       - 'scripts/validate_vector_selection_real.py'
+      - 'scripts/validate_vector_tabulation_real.py'
       - 'scripts/validate_vector_quality_real.py'
       - 'scripts/project_comparisons.py'
       - 'tests/test_project_comparisons.py'
       - 'tests/test_g07_real_oracle.py'
+      - 'tests/test_g09_real_oracle.py'
       - '.github/workflows/real-projects.yml'
   workflow_dispatch:
 
@@ -66,6 +70,9 @@ jobs:
       - name: Verify G07 selected and excluded records against original data
         if: '!cancelled()'
         run: python scripts/validate_vector_selection_real.py --data .real-project-data --work reports/g07-real/products --output reports/g07-real/validation.json
+      - name: Verify G09 area tables and balances against real data and independent clipping
+        if: '!cancelled()'
+        run: python scripts/validate_vector_tabulation_real.py --data .real-project-data --work reports/g09-real/products --output reports/g09-real/validation.json
       - name: Check complete regression suite
         if: '!cancelled()'
         run: python -m pytest -q --timeout=180 --junitxml=reports/regressions.xml
@@ -88,6 +95,7 @@ jobs:
             reports/**/*.pdf
             reports/**/*.svg
             reports/g07-real/products/**/*.gpkg
+            reports/g09-real/products/**/*.gpkg
             dist-validation/*
           if-no-files-found: error
           retention-days: 30

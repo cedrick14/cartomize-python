@@ -43,5 +43,6 @@
   "vector.merge_layers": "16_harmonisation_fusion_vectorielle",
   "vector.convert": "18_conversion_conditionnement",
   "raster.convert": "18_conversion_conditionnement",
-  "vector.extract_features": "19_extraction_attributaire_spatiale"
+  "vector.extract_features": "19_extraction_attributaire_spatiale",
+  "vector.tabulate_area": "20_table_croisee_surfaces"
 }

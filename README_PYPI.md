@@ -1,6 +1,6 @@
 # Cartomize
 
-**Version 1.10.0**
+**Version 1.11.0**
 
 Cartomize provides a Python API, a command-line interface and a desktop application for geospatial processing and cartographic production. It runs independently of QGIS and ArcGIS Pro. Native project bridges are optional.
 
@@ -18,7 +18,7 @@ python -m cartomize gui
 For a downloaded wheel:
 
 ```bash
-python -m pip install "./cartomize-1.10.0-py3-none-any.whl[gui]"
+python -m pip install "./cartomize-1.11.0-py3-none-any.whl[gui]"
 ```
 
 For the current GitHub sources:
@@ -55,13 +55,15 @@ Imported files are available for viewing and transfer to compatible processing t
 |---|---|
 | Satellite imagery | Exact grid coverage diagnostics, scene recommendations, band import, calibration, quality masking, mosaics, multiband assembly, clipping and RGB composition |
 | Raster | Algebra, 18 spectral indices, focal and zonal statistics, reductions, reclassification and change matrices |
-| Vector | Schema harmonization and merging with provenance, geometry audits and repairs, polygon/line topology, duplicate selection, overlay, spatial joins, buffers, clipping, dissolution, reprojection and measurement |
+| Vector | Polygon area cross-tabulation with coverage and overlap balances, schema harmonization and merging with provenance, geometry audits and repairs, polygon/line topology, duplicate selection, overlay, spatial joins, buffers, clipping, dissolution, reprojection and measurement |
 | Classification | Random forests, extra trees, K-means, validation and saved models |
 | Terrain and networks | Terrain derivatives, convolution, D8 drainage, watersheds and shortest paths |
 | Cartography | 24 templates, symbology, labels, legends, scale bars, multiple frames, atlases and PDF/PNG/SVG export |
-| Automation | 53 registered operators, processing plans, reusable recipes, batch production and saved sessions |
+| Automation | 54 registered operators, processing plans, reusable recipes, batch production and saved sessions |
 
 Optional Dask and CUDA execution is available for supported operators. Native GIS bridges and CUDA hardware execution require the corresponding runtime.
+
+Version 1.11.0 completes polygon area cross-tabulation by zone: exact typed category identities, same-category dissolution, complete long and wide tables, unique coverage, gaps and overlap diagnostics. Cross-category overlap is refused by default or explicitly reported; projected units and double-counting rules are recorded. All four GeoPackages and three CSV tables are verified before atomic publication through Python, CLI, plans and the vector desktop page. See the [G09 guide](https://github.com/cedrick14/cartomize-python/blob/main/docs/VECTOR_TABULATION.md).
 
 Version 1.9.0 adds verified data conversion: selected vector layers to GeoPackage, GeoJSON, Shapefile and FlatGeobuf, and rasters to GeoTIFF or COG. Encoding, field names, numeric precision, compression and NoData are explicit. Complete readback verifies saved attributes, geometries, pixels, masks and georeferencing. The workflow is available through Python, the CLI, plans and the dedicated Conversion and formats desktop page. See the [G06 guide](https://github.com/cedrick14/cartomize-python/blob/main/docs/DATA_CONVERSION.md).
 

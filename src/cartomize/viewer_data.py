@@ -232,6 +232,7 @@ def table_page(path, offset=0, size=2000, layer=None):
                 # the inference reader can turn their nulls into literal nan.
                 separator = '\t' if path.suffix.lower() == '.tsv' else ','
                 engine = 'c'
+                options['float_precision'] = 'round_trip'
         data = pd.read_csv(path, sep=separator, engine=engine,
                            skiprows=range(1, offset+1), nrows=size+1, encoding='utf-8-sig', **options)
     return dict(frame=data.iloc[:size].copy(), more=len(data)>size, offset=offset, size=size)

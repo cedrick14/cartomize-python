@@ -63,6 +63,14 @@ LABELS.update({
     'mask_layer': 'Couche du masque spatial',
     'combination': 'Combinaison attributs et localisation',
     'invert': 'Inverser la sélection finale',
+    'zone_field': 'Champ définissant les zones',
+    'class_field': 'Champ des catégories',
+    'zones_layer': 'Couche du fichier de zones',
+    'classes_layer': 'Couche du fichier d’occupation du sol',
+    'area_unit': 'Unité des surfaces',
+    'overlap_policy': 'Recouvrements entre catégories',
+    'zone_overlap_policy': 'Recouvrements entre zones',
+    'null_classes': 'Catégories manquantes',
 })
 PATHS={'data','source','left','right','mask','zones','before','after','training','validation','model','valid_footprint','outlets','table','observations','aoi'}
 PATHS.update({'reference', 'allowed_gaps'})
@@ -77,6 +85,15 @@ CHOICES={
     'value_mode':[('Valeurs physiques (calibration du raster)','physical'),('Valeurs brutes (DN)','raw')],
 }
 OPERATION_CHOICES = {
+    'vector.tabulate_area': {
+        'area_unit': [('Hectares (ha)', 'ha'), ('Mètres carrés (m²)', 'm2'), ('Kilomètres carrés (km²)', 'km2')],
+        'overlap_policy': [('Interrompre si des catégories se recouvrent', 'error'),
+                           ('Conserver les catégories et détailler les recouvrements', 'report')],
+        'zone_overlap_policy': [('Calculer chaque zone indépendamment', 'independent'),
+                                ('Refuser les recouvrements entre zones', 'error')],
+        'null_classes': [('Refuser les catégories manquantes', 'error'),
+                         ('Les considérer comme non classées', 'unclassified')],
+    },
     'vector.extract_features': {
         'attribute_match': [('Tous les critères', 'all'), ('Au moins un critère', 'any')],
         'combination': [('Attributs ET localisation', 'and'), ('Attributs OU localisation', 'or')],
@@ -159,6 +176,7 @@ class OperationDialog(QDialog):
         while self.form.rowCount():self.form.removeRow(0)
         self.controls={};self._explicit_nulls=set();self._invalid_choices={};spec=operation_spec(self.operation.currentData())
         self._choices = {**CHOICES, **OPERATION_CHOICES.get(spec['id'], {})}
+        self._paths = PATHS | ({'classes'} if spec['id'] == 'vector.tabulate_area' else set())
         self.add_map.setEnabled(self.allow_map and spec['output'] in {'raster','vector'});self.product.clear();self.product.addItems(spec['products'])
         for field in spec['parameters']:
             name=field['name'];default=field['default'];label=LABELS.get(name,name.replace('_',' '))+(' *' if field['required'] else '')
@@ -168,6 +186,8 @@ class OperationDialog(QDialog):
                 label='Encodage des caractères (UTF-8 hors Shapefile)'
             if spec['id'] in {'vector.reproject_batch', 'vector.merge_layers'} and name=='sources':
                 label='Fichiers, dossiers ou couches sélectionnées (liste JSON) *'
+            if spec['id'] == 'vector.tabulate_area' and name == 'classes':
+                label='Couche d’occupation du sol *'
             if name in self._choices:
                 widget=QComboBox();widget.setPlaceholderText('Choisir une valeur')
                 for title,value in self._choices[name]:widget.addItem(title,value)
@@ -175,14 +195,14 @@ class OperationDialog(QDialog):
             elif isinstance(default,bool):widget=QCheckBox();widget.setChecked(default);row=widget
             else:
                 widget=QComboBox();widget.setEditable(True);widget.setMinimumWidth(270)
-                if name in PATHS:
+                if name in self._paths:
                     widget.addItem('');widget.addItem('@scientific')
                     for step in self.previous:
                         widget.addItem('@'+step['id'])
                         for product in operation_spec(step['operation'])['products'][1:]:widget.addItem('@'+step['id']+':'+product)
                 text=json.dumps(default,ensure_ascii=False) if isinstance(default,(list,tuple,dict)) else str(default) if default is not None else ''
                 widget.setCurrentText(text);row=widget
-                if name in PATHS:
+                if name in self._paths:
                     row=QWidget();line=QHBoxLayout(row);line.setContentsMargins(0,0,0,0);line.addWidget(widget)
                     button=QPushButton('Parcourir');line.addWidget(button)
                     button.clicked.connect(lambda checked=False,w=widget:self.browse(w))
@@ -209,7 +229,7 @@ class OperationDialog(QDialog):
                     if field['required']:raise ValueError('Renseigner '+LABELS.get(name,name))
                     continue
                 default=field['default']
-                if name in PATHS or name in {'layer', 'mask_layer', 'id_field'}:value=text
+                if name in self._paths or name in {'layer', 'mask_layer', 'id_field', 'zone_field', 'class_field', 'zones_layer', 'classes_layer'}:value=text
                 elif name in COMPLEX or isinstance(default,(list,tuple,dict)):value=json.loads(text)
                 elif isinstance(default,int):value=int(text)
                 elif isinstance(default,float):value=float(text)

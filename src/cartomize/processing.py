@@ -73,6 +73,8 @@ def _catalog():
     add('raster.convert', 'Conversion et conditionnement raster', convert_raster, 'raster', 'conversion')
     from .vector_selection import extract_features
     add('vector.extract_features', 'Extraction attributaire et spatiale avec bilan', extract_features, 'vector', 'vector')
+    from .vector_tabulation import tabulate_area
+    add('vector.tabulate_area', 'Table croisée des surfaces par zone', tabulate_area, 'vector', 'vector')
     for key, label, function in [
         ('audit_geometries', 'Diagnostic détaillé des géométries', audit_geometries),
         ('repair_geometries', 'Réparation avec rapport des changements', repair_geometries),
@@ -270,6 +272,81 @@ def _write_vector_selection(result, work, *, cancel=None):
     return products
 
 
+def _write_vector_tabulation(result, work, *, cancel=None, progress=None):
+    """Publish all area products after exact vector and table readback."""
+    import hashlib
+    import pandas as pd
+    from .vector_io import write_geopackage
+
+    products = {}
+    tables = {}
+    verified = {}
+
+    def advance(step):
+        _check_cancel(cancel)
+        if progress is not None:
+            progress(8000 + 2000 * step // 9, 10000)
+        _check_cancel(cancel)
+
+    advance(0)
+    for number, name in enumerate(('data', 'zones', 'gaps', 'overlaps'), 1):
+        data = getattr(result, name)
+        path = work / (name + '.gpkg')
+        write_geopackage(data, path, layer='features', cancel=cancel)
+        products[name] = path
+        tables[name] = pd.DataFrame(data.drop(columns=data.geometry.name))
+        verified[path.name] = dict(rows=len(data), sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
+                                   verification='exact_attributes_geometry_and_crs')
+        advance(number)
+    for number, name in enumerate(('table', 'matrix', 'categories'), 5):
+        data = getattr(result, name)
+        path = work / (name + '.csv')
+        types = {}
+        for column in data:
+            dtype = data[column].dtype
+            types[column] = ('boolean' if pd.api.types.is_bool_dtype(dtype)
+                             else 'Int64' if pd.api.types.is_integer_dtype(dtype)
+                             else 'Float64' if pd.api.types.is_float_dtype(dtype) else 'string')
+        labels = [column for column in data if types[column] == 'string']
+        data.to_csv(path, index=False, encoding='utf-8-sig')
+        save_json(dict(schema='cartomize.table.v1', types=types, label_columns=labels,
+                       area_unit=result.summary['area_unit'],
+                       measurement_crs=result.summary['measurement_crs']),
+                  path.with_suffix('.csv.schema.json'))
+        _check_cancel(cancel)
+        reopened = pd.read_csv(path, sep=',', engine='c', float_precision='round_trip',
+                               encoding='utf-8-sig', dtype=types, keep_default_na=False,
+                               na_values={column: [''] for column in data if column not in labels})
+        try:
+            pd.testing.assert_frame_equal(reopened, data.reset_index(drop=True),
+                                          check_dtype=False, check_exact=True)
+        except AssertionError as error:
+            raise ValueError('Area table readback differs from the computed values: ' + name) from error
+        tables[name] = data
+        products[name] = path
+        verified[path.name] = dict(rows=len(data), sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
+                                   verification='exact_labels_and_numeric_values')
+        advance(number)
+    records = {}
+    for name, table in tables.items():
+        rows = []
+        for position, row in enumerate(table.itertuples(index=False, name=None)):
+            if position % 1024 == 0:
+                _check_cancel(cancel)
+            rows.append({column: _selection_audit_value(value) for column, value in zip(table.columns, row)})
+        records[name] = dict(columns={column: str(table[column].dtype) for column in table}, records=rows)
+    save_json(dict(schema='cartomize.vector_tabulation.audit.v1',
+                   area_unit=result.summary['area_unit'], measurement_crs=result.summary['measurement_crs'],
+                   label_encoding='canonical_text_with_explicit_type',
+                   verified_files=verified, tables=records), work / 'audit.json')
+    products['audit'] = work / 'audit.json'
+    advance(8)
+    save_json(result.summary, work / 'summary.json')
+    products['summary'] = work / 'summary.json'
+    advance(9)
+    return products
+
+
 def operation_catalog():
     """Machine-readable operator names, parameter defaults and output types."""
     rows=[]
@@ -300,6 +377,8 @@ def operation_catalog():
             products += ['data', 'manifest', 'report']
         if key == 'vector.extract_features':
             products += ['data', 'rejected', 'report', 'audit', 'summary']
+        if key == 'vector.tabulate_area':
+            products += ['data', 'table', 'matrix', 'zones', 'categories', 'gaps', 'overlaps', 'audit', 'summary']
         if key=='classify':
             from .classification import fit_classifier
             present={p['name'] for p in parameters}
@@ -374,6 +453,8 @@ def execute_operation(operation,parameters,destination,*,workers=1,block_size=51
         if operation=='classify' and p.get('model'):p.setdefault('training',None)
         for name,value in [('progress',progress),('cancel',cancel)]:
             if name in signature.parameters or 'options' in signature.parameters:p[name]=value
+        if operation == 'vector.tabulate_area' and progress is not None:
+            p['progress'] = lambda done, total: progress(int(8000 * done / max(total, 1)), 10000)
         from .imagery_automatic import ImageryCoverageError, diagnostic_destination
         try:
             result=function(**p)
@@ -388,12 +469,17 @@ def execute_operation(operation,parameters,destination,*,workers=1,block_size=51
         from .vector_conversion import ConvertedVector
         from .raster_conversion import ConvertedRaster
         from .vector_selection import VectorSelectionResult
+        from .vector_tabulation import AreaTabulationResult
         quality_products = None
         reprojection_products = None
         merge_products = None
         conversion_products = None
         selection_products = None
-        if isinstance(result, VectorSelectionResult):
+        tabulation_products = None
+        if isinstance(result, AreaTabulationResult):
+            tabulation_products = _write_vector_tabulation(result, work, cancel=cancel, progress=progress)
+            primary = tabulation_products['data']
+        elif isinstance(result, VectorSelectionResult):
             selection_products = _write_vector_selection(result, work, cancel=cancel)
             primary = selection_products['data']
         elif isinstance(result, VectorQualityResult):
@@ -426,7 +512,11 @@ def execute_operation(operation,parameters,destination,*,workers=1,block_size=51
         metadata=getattr(result,'attrs',{}).get('cartomize')
         if metadata is not None:record['metadata']=json_value(metadata)
         products={'primary':record['primary']}
-        if selection_products is not None:
+        if tabulation_products is not None:
+            products.update({key: str(destination / path.relative_to(work))
+                             for key, path in tabulation_products.items()})
+            record['metadata'] = json_value(result.summary)
+        elif selection_products is not None:
             products.update({key: str(destination / path.relative_to(work))
                              for key, path in selection_products.items()})
             record['metadata'] = json_value(result.summary)

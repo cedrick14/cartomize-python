@@ -1,6 +1,6 @@
 # Couverture fonctionnelle
 
-Version des sources **1.10.0**. Les paramètres et conditions d’utilisation sont décrits dans le [catalogue des outils](TOOL_AUDIT.md).
+Version des sources **1.11.0**. Les paramètres et conditions d’utilisation sont décrits dans le [catalogue des outils](TOOL_AUDIT.md).
 
 | Domaine | Fonctionnalités |
 |---|---|
@@ -15,7 +15,7 @@ Version des sources **1.10.0**. Les paramètres et conditions d’utilisation so
 | Mise en page | 24 maquettes d’origine, cadres, habillage, dimensions éditables, textes mesurés, étiquettes, aperçu et export |
 | Persistance | État des outils, couches, résultats et maquettes ; JSON et archive CMZ ; historique des actions principales |
 | Recettes, lots et révision | Variables, associations de couches, journaux, migration, empreintes et décision nominative |
-| Chaînes de traitements | 53 opérateurs, dépendances vérifiées, produits secondaires et paramètres moteur transmis |
+| Chaînes de traitements | 54 opérateurs, dépendances vérifiées, produits secondaires et paramètres moteur transmis |
 | Hydrologie, routage et STAC | Drainage D8, bassins, plus court chemin, recherche et téléchargement de scènes |
 | Projets natifs | Inventaire QGS/QGZ et import des styles pris en charge ; passerelles QGIS/ArcPy nécessitant leurs environnements natifs et une validation propre à la version |
 | Identité visuelle | Icône originale en couleur ; titre et contrôles en noir, blanc et gris |
@@ -25,8 +25,8 @@ Version des sources **1.10.0**. Les paramètres et conditions d’utilisation so
 Le [guide des moteurs](EXECUTION.md) précise les opérations compatibles avec Dask et CUDA. Le [guide de visualisation](RESULTS_WORKSPACE.md) décrit les vues, comparaisons et limites de rendu.
 
 L’[inventaire expert](EXPERT_PROCEDURES.md) distingue 123 procédures expertes :
-18 disponibles dans leur périmètre documenté, 43 partielles et 62 absentes. Les
-53 opérateurs enregistrés désignent des fonctions composables, pas 53 procédures
+19 disponibles dans leur périmètre documenté, 42 partielles et 62 absentes. Les
+54 opérateurs enregistrés désignent des fonctions composables, pas 54 procédures
 expertes achevées. Le [module M07](IMAGERY_AUTOMATIC.md) termine le raccordement
 automatique de l’imagerie optique ; les autres procédures conservent leurs
 conditions et leur état propre.
@@ -43,3 +43,5 @@ enregistrées.
 Le [guide M11/G06](DATA_CONVERSION.md) décrit la livraison vérifiée et les deux opérateurs communs à Python, aux plans, au terminal et à la fenêtre.
 
 Le [guide M12/G07](VECTOR_SELECTION.md) décrit les critères attributaires et spatiaux combinés, les partitions retenus/exclus, les motifs par ligne, le bilan croisé et la publication vérifiée.
+
+Le [guide M13/G09](VECTOR_TABULATION.md) décrit la table croisée des surfaces polygonales, les identités typées, les dissolutions, les règles de recouvrement, les lacunes et les bilans par zone et sur la réunion du territoire. Les GeoPackage et CSV sont intégralement relus avant publication.

@@ -160,6 +160,7 @@ def probe(output, expected):
         checks.extend(_g01_checks(cm, root, window, wait_for))
         checks.extend(_conversion_checks(cm, root, window, wait_for))
         checks.extend(_selection_checks(cm, root, window, wait_for))
+        checks.extend(_tabulation_checks(cm, root, window, wait_for))
         points=root/'points.gpkg'
         gpd.GeoDataFrame({'nom':['Site A']},geometry=[Point(300300,9499700)],crs=32733).to_file(points)
         assert window.project_explorer.open_path(points) is not None
@@ -605,6 +606,92 @@ def _selection_checks(cm, root, window, wait_for):
         'installed G07 API: exact decimal/int64 and spatial criteria partition unchanged source records',
         'installed G07 worker: native DATE, missing dates, exact int64 and textual identifiers verified by SQLite',
         'installed G07 views: retained/excluded products and nullable-Boolean attribute-only report reopen correctly',
+    ]
+
+
+def _tabulation_checks(cm, root, window, wait_for):
+    """Verify G09's installed engine, desktop worker and native result views."""
+    import geopandas as gpd
+    from shapely.geometry import box
+    from cartomize.tableio import read_table
+
+    zones_path, classes_path = root / 'g09-zones.gpkg', root / 'g09-classes.gpkg'
+    zones = gpd.GeoDataFrame({'123': ['001', 'NA']},
+        geometry=[box(0, 0, 10, 10), box(10, 0, 20, 10)], crs=3857)
+    # A duplicate within the first class must add no counted land area.
+    classes = gpd.GeoDataFrame({'456': ['Forêt', 'Forêt', 'Agriculture']},
+        geometry=[box(0, 0, 6, 10), box(0, 0, 3, 10), box(6, 0, 15, 10)], crs=3857)
+    zones.to_file(zones_path, layer='007', index=False)
+    classes.to_file(classes_path, layer='008', index=False)
+    before = [path.read_bytes() for path in (zones_path, classes_path)]
+    result = cm.tabulate_area(zones_path, classes_path, zone_field='123', class_field='456',
+        zones_layer='007', classes_layer='008', area_unit='m2')
+    assert isinstance(result, cm.AreaTabulationResult)
+    assert result.table.area.tolist() == [60.0, 40.0, 0.0, 50.0]
+    assert result.zones.zone_value.tolist() == ['001', 'NA']
+    assert result.zones.covered_area.tolist() == [100.0, 50.0]
+    assert result.zones.uncovered_area.tolist() == [0.0, 50.0]
+    assert result.categories.source_count.tolist() == [2, 1]
+    assert result.categories.same_class_excess_area.tolist() == [30.0, 0.0]
+    assert result.summary['totals']['domain']['closure_error'] == 0
+
+    window.transfer_result({'data': str(zones_path), 'kind': 'vector'}, 'vector')
+    page = window.tool('vector')
+
+    def choose(control, value):
+        index = control.findData(value)
+        assert index >= 0, value
+        control.setCurrentIndex(index)
+
+    choose(page.operation, 'tabulate_area')
+    page.tabulation_classes.edit.setText(str(classes_path))
+    page.refresh_fields()
+    choose(page.tabulation_zones_layer, '007')
+    choose(page.tabulation_classes_layer, '008')
+    choose(page.tabulation_zone_field, '123')
+    choose(page.tabulation_class_field, '456')
+    page.tabulation_crs.setText('EPSG:3857')
+    choose(page.tabulation_unit, 'm2')
+    choose(page.tabulation_overlap, 'report')
+    choose(page.tabulation_zone_overlap, 'error')
+    choose(page.tabulation_null_classes, 'unclassified')
+    page.output.edit.setText(str(root))
+    page.tabulation_folder.setText('g09-installed-desktop')
+    window.run_button.click()
+    wait_for(lambda: window.thread is None)
+    operation = root / 'g09-installed-desktop' / 'operation.json'
+    assert operation.is_file(), window.status.text()
+    record = json.loads(operation.read_text(encoding='utf-8'))
+    products = record['products']
+    summary = json.loads(Path(products['summary']).read_text(encoding='utf-8'))
+    assert summary['parameters']['zones_layer'] == '007'
+    assert summary['parameters']['classes_layer'] == '008'
+    assert summary['parameters']['overlap_policy'] == 'report'
+    assert summary['parameters']['zone_overlap_policy'] == 'error'
+    assert summary['parameters']['null_classes'] == 'unclassified'
+    assert summary['zone_count'] == 2 and summary['class_count'] == 2
+    assert read_table(products['table']).area.tolist() == [60.0, 40.0, 0.0, 50.0]
+    assert cm.read_file(products['zones'], layer='features').zone_value.tolist() == ['001', 'NA']
+    assert cm.read_file(products['gaps'], layer='features')['area'].tolist() == [50.0]
+    assert [path.read_bytes() for path in (zones_path, classes_path)] == before
+    for key in ('data', 'table', 'matrix', 'zones', 'categories', 'gaps', 'overlaps', 'summary'):
+        assert products[key] in window.workspace.records
+        assert page._tabulation_buttons[key].isEnabled()
+    page.tabulation_matrix_button.click()
+    assert window.workspace.catalog.currentData() == products['matrix']
+    matrix = page.open_tabulation_product('matrix')
+    wait_for(lambda: len(matrix.frame) == 2)
+    assert matrix.frame.zone_value.tolist() == ['001', 'NA']
+    assert matrix.frame.c000001.tolist() == [60.0, 0.0]
+    assert matrix.frame.c000002.tolist() == [40.0, 50.0]
+    balances = page.open_tabulation_product('zones')
+    assert balances.views.currentWidget() is balances._table
+    wait_for(lambda: len(balances._table.frame) == 2)
+    assert balances._table.frame.uncovered_area.tolist() == [0.0, 50.0]
+    return [
+        'installed G09 API: exact 60/40/0/50 cells and 100/50 coverage; same-class overlap dissolved once',
+        'installed G09 worker: explicit numeric layer/field names and chosen policies publish eight verified products',
+        'installed G09 views: matrix preserves 001/NA labels; per-zone balances open as attributes with 0/50 uncovered area',
     ]
 
 

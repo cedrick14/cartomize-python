@@ -118,5 +118,11 @@
     "title": "G07 : extraction attributaire et spatiale avec bilan",
     "real": false,
     "minutes": 35
+  },
+  {
+    "slug": "20_table_croisee_surfaces",
+    "title": "G09 : table croisée des surfaces et bilans",
+    "real": false,
+    "minutes": 35
   }
 ]

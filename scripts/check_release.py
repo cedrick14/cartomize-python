@@ -25,6 +25,7 @@ required_modules=(
     'vector_merge','vector_io','desktop_merge',
     'vector_conversion','raster_conversion','desktop_conversion',
     'vector_selection','desktop_selection',
+    'vector_tabulation','desktop_tabulation',
 )
 directory=Path(sys.argv[1]) if len(sys.argv)>1 else root/'pypi-dist'
 expected={f'{name}-{version}-py3-none-any.whl',f'{name}-{version}.tar.gz'}
@@ -99,6 +100,11 @@ with tarfile.open(directory/f'{name}-{version}.tar.gz') as archive:
                  'tests/test_vector_selection.py','tests/test_vector_selection_interfaces.py',
                  'tests/test_g07_desktop.py','tests/test_g07_real_oracle.py',
                  'tutorials/notebooks/19_extraction_attributaire_spatiale.ipynb',
+                 'docs/VECTOR_TABULATION.md','docs/RELEASE_1.11.0.md','docs/VALIDATION_1.11.0.json',
+                 'docs/VALIDATION_G09_REAL.json','scripts/validate_vector_tabulation_real.py',
+                 'tests/test_vector_tabulation.py','tests/test_vector_tabulation_interfaces.py',
+                 'tests/test_g09_desktop.py','tests/test_g09_real_oracle.py',
+                 'tutorials/notebooks/20_table_croisee_surfaces.ipynb',
                  'scripts/check_startup.py','scripts/check_release.py','scripts/verify_installed_release.py'):
         assert f'{name}-{version}/{file}' in names,file
 print(json.dumps({'name':name,'version':version,'files':[
