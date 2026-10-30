@@ -4,14 +4,23 @@
 
 Cette construction conserve la version publique **1.0** et ajoute les panneaux
 dynamiques, les repères de placement et les aides repliées. Son wheel est
-`cartomize-1.0-2026103001-py3-none-any.whl`. **La validation et la publication de
-cette correction sont en cours.** Les preuves ci-dessous concernent pour
-l’instant la construction précédente `20261030`.
+`cartomize-1.0-2026103001-py3-none-any.whl`. La disponibilité, les empreintes et
+les preuves propres à cette construction sont suivies dans la
+[version en ligne de ce document](https://github.com/cedrick14/cartomize-python/blob/main/docs/PUBLICATION.md).
+Les preuves historiques ci-dessous concernent la construction précédente `20261030`.
 
 Le nouvel identifiant permet d’ajouter un fichier à la release `1.0` recréée
 le 30 octobre, sans supprimer à nouveau cette release. Après publication,
 l’installation d’une précédente construction `1.0` demande une réinstallation
 explicite ; le champ `WHEEL` attendu sera `Build: 2026103001`.
+
+La description HTML de la release PyPI conserve les métadonnées de son premier
+fichier : les envois suivants ne remplacent pas ce texte, comme le précise la
+[documentation PyPI](https://docs.pypi.org/api/json/). L’ajout de cette construction
+met à disposition le nouveau wheel ; la description de la page peut encore
+mentionner `20261030`. Le [guide des panneaux dynamiques](DYNAMIC_WORKSPACE.md),
+le README inclus dans le nouveau wheel et la documentation GitHub décrivent
+l’interface corrigée. Vérifier le champ `Build` du paquet installé.
 
 ## Publication initiale de l’édition consolidée
 
