@@ -14,12 +14,12 @@ dont 283 cellules nulles, avec 357 géométries d’intersection. Les sept fichi
 sources sont inchangés. Les produits sont rouverts avec contrôle des géométries,
 attributs, tableaux et empreintes.
 
-Le cours 20 exécute **11 cellules** dans un noyau neuf (7.08 s) ; le site
+Le cours 20 exécute **11 cellules** dans un noyau neuf (6.87 s) ; le site
 exporte **21 leçons**. La wheel installée hors du dépôt dans un environnement
 neuf réussit **29 contrôles**, avec `pip check` réussi et **100 modules identiques
 aux sources**. Les deux exclusions locales concernent CUDA et QGIS. Les
 matrices Windows/Ubuntu et le contrôle QGIS distant restent attachés au commit
-exact testé sur GitHub ; ce rapport local précède leur lancement.
+exact testé sur GitHub ; leurs résultats sont lus sur la révision finale de la PR.
 
 Les références analytiques utilisent un découpage rectangulaire Python et la
 formule des lacets sur les limites réelles. La comparaison des polygones

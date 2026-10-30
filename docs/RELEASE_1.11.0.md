@@ -59,6 +59,11 @@ Les textes vides, `001` et `NA` restent des libellés ; les champs numériques
 de couches et de catégories restent des noms textuels dans le terminal et les
 formulaires de plans.
 
+Le parcours Windows du cours 20 rend explicite le mode UTF-8 du processus
+Python enfant qui exécute la commande, en accord avec le décodage de sa sortie
+JSON. Ce correctif du notebook conserve les libellés accentués et les mêmes
+calculs dans les deux systèmes.
+
 Le jeu réel parisien a révélé un écart entre une couverture calculée en réunissant
 les catégories avant découpage et les surfaces calculées catégorie par catégorie.
 Le moteur construit désormais la couverture d’une zone à partir de ses cellules
@@ -92,12 +97,12 @@ dont 283 cellules nulles, avec 357 géométries d’intersection. Les sept fichi
 sources sont inchangés. Les produits sont rouverts avec contrôle des géométries,
 attributs, tableaux et empreintes.
 
-Le cours 20 exécute **11 cellules** dans un noyau neuf (7.08 s) ; le site
+Le cours 20 exécute **11 cellules** dans un noyau neuf (6.87 s) ; le site
 exporte **21 leçons**. La wheel installée hors du dépôt dans un environnement
 neuf réussit **29 contrôles**, avec `pip check` réussi et **100 modules identiques
 aux sources**. Les deux exclusions locales concernent CUDA et QGIS. Les
 matrices Windows/Ubuntu et le contrôle QGIS distant restent attachés au commit
-exact testé sur GitHub ; ce rapport local précède leur lancement.
+exact testé sur GitHub ; leurs résultats sont lus sur la révision finale de la PR.
 
 
 ## Données réelles et portée des références

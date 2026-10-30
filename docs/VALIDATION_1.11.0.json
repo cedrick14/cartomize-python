@@ -5,7 +5,7 @@
   "procedures": [
     "G09"
   ],
-  "generated_at_utc": "2026-10-30T16:04:35.649644+00:00",
+  "generated_at_utc": "2026-10-30T16:14:38.732721+00:00",
   "baseline_commit": "221ccdc396f971fd610ec0a1963b3504bfce1459",
   "source_identity_note": "The baseline is the G07 main commit. SHA-256 maps identify the complete final G09 sources actually tested before the GitHub commit was created.",
   "tested_source_sha256": {
@@ -279,18 +279,18 @@
     "independent_spatial_oracle": 21
   },
   "notebook": {
-    "date": "2026-10-30T15:57:20.921574+00:00",
+    "date": "2026-10-30T16:13:36.027799+00:00",
     "results": [
       {
         "notebook": "20_table_croisee_surfaces.ipynb",
         "status": "passed",
         "code_cells": 11,
-        "seconds": 7.08
+        "seconds": 6.87
       }
     ],
-    "content_sha256": "e6f88f5c64476f1e4c6e298e28b931bb702d802783603a31b40b334834988f1d",
+    "content_sha256": "a6dd8cb7cd68d3a4ae162937a3516956771c515679aae9b5e44c162e5e2dcc02",
     "site_build": "21 lessons exported successfully",
-    "scope": "New course 20 executed locally on the final frozen sources. The 19 autonomous lessons are scheduled in the GitHub Windows/Ubuntu workflow; their remote results must be read on the exact eventual commit."
+    "scope": "Course 20 rerun locally after explicitly enabling UTF-8 in its child Python CLI process. Application sources, tests, scripts and workflows are unchanged from the complete passing suite. The final 19-notebook Windows/Ubuntu course is verified on the subsequent GitHub revision."
   },
   "real_data": {
     "report": "VALIDATION_G09_REAL.json",
@@ -363,8 +363,11 @@
     "desktop_tools": 21
   },
   "ci": {
-    "status_at_report_generation": "not_yet_submitted",
-    "scope": "GitHub Actions results belong to the eventual pull-request head. Check that exact commit for Windows/Ubuntu Python 3.11/3.12, native QGIS, notebooks and real-data acceptance."
+    "status_at_report_generation": "corrected_notebook_pending_remote_validation",
+    "scope": "Read all GitHub Actions results on the final PR revision. The initial Windows notebook failure and the corrected local execution are recorded separately from the unchanged application test results.",
+    "initial_submission_sha": "3be529144886a4030bb90a32dad9c0ebc2be6dc1",
+    "initial_failure": "Course 20 Windows CLI capture decoded UTF-8 without enabling UTF-8 in the child interpreter; stdout became None in both Windows notebook jobs. All earlier notebooks passed.",
+    "correction": "Launch the tutorial child interpreter with -X utf8 and retain explicit UTF-8 decoding in the parent. No application source changes."
   },
   "limits": [
     "The two Tuto.zip lessons require user-supplied local data and are excluded from autonomous notebook execution.",
