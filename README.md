@@ -8,11 +8,9 @@ Cette édition consolidée porte le numéro **1.0** et réunit tous les modules 
 
 Python 3.11 ou 3.12 est recommandé pour l’interface. QGIS et ArcGIS Pro ne sont pas nécessaires au fonctionnement de Cartomize ; seules les passerelles natives les utilisent.
 
-Cloner les sources, puis créer un environnement dans le dossier du dépôt :
+Créer un environnement Python :
 
 ```bash
-git clone https://github.com/cedrick14/cartomize-python.git
-cd cartomize-python
 python -m venv .venv
 ```
 
@@ -30,11 +28,11 @@ source .venv/bin/activate
 
 ### API Python et cellules Jupyter
 
-Depuis le répertoire du projet, installer le cœur Python :
+Installer la bibliothèque depuis PyPI :
 
 ```bash
 python -m pip install --upgrade pip
-python -m pip install -e .
+python -m pip install --index-url https://pypi.org/simple "cartomize==1.0"
 ```
 
 Les fonctions s’utilisent directement dans un script ou une cellule :
@@ -49,14 +47,21 @@ resultat = cm.preprocess_imagery(
 print(resultat.report["status"], resultat.report["usable_percent"])
 ```
 
-Qt est facultatif pour ces calculs. Pour installer Jupyter et le parcours exécutable depuis les mêmes sources : `python -m pip install -r tutorials/requirements.txt`. Le [guide Jupyter](docs/NOTEBOOKS.md) explique le choix du noyau et l’installation dans un environnement existant.
+Qt est facultatif pour ces calculs. Pour installer Jupyter et les composants de l’interface locale :
+
+```bash
+python -m pip install --index-url https://pypi.org/simple "cartomize[notebook]==1.0"
+python -m jupyter lab
+```
+
+Les notebooks et les données synthétiques de démonstration sont fournis dans la [livraison GitHub](https://github.com/cedrick14/cartomize-python/releases/tag/cartomize-1.0-20261030). Le [guide Jupyter](docs/NOTEBOOKS.md) explique le choix du noyau et l’installation dans un environnement existant.
 
 ### Interface de bureau sans code
 
-Depuis le même répertoire :
+Installer puis ouvrir l’interface :
 
 ```bash
-python -m pip install -e ".[gui]"
+python -m pip install --index-url https://pypi.org/simple "cartomize[gui]==1.0"
 python -m cartomize gui
 ```
 
@@ -69,9 +74,9 @@ import cartomize as cm
 fenetre = cm.launch()
 ```
 
-Pour ouvrir cette fenêtre depuis un notebook local, installer `.[notebook]`, redémarrer le noyau puis appeler `cm.launch()`. Les notebooks distants peuvent utiliser l’API sans ouvrir de fenêtre native.
+Pour ouvrir cette fenêtre depuis un notebook local, installer l’option `cartomize[notebook]==1.0` avec la commande ci-dessus, redémarrer le noyau puis appeler `cm.launch()`. Les notebooks distants peuvent utiliser l’API sans ouvrir de fenêtre native.
 
-Pour cette édition consolidée, installer le **wheel fourni avec la livraison** ou les sources de cette branche. Le paquet historique `cartomize==1.0` publié sur [PyPI](https://pypi.org/project/cartomize/) en septembre 2026 est antérieur à cette consolidation ; le numéro seul ne permet pas de les distinguer. Le [suivi de publication](docs/PUBLICATION.md) précise l’état de la distribution et le [guide de démonstration](docs/DEMONSTRATION_1.0.md) donne les commandes d’installation du wheel.
+L’édition consolidée **Cartomize 1.0**, construction **20261030**, est disponible sur [PyPI](https://pypi.org/project/cartomize/1.0/). La version publique reste `1.0` ; le fichier installé porte `Build: 20261030`. Les sources complètes, le wheel et le dossier de présentation sont conservés dans la [livraison GitHub](https://github.com/cedrick14/cartomize-python/releases/tag/cartomize-1.0-20261030). Le [suivi de publication](docs/PUBLICATION.md) explique la vérification de la construction et la réinstallation explicite d’une ancienne édition `1.0`. Le [guide de démonstration](docs/DEMONSTRATION_1.0.md) donne également les commandes d’installation du wheel téléchargé.
 
 ## Espace de travail
 
@@ -148,7 +153,11 @@ Le [parcours de tutoriels](tutorials/README.md) contient les notebooks de prépa
 
 ## Développement et validation
 
+Pour travailler sur les sources, cloner le dépôt puis utiliser un environnement Python activé :
+
 ```bash
+git clone https://github.com/cedrick14/cartomize-python.git
+cd cartomize-python
 python -m pip install -e ".[dev,notebook,distributed]" pytest-timeout
 python -m pytest
 python -m build
