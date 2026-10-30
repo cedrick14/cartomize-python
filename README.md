@@ -76,7 +76,7 @@ fenetre = cm.launch()
 
 Pour ouvrir cette fenêtre depuis un notebook local, installer l’option `cartomize[notebook]==1.0` avec la commande ci-dessus, redémarrer le noyau puis appeler `cm.launch()`. Les notebooks distants peuvent utiliser l’API sans ouvrir de fenêtre native.
 
-L’espace de travail dynamique correspond à la construction **2026103001** de **Cartomize 1.0**. La version publique reste `1.0` ; le fichier installé doit porter `Build: 2026103001`. Le [suivi de publication](docs/PUBLICATION.md) indique sa disponibilité sur PyPI et GitHub. Pour remplacer une installation antérieure portant déjà le numéro `1.0`, utiliser une réinstallation explicite :
+L’espace de travail dynamique de **Cartomize 1.0**, construction **2026103001**, est publié sur [PyPI](https://pypi.org/project/cartomize/1.0/#files) et dans la [livraison GitHub](https://github.com/cedrick14/cartomize-python/releases/tag/cartomize-1.0-2026103001) depuis le 30 octobre 2026. La version publique reste `1.0` ; le paquet installé doit indiquer `Build: 2026103001`. La sélection par l’index PyPI et l’installation isolée du wheel publié ont été vérifiées séparément ; les [preuves de publication](docs/PUBLICATION.md) et le [rapport de validation](docs/VALIDATION_DYNAMIC_1.0.json) en précisent les résultats. Pour remplacer une installation antérieure portant déjà le numéro `1.0`, utiliser une réinstallation explicite :
 
 ```bash
 python -m pip install --index-url https://pypi.org/simple --force-reinstall --no-cache-dir "cartomize[notebook]==1.0"

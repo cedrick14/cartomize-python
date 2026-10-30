@@ -1,0 +1,1586 @@
+{
+  "schema": "cartomize.dynamic-release-validation.v1",
+  "status": "published_and_verified",
+  "created_at_utc": "2026-10-30T22:58:41.726994+00:00",
+  "release": {
+    "name": "cartomize",
+    "version": "1.0",
+    "build": "2026103001",
+    "published_at_utc": "2026-10-30T22:46:27.115192Z",
+    "published_at_kinshasa": "2026-10-30T23:46:27.115192+01:00"
+  },
+  "source_provenance": {
+    "pull_request_url": "https://github.com/cedrick14/cartomize-python/pull/15",
+    "tested_head": "83c7dfd1790115a3485480182bc2409907249959",
+    "native_test_merge_commit": "d83ee5ab223a618ba559801c964c7d9d4593b7a4",
+    "published_commit": "7d4dc8510fbd1d7aaa147587149f0766769d62c9",
+    "published_commit_url": "https://github.com/cedrick14/cartomize-python/commit/7d4dc8510fbd1d7aaa147587149f0766769d62c9",
+    "published_tree": "7c9cad9fd61d72dd5ca271d1f9289d700d6f8345",
+    "tested_tree": "7c9cad9fd61d72dd5ca271d1f9289d700d6f8345",
+    "published_tree_matches_tested_tree": true,
+    "merge_commit_git_api_verified": true,
+    "merge_commit_git_api_url": "https://api.github.com/repos/cedrick14/cartomize-python/git/commits/7d4dc8510fbd1d7aaa147587149f0766769d62c9",
+    "merge_parents": [
+      "275498e325c5a5d58a9faaf33454e4c5fd4c9db9",
+      "83c7dfd1790115a3485480182bc2409907249959"
+    ]
+  },
+  "counting_policy": "Les comptes sont conservés par suite, plateforme et exécution. Les précontrôles, suites complètes, workflows répétés et essais natifs se recouvrent : ils ne sont pas additionnés en un nombre de tests distincts. Les 138 contrôles natifs désignent 69 exécutions par plateforme. La durée 21.329 du contrôle installé est exprimée en secondes, pas en nombre de tests.",
+  "general_ci": {
+    "schema": "cartomize.ci-validation.v1",
+    "repository": "cedrick14/cartomize-python",
+    "source_commit": "83c7dfd1790115a3485480182bc2409907249959",
+    "source_tree": "7c9cad9fd61d72dd5ca271d1f9289d700d6f8345",
+    "verified_at_utc": "2026-10-30 22:39:02 UTC",
+    "conclusion": "success",
+    "workflows": [
+      {
+        "run_id": 41137160019,
+        "name": "Real project acceptance",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/cedrick14/cartomize-python/actions/runs/41137160019"
+      },
+      {
+        "run_id": 41137159968,
+        "name": "Cartomize Python library",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/cedrick14/cartomize-python/actions/runs/41137159968"
+      }
+    ],
+    "jobs": [
+      {
+        "run_id": 41137159968,
+        "job_id": 124342900683,
+        "name": "test (ubuntu-latest, 3.11)",
+        "os": "Linux",
+        "python": "3.11.17",
+        "conclusion": "success",
+        "url": "https://github.com/cedrick14/cartomize-python/actions/runs/41137159968/job/124342900683",
+        "first_log_timestamp_utc": "2026-10-30T22:19:23.3130591Z",
+        "last_log_timestamp_utc": "2026-10-30T22:28:25.6675135Z",
+        "log_span_seconds": 542.354,
+        "pytest": [
+          {
+            "scope": "complete_regression",
+            "counts": {
+              "passed": 1878,
+              "skipped": 2,
+              "warnings": 7352
+            },
+            "duration_seconds": 479.98,
+            "log_timestamp_utc": "2026-10-30T22:28:20.6754883Z",
+            "summary": "1878 passed, 2 skipped, 7352 warnings in 479.98s (0:07:59)"
+          }
+        ]
+      },
+      {
+        "run_id": 41137159968,
+        "job_id": 124342900641,
+        "name": "test (ubuntu-latest, 3.12)",
+        "os": "Linux",
+        "python": "3.12.15",
+        "conclusion": "success",
+        "url": "https://github.com/cedrick14/cartomize-python/actions/runs/41137159968/job/124342900641",
+        "first_log_timestamp_utc": "2026-10-30T22:19:22.7687396Z",
+        "last_log_timestamp_utc": "2026-10-30T22:29:43.2673532Z",
+        "log_span_seconds": 620.499,
+        "pytest": [
+          {
+            "scope": "complete_regression",
+            "counts": {
+              "passed": 1878,
+              "skipped": 2,
+              "warnings": 4910
+            },
+            "duration_seconds": 546.55,
+            "log_timestamp_utc": "2026-10-30T22:29:36.4889935Z",
+            "summary": "1878 passed, 2 skipped, 4910 warnings in 546.55s (0:09:06)"
+          }
+        ]
+      },
+      {
+        "run_id": 41137159968,
+        "job_id": 124342900420,
+        "name": "test (windows-latest, 3.11)",
+        "os": "Windows",
+        "python": "3.11.9",
+        "conclusion": "success",
+        "url": "https://github.com/cedrick14/cartomize-python/actions/runs/41137159968/job/124342900420",
+        "first_log_timestamp_utc": "2026-10-30T22:19:24.1253789Z",
+        "last_log_timestamp_utc": "2026-10-30T22:32:02.7356291Z",
+        "log_span_seconds": 758.61,
+        "pytest": [
+          {
+            "scope": "compact_desktop_forms",
+            "counts": {
+              "passed": 46,
+              "deselected": 111,
+              "warnings": 2
+            },
+            "duration_seconds": 102.34,
+            "log_timestamp_utc": "2026-10-30T22:23:09.3584752Z",
+            "summary": "46 passed, 111 deselected, 2 warnings in 102.34s (0:01:42)"
+          },
+          {
+            "scope": "complete_regression",
+            "counts": {
+              "passed": 1898,
+              "skipped": 2,
+              "warnings": 7353
+            },
+            "duration_seconds": 521.23,
+            "log_timestamp_utc": "2026-10-30T22:31:52.1090207Z",
+            "summary": "1898 passed, 2 skipped, 7353 warnings in 521.23s (0:08:41)"
+          }
+        ]
+      },
+      {
+        "run_id": 41137159968,
+        "job_id": 124342900855,
+        "name": "test (windows-latest, 3.12)",
+        "os": "Windows",
+        "python": "3.12.10",
+        "conclusion": "success",
+        "url": "https://github.com/cedrick14/cartomize-python/actions/runs/41137159968/job/124342900855",
+        "first_log_timestamp_utc": "2026-10-30T22:19:23.2816289Z",
+        "last_log_timestamp_utc": "2026-10-30T22:37:06.8780060Z",
+        "log_span_seconds": 1063.597,
+        "pytest": [
+          {
+            "scope": "compact_desktop_forms",
+            "counts": {
+              "passed": 46,
+              "deselected": 111
+            },
+            "duration_seconds": 151.74,
+            "log_timestamp_utc": "2026-10-30T22:24:25.4304247Z",
+            "summary": "46 passed, 111 deselected in 151.74s (0:02:31)"
+          },
+          {
+            "scope": "complete_regression",
+            "counts": {
+              "passed": 1898,
+              "skipped": 2,
+              "warnings": 4910
+            },
+            "duration_seconds": 744.75,
+            "log_timestamp_utc": "2026-10-30T22:36:51.7849061Z",
+            "summary": "1898 passed, 2 skipped, 4910 warnings in 744.75s (0:12:24)"
+          }
+        ]
+      },
+      {
+        "run_id": 41137159968,
+        "job_id": 124342900707,
+        "name": "qgis",
+        "os": "Linux",
+        "python": "3.12.15",
+        "conclusion": "success",
+        "url": "https://github.com/cedrick14/cartomize-python/actions/runs/41137159968/job/124342900707",
+        "first_log_timestamp_utc": "2026-10-30T22:19:22.9219215Z",
+        "last_log_timestamp_utc": "2026-10-30T22:21:27.2995261Z",
+        "log_span_seconds": 124.378,
+        "pytest": [
+          {
+            "scope": "native_qgis",
+            "counts": {
+              "passed": 1
+            },
+            "duration_seconds": 7.55,
+            "log_timestamp_utc": "2026-10-30T22:21:26.7178092Z",
+            "summary": "1 passed in 7.55s"
+          }
+        ]
+      },
+      {
+        "run_id": 41137160019,
+        "job_id": 124342339566,
+        "name": "real-projects (ubuntu-latest)",
+        "os": "Linux",
+        "python": "3.12.15",
+        "conclusion": "success",
+        "url": "https://github.com/cedrick14/cartomize-python/actions/runs/41137160019/job/124342339566",
+        "first_log_timestamp_utc": "2026-10-30T22:17:53.7122207Z",
+        "last_log_timestamp_utc": "2026-10-30T22:30:03.4876630Z",
+        "log_span_seconds": 729.775,
+        "pytest": [
+          {
+            "scope": "complete_regression",
+            "counts": {
+              "passed": 1878,
+              "skipped": 2,
+              "warnings": 4910
+            },
+            "duration_seconds": 519.81,
+            "log_timestamp_utc": "2026-10-30T22:29:54.2544242Z",
+            "summary": "1878 passed, 2 skipped, 4910 warnings in 519.81s (0:08:39)"
+          }
+        ]
+      },
+      {
+        "run_id": 41137160019,
+        "job_id": 124342339360,
+        "name": "real-projects (windows-latest)",
+        "os": "Windows",
+        "python": "3.12.10",
+        "conclusion": "success",
+        "url": "https://github.com/cedrick14/cartomize-python/actions/runs/41137160019/job/124342339360",
+        "first_log_timestamp_utc": "2026-10-30T22:17:52.7053474Z",
+        "last_log_timestamp_utc": "2026-10-30T22:36:20.2482828Z",
+        "log_span_seconds": 1107.543,
+        "pytest": [
+          {
+            "scope": "complete_regression",
+            "counts": {
+              "passed": 1898,
+              "skipped": 2,
+              "warnings": 4909
+            },
+            "duration_seconds": 771.78,
+            "log_timestamp_utc": "2026-10-30T22:36:02.6776826Z",
+            "summary": "1898 passed, 2 skipped, 4909 warnings in 771.78s (0:12:51)"
+          }
+        ]
+      }
+    ],
+    "cancelled_duplicate": {
+      "run_id": 41137153366,
+      "conclusion": "cancelled",
+      "reason": "Expected concurrency cancellation of the duplicate push workflow; the pull-request workflow completed successfully."
+    },
+    "notes": [
+      "Counts and pytest durations are copied from completed GitHub Actions job logs. They are not local test results.",
+      "The compact Windows checks and complete regression suites overlap; their passed counts must not be added as distinct tests.",
+      "log_span_seconds is the elapsed span between the first and last timestamps present in each downloaded job log."
+    ]
+  },
+  "native_desktop_ci": {
+    "schema": "cartomize.native-evidence-summary.v1",
+    "status": "passed",
+    "created_at_utc": "2026-10-30T22:25:11.189888+00:00",
+    "provenance": {
+      "repository": "https://github.com/cedrick14/cartomize-python",
+      "run_id": 41137159917,
+      "run_url": "https://github.com/cedrick14/cartomize-python/actions/runs/41137159917",
+      "head_sha": "83c7dfd1790115a3485480182bc2409907249959",
+      "test_merge_commit": "d83ee5ab223a618ba559801c964c7d9d4593b7a4",
+      "test_tree_sha": "7c9cad9fd61d72dd5ca271d1f9289d700d6f8345",
+      "expected_product_tree_sha": "7c9cad9fd61d72dd5ca271d1f9289d700d6f8345",
+      "test_tree_matches_expected_product_tree": true,
+      "test_commit_parents": [
+        "275498e325c5a5d58a9faaf33454e4c5fd4c9db9",
+        "83c7dfd1790115a3485480182bc2409907249959"
+      ],
+      "git_api_verified": true,
+      "git_api_url": "https://api.github.com/repos/cedrick14/cartomize-python/git/commits/d83ee5ab223a618ba559801c964c7d9d4593b7a4"
+    },
+    "totals": {
+      "tests_passed": 138,
+      "tests_failed": 0,
+      "test_errors": 0,
+      "tests_skipped": 0,
+      "capture_cases_passed": 8,
+      "captured_states": 92,
+      "png_files": 148
+    },
+    "data_origin": "Fichiers raster et vectoriels de démonstration pédagogique synthétiques ; aucune observation satellitaire réelle.",
+    "capture_method": "QWidget.grab des véritables fenêtres et widgets sous les plugins Qt natifs. Les vues des guides sont des compositions des captures de widgets réels à leurs positions Qt observées.",
+    "platforms": {
+      "linux": {
+        "status": "passed",
+        "os": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+        "python": "3.12.15",
+        "pyside": "6.9.3",
+        "qt": "6.9.3",
+        "qt_platform": "xcb",
+        "tests": {
+          "passed": 69,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "capture_cases_passed": 4,
+        "captured_states": 46,
+        "png_files": 74,
+        "cases": [
+          "1100x750-light",
+          "1100x750-dark",
+          "1440x940-light",
+          "1440x940-dark"
+        ],
+        "window_dimensions_verified_px": [
+          [
+            1100,
+            750
+          ],
+          [
+            1440,
+            940
+          ]
+        ],
+        "resized_floating_dimensions_px": {
+          "parameters": [
+            [
+              540,
+              620
+            ]
+          ],
+          "result": [
+            [
+              840,
+              620
+            ]
+          ]
+        },
+        "screen": {
+          "geometry": [
+            0,
+            0,
+            1920,
+            1200
+          ],
+          "available_geometry": [
+            0,
+            0,
+            1920,
+            1200
+          ],
+          "logical_dpi": 96.0,
+          "device_pixel_ratio": 1.0
+        },
+        "font_sizes_exercised_px": [
+          11,
+          12
+        ],
+        "settings_isolation_verified": true,
+        "preservation": {
+          "same_parameter_panel": true,
+          "same_document": true,
+          "same_canvas": true,
+          "parameter_values_preserved": true,
+          "parameter_values": {
+            "source_fixture": "zone_one_scene.gpkg",
+            "operation": "buffer",
+            "distance_m": 200.0
+          },
+          "retained_display_options": {
+            "bands": [
+              1
+            ],
+            "palette": "terrain",
+            "resampling": "nearest",
+            "page": 0
+          }
+        },
+        "pointer_drag": {
+          "all_cases_passed": true,
+          "method": "QTest sur la véritable barre de titre du panneau Paramètres",
+          "events": [
+            "mousePress",
+            "mouseMove",
+            "mouseMove",
+            "mouseRelease"
+          ],
+          "guides_captured": true,
+          "drop_area": "BottomDockWidgetArea",
+          "initial_layout_restored": true
+        },
+        "icons": {
+          "theme_color_checks_passed": true,
+          "checked_per_case": 18,
+          "result_tab_glyph_bounds_verified_px": {
+            "detach": [
+              12,
+              12
+            ],
+            "focus": [
+              10,
+              10
+            ]
+          }
+        },
+        "artifact": {
+          "id": 13016848678,
+          "name": "dynamic-workspace-Linux-py3.12",
+          "archive_sha256": "0159577b2891a3a42ce52205344895b0773cef1cb62ab0e762d761f6fd8e7686",
+          "archive_sha256_verified": true,
+          "url": "https://api.github.com/repos/cedrick14/cartomize-python/actions/artifacts/13016848678",
+          "report_in_archive": "dynamic-workspace/capture.json",
+          "junit_in_archive": "native-desktop.xml"
+        },
+        "report_comparison": {
+          "reference_run_id": 41134247586,
+          "relevant_signature_unchanged": true,
+          "difference_count": 0,
+          "dock_and_map_viewport_geometries_compared": true
+        }
+      },
+      "windows": {
+        "status": "passed",
+        "os": "Windows-2025Server-10.0.26100-SP0",
+        "python": "3.12.10",
+        "pyside": "6.9.3",
+        "qt": "6.9.3",
+        "qt_platform": "windows",
+        "tests": {
+          "passed": 69,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "capture_cases_passed": 4,
+        "captured_states": 46,
+        "png_files": 74,
+        "cases": [
+          "1100x750-light",
+          "1100x750-dark",
+          "1440x940-light",
+          "1440x940-dark"
+        ],
+        "window_dimensions_verified_px": [
+          [
+            1100,
+            750
+          ],
+          [
+            1440,
+            940
+          ]
+        ],
+        "resized_floating_dimensions_px": {
+          "parameters": [
+            [
+              540,
+              620
+            ]
+          ],
+          "result": [
+            [
+              840,
+              620
+            ]
+          ]
+        },
+        "screen": {
+          "geometry": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "available_geometry": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "logical_dpi": 96.0,
+          "device_pixel_ratio": 1.0
+        },
+        "font_sizes_exercised_px": [
+          11,
+          12
+        ],
+        "settings_isolation_verified": true,
+        "preservation": {
+          "same_parameter_panel": true,
+          "same_document": true,
+          "same_canvas": true,
+          "parameter_values_preserved": true,
+          "parameter_values": {
+            "source_fixture": "zone_one_scene.gpkg",
+            "operation": "buffer",
+            "distance_m": 200.0
+          },
+          "retained_display_options": {
+            "bands": [
+              1
+            ],
+            "palette": "terrain",
+            "resampling": "nearest",
+            "page": 0
+          }
+        },
+        "pointer_drag": {
+          "all_cases_passed": true,
+          "method": "QTest sur la véritable barre de titre du panneau Paramètres",
+          "events": [
+            "mousePress",
+            "mouseMove",
+            "mouseMove",
+            "mouseRelease"
+          ],
+          "guides_captured": true,
+          "drop_area": "BottomDockWidgetArea",
+          "initial_layout_restored": true
+        },
+        "icons": {
+          "theme_color_checks_passed": true,
+          "checked_per_case": 18,
+          "result_tab_glyph_bounds_verified_px": {
+            "detach": [
+              12,
+              12
+            ],
+            "focus": [
+              10,
+              10
+            ]
+          }
+        },
+        "artifact": {
+          "id": 13017383154,
+          "name": "dynamic-workspace-Windows-py3.12",
+          "archive_sha256": "a2c95c241c65c220b459c2c14f17f486dbf50519c45d8eb8955a5c0b9cbb8db0",
+          "archive_sha256_verified": true,
+          "url": "https://api.github.com/repos/cedrick14/cartomize-python/actions/artifacts/13017383154",
+          "report_in_archive": "dynamic-workspace/capture.json",
+          "junit_in_archive": "native-desktop.xml"
+        },
+        "report_comparison": {
+          "reference_run_id": 41134247586,
+          "relevant_signature_unchanged": true,
+          "difference_count": 0,
+          "dock_and_map_viewport_geometries_compared": true
+        }
+      }
+    },
+    "windows_screen_limit": {
+      "screen_px": [
+        1024,
+        768
+      ],
+      "available_screen_px": [
+        1024,
+        720
+      ],
+      "interpretation": "Le runner Windows fournit des rendus Qt natifs et des gestes injectés par QTest. QWidget.grab et les géométries vérifient les fenêtres de 1100×750 et 1440×940, qui dépassent cet écran ; ces preuves ne démontrent pas qu’une fenêtre de 1440×940 est entièrement visible sur le moniteur du runner."
+    },
+    "change_under_review": "Correctif HFW : politique verticale du wrapper d’aide passée de Maximum à Expanding pour préserver titres et résumés, sans texte remplacé ni hauteur fixée.",
+    "visual_inspection": {
+      "current_run_id": 41137159917,
+      "current_images_inspected": 4,
+      "selection_per_platform": [
+        "dynamic-workspace/1100x750-dark-initial-main.png",
+        "dynamic-workspace/1440x940-light-initial-main.png"
+      ],
+      "focus": "États initiaux, aide repliée : espacement du titre, alignement du bouton Aide et début du formulaire après correction HFW.",
+      "finding": "Sur Windows et Linux, les quatre images inspectées ne montrent aucun espace artificiel ajouté autour du titre Traitements vectoriels ; le titre, le bouton Aide et le formulaire restent compacts et lisibles.",
+      "other_current_images_reopened": false,
+      "reason": "Aucune différence pertinente dans les autres états enregistrés, y compris les géométries locales des docks et du viewport, comparés au run 41134247586.",
+      "earlier_broader_visual_inspection": {
+        "linux": {
+          "visually_inspected_run_id": 41132530500,
+          "intermediate_report_comparison_run_id": 41133386561,
+          "selection": [
+            "Les quatre états initiaux : clair/sombre, 1100×750/1440×940",
+            "Guides pendant un déplacement réel QTest",
+            "Résultat flottant redimensionné",
+            "Texte à 11 px"
+          ]
+        },
+        "windows": {
+          "visually_inspected_run_id": 41133386561,
+          "selection": [
+            "Les quatre états initiaux : clair/sombre, 1100×750/1440×940",
+            "Guides pendant un déplacement réel QTest",
+            "Paramètres et résultat flottants redimensionnés",
+            "Ancrage du panneau en bas",
+            "Texte à 11 px"
+          ]
+        }
+      },
+      "report_comparison_scope": [
+        "dimensions des fenêtres et des images",
+        "états des panneaux et nombre de documents détachés",
+        "identité du panneau, du document et du canvas",
+        "paramètres et options de rendu conservés",
+        "gestes et restauration de la disposition",
+        "statut et couleur des icônes",
+        "plateformes Qt et écrans",
+        "isolation des préférences",
+        "géométries locales des docks et du viewport cartographique"
+      ],
+      "excluded_volatile_fields": [
+        "dates et durées",
+        "répertoires temporaires des fixtures et préférences",
+        "identifiants de commit remplacés par une vérification de provenance"
+      ]
+    }
+  },
+  "post_merge_workflows": {
+    "source_commit": "7d4dc8510fbd1d7aaa147587149f0766769d62c9",
+    "source_tree": "7c9cad9fd61d72dd5ca271d1f9289d700d6f8345",
+    "verified_at_utc": "2026-10-30T22:56:53Z",
+    "status": "passed",
+    "workflows": [
+      {
+        "id": 41139569567,
+        "name": "Cartomize PyPI",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/cedrick14/cartomize-python/actions/runs/41139569567",
+        "updated_at": "2026-10-30T22:46:31Z"
+      },
+      {
+        "id": 41139569384,
+        "name": "Cartomize Python library",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/cedrick14/cartomize-python/actions/runs/41139569384",
+        "updated_at": "2026-10-30T22:51:15Z"
+      },
+      {
+        "id": 41139569336,
+        "name": "Real project acceptance",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/cedrick14/cartomize-python/actions/runs/41139569336",
+        "updated_at": "2026-10-30T22:51:39Z"
+      },
+      {
+        "id": 41139569368,
+        "name": "Desktop cross-platform validation",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/cedrick14/cartomize-python/actions/runs/41139569368",
+        "updated_at": "2026-10-30T22:53:41Z"
+      }
+    ]
+  },
+  "publication_workflow": {
+    "observed_at": "2026-10-30T22:50:29Z",
+    "run": {
+      "id": 41139569567,
+      "name": "Cartomize PyPI",
+      "event": "push",
+      "attempt": 1,
+      "head_sha": "7d4dc8510fbd1d7aaa147587149f0766769d62c9",
+      "head_branch": "main",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-30T22:39:33Z",
+      "updated_at": "2026-10-30T22:46:31Z",
+      "url": "https://github.com/cedrick14/cartomize-python/actions/runs/41139569567",
+      "api_url": "https://api.github.com/repos/cedrick14/cartomize-python/actions/runs/41139569567"
+    },
+    "jobs": [
+      {
+        "id": 124350264530,
+        "name": "build",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-30T22:39:37Z",
+        "completed_at": "2026-10-30T22:45:55Z",
+        "url": "https://github.com/cedrick14/cartomize-python/actions/runs/41139569567/job/124350264530",
+        "logs_url": "https://api.github.com/repos/cedrick14/cartomize-python/actions/jobs/124350264530/logs",
+        "test_summaries": [
+          {
+            "timestamp": "2026-10-30T22:40:36.7003563Z",
+            "passed": 19,
+            "failed": 0,
+            "skipped": 0,
+            "errors": 0,
+            "warnings": 213,
+            "duration_seconds": 12.63,
+            "evidence_line": "2026-10-30T22:40:36.7003563Z 19 passed, 213 warnings in 12.63s",
+            "source": "https://api.github.com/repos/cedrick14/cartomize-python/actions/jobs/124350264530/logs",
+            "scope": "Result view lifecycle and desktop imagery precheck"
+          },
+          {
+            "timestamp": "2026-10-30T22:45:45.1335228Z",
+            "passed": 1878,
+            "failed": 0,
+            "skipped": 2,
+            "errors": 0,
+            "warnings": 7366,
+            "duration_seconds": 307.54,
+            "evidence_line": "2026-10-30T22:45:45.1335228Z ========== 1878 passed, 2 skipped, 7366 warnings in 307.54s (0:05:07) ==========",
+            "source": "https://api.github.com/repos/cedrick14/cartomize-python/actions/jobs/124350264530/logs",
+            "scope": "Full test suite"
+          }
+        ]
+      },
+      {
+        "id": 124350264938,
+        "name": "windows-conda / startup",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-30T22:39:36Z",
+        "completed_at": "2026-10-30T22:44:17Z",
+        "url": "https://github.com/cedrick14/cartomize-python/actions/runs/41139569567/job/124350264938",
+        "logs_url": "https://api.github.com/repos/cedrick14/cartomize-python/actions/jobs/124350264938/logs",
+        "test_summaries": [
+          {
+            "timestamp": "2026-10-30T22:44:13.2200757Z",
+            "passed": 52,
+            "failed": 0,
+            "skipped": 0,
+            "errors": 0,
+            "warnings": 306,
+            "duration_seconds": 57.94,
+            "evidence_line": "2026-10-30T22:44:13.2200757Z ====================== 52 passed, 306 warnings in 57.94s ======================",
+            "source": "https://api.github.com/repos/cedrick14/cartomize-python/actions/jobs/124350264938/logs",
+            "scope": "Windows Conda installed package, notebook event loop and desktop processing"
+          }
+        ]
+      },
+      {
+        "id": 124352502209,
+        "name": "publish",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-30T22:46:03Z",
+        "completed_at": "2026-10-30T22:46:30Z",
+        "url": "https://github.com/cedrick14/cartomize-python/actions/runs/41139569567/job/124352502209",
+        "logs_url": "https://api.github.com/repos/cedrick14/cartomize-python/actions/jobs/124352502209/logs",
+        "test_summaries": []
+      },
+      {
+        "id": 124352502234,
+        "name": "delivery",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-30T22:45:59Z",
+        "completed_at": "2026-10-30T22:46:08Z",
+        "url": "https://github.com/cedrick14/cartomize-python/actions/runs/41139569567/job/124352502234",
+        "logs_url": "https://api.github.com/repos/cedrick14/cartomize-python/actions/jobs/124352502234/logs",
+        "test_summaries": []
+      }
+    ],
+    "published_wheel": {
+      "filename": "cartomize-1.0-2026103001-py3-none-any.whl",
+      "bytes": 552185,
+      "sha256": "595754d33bea43d4aa70e1891061a9c2300dc2b3195f8a591957eaf88d1344fd",
+      "version": "1.0",
+      "build_tag": "2026103001",
+      "upload_endpoint": "https://upload.pypi.org/legacy/",
+      "http_response": "200 OK",
+      "http_response_timestamp": "2026-10-30T22:46:28.5203131Z",
+      "source": "https://api.github.com/repos/cedrick14/cartomize-python/actions/jobs/124352502209/logs",
+      "evidence_lines": [
+        "2026-10-30T22:46:07.6241622Z ##[end-action id=__pypa_gh-action-pypi-publish.__run_2;outcome=success;conclusion=success;duration_ms=20]",
+        "2026-10-30T22:46:07.6425402Z ##[end-action id=__pypa_gh-action-pypi-publish.pre-installed-python;outcome=success;conclusion=success;duration_ms=17]",
+        "2026-10-30T22:46:07.6942667Z ##[end-action id=__pypa_gh-action-pypi-publish.__run_3;outcome=success;conclusion=success;duration_ms=45]",
+        "2026-10-30T22:46:14.6721970Z Checking dist/cartomize-1.0-2026103001-py3-none-any.whl: PASSED",
+        "2026-10-30T22:46:16.2241982Z DSSE PAE: b'DSSEv1 28 application/vnd.in-toto+json 276 {\"_type\":\"https://in-toto.io/Statement/v1\",\"subject\":[{\"name\":\"cartomize-1.0-2026103001-py3-none-any.whl\",\"digest\":{\"sha256\":\"595754d33bea43d4aa70e1891061a9c2300dc2b3195f8a591957eaf88d1344fd\"}}],\"predicateType\":\"https://docs.pypi.org/attestations/publish/v1\",\"predicate\":null}'",
+        "2026-10-30T22:46:25.9851737Z /github/workspace/dist/cartomize-1.0-2026103001-py3-none-any.whl",
+        "2026-10-30T22:46:25.9869405Z SHA256: 595754d33bea43d4aa70e1891061a9c2300dc2b3195f8a591957eaf88d1344fd",
+        "2026-10-30T22:46:26.6625653Z Uploading distributions to https://upload.pypi.org/legacy/",
+        "2026-10-30T22:46:26.6728063Z Uploading cartomize-1.0-2026103001-py3-none-any.whl",
+        "2026-10-30T22:46:28.5202224Z INFO     Response from https://upload.pypi.org/legacy/:                         ",
+        "2026-10-30T22:46:28.5203131Z          200 OK                                                                 ",
+        "2026-10-30T22:46:28.5221735Z https://pypi.org/project/cartomize/1.0/",
+        "2026-10-30T22:46:28.6365208Z ##[end-action id=__pypa_gh-action-pypi-publish.__self;outcome=success;conclusion=success;duration_ms=20941]"
+      ]
+    },
+    "release_validation": {
+      "source": "https://api.github.com/repos/cedrick14/cartomize-python/actions/jobs/124350264530/logs",
+      "evidence_lines": [
+        "2026-10-30T22:45:48.4430991Z Checking pypi-dist/cartomize-1.0.tar.gz: PASSED",
+        "2026-10-30T22:45:48.5432368Z {",
+        "2026-10-30T22:45:48.5432710Z   \"name\": \"cartomize\",",
+        "2026-10-30T22:45:48.5433277Z   \"version\": \"1.0\",",
+        "2026-10-30T22:45:48.5433571Z   \"files\": [",
+        "2026-10-30T22:45:48.5433840Z     {",
+        "2026-10-30T22:45:48.5434122Z       \"filename\": \"cartomize-1.0-2026103001-py3-none-any.whl\",",
+        "2026-10-30T22:45:48.5434459Z       \"bytes\": 552185,",
+        "2026-10-30T22:45:48.5434932Z       \"sha256\": \"595754d33bea43d4aa70e1891061a9c2300dc2b3195f8a591957eaf88d1344fd\"",
+        "2026-10-30T22:45:48.5435321Z     },",
+        "2026-10-30T22:45:48.5435504Z     {",
+        "2026-10-30T22:45:48.5435710Z       \"filename\": \"cartomize-1.0.tar.gz\",",
+        "2026-10-30T22:45:48.5435998Z       \"bytes\": 2209988,",
+        "2026-10-30T22:45:48.5436346Z       \"sha256\": \"b6d8770148c7d3ef00c04316a9b8bbc25415ee313b57791ebe289c00712dd2e1\"",
+        "2026-10-30T22:45:48.5436983Z     }",
+        "2026-10-30T22:45:48.5437188Z   ]",
+        "2026-10-30T22:45:48.5437366Z }",
+        "2026-10-30T22:45:48.5552187Z ##[group]Run actions/upload-artifact@v4"
+      ]
+    },
+    "checks": {
+      "all_four_jobs_succeeded": true,
+      "expected_merge_commit": true,
+      "build_hash_matches_upload_hash": true,
+      "upload_hash_matches_requested_hash": true,
+      "http_200_confirmed": true
+    },
+    "scope": "Read-only GitHub Actions job/status/log evidence. Public PyPI CDN/index visibility and an isolated download/install are verified separately. Test executions across suites overlap and are not summed."
+  },
+  "pypi_distribution": {
+    "filename": "cartomize-1.0-2026103001-py3-none-any.whl",
+    "url": "https://files.pythonhosted.org/packages/20/0d/fa7e601036003022f8e250bdd8d3505eb45122b89a0a7ed748e5e129de25/cartomize-1.0-2026103001-py3-none-any.whl",
+    "sha256": "595754d33bea43d4aa70e1891061a9c2300dc2b3195f8a591957eaf88d1344fd",
+    "size": 552185,
+    "uploaded_at": "2026-10-30T22:46:27.115192Z",
+    "commit": "7d4dc8510fbd1d7aaa147587149f0766769d62c9",
+    "pypi_json_url": "https://pypi.org/pypi/cartomize/1.0/json",
+    "retrieved_release_url": "https://pypi.org/pypi/cartomize/1.0/json?build=2026103001",
+    "checked_at_utc": "2026-10-30T22:50:46.062405+00:00",
+    "public_release_versions": [
+      "1.0"
+    ],
+    "latest_public_version": "1.0"
+  },
+  "normal_index_resolution": {
+    "status": "passed",
+    "checked_at_utc": "2026-10-30T22:54:44.517091+00:00",
+    "index_url": "https://pypi.org/simple",
+    "package_requirement": "cartomize[notebook,distributed]==1.0",
+    "mode": "pip dry-run --ignore-installed --no-deps --no-cache-dir --require-hashes",
+    "is_direct": false,
+    "selected_url": "https://files.pythonhosted.org/packages/20/0d/fa7e601036003022f8e250bdd8d3505eb45122b89a0a7ed748e5e129de25/cartomize-1.0-2026103001-py3-none-any.whl",
+    "sha256": "595754d33bea43d4aa70e1891061a9c2300dc2b3195f8a591957eaf88d1344fd",
+    "version": "1.0",
+    "pip_version": "25.0.1",
+    "old_file_previously_rejected": true,
+    "installation_scope": "The actual fresh installation and runtime probe used the identical wheel through its direct PyPI URL; this check independently validates normal index selection."
+  },
+  "initial_index_cache_observation": {
+    "status": "stale",
+    "observed_at_utc": "2026-10-30T22:50:12Z",
+    "index_serial": "42985509",
+    "current_release_serial": "42989177",
+    "old_filename": "cartomize-1.0-20261030-py3-none-any.whl",
+    "installation_prevented_by_hash_check": true,
+    "closed_by_normal_index_resolution_at_utc": "2026-10-30T22:54:44.517091+00:00",
+    "current_blocker": false
+  },
+  "installed_pypi_wheel": {
+    "status": "passed",
+    "checked_at_utc": "2026-10-30T22:52:37.145840+00:00",
+    "provenance": {
+      "pypi_json_url": "https://pypi.org/pypi/cartomize/1.0/json",
+      "wheel_url": "https://files.pythonhosted.org/packages/20/0d/fa7e601036003022f8e250bdd8d3505eb45122b89a0a7ed748e5e129de25/cartomize-1.0-2026103001-py3-none-any.whl",
+      "sha256": "595754d33bea43d4aa70e1891061a9c2300dc2b3195f8a591957eaf88d1344fd",
+      "hash_pinned_during_installation": true,
+      "pip_install_report": "Rapport pip de l’installation isolée par URL PyPI directe, avec empreinte imposée.",
+      "installation_method": "direct_pypi_wheel"
+    },
+    "installation": {
+      "version_metadata": "1.0",
+      "version_runtime": "1.0",
+      "wheel_build": "2026103001",
+      "python": "3.12.14",
+      "executable": "Interpréteur Python 3.12.14 du nouvel environnement virtuel isolé.",
+      "module_path": "site-packages/cartomize/__init__.py dans cet environnement.",
+      "virtual_environment": "Environnement virtuel neuf dédié à la vérification, hors du dépôt source.",
+      "system_site_packages": false,
+      "python_isolated_mode": true,
+      "direct_url": {
+        "archive_info": {
+          "hash": "sha256=595754d33bea43d4aa70e1891061a9c2300dc2b3195f8a591957eaf88d1344fd",
+          "hashes": {
+            "sha256": "595754d33bea43d4aa70e1891061a9c2300dc2b3195f8a591957eaf88d1344fd"
+          }
+        },
+        "url": "https://files.pythonhosted.org/packages/20/0d/fa7e601036003022f8e250bdd8d3505eb45122b89a0a7ed748e5e129de25/cartomize-1.0-2026103001-py3-none-any.whl"
+      }
+    },
+    "g12": {
+      "status": "passed",
+      "modules": {
+        "cartomize.vector_rings": "site-packages/cartomize/vector_rings.py",
+        "cartomize.desktop_rings": "site-packages/cartomize/desktop_rings.py"
+      },
+      "ring_areas_m2": [
+        42.0,
+        46.0
+      ],
+      "lower_bounds_m": [
+        0.0,
+        1.0
+      ],
+      "upper_bounds_m": [
+        1.0,
+        2.0
+      ],
+      "expected_total_area_m2": [
+        88.0
+      ],
+      "overlap_area_m2": [
+        0.0
+      ],
+      "ring_areas_with_input_m2": [
+        142.0,
+        46.0
+      ],
+      "input_example": {
+        "geometry_wkt": "POLYGON ((0 0, 10 0, 10 10, 0 10, 0 0))",
+        "crs": "EPSG:3857",
+        "distance_bounds_m": [
+          1,
+          2
+        ],
+        "quad_segs": 1,
+        "area_unit": "m2",
+        "id_field": "code",
+        "code": "001"
+      }
+    },
+    "dynamic_workspace": {
+      "status": "passed",
+      "qt_platform": "offscreen",
+      "report": "Rapport du scénario 1100x750-dark exécuté depuis le wheel installé, sous Qt offscreen.",
+      "cases": [
+        "1100x750-dark"
+      ],
+      "module_origin_verified": true,
+      "scope": "Actual installed window: panel and result detachment, resize, return, pointer guides and reset."
+    },
+    "extras": {
+      "declared": [
+        "dev",
+        "distributed",
+        "gpu",
+        "gui",
+        "notebook"
+      ],
+      "dependencies": {
+        "gui": [
+          "PySide6-Essentials<6.10,>=6.9.3; extra == \"gui\"",
+          "pypdfium2<6,>=4.30; extra == \"gui\""
+        ],
+        "notebook": [
+          "PySide6-Essentials<6.10,>=6.9.3; extra == \"notebook\"",
+          "pypdfium2<6,>=4.30; extra == \"notebook\"",
+          "ipykernel<8,>=6.29; extra == \"notebook\"",
+          "jupyter-client<9,>=8.6; extra == \"notebook\"",
+          "jupyterlab<5,>=4.3; extra == \"notebook\"",
+          "typing_extensions<5,>=4.13; extra == \"notebook\""
+        ],
+        "distributed": [
+          "dask[distributed]<2027,>=2024.8; extra == \"distributed\""
+        ],
+        "gpu": [
+          "cupy-cuda12x[ctk]<15,>=14; extra == \"gpu\""
+        ]
+      },
+      "installed_and_imported": {
+        "gui": {
+          "PySide6-Essentials": {
+            "module": "PySide6.QtWidgets",
+            "version": "6.9.3",
+            "import": "passed"
+          },
+          "pypdfium2": {
+            "module": "pypdfium2",
+            "version": "5.14.0",
+            "import": "passed"
+          }
+        },
+        "notebook": {
+          "ipykernel": {
+            "module": "ipykernel",
+            "version": "7.4.0",
+            "import": "passed"
+          },
+          "jupyter-client": {
+            "module": "jupyter_client",
+            "version": "8.10.0",
+            "import": "passed"
+          },
+          "jupyterlab": {
+            "module": "jupyterlab",
+            "version": "4.6.5",
+            "import": "passed"
+          }
+        },
+        "distributed": {
+          "dask": {
+            "module": "dask",
+            "version": "2026.8.0",
+            "import": "passed"
+          },
+          "distributed": {
+            "module": "dask.distributed",
+            "version": "2026.8.0",
+            "import": "passed"
+          }
+        }
+      },
+      "gpu": {
+        "declared": true,
+        "runtime_tested": false,
+        "scope": "CUDA/CuPy execution is outside this CPU environment verification."
+      }
+    },
+    "commands": {
+      "pip_check": {
+        "exit_code": 0,
+        "log": "pip_check.log",
+        "output": "No broken requirements found."
+      },
+      "cartomize_help": {
+        "exit_code": 0,
+        "log": "cartomize_help.log",
+        "output": "usage: cartomize [-h] [--version]"
+      },
+      "jupyterlab_version": {
+        "exit_code": 0,
+        "log": "jupyterlab_version.log",
+        "output": "4.6.5"
+      }
+    },
+    "source_commit": "7d4dc8510fbd1d7aaa147587149f0766769d62c9",
+    "elapsed_probe_seconds": 21.329,
+    "scope": "Targeted verification of the wheel actually served by PyPI; no repository test suite rerun.",
+    "source_comparison_reference": "#/source_comparison"
+  },
+  "source_comparison": {
+    "source_commit": "7d4dc8510fbd1d7aaa147587149f0766769d62c9",
+    "wheel_sha256": "595754d33bea43d4aa70e1891061a9c2300dc2b3195f8a591957eaf88d1344fd",
+    "wheel_source_count": 103,
+    "local_source_count": 103,
+    "matching_count": 103,
+    "mismatches": [],
+    "missing_in_wheel": [],
+    "missing_locally": [],
+    "matches": [
+      {
+        "path": "cartomize/__init__.py",
+        "sha256": "04a8e6ec04753cd22f072f100b38f1a7497f5b9f134eb7bb5f9994cf52b3cc29"
+      },
+      {
+        "path": "cartomize/__main__.py",
+        "sha256": "79ee6f134c5c5193377cf9b189cbdcc3e2095e49ba9cec310114441c15a917c4"
+      },
+      {
+        "path": "cartomize/_core/__init__.py",
+        "sha256": "c3a4f54d5167d40f878807f2f86385271fe67d7af83bf4f096cbafab21e5424c"
+      },
+      {
+        "path": "cartomize/_core/band_semantics.py",
+        "sha256": "7b96a22980a377867b3357aebef2b1436def0dd43a8151c51ec72299d4b892d4"
+      },
+      {
+        "path": "cartomize/_core/constants.py",
+        "sha256": "3da966ffbeda1b3fa611cdf3dbd7aac3f5e53ebf1ff70ef637149f73103740cf"
+      },
+      {
+        "path": "cartomize/_core/errors.py",
+        "sha256": "3dbe1ba0a88783c14068b7cbbcfb0940b260ea54aafd472a7c9964ceca3c20d5"
+      },
+      {
+        "path": "cartomize/_core/layout_plan.py",
+        "sha256": "efbba1d8fa45344132109445ff81095226e9d6faf163e07367b6cc1b25a1ad82"
+      },
+      {
+        "path": "cartomize/_core/models.py",
+        "sha256": "00c9e40fe32fa106873a892882e168ebcaad1271bf4f6bffeeffa75f50c0db77"
+      },
+      {
+        "path": "cartomize/_core/raster_intelligence_core.py",
+        "sha256": "ea267f2134e8abda04af7a53ae9a752fd0242ad7926b90eb778d15f09d99a869"
+      },
+      {
+        "path": "cartomize/_core/raster_sampling.py",
+        "sha256": "fed46fd7996d56e0e50b6e2a4a23545c95429f529d24ff24600d991590442e95"
+      },
+      {
+        "path": "cartomize/_core/raster_themes.py",
+        "sha256": "5b3891185b0bbda51c00a04d4516df4f30df9a6d7bdfe6590b561d551608e3da"
+      },
+      {
+        "path": "cartomize/_core/template_catalog.py",
+        "sha256": "15f1ac89d2048e90ec7de8a6a471aae8289103592de3e4dcea6b6b8730aa1512"
+      },
+      {
+        "path": "cartomize/_core/vector.py",
+        "sha256": "9dca3693b19aba8dad959f53fcfe01f7d5b8d1fa4b8165f9bf5f49886307be20"
+      },
+      {
+        "path": "cartomize/_native_worker.py",
+        "sha256": "b0a8fb1db479165f26d4bd5d24780a0fd3c5b1823263d7193c57f4a619669dfd"
+      },
+      {
+        "path": "cartomize/_validation.py",
+        "sha256": "64f3be9ca03e3f2e3e9d29241aa85ef90f187e77fad49e4e8517cf473c280eb6"
+      },
+      {
+        "path": "cartomize/algebra.py",
+        "sha256": "6614927cfaf3128960a05f39dc2acc803c59736c0511d7787c8f895a5f3dac8d"
+      },
+      {
+        "path": "cartomize/assistant.py",
+        "sha256": "f54a117950a336f8978bde7580fa5ec4c64a7a1853b029ff76cf7a0aad6e88e7"
+      },
+      {
+        "path": "cartomize/automation.py",
+        "sha256": "9d9974beccf66c3242e2e886c10f7a95bd95c85fb5770d243cdcc5d9a06a8c56"
+      },
+      {
+        "path": "cartomize/batch.py",
+        "sha256": "b20ffe44b2a7e784fcef6f3951613a07c675ed7d6fb01274c3bb5ce045de5cfb"
+      },
+      {
+        "path": "cartomize/cartographic_rules.py",
+        "sha256": "af80a19c1c24a0bba44656e108dc90d80d604530ba5d51115fb51aef329d7faf"
+      },
+      {
+        "path": "cartomize/catalogs.py",
+        "sha256": "f6eb003c3fb05d0efdf21d4f05b1ddb6a247698ac3df1d36c508bf198f3ac2b6"
+      },
+      {
+        "path": "cartomize/classification.py",
+        "sha256": "d46023210758736e8ab34d806fa5cfb2cb47fa3dc1225ebddd4188a4413301cc"
+      },
+      {
+        "path": "cartomize/cli.py",
+        "sha256": "1a561eb513e55001675ca875eda5337f239182238741efca73a5204b7105d36d"
+      },
+      {
+        "path": "cartomize/color.py",
+        "sha256": "f896198f7e4cd2968c5b25c60817c24e1fb6999d68f243b492d9831ddcb0e610"
+      },
+      {
+        "path": "cartomize/composition.py",
+        "sha256": "7ad56e4fd743ffba5c8b89bc9b94d0475d341c32283c24d259c734482cddc2c2"
+      },
+      {
+        "path": "cartomize/cuda.py",
+        "sha256": "717f58fc1073683e3cf70b7dccf70cc6db5f763a766bedb02f3888ec31a7d2e8"
+      },
+      {
+        "path": "cartomize/desktop.py",
+        "sha256": "e722b0b3d7bcbdc2a9dc2ade68691910b4dae4f2e2f16ed72c156b49b5f6464d"
+      },
+      {
+        "path": "cartomize/desktop_adaptive.py",
+        "sha256": "77ee651a8ebcfc6b4e1ef5caf4ecf0936122915a7168d6e3f7fb7fcec64c0c7e"
+      },
+      {
+        "path": "cartomize/desktop_assistant.py",
+        "sha256": "3c220c7bd6bbe7bdc701a4d4760128d4ddffb3e2bbae85fb41ef4518961d970a"
+      },
+      {
+        "path": "cartomize/desktop_canvas.py",
+        "sha256": "23563da064504a02cf93d563f21c119fa5921645903a6b64771f25bd2ae5a323"
+      },
+      {
+        "path": "cartomize/desktop_classification.py",
+        "sha256": "b62c9f66c9cf577de83dc6ecc0b232a1e36f8da5bcf5c2155d8d70679d8a3d5e"
+      },
+      {
+        "path": "cartomize/desktop_connections.py",
+        "sha256": "d7e3bc8a579ac20ef1bfe2bce60bb0549cb0eaa4be8ccabca7cb5fbb51792c7b"
+      },
+      {
+        "path": "cartomize/desktop_console.py",
+        "sha256": "4b8ff4bc35bc980da89bf76a0e9b15ddb100f30eafe4bdd3b86f9668e15fa9f4"
+      },
+      {
+        "path": "cartomize/desktop_conversion.py",
+        "sha256": "4c1c863d26ae1521e24bc36ec6229c07f12c46064d54d499d42432b82e05db3d"
+      },
+      {
+        "path": "cartomize/desktop_docking.py",
+        "sha256": "7d9b442d9a76754cd471b55ea39aada95a89aa87013f343f8a19e9740f4d74d5"
+      },
+      {
+        "path": "cartomize/desktop_execution.py",
+        "sha256": "152a0c18e696491fd1cd6f7bb3ff9f248306f07d7c02a47f3922b7a6f29f951b"
+      },
+      {
+        "path": "cartomize/desktop_explorer.py",
+        "sha256": "c05e2456f3b9b01932abd411eb783987a22ce8a17a4f2641b53c9f4f864fc75b"
+      },
+      {
+        "path": "cartomize/desktop_imagery.py",
+        "sha256": "9db34543302c7c30e3a1097b6452826e4ccc3b09b518fccea595214dcd54a12f"
+      },
+      {
+        "path": "cartomize/desktop_kernel.py",
+        "sha256": "ac9d38452c18563c2f9a9bf64c3f6fed5b7a67a935a28a9c24d6fa9e5b194ef9"
+      },
+      {
+        "path": "cartomize/desktop_layout.py",
+        "sha256": "9cc76b26057ba32fd9d44cfa8bafab5fc31bf929f4bfaaa61642449e72d7a075"
+      },
+      {
+        "path": "cartomize/desktop_mapops.py",
+        "sha256": "4bb3d65c7b0aba70643b0da32683545eb29de9bb41b448e659425478bdb7542e"
+      },
+      {
+        "path": "cartomize/desktop_merge.py",
+        "sha256": "9d95aae8e99282ce2fbb09473aa6338cd3bb0614da4166b4684347ebb172c3da"
+      },
+      {
+        "path": "cartomize/desktop_native.py",
+        "sha256": "b66b5de110978903854dd959f13d2eeea2c4a908624386ce7b535e44bd1690b4"
+      },
+      {
+        "path": "cartomize/desktop_processing.py",
+        "sha256": "f2b90d774bb9882f89c6bd015f08726322b1acd52fd4d79748b595608fbed0cb"
+      },
+      {
+        "path": "cartomize/desktop_project.py",
+        "sha256": "29950a1d38c8528c8ce2c7637c0ae405f0a416e89a35ed7aa98d79c06e6cd040"
+      },
+      {
+        "path": "cartomize/desktop_recipes.py",
+        "sha256": "62cb23398014d49224fe2c45be644a9d8f98f4b48d6ea4539752e7a410bb9c53"
+      },
+      {
+        "path": "cartomize/desktop_reprojection.py",
+        "sha256": "e41192b79c5d864704fe6c0fdd683a86401a458a60ced68c0b1af5f8c2720049"
+      },
+      {
+        "path": "cartomize/desktop_results.py",
+        "sha256": "4949c1cf696fb93115d82fd61608ecb829eb191eba5ad6566060f6335baf103c"
+      },
+      {
+        "path": "cartomize/desktop_rings.py",
+        "sha256": "34a75ff643db4cc844e84f8dc3ad557b100defb459c72c2891f1029bb350de55"
+      },
+      {
+        "path": "cartomize/desktop_selection.py",
+        "sha256": "e3c46211d655cc0b6fc7ea7439e7a9d99ee2bab7f05e7f1c1e65b7c62d3cd734"
+      },
+      {
+        "path": "cartomize/desktop_session.py",
+        "sha256": "ff4ca61939ceb348abc0d8faf68c48ab4fc0b89919da577ce136767ce8164407"
+      },
+      {
+        "path": "cartomize/desktop_tables.py",
+        "sha256": "2769b278eb6d7f76393c98e297ba2531fe677cccb0cbf60e3121b2394f0c40ca"
+      },
+      {
+        "path": "cartomize/desktop_tabulation.py",
+        "sha256": "10a7a8741c0e5a8dbb367ecf35c201d6e7aa6cfde3911a350e515c61ba8dca02"
+      },
+      {
+        "path": "cartomize/desktop_terrain.py",
+        "sha256": "a2eb4d5a0ddc73ec1bd5438ec0efac3ef233dcc2f62c9c06acbd86ce91375509"
+      },
+      {
+        "path": "cartomize/desktop_theme.py",
+        "sha256": "8af650c47096ea71996d1f6a506a88a3831616a5dcd6395a9cc393d507a6a816"
+      },
+      {
+        "path": "cartomize/desktop_tools.py",
+        "sha256": "8d0baa2ed1174c30228e5ae32fc89c30a56a268436ef4879dd784c0c0421fbd8"
+      },
+      {
+        "path": "cartomize/desktop_tools_base.py",
+        "sha256": "0e008d7db5dc083761c422a9becd36d1d3528291aa41b615840c06cce6428861"
+      },
+      {
+        "path": "cartomize/desktop_vector.py",
+        "sha256": "02df5632fbd5a71f05482b860013ddba4fd97816b56f7f9e1607b3b384eddc48"
+      },
+      {
+        "path": "cartomize/desktop_vector_quality.py",
+        "sha256": "0240448cec7dfd4c36c2dec129038ba6910a71ccab6dc2095147800acb69f929"
+      },
+      {
+        "path": "cartomize/desktop_workbench.py",
+        "sha256": "07523566b838a17983a0100f44969370d71c04fca06036440ab5f99b479402bf"
+      },
+      {
+        "path": "cartomize/execution.py",
+        "sha256": "34a3ea260f1009d186ffb94bc0f5835070b6947ee380671b94b67efd4c9fe7db"
+      },
+      {
+        "path": "cartomize/focal.py",
+        "sha256": "356f7591e6664966c0e062fcfa9f7dc46f4a1722777e8b77c3af34d480aaa744"
+      },
+      {
+        "path": "cartomize/hydrology.py",
+        "sha256": "136bdab6aa98712cc328a531baffc438e073863aab137a678a207cdf42d4a6d0"
+      },
+      {
+        "path": "cartomize/imagery.py",
+        "sha256": "400e7e0b17b0761cb31e3ed9129c847487d259c8d0007b51c4fbe3fd75ee0a36"
+      },
+      {
+        "path": "cartomize/imagery_audit.py",
+        "sha256": "057a0eeb93c5711e01bd1fc1c81cd6fbebe32e9bca260a65bcd50f0038e5f58d"
+      },
+      {
+        "path": "cartomize/imagery_automatic.py",
+        "sha256": "b54a2a373c5270180fdf8a0697e17184893ee71f1dce4c9148a9431616540fb6"
+      },
+      {
+        "path": "cartomize/imagery_pipeline.py",
+        "sha256": "813cb4c9bb172d7721be2056bf478c50a803ce29b0cb075d20e5490640c58a29"
+      },
+      {
+        "path": "cartomize/indices.py",
+        "sha256": "d13c38c746f67c55c4de97698df108934e86dc6727e7b045686e5a086b16f52b"
+      },
+      {
+        "path": "cartomize/mapops.py",
+        "sha256": "1071df7195bf0e581a002fc9efd4996f147220b855efab1927c64cb5260cdf34"
+      },
+      {
+        "path": "cartomize/mapping.py",
+        "sha256": "ef26b0cbb0f93a8a7b6a5555e65422bd829d69aad47b1dcfd1d4c1cf71d1f0a8"
+      },
+      {
+        "path": "cartomize/native.py",
+        "sha256": "b7c71a390783ebd73d2bfa59693b423669cea0e617b654a6f9a30c284494c07a"
+      },
+      {
+        "path": "cartomize/native_styles.py",
+        "sha256": "1c16e684e8de9f52b15ee23969542fddfd0eb410487617bf9222a153cb3591a8"
+      },
+      {
+        "path": "cartomize/nodata.py",
+        "sha256": "eb6ee4470f235e99ca3d019c328cf9df2dc622f4e2e7cc8bc40588adf8ef2720"
+      },
+      {
+        "path": "cartomize/processing.py",
+        "sha256": "b5262aec651e455e1483d0254e8caf607b0d4c48fce69914c7be61b7a1b26106"
+      },
+      {
+        "path": "cartomize/project.py",
+        "sha256": "fe0bb97b9b1b4ace23f4bf9b2038e5aebe5c6d4c8f37e98a3e46aa1475897cfd"
+      },
+      {
+        "path": "cartomize/quality.py",
+        "sha256": "de22e6dc8a5ffe711262a988ab7ec90dad08dc91bbc8d5d60abe5f0e717873fe"
+      },
+      {
+        "path": "cartomize/raster.py",
+        "sha256": "81f94b725e02156c06de562799746a7242f23eb7980e4ef977c46842ccef282b"
+      },
+      {
+        "path": "cartomize/raster_conversion.py",
+        "sha256": "03f3e9deda44b411b9b954601aa2b382d096a1d4f2a16db44e7c3439ec05f611"
+      },
+      {
+        "path": "cartomize/recipes.py",
+        "sha256": "d130b87e5f88764cefd53bff2b9b538aa455c560ef941e421fd3831afffa142a"
+      },
+      {
+        "path": "cartomize/relations.py",
+        "sha256": "b0b8b919342c2d4290d6f6115bdc3be81581b7dbbc2395e72e853a5ab58a61ba"
+      },
+      {
+        "path": "cartomize/routing.py",
+        "sha256": "10488e55aa55601e8cc56798f26db873758367a58fc9e3f3fb25afd387278c67"
+      },
+      {
+        "path": "cartomize/scenes.py",
+        "sha256": "0c5fa4ee9266a99be74a7cc7c77622975e571ea592b121c89f1d537175adbda6"
+      },
+      {
+        "path": "cartomize/session.py",
+        "sha256": "659790e83339e818b9133999e0882915b079176465dd9361c74c48955857375b"
+      },
+      {
+        "path": "cartomize/storage.py",
+        "sha256": "c077e7202ac66e57d13a51b57d944c71d2ea77f0bbccafabaad422b20b56f5d8"
+      },
+      {
+        "path": "cartomize/tableio.py",
+        "sha256": "446e9b9c7436c86c64e12bea1dadb3602a8957454deaae8249db2fd0e6dd9933"
+      },
+      {
+        "path": "cartomize/templates.py",
+        "sha256": "f72d21d7096cc506736e65b16d72455f255ca1743f37fc552b737f990f554a1c"
+      },
+      {
+        "path": "cartomize/terrain.py",
+        "sha256": "723c0d9dd2d1fad23bda3cb06a31b9371be2d50e1650fe702c01c0014d040b89"
+      },
+      {
+        "path": "cartomize/typography.py",
+        "sha256": "38320404ff64a62a6b050835784abec016a0533ad50ab9b7c3e4b0bae19e2f54"
+      },
+      {
+        "path": "cartomize/vector.py",
+        "sha256": "59aa00f750309f304869b34320f472e66f76c59bcc6007344735ab16f8c9c688"
+      },
+      {
+        "path": "cartomize/vector_conversion.py",
+        "sha256": "2d6751a79da932eaa5e77135556e9089fb099bc5f7184326b7b814a2f8adc59a"
+      },
+      {
+        "path": "cartomize/vector_duplicates.py",
+        "sha256": "f1f04533c777b32b9bea63670b861eb69f3548be52a5d83ca979bd25e0452406"
+      },
+      {
+        "path": "cartomize/vector_io.py",
+        "sha256": "6eff4d50b7282bd87aaea4503ba519e43b7c40f43df115bac9506f52d00f0ff0"
+      },
+      {
+        "path": "cartomize/vector_merge.py",
+        "sha256": "fafdf798fd73b4733da547264bcf322b1905d1ddb8162de4232cfaaff0cf0d69"
+      },
+      {
+        "path": "cartomize/vector_quality.py",
+        "sha256": "b9161aeb28ac1ae5427fd04267c2ec9d58b4fa65fb840462f837e8d69d6f274e"
+      },
+      {
+        "path": "cartomize/vector_quality_result.py",
+        "sha256": "c7406ce942b9f6531344142dbcb66ae81ed640c0e89ac898580105c87232befd"
+      },
+      {
+        "path": "cartomize/vector_reprojection.py",
+        "sha256": "bfeb607775acf4b181ce29e05a97c9ad4aa1c62f7d6c055a385327a3a0596d6e"
+      },
+      {
+        "path": "cartomize/vector_rings.py",
+        "sha256": "64dbf64c7fe015d04781dd83223a968a255938cddf672829bf91d3961b442a04"
+      },
+      {
+        "path": "cartomize/vector_selection.py",
+        "sha256": "c6cc8c0c6282f5328c78dbe69c8d18fe5fe115f2930f4b659413b63e68ab6a92"
+      },
+      {
+        "path": "cartomize/vector_tabulation.py",
+        "sha256": "991da21d243bf4ace4a668baf92c51442131ff18ebc9be1e3089739f4ad34177"
+      },
+      {
+        "path": "cartomize/vector_topology.py",
+        "sha256": "0c315c3bdde4881d4ca172a0207dd1cd9f6780b9c75362c8c118dfb286f96f78"
+      },
+      {
+        "path": "cartomize/vector_workflows.py",
+        "sha256": "62bc3bdae488ece3f18314605ef82225fcceb8fcbdeada5d3ed2bf212c1587d2"
+      },
+      {
+        "path": "cartomize/viewer_data.py",
+        "sha256": "6f8b77ff8ee3e261f40613416d58ee2b9392a38ff6e9953bf83dec48b142481c"
+      },
+      {
+        "path": "cartomize/workflow.py",
+        "sha256": "177a4985d45f77534e58fd393976e3962400b68b77460f46223da53db7b2368b"
+      }
+    ],
+    "comparison": "Byte-for-byte: published wheel, local source and exact publication commit."
+  },
+  "github_delivery": {
+    "status": "passed",
+    "checked_at_utc": "2026-10-30T22:52:41.451497+00:00",
+    "release_url": "https://github.com/cedrick14/cartomize-python/releases/tag/cartomize-1.0-2026103001",
+    "published_at": "2026-10-30T22:46:06Z",
+    "source_commit": "7d4dc8510fbd1d7aaa147587149f0766769d62c9",
+    "assets": [
+      {
+        "name": "cartomize-1.0-2026103001-py3-none-any.whl",
+        "size": 552185,
+        "sha256": "595754d33bea43d4aa70e1891061a9c2300dc2b3195f8a591957eaf88d1344fd",
+        "url": "https://github.com/cedrick14/cartomize-python/releases/download/cartomize-1.0-2026103001/cartomize-1.0-2026103001-py3-none-any.whl",
+        "sha256_recalculated": true
+      },
+      {
+        "name": "cartomize-1.0-presentation.zip",
+        "size": 3439905,
+        "sha256": "329f85778416aca3ceda3f86a8f8a601d6522177baa08c7d0e6e7067a67fa25f",
+        "url": "https://github.com/cedrick14/cartomize-python/releases/download/cartomize-1.0-2026103001/cartomize-1.0-presentation.zip",
+        "sha256_recalculated": true
+      },
+      {
+        "name": "cartomize-1.0.tar.gz",
+        "size": 2209988,
+        "sha256": "b6d8770148c7d3ef00c04316a9b8bbc25415ee313b57791ebe289c00712dd2e1",
+        "url": "https://github.com/cedrick14/cartomize-python/releases/download/cartomize-1.0-2026103001/cartomize-1.0.tar.gz",
+        "sha256_recalculated": true
+      }
+    ],
+    "wheel_matches_pypi": true,
+    "demo": {
+      "wheel_identical": true,
+      "source_archive_identical": true,
+      "dynamic_workspace_guide": "docs/DYNAMIC_WORKSPACE.md",
+      "screenshots": [
+        "docs/images/dynamic-workspace/dark.png",
+        "docs/images/dynamic-workspace/light.png",
+        "docs/images/dynamic-workspace/placement-guides.png"
+      ],
+      "notebooks": [
+        "tutorials/notebooks/22_demonstration_pretraitement_automatique.ipynb"
+      ],
+      "file_count": 103
+    }
+  },
+  "public_pages_observation": {
+    "checked_at_utc": "2026-10-30T22:55:21.219715+00:00",
+    "pypi_page": {
+      "url": "https://pypi.org/project/cartomize/1.0/?build=2026103001",
+      "http_status": 200,
+      "contains_dynamic_filename": false,
+      "wheel_filenames": [],
+      "content_verified": false,
+      "interpretation": "Direct HTML retrieval did not expose release file names; no conclusion is drawn from this HTML response. PyPI JSON, the normal index and downloaded bytes independently verified the new file."
+    },
+    "piwheels_page": {
+      "url": "https://www.piwheels.org/project/cartomize/?build=2026103001",
+      "http_status": 200,
+      "contains_dynamic_filename": false,
+      "wheel_filenames": [
+        "cartomize-0.8.1a1-py3-none-any.whl",
+        "cartomize-0.8.1a2-py3-none-any.whl",
+        "cartomize-0.8.2a1-py3-none-any.whl",
+        "cartomize-0.9.0a1-py3-none-any.whl",
+        "cartomize-1.0-py3-none-any.whl",
+        "cartomize-1.0.1-py3-none-any.whl"
+      ],
+      "page_last_updated": "2026-09-26 23:18:34 UTC"
+    },
+    "piwheels_json": {
+      "url": "https://www.piwheels.org/project/cartomize/json?build=2026103001",
+      "http_status": 200,
+      "contains_dynamic_filename": false,
+      "release_versions": [
+        "1.0.1",
+        "1.0",
+        "0.9.0a1",
+        "0.8.2a1",
+        "0.8.1a2",
+        "0.8.1a1"
+      ],
+      "release_1_0": {
+        "released": "2026-09-26 21:17:58",
+        "prerelease": false,
+        "yanked": false,
+        "skip_reason": "",
+        "files": {
+          "cartomize-1.0-py3-none-any.whl": {
+            "file_url": "/simple/cartomize/cartomize-1.0-py3-none-any.whl",
+            "filehash": "d9f72e2b876444216e95b453915b31c92cf7e106d90c88929ac8ba31eb809644",
+            "filesize": 335815,
+            "builder_abi": "cp311",
+            "file_abi_tag": "none",
+            "platform": "any",
+            "requires_python": ">=3.11",
+            "apt_dependencies": [],
+            "pip_dependencies": [
+              "geopandas",
+              "matplotlib",
+              "numpy",
+              "pyproj",
+              "rasterio",
+              "scikit-learn",
+              "scipy"
+            ]
+          }
+        }
+      }
+    },
+    "pypi_description": {
+      "source": "https://pypi.org/pypi/cartomize/1.0/json?build=2026103001",
+      "mentions_initial_wheel": true,
+      "mentions_dynamic_wheel": false,
+      "interpretation": "Release description retains the metadata from its first uploaded file."
+    }
+  },
+  "verification_scopes": {
+    "normal_index": "Sélection indépendante par pip dry-run avec index PyPI normal et empreinte imposée ; is_direct=false. Aucun second essai d’installation complète n’est attribué à ce dry-run.",
+    "actual_installation": "Installation réelle du même wheel par son URL files.pythonhosted.org, empreinte imposée, hors dépôt et sans paquets système ; installation_method=direct_pypi_wheel.",
+    "installed_gui": "Fenêtre du paquet installé et déplacements réels de widgets Qt sous offscreen, cas 1100x750-dark ; cette vérification est distincte de la CI native Windows et Linux.",
+    "native_gui": "Plugins Qt windows et xcb de la CI, 4 configurations par plateforme ; la limite d’écran Windows est décrite dans native_desktop_ci.windows_screen_limit.",
+    "gpu": "Option déclarée ; aucune exécution CUDA/CuPy dans l’environnement de vérification CPU."
+  },
+  "evidence_references": {
+    "publication_guide": "PUBLICATION.md",
+    "dynamic_workspace_guide": "DYNAMIC_WORKSPACE.md",
+    "source_file_hashes": "#/source_comparison/matches",
+    "native_artifacts": "#/native_desktop_ci/platforms",
+    "installation_logs": "Les noms de journaux décrivent les preuves de la vérification isolée ; les résultats et codes de sortie utiles sont intégrés dans ce rapport."
+  }
+}
