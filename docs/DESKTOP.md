@@ -321,3 +321,11 @@ de conversion. Les paramètres sont conservés dans la session ; chaque
 enregistrement garde sa provenance. Le [guide M10](VECTOR_MERGE.md) et le
 [cours 16](../tutorials/notebooks/16_harmonisation_fusion_vectorielle.ipynb)
 expliquent les décisions sur un exemple autonome.
+
+## Conversion et formats — G06
+
+La page **Projet → Conversion et formats** permet d’analyser une source, de sélectionner une couche vectorielle et de préparer son format de livraison. Le tableau des noms de champs est modifiable ; les types raster, la compression, les valeurs NoData et les pyramides disposent de contrôles dédiés.
+
+Indiquer le répertoire parent puis le nom d’un nouveau dossier. Après exécution, **Afficher les données converties** et **Ouvrir le rapport de conversion** donnent accès aux produits relus. Le format FlatGeobuf est également reconnu par le visualiseur, l’import et les transferts entre outils.
+
+La session conserve les paramètres et les choix de couches. Une source modifiée doit être analysée de nouveau. Les paramètres du worker sont capturés au lancement. Voir le [guide G06](DATA_CONVERSION.md) pour les formats, les valeurs manquantes et les politiques de précision.

@@ -1,11 +1,39 @@
 # Validation du parcours
 
-Le parcours courant installe les sources **Cartomize 1.7.0** de la copie du dépôt
+Le parcours courant installe les sources **Cartomize 1.9.0** de la copie du dépôt
 utilisée. Les résultats des versions précédentes sont conservés ci-dessous avec
 leur version et leur date ; ils ne constituent pas une nouvelle exécution de
 tous les cours avec la version courante.
 
-## Parcours courant — sources 1.7.0
+## Parcours courant — sources 1.9.0
+
+La réexécution du 30 octobre 2026 réussit **17 notebooks autonomes et
+115 cellules de code non vides, sans erreur**, dans un noyau Jupyter neuf par
+cours. Elle dure **86,264 secondes**, dont **85,44 secondes cumulées** dans
+les leçons, sous Linux / Python 3.12.14. Les deux études 11 et 12 demandant les
+données locales de `Tuto.zip` sont exclues par le script officiel.
+
+Le [cours 18](notebooks/18_conversion_conditionnement.ipynb) ajoute neuf
+cellules : inspection multicouche, quatre formats vectoriels, vérification
+SQLite des attributs, COG et NoData, comparaison des pixels et masques,
+refus d’un débordement, chaîne de conversions et retrait explicite du NoData.
+Ses résultats et sa figure sont enregistrés. Les fichiers historiques 00 à 17
+retrouvent exactement leur contenu antérieur après la validation ; leurs
+sorties anciennes ne sont pas utilisées comme preuve de cette nouvelle passe.
+
+La première passe avait révélé l’absence locale d’`ipywidgets`, pourtant
+déclaré dans `requirements.txt`. Cette dépendance et ses deux composants de
+widgets ont été ajoutés, sans changer les paquets préexistants. La passe
+complète ci-dessus intervient après cette correction d’environnement.
+
+La [matrice pédagogique](COVERAGE.md) relie **44 opérateurs aux cours sur les
+52 enregistrés**. Le [rapport de livraison 1.9.0](../docs/VALIDATION_1.9.0.json)
+conserve les résultats par leçon, les empreintes des entrées, l’environnement
+et les exclusions. L’édition HTML des **19 cours** a également été construite ;
+l’export des pages privées 11 et 12 conserve leurs résultats historiques et
+ne constitue pas une nouvelle exécution de ces études.
+
+## Historique du 26 octobre 2026 — sources 1.7.0
 
 La réexécution complète sur les sources finales réussit : **15 notebooks,
 97 cellules de code, aucune erreur**, en **47,85 secondes cumulées** sous

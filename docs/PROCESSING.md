@@ -239,3 +239,17 @@ La fusion ne dissout ni ne dédoublonne les géométries. Le
 [guide M10](VECTOR_MERGE.md) décrit les conversions et le
 [cours 16](../tutorials/notebooks/16_harmonisation_fusion_vectorielle.ipynb)
 exécute une chaîne de fusion puis tampons.
+
+## Conversion G06 dans les plans
+
+`vector.convert` et `raster.convert` fournissent `primary`, `data`, `manifest` et `report`. Leur produit `data` est un fichier géographique directement réutilisable, par exemple `@conversion:data`. Le dossier contient aussi les compagnons du format choisi.
+
+```python
+plan = cm.processing_plan([
+    {"id": "conversion", "operation": "raster.convert", "parameters": {
+        "source": "classes.tif", "driver": "COG", "dtype": "uint8", "nodata": 255}},
+])
+cm.run_plan(plan, "livraison_plan")
+```
+
+Les options de conversion sont celles de l’[API G06](DATA_CONVERSION.md). Les paramètres refusés et les différences non autorisées empêchent la publication du dossier.

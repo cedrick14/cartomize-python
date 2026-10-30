@@ -1,0 +1,351 @@
+{
+  "schema": "cartomize.validation_g06_real.v1",
+  "generated_at_utc": "2026-10-30T08:50:56.224369+00:00",
+  "cartomize_version": "1.9.0",
+  "repository_head_at_validation": "7d06bb4a554ddc316363b3b6296379d9ec422258",
+  "code_state": "Module hashes identify the tested working sources; HEAD may precede uncommitted implementation.",
+  "validation_script_sha256": "526482b4f12857548084837cdd3576fc9467589c6a6c68094e1303bfb5308181",
+  "tested_source_sha256": {
+    "src/cartomize/__init__.py": "95b635bfb434334d316e2d7f99c21ffe04e2017178e698cf59f262a1e6cbe3cd",
+    "src/cartomize/_validation.py": "64f3be9ca03e3f2e3e9d29241aa85ef90f187e77fad49e4e8517cf473c280eb6",
+    "src/cartomize/imagery.py": "400e7e0b17b0761cb31e3ed9129c847487d259c8d0007b51c4fbe3fd75ee0a36",
+    "src/cartomize/raster_conversion.py": "03f3e9deda44b411b9b954601aa2b382d096a1d4f2a16db44e7c3439ec05f611",
+    "src/cartomize/session.py": "659790e83339e818b9133999e0882915b079176465dd9361c74c48955857375b",
+    "src/cartomize/storage.py": "c077e7202ac66e57d13a51b57d944c71d2ea77f0bbccafabaad422b20b56f5d8",
+    "src/cartomize/vector_conversion.py": "2d6751a79da932eaa5e77135556e9089fb099bc5f7184326b7b814a2f8adc59a",
+    "src/cartomize/vector_io.py": "6eff4d50b7282bd87aaea4503ba519e43b7c40f43df115bac9506f52d00f0ff0",
+    "src/cartomize/vector_reprojection.py": "bfeb607775acf4b181ce29e05a97c9ad4aa1c62f7d6c055a385327a3a0596d6e"
+  },
+  "runtime": {
+    "python": "3.12.14",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.39",
+    "gdal": "3.12.2",
+    "packages": {
+      "geopandas": "1.2.0",
+      "pyogrio": "0.13.0",
+      "shapely": "2.2.0",
+      "numpy": "2.5.4",
+      "pyproj": "3.8.0",
+      "rasterio": "1.5.2"
+    }
+  },
+  "sources": [
+    {
+      "name": "Paris districts",
+      "url": "https://raw.githubusercontent.com/jorisvandenbossche/geopandas-tutorial/72c7f3168e1e4e257caf84eb7b3fcaa47ade09c0/data/paris_districts.geojson",
+      "expected_sha256": "db65faf397e8876e9a62cdb722bc8c0897e9f9e4db4daa5c01a7e7d7883d626b",
+      "local_file": "/workspace/scratch/eeb1697666d1/g06-validation-data/paris_districts.geojson",
+      "scope": "Pinned historical teaching snapshot; 80 real district polygons."
+    },
+    {
+      "name": "Sentinel-2 Mayombe",
+      "item_url": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2C_33MTR_20260721_0_L2A",
+      "attribution": "Contains modified Copernicus Sentinel data 2026",
+      "license": "https://sentinels.copernicus.eu/documents/247904/690755/Sentinel_Data_Legal_Notice",
+      "provenance_file": "tests/data/sentinel2_mvouti/provenance.json",
+      "assets": {
+        "red": {
+          "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/TR/2026/7/S2C_33MTR_20260721_0_L2A/B04.tif",
+          "source_window": [
+            3294,
+            6404,
+            128,
+            128
+          ],
+          "sha256": "a21f7d659ed56252f1fb50b2ae492dc46b66e3fef1ee3cc2674663410fe9401d"
+        },
+        "nir": {
+          "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/TR/2026/7/S2C_33MTR_20260721_0_L2A/B08.tif",
+          "source_window": [
+            3294,
+            6404,
+            128,
+            128
+          ],
+          "sha256": "d0d4ace7d2b0a10edc9f6646f9d6284965c243e0cd3540a835fd4e13724df581"
+        },
+        "scl": {
+          "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/TR/2026/7/S2C_33MTR_20260721_0_L2A/SCL.tif",
+          "source_window": [
+            1647,
+            3202,
+            64,
+            64
+          ],
+          "sha256": "49458db506c4d4d650804c123540813c4fc0b5001a192c4350e459e946b1bbd8"
+        }
+      },
+      "scope": "Unresampled native integer cutouts. No recalibration or land-cover accuracy claim."
+    }
+  ],
+  "source_sha256_before": {
+    "/workspace/scratch/eeb1697666d1/g06-validation-data/paris_districts.geojson": "db65faf397e8876e9a62cdb722bc8c0897e9f9e4db4daa5c01a7e7d7883d626b",
+    "/workspace/scratch/eeb1697666d1/cartomize-python/tests/data/sentinel2_mvouti/README.md": "4b15528249f079299fb8bb286760a1cd5b1e0cef85cd139aa0bd720665b05c68",
+    "/workspace/scratch/eeb1697666d1/cartomize-python/tests/data/sentinel2_mvouti/provenance.json": "f30859b793dc533842bc38002c1fd77a28f4695a117df2ef318434434c74134f",
+    "/workspace/scratch/eeb1697666d1/cartomize-python/tests/data/sentinel2_mvouti/red.tif": "a21f7d659ed56252f1fb50b2ae492dc46b66e3fef1ee3cc2674663410fe9401d",
+    "/workspace/scratch/eeb1697666d1/cartomize-python/tests/data/sentinel2_mvouti/nir.tif": "d0d4ace7d2b0a10edc9f6646f9d6284965c243e0cd3540a835fd4e13724df581",
+    "/workspace/scratch/eeb1697666d1/cartomize-python/tests/data/sentinel2_mvouti/scl.tif": "49458db506c4d4d650804c123540813c4fc0b5001a192c4350e459e946b1bbd8"
+  },
+  "output_directory": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-4jiry4kt",
+  "downloaded_files": 0,
+  "method": "Original JSON properties/coordinates, independent SQLite/WKB and DBF/SHP decoding, full raster-array comparison; no pass relies solely on a Cartomize summary.",
+  "analytic_fixture": "Separate deterministic 64x64 raster with one NoData sample, custom dataset/band metadata and two overview levels.",
+  "checks": [
+    {
+      "name": "Pinned source hashes, original IDs and Sentinel provenance",
+      "status": "passed",
+      "features": 80,
+      "attributes_checked": 240,
+      "coordinates_checked": 8366,
+      "pinned_files_verified": 4,
+      "source_crs": "OGC:CRS84",
+      "scl_class_counts": {
+        "2": 86,
+        "4": 1518,
+        "5": 2406,
+        "7": 86
+      }
+    },
+    {
+      "name": "Paris -> GeoPackage: SQLite fields, scalar types and WKB coordinates",
+      "status": "passed",
+      "features": 80,
+      "attributes_checked": 240,
+      "coordinates_checked": 8366,
+      "oracle": "Original JSON + SQLite + independent GeoPackage/WKB decoder",
+      "declared_attribute_types": {
+        "id": "INTEGER",
+        "district_name": "TEXT",
+        "population": "INTEGER"
+      },
+      "all_coordinates_exact": true,
+      "row_order_preserved": true,
+      "crs_preserved": true,
+      "driver": "GPKG",
+      "output": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-4jiry4kt/paris_gpkg/data.gpkg",
+      "output_sha256": "b0cebb022a1171f862f09f5f21c2de46b3fca2713599818b91a2e7c382de4dca"
+    },
+    {
+      "name": "Paris -> GeoJSON: every JSON scalar, coordinate and row",
+      "status": "passed",
+      "features": 80,
+      "attributes_checked": 240,
+      "coordinates_checked": 8366,
+      "oracle": "Python JSON decoder on both files",
+      "all_scalar_types_exact": true,
+      "all_coordinates_exact": true,
+      "row_order_preserved": true,
+      "crs_preserved": true,
+      "driver": "GeoJSON",
+      "output": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-4jiry4kt/paris_geojson/data.geojson",
+      "output_sha256": "43532da5525e70191a3dddf62a6d5af2f4d785e69bb2159bf9c9c39feb68dbc1"
+    },
+    {
+      "name": "Paris -> FlatGeobuf: all records against the original JSON oracle",
+      "status": "passed",
+      "features": 80,
+      "attributes_checked": 240,
+      "coordinates_checked": 8366,
+      "oracle": "Original JSON; GDAL decodes only the FlatGeobuf output",
+      "output_dtypes": {
+        "id": "int64",
+        "district_name": "str",
+        "population": "int64"
+      },
+      "all_coordinates_exact": true,
+      "row_order_preserved": true,
+      "crs_preserved": true,
+      "driver": "FlatGeobuf",
+      "output": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-4jiry4kt/paris_fgb/data.fgb",
+      "output_sha256": "83bb667f41e3345e3d389570b44ffe0c47d7a8ccb702217af396fc7e2103f984"
+    },
+    {
+      "name": "Paris -> adapted Shapefile: independent DBF/SHP and explicit ring representation policy",
+      "status": "passed",
+      "features": 80,
+      "attributes_checked": 240,
+      "coordinates_checked": 8366,
+      "oracle": "Original JSON + independent DBF/SHP binary decoders",
+      "field_map": {
+        "district_name": "district"
+      },
+      "encoding": "UTF-8",
+      "all_attribute_types_and_values_exact": true,
+      "all_coordinate_values_exact": true,
+      "allowed_change": "Polygon ring direction/start only",
+      "polygons_with_ring_representation_changed": 0,
+      "row_order_preserved": true,
+      "crs_preserved": true,
+      "driver": "ESRI Shapefile",
+      "output": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-4jiry4kt/paris_shapefile/data.shp",
+      "output_sha256": "f61965052f9b5ab8df6170a97ae7dad05873232fb37e9662b57d1bd6778482cd"
+    },
+    {
+      "name": "Real Sentinel red -> GeoTIFF: every pixel, mask and grid element",
+      "status": "passed",
+      "pixel_values_checked": 16384,
+      "valid_values_checked": 16384,
+      "masks_checked": 16384,
+      "all_valid_values_exact": true,
+      "masks_exact": true,
+      "grid_exact": true,
+      "metadata_preserved": true,
+      "output_dtype": [
+        "uint16"
+      ],
+      "output_nodata": 0.0,
+      "compression": "deflate",
+      "driver": "GTiff",
+      "oracle": "Full source arrays and metadata; independent NumPy comparisons; shared GDAL TIFF decoder",
+      "source_band": "red",
+      "output": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-4jiry4kt/sentinel_red_gtiff/data.tif",
+      "output_sha256": "be4cd987f3164a33ce0c5abeaeabd3a69683d191f4f64fea0929599824c51fa2"
+    },
+    {
+      "name": "Real Sentinel NIR -> COG: every pixel, mask and metadata value",
+      "status": "passed",
+      "pixel_values_checked": 16384,
+      "valid_values_checked": 16384,
+      "masks_checked": 16384,
+      "all_valid_values_exact": true,
+      "masks_exact": true,
+      "grid_exact": true,
+      "metadata_preserved": true,
+      "output_dtype": [
+        "uint16"
+      ],
+      "output_nodata": 0.0,
+      "compression": "lzw",
+      "driver": "COG",
+      "oracle": "Full source arrays and metadata; independent NumPy comparisons; shared GDAL TIFF decoder",
+      "source_band": "nir",
+      "output": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-4jiry4kt/sentinel_nir_cog/data.tif",
+      "output_sha256": "f8eb9c519cf0898bd2a93fbc6535ab41e0139b7338ca7e99571a268d48be971c"
+    },
+    {
+      "name": "Real Sentinel SCL -> uint16 COG with NoData=65535: exact class conservation",
+      "status": "passed",
+      "pixel_values_checked": 4096,
+      "valid_values_checked": 4096,
+      "masks_checked": 4096,
+      "all_valid_values_exact": true,
+      "masks_exact": true,
+      "grid_exact": true,
+      "metadata_preserved": true,
+      "output_dtype": [
+        "uint16"
+      ],
+      "output_nodata": 65535.0,
+      "compression": "deflate",
+      "driver": "COG",
+      "oracle": "Full source arrays and metadata; independent NumPy comparisons; shared GDAL TIFF decoder",
+      "source_band": "scl",
+      "output": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-4jiry4kt/sentinel_scl_cog/data.tif",
+      "output_sha256": "911a949e42f4ae01c2eee784db381da8992d7fd27793d199b960be905903943b"
+    },
+    {
+      "name": "Real Sentinel red -> float32 GeoTIFF with NaN NoData: exact valid values",
+      "status": "passed",
+      "pixel_values_checked": 16384,
+      "valid_values_checked": 16384,
+      "masks_checked": 16384,
+      "all_valid_values_exact": true,
+      "masks_exact": true,
+      "grid_exact": true,
+      "metadata_preserved": true,
+      "output_dtype": [
+        "float32"
+      ],
+      "output_nodata": "nan",
+      "compression": "lzw",
+      "driver": "GTiff",
+      "oracle": "Full source arrays and metadata; independent NumPy comparisons; shared GDAL TIFF decoder",
+      "source_band": "red",
+      "output": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-4jiry4kt/sentinel_red_float/data.tif",
+      "output_sha256": "418ea3d5b11c5cde7ec068ed93d745da32783b1dd4f60e8cdd2a9abc3d74fed9"
+    },
+    {
+      "name": "Analytic COG: custom band metadata requires and survives a declared PAM companion",
+      "status": "passed",
+      "pixel_values_checked": 4096,
+      "valid_values_checked": 4095,
+      "masks_checked": 4096,
+      "all_valid_values_exact": true,
+      "masks_exact": true,
+      "grid_exact": true,
+      "metadata_preserved": true,
+      "output_dtype": [
+        "int16"
+      ],
+      "output_nodata": -9999.0,
+      "compression": "lzw",
+      "driver": "COG",
+      "oracle": "Full source arrays and metadata; independent NumPy comparisons; shared GDAL TIFF decoder",
+      "fixture_type": "analytic",
+      "pam_companion": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-4jiry4kt/analytic_pam/delivery/data.tif.aux.xml",
+      "pam_band_metadata_parsed_independently": true,
+      "pam_band_tag": {
+        "sensor": "G06 analytic sensor"
+      },
+      "sidecar_declared_in_manifest": true,
+      "original_analytic_sha256": "10b8c8a38c90b69d7df713ab7ee39c9fcb723406a9adb2b3874d6ef258daf339"
+    },
+    {
+      "name": "Portable COG/PAM: reopen after the original source and delivery paths are retired",
+      "status": "passed",
+      "pixel_values_checked": 4096,
+      "valid_values_checked": 4095,
+      "masks_checked": 4096,
+      "all_valid_values_exact": true,
+      "masks_exact": true,
+      "grid_exact": true,
+      "metadata_preserved": true,
+      "output_dtype": [
+        "int16"
+      ],
+      "output_nodata": -9999.0,
+      "compression": "lzw",
+      "driver": "COG",
+      "oracle": "Full source arrays and metadata; independent NumPy comparisons; shared GDAL TIFF decoder",
+      "fixture_type": "analytic",
+      "original_paths_unavailable": true,
+      "portable_archive": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-4jiry4kt/portable_cog.cmz",
+      "restored_data": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-4jiry4kt/portable_restored/assets/fbcf94c0be94e036/data.tif",
+      "colocated_pam_exact": true,
+      "all_manifest_files_present": true,
+      "missing_dependencies": []
+    },
+    {
+      "name": "All original inputs and tested application modules remain byte-identical",
+      "status": "passed",
+      "input_files": 6,
+      "input_bytes_unchanged": true,
+      "tested_modules": 9,
+      "tested_modules_unchanged": true,
+      "network_downloads": 0
+    }
+  ],
+  "passed": 12,
+  "failed": 0,
+  "source_sha256_after": {
+    "/workspace/scratch/eeb1697666d1/g06-validation-data/paris_districts.geojson": "db65faf397e8876e9a62cdb722bc8c0897e9f9e4db4daa5c01a7e7d7883d626b",
+    "/workspace/scratch/eeb1697666d1/cartomize-python/tests/data/sentinel2_mvouti/README.md": "4b15528249f079299fb8bb286760a1cd5b1e0cef85cd139aa0bd720665b05c68",
+    "/workspace/scratch/eeb1697666d1/cartomize-python/tests/data/sentinel2_mvouti/provenance.json": "f30859b793dc533842bc38002c1fd77a28f4695a117df2ef318434434c74134f",
+    "/workspace/scratch/eeb1697666d1/cartomize-python/tests/data/sentinel2_mvouti/red.tif": "a21f7d659ed56252f1fb50b2ae492dc46b66e3fef1ee3cc2674663410fe9401d",
+    "/workspace/scratch/eeb1697666d1/cartomize-python/tests/data/sentinel2_mvouti/nir.tif": "d0d4ace7d2b0a10edc9f6646f9d6284965c243e0cd3540a835fd4e13724df581",
+    "/workspace/scratch/eeb1697666d1/cartomize-python/tests/data/sentinel2_mvouti/scl.tif": "49458db506c4d4d650804c123540813c4fc0b5001a192c4350e459e946b1bbd8"
+  },
+  "tested_source_sha256_after": {
+    "src/cartomize/__init__.py": "95b635bfb434334d316e2d7f99c21ffe04e2017178e698cf59f262a1e6cbe3cd",
+    "src/cartomize/_validation.py": "64f3be9ca03e3f2e3e9d29241aa85ef90f187e77fad49e4e8517cf473c280eb6",
+    "src/cartomize/imagery.py": "400e7e0b17b0761cb31e3ed9129c847487d259c8d0007b51c4fbe3fd75ee0a36",
+    "src/cartomize/raster_conversion.py": "03f3e9deda44b411b9b954601aa2b382d096a1d4f2a16db44e7c3439ec05f611",
+    "src/cartomize/session.py": "659790e83339e818b9133999e0882915b079176465dd9361c74c48955857375b",
+    "src/cartomize/storage.py": "c077e7202ac66e57d13a51b57d944c71d2ea77f0bbccafabaad422b20b56f5d8",
+    "src/cartomize/vector_conversion.py": "2d6751a79da932eaa5e77135556e9089fb099bc5f7184326b7b814a2f8adc59a",
+    "src/cartomize/vector_io.py": "6eff4d50b7282bd87aaea4503ba519e43b7c40f43df115bac9506f52d00f0ff0",
+    "src/cartomize/vector_reprojection.py": "bfeb607775acf4b181ce29e05a97c9ad4aa1c62f7d6c055a385327a3a0596d6e"
+  },
+  "status": "passed",
+  "duration_seconds": 0.813
+}

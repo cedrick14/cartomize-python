@@ -337,3 +337,14 @@ Sans `target_crs`, les SCR doivent déjà être identiques ; une cible explicite
 réutilise les règles de M09. L’opérateur `vector.merge_layers` expose notamment
 `@fusion:data` dans les plans. Voir le [guide M10/G05](VECTOR_MERGE.md) et le
 [cours 16](../tutorials/notebooks/16_harmonisation_fusion_vectorielle.ipynb).
+
+## Conversion et conditionnement G06
+
+```python
+inspection = cm.inspect_vector_conversion("donnees.gpkg")
+vecteur = cm.convert_vector("donnees.gpkg", "livraison_vecteur", layer="villages", driver="GPKG")
+raster = cm.convert_raster("classes.tif", "livraison_cog", driver="COG", dtype="uint8", nodata=255)
+print(vecteur.data, vecteur.report, raster.data, raster.report)
+```
+
+Les dossiers de sortie doivent être nouveaux. Les deux résultats exposent `data`, `report`, `manifest` et `summary`. Une couche multicouche exige une sélection explicite. La politique `loss_policy="error"` refuse une perte de représentation ; `report` autorise seulement les changements mesurés et consignés. Les contrôles de plage, coordonnées, projection et validité restent obligatoires. Voir les [paramètres et formats G06](DATA_CONVERSION.md).

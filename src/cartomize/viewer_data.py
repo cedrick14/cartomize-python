@@ -19,7 +19,7 @@ from matplotlib import colormaps
 from matplotlib.colors import to_rgba
 
 RASTERS = {'.tif', '.tiff', '.jp2', '.vrt', '.img'}
-VECTORS = {'.gpkg', '.shp', '.geojson'}
+VECTORS = {'.gpkg', '.shp', '.geojson', '.fgb'}
 IMAGES = {'.png', '.jpg', '.jpeg', '.bmp', '.webp'}
 SUPPORTED = RASTERS | VECTORS | IMAGES | {'.svg', '.pdf', '.csv', '.tsv', '.json'}
 PDF_LOCK = threading.RLock()  # PDFium is not thread-safe, including separate documents.

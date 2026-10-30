@@ -1,5 +1,44 @@
 # Tests et validation
 
+## Cartomize 1.9.0 — M11 / G06, conversion et conditionnement
+
+La suite finale du 30 octobre 2026 réussit **1 281 tests, avec 2 exclusions
+prévues et aucun échec**, en **329,795 s** sous Linux / Python 3.12.14.
+Elle comprend les **150 nouveaux cas** depuis 1.8.0 : 44 pour la conversion
+vectorielle, 58 pour la conversion raster, 14 pour les interfaces publiques,
+19 pour la fenêtre et 15 ajoutés au lecteur vectoriel. Les exclusions locales
+concernent le matériel CUDA et QGIS natif, qui possède un contrôle distant.
+
+La première passe avait détecté une attente périmée dans le script de
+démarrage : 20 outils au lieu des 21 désormais présents. Cette assertion a
+été corrigée, les quatre tests de démarrage ont été réexécutés, puis toute
+la suite a été relancée. Les modules applicatifs n’ont pas changé entre
+les deux passes ; sources, tests et scripts de validation sont figés pour
+le résultat final ci-dessus.
+
+Les **17 notebooks autonomes exécutent 115 cellules**, sans erreur, dans
+des noyaux Jupyter neufs. La wheel 1.9.0 réussit **23 contrôles** après
+installation isolée hors du dépôt, avec `pip check` réussi. Ses **96 modules
+Python** correspondent exactement aux sources testées. Les deux leçons
+demandant les données privées de `Tuto.zip` restent hors de la passe autonome.
+
+Les [contrôles G06 sur données réelles](VALIDATION_G06_REAL.json) réussissent
+**12 contrôles, sans échec**. Pour chacun des quatre formats vectoriels,
+les **80 quartiers de Paris, 240 valeurs attributaires et 8 366 couples de
+coordonnées** sont comparés au JSON d’origine. SQLite/WKB et DBF/SHP sont
+relus indépendamment du moteur de conversion. Les quatre conversions des
+extraits Sentinel comparent **53 248 valeurs et autant de masques**, avec
+grille et métadonnées conservées. Un cas analytique distinct vérifie les
+4 096 pixels d’un COG, son compagnon PAM et leur reprise depuis un projet
+portable après retrait des chemins d’origine. Les six fichiers sources
+conservent leurs empreintes.
+
+Le [rapport de livraison 1.9.0](VALIDATION_1.9.0.json) contient les résultats,
+les empreintes des modules et des scripts, les versions des bibliothèques
+et les limites. Le [guide G06](DATA_CONVERSION.md) décrit les paramètres et
+les changements admissibles. Les contrôles GitHub restent attachés aux
+commits testés dans la demande d’intégration.
+
 ## Cartomize 1.7.0 — M10, harmonisation et fusion de couches
 
 La suite complète finale réussit **1 074 tests, avec 2 exclusions prévues et

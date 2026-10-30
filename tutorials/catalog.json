@@ -106,5 +106,11 @@
     "title": "G01 : contrôle et réparation des géométries",
     "real": false,
     "minutes": 35
+  },
+  {
+    "slug": "18_conversion_conditionnement",
+    "title": "G06 : conversion et conditionnement des données",
+    "real": false,
+    "minutes": 30
   }
 ]

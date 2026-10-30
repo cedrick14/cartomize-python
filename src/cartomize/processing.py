@@ -67,6 +67,10 @@ def _catalog():
     add('vector.reproject_batch', 'Reprojection vectorielle par lot', reproject_batch, 'document', 'vector')
     from .vector_merge import merge_layers
     add('vector.merge_layers', 'Harmonisation et fusion de couches', merge_layers, 'vector', 'vector')
+    from .vector_conversion import convert_vector
+    from .raster_conversion import convert_raster
+    add('vector.convert', 'Conversion et conditionnement vectoriel', convert_vector, 'vector', 'conversion')
+    add('raster.convert', 'Conversion et conditionnement raster', convert_raster, 'raster', 'conversion')
     for key, label, function in [
         ('audit_geometries', 'Diagnostic détaillé des géométries', audit_geometries),
         ('repair_geometries', 'Réparation avec rapport des changements', repair_geometries),
@@ -224,6 +228,8 @@ def operation_catalog():
             products += ['manifest', 'report']
         if key == 'vector.merge_layers':
             products += ['data', 'manifest', 'report', 'issues']
+        if key in {'vector.convert', 'raster.convert'}:
+            products += ['data', 'manifest', 'report']
         if key=='classify':
             from .classification import fit_classifier
             present={p['name'] for p in parameters}
@@ -292,7 +298,7 @@ def execute_operation(operation,parameters,destination,*,workers=1,block_size=51
         if operation=='raster.reclassify':p['mapping']={float(k):v for k,v in p['mapping'].items()}
         # JSON raster assets use [path, band], accepted by the array engine.
         if 'destination' in signature.parameters:
-            p['destination']=work/'products' if operation in {'classify','cluster','hydrology','stac.download','imagery.audit','imagery.preprocess','vector.reproject_batch','vector.merge_layers'} else work/'result.tif'
+            p['destination']=work/'products' if operation in {'classify','cluster','hydrology','stac.download','imagery.audit','imagery.preprocess','vector.reproject_batch','vector.merge_layers','vector.convert','raster.convert'} else work/'result.tif'
         for name,value in [('workers',workers),('block_size',block_size),('memory_limit_mb',memory_limit_mb)]:
             if 'options' in signature.parameters or name in signature.parameters or operation=='classify' and name=='workers':p.setdefault(name,value)
         if operation=='classify' and p.get('model'):p.setdefault('training',None)
@@ -309,9 +315,12 @@ def execute_operation(operation,parameters,destination,*,workers=1,block_size=51
         from .vector_quality_result import VectorQualityResult
         from .vector_reprojection import ReprojectedBatch
         from .vector_merge import MergedVectors
+        from .vector_conversion import ConvertedVector
+        from .raster_conversion import ConvertedRaster
         quality_products = None
         reprojection_products = None
         merge_products = None
+        conversion_products = None
         if isinstance(result, VectorQualityResult):
             quality_products = _write_vector_quality(result, work, cancel=cancel)
             primary = quality_products['issues' if operation == 'vector.audit_geometries' else 'data']
@@ -321,6 +330,9 @@ def execute_operation(operation,parameters,destination,*,workers=1,block_size=51
         elif isinstance(result, MergedVectors):
             primary = result.data
             merge_products = {key: getattr(result, key) for key in ('data', 'manifest', 'report', 'issues')}
+        elif isinstance(result, (ConvertedVector, ConvertedRaster)):
+            primary = result.data
+            conversion_products = {key: getattr(result, key) for key in ('data', 'manifest', 'report')}
         elif isinstance(result,gpd.GeoDataFrame):
             primary=work/'result.gpkg'
             from .vector_io import write_geopackage
@@ -354,6 +366,10 @@ def execute_operation(operation,parameters,destination,*,workers=1,block_size=51
             record['metadata'] = {key: result.summary[key] for key in
                                   ('status', 'target_crs', 'source_count', 'feature_count',
                                    'provenance_columns', 'conversion_error_count')}
+        elif conversion_products is not None:
+            products.update({key: str(destination / path.relative_to(work))
+                             for key, path in conversion_products.items()})
+            record['metadata'] = json_value(result.summary)
         elif operation=='imagery.preprocess':
             document=json.loads(primary.read_text(encoding='utf-8'))
             record['metadata']={key:document[key] for key in

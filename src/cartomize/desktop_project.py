@@ -63,7 +63,7 @@ class ProjectPage(Page):
         row=self.layers.rowCount();self.layers.insertRow(row);self.layers.setItem(row,0,QTableWidgetItem(str(path)))
         self.layers.setItem(row,1,QTableWidgetItem(''));self.layers.setItem(row,2,QTableWidgetItem(''))
     def browse(self):
-        for path in QFileDialog.getOpenFileNames(self,'Couches géographiques',filter='Données SIG (*.tif *.tiff *.jp2 *.vrt *.img *.gpkg *.shp *.geojson)')[0]:self.add_layer(path)
+        for path in QFileDialog.getOpenFileNames(self,'Couches géographiques',filter='Données SIG (*.tif *.tiff *.jp2 *.vrt *.img *.gpkg *.shp *.geojson *.fgb)')[0]:self.add_layer(path)
     def open_project(self):
         path=QFileDialog.getOpenFileName(self,'Analyse Cartomize',filter='Plan Cartomize (*.json)')[0]
         if path:

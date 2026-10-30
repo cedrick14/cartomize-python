@@ -23,7 +23,7 @@ import cartomize as cm
 from .composition import ORDER
 
 RASTER_FILTER="Données raster (*.tif *.tiff *.vrt *.img *.jp2);;Tous les fichiers (*)"
-VECTOR_FILTER="Données vectorielles (*.gpkg *.shp *.geojson *.json);;Tous les fichiers (*)"
+VECTOR_FILTER="Données vectorielles (*.gpkg *.shp *.geojson *.json *.fgb);;Tous les fichiers (*)"
 STATISTICS={"Moyenne":"mean","Somme":"sum","Minimum":"min","Maximum":"max","Écart-type":"std","Nombre de valeurs valides":"count"}
 ROLE_LABELS={"Fond raster":"background","Occupation du sol":"landcover","Données thématiques":"thematic",
              "Polygones":"polygon","Hydrographie":"water","Lignes":"line","Routes":"roads",
@@ -269,7 +269,7 @@ class MappingPage(Page):
         self.atlas_button=QPushButton('Préparer l’atlas');self.atlas_button.clicked.connect(self.request_atlas);self.form.addRow(self.atlas_button)
         self.finish();self.tabs.setCurrentIndex(1)
     def browse(self):
-        for path in QFileDialog.getOpenFileNames(self,"Couches géographiques",filter="Données SIG (*.tif *.tiff *.jp2 *.vrt *.gpkg *.shp *.geojson)")[0]:self.add_layer(path)
+        for path in QFileDialog.getOpenFileNames(self,"Couches géographiques",filter="Données SIG (*.tif *.tiff *.jp2 *.vrt *.gpkg *.shp *.geojson *.fgb)")[0]:self.add_layer(path)
     def add_layer(self,path):
         row=self.layers.rowCount();self.layers.insertRow(row);self.layers.setItem(row,0,QTableWidgetItem(str(path)))
         roles=QComboBox();roles.addItem("Automatique",None)
@@ -551,10 +551,12 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
         from .assistant import TOOL_LABELS
         from .desktop_processing import ProcessingPage
         from .desktop_imagery import PreparationPage
+        from .desktop_conversion import ConversionPage
         self.tool_pages=dict(assistant=AssistantPage(self._preview_directory.name),project=ProjectPage(),inspect=InspectionPage(),
+            conversion=ConversionPage(),
             prepare=PreparationPage(),composite=CompositePage(),classification=ClassificationPage(),vector=VectorPage(),raster=RasterToolsPage(),terrain=TerrainPage(),indices=IndicesPage(),
             calculator=CalculatorPage(),focal=FocalPage(),temporal=TemporalPage(),mapping=MappingPage(),atlas=AtlasPage(),workflow=WorkflowPage(),processing=ProcessingPage(),recipes=RecipesPage(self),native=NativePage(self._preview_directory.name),mapops=MapOpsPage(self))
-        order=('assistant','inspect','prepare','composite','classification','indices','calculator','focal','temporal','terrain','vector','raster','project','mapping','atlas','workflow','processing','recipes','native','mapops')
+        order=('assistant','inspect','conversion','prepare','composite','classification','indices','calculator','focal','temporal','terrain','vector','raster','project','mapping','atlas','workflow','processing','recipes','native','mapops')
         self.tool_pages={key:self.tool_pages[key] for key in order}
         self.pages=list(self.tool_pages.values());titles=['Assistant cartographique' if key=='assistant' else TOOL_LABELS[key] for key in self.tool_pages]
         for title,page in zip(titles,self.pages):

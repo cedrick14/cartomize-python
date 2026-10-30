@@ -23,6 +23,7 @@ required_modules=(
     'vector_quality','vector_quality_result','vector_topology','vector_duplicates','desktop_vector_quality',
     'vector_reprojection','desktop_reprojection',
     'vector_merge','vector_io','desktop_merge',
+    'vector_conversion','raster_conversion','desktop_conversion',
 )
 directory=Path(sys.argv[1]) if len(sys.argv)>1 else root/'pypi-dist'
 expected={f'{name}-{version}-py3-none-any.whl',f'{name}-{version}.tar.gz'}
@@ -87,6 +88,11 @@ with tarfile.open(directory/f'{name}-{version}.tar.gz') as archive:
                  'tutorials/notebooks/15_reprojection_vectorielle_par_lot.ipynb',
                  'tutorials/notebooks/16_harmonisation_fusion_vectorielle.ipynb',
                  'tutorials/notebooks/17_g01_controle_reparation_geometries.ipynb',
+                 'tutorials/notebooks/18_conversion_conditionnement.ipynb',
+                 'docs/DATA_CONVERSION.md','docs/RELEASE_1.9.0.md','docs/VALIDATION_1.9.0.json',
+                 'tests/test_vector_conversion.py','tests/test_raster_conversion.py',
+                 'tests/test_conversion_interfaces.py','tests/test_desktop_conversion.py',
+                 'scripts/validate_data_conversion_real.py','docs/VALIDATION_G06_REAL.json',
                  'scripts/check_startup.py','scripts/check_release.py','scripts/verify_installed_release.py'):
         assert f'{name}-{version}/{file}' in names,file
 print(json.dumps({'name':name,'version':version,'files':[

@@ -157,7 +157,7 @@ class VectorPage(VectorQualityControls, BaseVectorPage):
         self.predicate.addItems(predicates)
         if previous in predicates:
             self.predicate.setCurrentText(previous)
-        vector_filter = 'Données vectorielles (*.gpkg *.shp *.geojson *.json *.zip);;Tous les fichiers (*)'
+        vector_filter = 'Données vectorielles (*.gpkg *.shp *.geojson *.json *.fgb *.zip);;Tous les fichiers (*)'
         table_filter = 'Tableaux (*.csv *.tsv);;Tous les fichiers (*)'
         self.source.filter = table_filter if op=='from_xy' else vector_filter
         self.secondary.filter = table_filter if op=='join_attributes' else vector_filter

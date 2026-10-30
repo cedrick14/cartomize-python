@@ -1,6 +1,6 @@
 # Cartomize
 
-**Version 1.8.0**
+**Version 1.9.0**
 
 Cartomize provides a Python API, a command-line interface and a desktop application for geospatial processing and cartographic production. It runs independently of QGIS and ArcGIS Pro. Native project bridges are optional.
 
@@ -18,7 +18,7 @@ python -m cartomize gui
 For a downloaded wheel:
 
 ```bash
-python -m pip install "./cartomize-1.8.0-py3-none-any.whl[gui]"
+python -m pip install "./cartomize-1.9.0-py3-none-any.whl[gui]"
 ```
 
 For the current GitHub sources:
@@ -59,9 +59,11 @@ Imported files are available for viewing and transfer to compatible processing t
 | Classification | Random forests, extra trees, K-means, validation and saved models |
 | Terrain and networks | Terrain derivatives, convolution, D8 drainage, watersheds and shortest paths |
 | Cartography | 24 templates, symbology, labels, legends, scale bars, multiple frames, atlases and PDF/PNG/SVG export |
-| Automation | 50 registered operators, processing plans, reusable recipes, batch production and saved sessions |
+| Automation | 52 registered operators, processing plans, reusable recipes, batch production and saved sessions |
 
 Optional Dask and CUDA execution is available for supported operators. Native GIS bridges and CUDA hardware execution require the corresponding runtime.
+
+Version 1.9.0 adds verified data conversion: selected vector layers to GeoPackage, GeoJSON, Shapefile and FlatGeobuf, and rasters to GeoTIFF or COG. Encoding, field names, numeric precision, compression and NoData are explicit. Complete readback verifies saved attributes, geometries, pixels, masks and georeferencing. The workflow is available through Python, the CLI, plans and the dedicated Conversion and formats desktop page. See the [G06 guide](https://github.com/cedrick14/cartomize-python/blob/main/docs/DATA_CONVERSION.md).
 
 Version 1.8.0 completes the G01 geometry quality workflow: select a file layer, diagnose original geometries, choose explicit repair and retention policies, and optionally apply an XY precision grid in the source projected CRS units. Reports distinguish repair from precision changes and link every original record to its retained or rejected output. A complete before layer supports direct comparison in the desktop. GeoPackages are read back and checked for exact attribute and geometry preservation before the bundle is published. The same workflow is available in Python, the CLI, processing plans and the desktop. See the [G01 guide](https://github.com/cedrick14/cartomize-python/blob/main/docs/G01_GEOMETRY_QUALITY.md).
 

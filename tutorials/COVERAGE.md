@@ -1,6 +1,6 @@
 # Couverture des outils
 
-Le registre comprend 50 opérateurs. Cette matrice relie 42 d’entre eux aux cours qui exécutent leurs fonctions publiques. Les huit opérateurs vectoriels ajoutés en 1.3 sont documentés dans le guide SIG et vérifiés par les tests d’intégration ; un cours dédié reste à rédiger. Elle décrit la couverture pédagogique des familles, sans prétendre tester toutes les combinaisons de paramètres. Le cours 08 montre leur insertion dans des plans ; le cours 13 exécute le prétraitement automatique M07. Le cours 14 exécute les quatre opérateurs de qualité vectorielle M08 ; le cours 15 vérifie la reprojection par lot M09 et raccorde une couche nommée à l’étape suivante. Le cours 16 harmonise les schémas, contrôle les valeurs enregistrées et poursuit la couche fusionnée dans un plan.
+Le registre comprend 52 opérateurs. Cette matrice relie 44 d’entre eux aux cours qui exécutent leurs fonctions publiques. Les huit opérateurs vectoriels ajoutés en 1.3 sont documentés dans le guide SIG et vérifiés par les tests d’intégration ; un cours dédié reste à rédiger. Elle décrit la couverture pédagogique des familles, sans prétendre tester toutes les combinaisons de paramètres. Le cours 08 montre leur insertion dans des plans ; le cours 13 exécute le prétraitement automatique M07. Le cours 14 exécute les quatre opérateurs de qualité vectorielle M08 ; le cours 15 vérifie la reprojection par lot M09 et raccorde une couche nommée à l’étape suivante. Le cours 16 harmonise les schémas, contrôle les valeurs enregistrées et poursuit la couche fusionnée dans un plan.
 
 | Opérateur | Fonction | Cours |
 |---|---|---|
@@ -11,6 +11,8 @@ Le registre comprend 50 opérateurs. Cette matrice relie 42 d’entre eux aux co
 | `vector.dissolve` | Dissolution | [01](notebooks/01_superposition_vectorielle.ipynb) |
 | `vector.reproject` | Reprojection vectorielle | [01](notebooks/01_superposition_vectorielle.ipynb) |
 | `vector.reproject_batch` | Reprojection multicouche et choix géodésique | [15](notebooks/15_reprojection_vectorielle_par_lot.ipynb) |
+| `vector.convert` | Conversion vectorielle vérifiée | [18](notebooks/18_conversion_conditionnement.ipynb) |
+| `raster.convert` | Conversion raster et livraison COG vérifiées | [18](notebooks/18_conversion_conditionnement.ipynb) |
 | `vector.merge_layers` | Harmonisation des schémas et fusion avec provenance | [16](notebooks/16_harmonisation_fusion_vectorielle.ipynb) |
 | `vector.make_valid` | Réparation des géométries | [01](notebooks/01_superposition_vectorielle.ipynb) |
 | `vector.intersection` | Intersection | [01](notebooks/01_superposition_vectorielle.ipynb) |

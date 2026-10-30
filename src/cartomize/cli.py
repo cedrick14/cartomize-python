@@ -21,6 +21,22 @@ def _json_value(value):
     return value
 
 
+def _conversion_nodata(value):
+    """Keep preserve, removal and NaN distinct in serializable CLI parameters."""
+    token = value.strip().lower()
+    if token in {'preserve', 'nan'}:
+        return token
+    if token in {'none', 'null'}:
+        return None
+    try:
+        number = json.loads(value)
+    except (ValueError, TypeError):
+        raise argparse.ArgumentTypeError('NoData must be preserve, none, nan or a finite number.') from None
+    if isinstance(number, bool) or not isinstance(number, (int, float)) or not math.isfinite(number):
+        raise argparse.ArgumentTypeError('NoData must be preserve, none, nan or a finite number.')
+    return number
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(prog="cartomize", description="Cartographic layouts and spatial analysis")
     parser.add_argument("--version", action="version", version=__version__)
@@ -96,6 +112,35 @@ def main(argv=None):
     for command in (merge, merge_options):
         command.add_argument('--recursive', action='store_true')
         command.add_argument('--field-maps', help='JSON file mapping source layer IDs and source fields to target fields')
+    conversion_vector = subs.add_parser('convert-vector', help='Convert a selected vector layer and verify every saved record')
+    conversion_vector.add_argument('source')
+    conversion_vector.add_argument('destination', help='New directory for data, sidecars and verification reports')
+    conversion_vector.add_argument('--output-layer', default='features', help='Name of the saved vector layer')
+    conversion_vector.add_argument('--loss-policy', choices=['error', 'report'], default='error',
+                                   help='Refuse changes by default; report explicitly accepts traceable representation changes')
+    vector_options = subs.add_parser('vector-conversion-options', help='Inspect vector layers, fields and conversion options')
+    vector_options.add_argument('source')
+    for command in (conversion_vector, vector_options):
+        command.add_argument('--layer', help='Exact source layer name; required for a multilayer file')
+        command.add_argument('--driver', choices=['GPKG', 'GeoJSON', 'ESRI Shapefile', 'FlatGeobuf'], default='GPKG')
+        command.add_argument('--encoding', default='UTF-8', help='Output encoding; configurable for Shapefile')
+        command.add_argument('--field-map', help='JSON file mapping original field names to output names')
+    conversion_raster = subs.add_parser('convert-raster', help='Convert a raster and verify the complete saved pixels and metadata')
+    conversion_raster.add_argument('source')
+    conversion_raster.add_argument('destination', help='New directory for the raster and verification reports')
+    conversion_raster.add_argument('--block-size', type=int, default=512)
+    conversion_raster.add_argument('--overviews', type=int, nargs='+', help='Optional overview factors, e.g. 2 4 8')
+    conversion_raster.add_argument('--resampling', default='nearest', help='Overview resampling only; base pixels are unchanged')
+    conversion_raster.add_argument('--loss-policy', choices=['error', 'report'], default='error',
+                                   help='Refuse precision loss by default; report explicitly accepts audited numeric rounding')
+    raster_options = subs.add_parser('raster-conversion-options', help='Inspect raster bands and delivery options')
+    raster_options.add_argument('source')
+    for command in (conversion_raster, raster_options):
+        command.add_argument('--driver', choices=['GTiff', 'COG'], default='GTiff')
+        command.add_argument('--dtype', help='Output numeric type; preserve source type when omitted')
+        command.add_argument('--nodata', type=_conversion_nodata, default='preserve',
+                             help='preserve (default), none, nan, or a numeric NoData value')
+        command.add_argument('--compression', default='lzw', choices=['none', 'lzw', 'deflate', 'zstd'])
     audit = subs.add_parser("audit-imagery", help="Diagnose AOI coverage and recommend spectral scene preparation")
     audit.add_argument("source", help="Scene directory or scene manifest")
     audit.add_argument("destination", help="New directory for coverage maps and report")
@@ -213,6 +258,26 @@ def main(argv=None):
             elif args.command=='batch':output=cm.run_batch(args.manifest,args.destination,bindings=json.loads(args.bindings),reviewed=args.reviewed,continue_on_error=args.continue_on_error)
             else:output=cm.native_project(args.project,python=args.python,action=args.action,destination=args.destination,layout=args.layout,template=args.template,texts=json.loads(args.texts),extents=json.loads(args.extents))
             result=output if isinstance(output,dict) else {'output':str(output)}
+        elif args.command in {'convert-vector', 'vector-conversion-options'}:
+            import cartomize as cm
+            field_map = json.loads(Path(args.field_map).read_text(encoding='utf-8')) if args.field_map else None
+            parameters = dict(source=args.source, layer=args.layer, driver=args.driver,
+                              encoding=args.encoding, field_map=field_map)
+            if args.command == 'vector-conversion-options':
+                result = cm.inspect_vector_conversion(**parameters)
+            else:
+                parameters.update(output_layer=args.output_layer, loss_policy=args.loss_policy)
+                result = cm.execute_operation('vector.convert', parameters, args.destination)
+        elif args.command in {'convert-raster', 'raster-conversion-options'}:
+            import cartomize as cm
+            parameters = dict(source=args.source, driver=args.driver, dtype=args.dtype,
+                              nodata=args.nodata, compression=args.compression)
+            if args.command == 'raster-conversion-options':
+                result = cm.inspect_raster_conversion(**parameters)
+            else:
+                parameters.update(block_size=args.block_size, overviews=args.overviews,
+                                  resampling=args.resampling, loss_policy=args.loss_policy)
+                result = cm.execute_operation('raster.convert', parameters, args.destination)
         elif args.command in {'merge-layers', 'merge-options'}:
             import cartomize as cm
             def json_option(path):
