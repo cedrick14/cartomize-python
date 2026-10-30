@@ -1,8 +1,11 @@
 """Regression tests for vector persistence comparisons used by acceptance."""
+from datetime import date, datetime
 import importlib.util
 from pathlib import Path
 
 import geopandas as gpd
+import numpy as np
+import pandas as pd
 import pytest
 from shapely.geometry import Point, MultiPolygon, box
 
@@ -47,6 +50,73 @@ def test_additional_parts_are_never_discarded(compare):
     changed = original.set_geometry([MultiPolygon([polygon, box(20, 20, 21, 21)])])
     with pytest.raises(AssertionError):
         compare(changed, original)
+
+
+@pytest.mark.parametrize('reverse', [False, True])
+@pytest.mark.parametrize('representation', ['datetime64', 'python', 'numpy'])
+def test_native_date_matches_only_exact_naive_midnight_without_mutation(
+        compare, frame, reverse, representation):
+    original = frame.copy()
+    original['visit_date'] = pd.Series([date(2024, 2, 29), None], dtype=object)
+    reloaded = frame.copy()
+    if representation == 'datetime64':
+        reloaded['visit_date'] = pd.Series(['2024-02-29', None], dtype='datetime64[ms]')
+    else:
+        value = (datetime(2024, 2, 29) if representation == 'python'
+                 else np.datetime64('2024-02-29T00:00:00.000000000'))
+        reloaded['visit_date'] = pd.Series([value, pd.NaT], dtype=object)
+    original_copy, reloaded_copy = original.copy(deep=True), reloaded.copy(deep=True)
+
+    compare(reloaded, original) if reverse else compare(original, reloaded)
+
+    pd.testing.assert_frame_equal(original, original_copy, check_exact=True)
+    pd.testing.assert_frame_equal(reloaded, reloaded_copy, check_exact=True)
+
+
+@pytest.mark.parametrize('reverse', [False, True])
+@pytest.mark.parametrize('changed', [
+    pd.Timestamp('2024-03-01'),
+    pd.Timestamp('2024-02-29T01:00:00'),
+    pd.Timestamp('2024-02-29T00:00:00.000001'),
+    pd.Timestamp('2024-02-29T00:00:00.000000001'),
+    pd.Timestamp('2024-02-29T00:00:00Z'),
+    pd.Timestamp('2024-02-29T00:00:00+01:00'),
+    '2024-02-29',
+    '2024-02-29T00:00:00.000',
+    None,
+], ids=['different-day', 'hour', 'microsecond', 'nanosecond', 'utc',
+        'timezone-offset', 'date-text', 'timestamp-text', 'missing-date'])
+def test_date_normalization_never_hides_temporal_changes(compare, frame, reverse, changed):
+    original = frame.copy()
+    original['visit_date'] = pd.Series([date(2024, 2, 29), None], dtype=object)
+    reloaded = frame.copy()
+    reloaded['visit_date'] = pd.Series([changed, pd.NaT], dtype=object)
+    with pytest.raises(AssertionError):
+        compare(reloaded, original) if reverse else compare(original, reloaded)
+
+
+@pytest.mark.parametrize('reverse', [False, True])
+def test_date_normalization_keeps_missing_values_significant(compare, frame, reverse):
+    original = frame.copy()
+    original['visit_date'] = pd.Series([date(2024, 2, 29), None], dtype=object)
+    reloaded = frame.copy()
+    reloaded['visit_date'] = pd.Series(['2024-02-29', '2024-03-01'], dtype='datetime64[ms]')
+    with pytest.raises(AssertionError):
+        compare(reloaded, original) if reverse else compare(original, reloaded)
+
+
+def test_date_normalization_preserves_real_timestamps_and_exact_precision(compare, frame):
+    original = frame.copy()
+    original['visit_date'] = pd.Series([date(2024, 2, 29), None], dtype=object)
+    original['observed_at'] = pd.Series([pd.Timestamp('2024-02-29T12:34:56.123456789'), pd.NaT])
+    reloaded = original.copy(deep=True)
+    reloaded['visit_date'] = pd.Series(['2024-02-29', None], dtype='datetime64[ms]')
+    timestamps = reloaded['observed_at'].copy(deep=True)
+    compare(original, reloaded)
+    pd.testing.assert_series_equal(reloaded['observed_at'], timestamps, check_exact=True)
+    reloaded.loc[0, 'observed_at'] += pd.Timedelta(nanoseconds=1)
+    with pytest.raises(AssertionError):
+        compare(original, reloaded)
 
 
 @pytest.mark.parametrize('change', ['value', 'float_value', 'missing_field',

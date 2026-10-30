@@ -109,6 +109,27 @@ Les contrôles de fenêtres ont également vérifié la largeur utile des champs
 la lisibilité du tableau et l’absence de défilement horizontal du formulaire,
 avec texte agrandi à la taille minimale de la fenêtre existante.
 
+## Complément après intégration : dates des projets réels
+
+Le contrôle des projets réels exécuté après l'intégration de G06 a révélé
+trois écarts temporels, reproduits sur Windows et Ubuntu. Les deux imports
+comparaient des dates natives à des horodatages à minuit. Le comparateur
+reconnaît désormais cette seule équivalence : il refuse toujours une chaîne
+de caractères, un changement de jour, une heure non nulle ou un fuseau ajouté.
+
+Le parcours des dernières visites IPIS a également révélé que l'écriture
+GeoPackage générique de l'interface pouvait transformer une date native en
+texte. Cette sauvegarde et les fichiers intermédiaires du contrôle utilisent
+maintenant l'écriture typée avec relecture, en conservant le nom de couche et
+la publication atomique. Les tests contrôlent les types DATE et DATETIME
+directement dans SQLite, les valeurs nulles et les heures. Une précision
+temporelle non représentable ne remplace pas une sortie existante.
+
+La validation des projets réels s'exécute aussi sur les demandes d'intégration
+qui touchent les sources ou ces comparateurs. Les chiffres et empreintes du
+rapport initial `VALIDATION_1.9.0.json` restent ceux de la livraison `61a6a9c` ;
+les contrôles de ce complément sont associés à sa propre révision GitHub.
+
 ## Cours et inventaire
 
 Le [cours 18](../tutorials/notebooks/18_conversion_conditionnement.ipynb)

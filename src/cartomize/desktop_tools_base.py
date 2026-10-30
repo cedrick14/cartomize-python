@@ -35,7 +35,11 @@ def write_result(result,destination,*,sources=(),overwrite=False):
             staged.write_text(json.dumps(_json_value(result),ensure_ascii=False,indent=2,allow_nan=False)+'\n',encoding='utf-8')
         elif hasattr(result,'geometry'):
             if suffix not in {'.gpkg','.geojson'}:raise ValueError('Une couche vectorielle exige un fichier .gpkg ou .geojson.')
-            result.to_file(staged,driver='GPKG' if suffix=='.gpkg' else 'GeoJSON',index=False)
+            if suffix=='.gpkg':
+                from .vector_io import write_geopackage
+                write_geopackage(result,staged,layer=staged.stem)
+            else:
+                result.to_file(staged,driver='GeoJSON',index=False)
         else:
             if suffix!='.csv':raise ValueError('Le tableau doit être enregistré en CSV.')
             result.to_csv(staged,index=False)

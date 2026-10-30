@@ -124,7 +124,8 @@ class Audit:
 
 
 def save(frame,path):
-    frame.to_file(path,driver='GPKG',index=False)
+    from cartomize.vector_io import write_geopackage
+    write_geopackage(frame,path,layer=Path(path).stem)
     return path
 
 
