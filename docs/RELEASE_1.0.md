@@ -1,89 +1,34 @@
-# Cartomize 1.0 — Espace de travail dynamique
+# Cartomize 1.0
 
-Édition du 30 octobre 2026, préparée pour la démonstration du 1er novembre 2026.
+Cartomize associe une bibliothèque Python et une application de bureau pour l’analyse géospatiale et la production cartographique. Les scripts Python, les notebooks Jupyter et l’interface graphique utilisent les mêmes fonctions de traitement.
 
-## Contenu retenu
+## Analyse et cartographie
 
-Cette édition réunit le code de la branche principale après l’intégration de
-G12 (base `c81e798b24da8bbb902f77f49008bb556c71e784`) et les corrections du
-parcours de démonstration. Le numéro du paquet et `cartomize.__version__`
-sont tous deux **1.0**. Le wheel porte l’identifiant de construction `2026103001`
-(`cartomize-1.0-2026103001-py3-none-any.whl`) afin de distinguer la correction
-de l’interface de la construction précédente ; cet identifiant ne change pas le numéro de version. L’interface
-et Python utilisent le même moteur.
+Les traitements couvrent les données raster et vectorielles : indices spectraux, classification, statistiques zonales, reprojection, validation des géométries, sélection spatiale, superposition, jointure et zones tampons. La préparation des images satellites comprend le contrôle de couverture, l’alignement des grilles, la mosaïque et le découpage sur une zone d’étude.
 
-## Interface dynamique
+Les mises en page associent couches, symbologie, étiquettes, légendes et échelles. Les cartes peuvent être exportées en PDF, PNG et SVG, individuellement, en atlas ou par lot.
 
-La disposition initiale et les thèmes sont conservés. L’explorateur, le
-catalogue, les paramètres, la console et les vues de résultat deviennent
-des panneaux déplaçables et redimensionnables.
+## Interface de bureau
 
-- **Placement guidé** : déplacer une barre de titre affiche les positions
-  possibles, l’aperçu de la destination et le regroupement en onglets.
-- **Détacher et agrandir** : un panneau peut devenir une fenêtre indépendante,
-  être maximisé puis réancré. Les résultats retrouvent les onglets centraux
-  avec « Réintégrer dans les vues ».
-- **Conserver le travail** : le déplacement conserve les paramètres saisis,
-  les cartes et leurs réglages. Les résultats rafraîchis retrouvent leur
-  emplacement et leur groupe.
-- **Retrouver la disposition** : F11 agrandit la vue centrale, Échap restaure
-  l’affichage ou annule le déplacement. Le menu Affichage permet de rouvrir
-  un panneau masqué et de restaurer l’organisation initiale.
-- **Alléger les formulaires** : les descriptions longues sont repliées dans
-  Aide. Les commandes, unités, diagnostics et erreurs restent accessibles.
+Les panneaux et les vues de résultat sont déplaçables, détachables et redimensionnables. Des repères guident leur placement ; les fenêtres peuvent être ancrées sur un côté ou regroupées en onglets. Les paramètres, les cartes et leur disposition sont mémorisés.
 
-La disposition locale est mémorisée entre les lancements. Les projets
-enregistrent les positions des vues avec des propriétés JSON contrôlées.
-Le [guide pratique](https://github.com/cedrick14/cartomize-python/blob/main/docs/DYNAMIC_WORKSPACE.md)
-détaille ces commandes ; la démonstration fournit les mêmes indications.
+Les descriptions techniques sont accessibles par le bouton **Aide**. Les thèmes clair, sombre et système ainsi que la taille du texte sont réglables dans l’application.
 
-## Modules réunis
+## Installation
 
-| Ensemble | Contenu |
-|---|---|
-| Prétraitement optique automatique | Reconnaissance des produits et bandes, calibration, masques, couverture de la zone, sélection des scènes, harmonisation de grille, mosaïque si nécessaire, découpage et produits scientifiques/visuels. |
-| Qualité vectorielle | Diagnostic et réparation des géométries, précision XY explicite, topologie et doublons, rapports avant/après. |
-| G04 | Reprojection vectorielle par lot et contrôles des transformations. |
-| G05 | Harmonisation des schémas et fusion avec provenance. |
-| G06 | Conversion et conditionnement vectoriel/raster avec relecture des sorties. |
-| G07 | Extraction attributaire et spatiale avec retenus, exclus et bilan. |
-| G09 | Table croisée de surfaces, catégories, lacunes et recouvrements. |
-| G12 | Zones tampons et anneaux de distance, identités des sources et bilans. |
-| Socle commun | Traitements raster, indices, classification, terrain, réseaux, cartes et maquettes, plans, console et projets. |
+Python 3.11 ou ultérieur est nécessaire. Python 3.11 ou 3.12 est recommandé pour l’interface.
 
-Les procédures futures de l’inventaire, dont G14, ne sont pas ajoutées à cette
-livraison. Les notes historiques du dépôt conservent les preuves de développement
-et de validation des modules réunis ici.
+```bash
+python -m pip install "cartomize[gui]"
+python -m cartomize gui
+```
 
-## Démonstration principale
+L’option `notebook` ajoute JupyterLab et son noyau Python. Les fichiers joints à cette release comprennent le wheel installable, les sources et un dossier d’exemples avec des données synthétiques.
 
-L’utilisateur choisit **les scènes, les bandes et la zone d’étude**. Le mode
-« Automatique : contrôler et préparer » mesure la couverture utile, choisit une
-scène suffisante ou les scènes contributrices, aligne les grilles, effectue les
-masques et la calibration, réalise la mosaïque utile et découpe sur le polygone.
-Les bandes scientifiques, le multibande et la composition colorée sont des
-produits distincts. Le rapport conserve la décision et les scènes utilisées.
+## Documentation
 
-Une couverture insuffisante produit un diagnostic et une carte des lacunes.
-Un résultat partiel n’est produit que selon la politique explicitement choisie.
-Les scènes à dates différentes exigent également un choix explicite.
+Consulter la [documentation](https://github.com/cedrick14/cartomize-python/blob/main/docs/README.md), l’[API Python](https://github.com/cedrick14/cartomize-python/blob/main/docs/PYTHON_API.md) et le [guide de l’interface](https://github.com/cedrick14/cartomize-python/blob/main/docs/WORKBENCH.md).
 
-Le [guide de démonstration](https://github.com/cedrick14/cartomize-python/blob/main/docs/DEMONSTRATION_1.0.md) donne le parcours graphique,
-le code Jupyter et les conditions d’entrée des scènes USGS.
+## Licence
 
-## Installation et distribution
-
-Le wheel de cette édition inclut les modules déjà terminés et les points d’entrée
-`cartomize` et `cartomize-desktop`. L’option `gui` installe l’interface ; l’option
-`notebook` installe aussi JupyterLab et son noyau Python.
-
-Les fichiers de livraison comprennent le wheel installable, l’archive source
-et `cartomize-1.0-presentation.zip`, qui rassemble les guides, le notebook 22
-et des scènes pédagogiques synthétiques prêtes à charger dans l’interface.
-Décompresser le ZIP et suivre `LISEZ_MOI.md`.
-
-Si une construction précédente de **1.0** est déjà installée, utiliser
-`--force-reinstall --no-cache-dir` puis vérifier `Build: 2026103001`, ou
-installer directement le wheel de cette livraison. Le
-[suivi de publication](https://github.com/cedrick14/cartomize-python/blob/main/docs/PUBLICATION.md)
-indique les fichiers disponibles et les vérifications exécutées.
+Code : **GPL-3.0-only**. Maquettes cartographiques originales : **CC BY 4.0**, attribuées à Cartomize / ONDON NKOUA Cédrick Belmich.

@@ -64,6 +64,7 @@ with tarfile.open(directory/f'{name}-{version}.tar.gz') as archive:
     for module in required_modules:
         assert f'{name}-{version}/src/cartomize/{module}.py' in names, f'Missing source archive module: {module}'
     for file in ('README_PYPI.md','LICENSE','NOTICE.md','pyproject.toml','setup.cfg',
+                 'docs/README.md','scripts/check_pypi_metadata.py','tests/test_pypi_metadata.py',
                  'docs/RELEASE_1.0.md','docs/DEMONSTRATION_1.0.md','docs/DYNAMIC_WORKSPACE.md',
                  'scripts/capture_dynamic_workspace.py','tests/test_desktop_docking.py',
                  'tests/test_result_docking.py','tests/test_desktop_help.py',

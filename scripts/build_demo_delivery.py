@@ -96,9 +96,9 @@ def make_relative(value, root):
 
 
 def readme(wheel_name, build):
-    return f"""# Cartomize 1.0 — Présentation
+    return f"""# Cartomize 1.0 — Exemples d’utilisation
 
-Édition consolidée, construction **{build}**. Décompresser entièrement ce ZIP,
+Ce dossier réunit le paquet Python, les sources et les exemples. Décompresser entièrement ce ZIP,
 puis ouvrir un terminal dans son dossier. Utiliser Python 3.11 ou 3.12.
 
 ## Installation et lancement sous Windows
@@ -112,10 +112,10 @@ py -3.12 -m venv .venv
 
 Adapter `-3.12` à `-3.11` si nécessaire. Sous Linux/macOS, créer l'environnement
 avec `python3 -m venv .venv`, puis utiliser `./.venv/bin/python` pour les trois
-commandes suivantes. Préparer l'installation avant la séance : pip peut
-télécharger les dépendances. La démonstration utilise ensuite des fichiers locaux.
+commandes suivantes. L'installation télécharge les dépendances nécessaires.
+Les exemples utilisent ensuite des fichiers locaux.
 
-## Données et parcours
+## Données et exemples
 
 **Toutes les images fournies sont pédagogiques et simulées ; ce ne sont pas des
 observations satellitaires.** Dans « Prétraitement multispectral », garder le
@@ -124,7 +124,7 @@ mode automatique, sélectionner `demo_complete/scenes` et la zone souhaitée :
 - `demo_complete/zone_one_scene.gpkg` : une scène suffit, puis découpage ;
 - `demo_complete/zone_mosaic.gpkg` : harmonisation, mosaïque et découpage ;
 - pour cette grande zone, sélectionner seulement `demo_complete/scenes/west`
-  afin de montrer le diagnostic de couverture incomplète.
+  pour obtenir le diagnostic de couverture incomplète.
 
 Les dossiers `demo_nuages`, `demo_nodata` et `demo_projections` fournissent les
 variantes qualité, données absentes et projections différentes. Chaque fichier

@@ -118,7 +118,7 @@ jobs:
         run: >-
           gh release create "$RELEASE_TAG" pypi-dist/* delivery-dist/*.zip
           --target "$RELEASE_COMMIT" --latest
-          --title "Cartomize 1.0 — espace de travail dynamique"
+          --title "Cartomize 1.0"
           --notes-file docs/RELEASE_1.0.md
 
   publish:
@@ -134,11 +134,19 @@ jobs:
       url: ${{ inputs.index == 'testpypi' && 'https://test.pypi.org/p/cartomize' || 'https://pypi.org/p/cartomize' }}
     permissions:
       id-token: write
+      contents: read
     steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/download-artifact@v4
         with:
           name: cartomize-pypi-distributions
           path: dist/
+      - name: Verify the release description before upload
+        env:
+          PACKAGE_INDEX: ${{ inputs.index == 'testpypi' && 'testpypi' || 'pypi' }}
+        run: python scripts/check_pypi_metadata.py dist --index "$PACKAGE_INDEX"
       - name: Publish to PyPI
         if: inputs.index != 'testpypi'
         uses: pypa/gh-action-pypi-publish@release/v1

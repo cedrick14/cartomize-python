@@ -1,6 +1,6 @@
 """Verified raster delivery without changing the grid or silently losing data.
 
-G06 writes a new directory atomically. A full-resolution, block-by-block
+Raster conversion writes a new directory atomically. A full-resolution, block-by-block
 readback checks every valid sample and every band mask. Numeric quantization
 is opt-in; overflow, NoData collisions and loss of georeferencing are errors.
 The COG driver runs only after the temporary GeoTIFF is complete, and its
@@ -188,7 +188,7 @@ def _options(src, *, driver, dtype, nodata, compression, source_nodata=None):
     nodata = _nodata(nodata, dtype)
     gcps, _ = src.gcps
     if gcps or src.tags(ns='GEOLOCATION'):
-        raise ValueError('GCP/geolocation-array rasters require an explicit affine-grid preparation before G06.')
+        raise ValueError('GCP/geolocation-array rasters require preparation on an affine grid before conversion.')
     # Palette entries and their transparency depend on dtype and NoData.
     # Keeping their representation unchanged avoids an undocumented remap.
     if ColorInterp.palette in src.colorinterp:

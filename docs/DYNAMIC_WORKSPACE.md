@@ -1,15 +1,15 @@
 # Panneaux et vues mobiles — Cartomize 1.0
 
-Guide de la construction **2026103001**. Le numéro public reste **1.0** ; l’état de distribution est suivi dans [PUBLICATION.md](PUBLICATION.md).
+Les panneaux et les vues de résultat permettent d’adapter l’espace de travail aux données et aux traitements utilisés.
 
 ![Interface sombre et disposition initiale](images/dynamic-workspace/dark.png)
 
-Capture de l’application sur les scènes pédagogiques synthétiques de la démonstration.
+Capture de l’application sur des données synthétiques.
 Le [thème clair](images/dynamic-workspace/light.png) conserve la même organisation.
 
 ## Repères de départ
 
-La disposition initiale est conservée :
+La disposition par défaut est la suivante :
 
 | Emplacement | Contenu |
 |---|---|
@@ -30,10 +30,7 @@ Le bouton **Positionner** ouvre un menu pour choisir un côté sans glisser. **G
 
 ![Repères et aperçu de placement](images/dynamic-workspace/placement-guides.png)
 
-Ce contrôle hors écran réunit les captures des véritables widgets Qt à leurs positions :
-panneau déplacé, repères et aperçu de la destination. Le geste est exécuté avec
-les événements de souris Qt ; les contrôles natifs Windows et Linux sont suivis
-dans l’intégration continue.
+Les repères indiquent les emplacements disponibles. L’aperçu montre la position du panneau avant de le déposer.
 
 Pour déplacer une vue encore dans les onglets centraux, ouvrir son menu et choisir **Détacher**. Sa barre de titre donne ensuite accès aux mêmes guides et commandes de placement. **Réintégrer dans les vues** la ramène aux onglets centraux.
 
@@ -59,9 +56,9 @@ Pour repartir de l’organisation initiale, choisir **Affichage > Rétablir la d
 
 ## Aide et apparence
 
-Les descriptions des **21 pages** et les explications longues sont repliées derrière **Aide**. Le bouton s’utilise à la souris ou avec **Tab**, puis **Espace**. Le texte complet reste consultable et sélectionnable.
+Les descriptions et les explications détaillées sont accessibles par **Aide**. Le bouton s’utilise à la souris ou avec **Tab**, puis **Espace**. Le texte complet reste consultable et sélectionnable.
 
-Les valeurs saisies, unités, erreurs, diagnostics et avertissements opérationnels restent visibles : couverture partielle, contraintes du SCR, valeurs manquantes ou précision du traitement. Les thèmes **Clair**, **Sombre** et **Système** ainsi que la taille du texte de **11 à 16 pixels** sont conservés.
+Les valeurs saisies, unités, erreurs, diagnostics et avertissements opérationnels restent visibles : couverture partielle, contraintes du SCR, valeurs manquantes ou précision du traitement. La barre d’outils permet de choisir les thèmes **Clair**, **Sombre** ou **Système**, ainsi qu’une taille de texte de **11 à 16 pixels**.
 
 ## Mémoriser le placement
 

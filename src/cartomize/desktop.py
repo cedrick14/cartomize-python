@@ -445,8 +445,8 @@ class WorkflowPage(Page):
         for label,widget in [("Système de coordonnées cible",self.crs),("Bandes spectrales",self.bands),
             ("Résolution (m)",self.resolution),("Masque de qualité",self.clouds),("Dates d’acquisition",self.dates),
             ("Couverture utile minimale (%)",self.coverage_threshold),("Couverture sous le seuil",self.allow_partial)]:form.addRow(label,widget)
-        note=QLabel("Calibration radiométrique et masque de qualité avant rééchantillonnage. Les scènes sont alignées sur une grille commune. Les bandes nécessaires à la composition colorée sont ajoutées à la sélection.")
-        note.setWordWrap(True);note.setObjectName("muted");form.addRow(note)
+        self.add_help("Calibration radiométrique et masque de qualité avant rééchantillonnage. Les scènes sont alignées sur une grille commune. Les bandes nécessaires à la composition colorée sont ajoutées à la sélection.",
+            subject="Prétraitement des scènes",form=form)
         output=QWidget();form=QFormLayout(output);tabs.addTab(output,"Restitution cartographique")
         self.title=QLineEdit();self.subtitle=QLineEdit();self.credits=QLineEdit();self.rgb=QComboBox()
         for label,value in [("Couleurs naturelles","natural"),("Infrarouge proche : végétation","vegetation"),

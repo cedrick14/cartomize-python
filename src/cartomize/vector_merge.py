@@ -2,7 +2,7 @@
 
 Field correspondences, conversions, missing values and dropped attributes are
 explicit. Geometries are never dissolved, repaired or deduplicated. A requested
-CRS transformation delegates to the audited M09 workflow before publication.
+CRS transformation is applied with explicit geodetic options before publication.
 """
 from dataclasses import dataclass
 from datetime import date, datetime
@@ -358,7 +358,7 @@ def _aligned_geometries(layers, frames, target, options, work, cancel):
         options = {}
     if not isinstance(options, dict) or set(options) - {
             'operations', 'area_of_interest', 'accuracy', 'allow_ballpark', 'require_best', 'area_policy'}:
-        raise ValueError('reprojection_options accepts only the documented M09 geodetic options.')
+        raise ValueError('reprojection_options accepts only the documented geodetic transformation options.')
     # Reproject geometry-only frames. Attribute conversions are independent
     # of temporary vector storage, including fields intentionally dropped.
     sources = [{'data': gpd.GeoDataFrame(geometry=frame.geometry.copy(), crs=frame.crs),
@@ -389,8 +389,8 @@ def merge_layers(sources, destination, *, schema=None, field_maps=None, recursiv
     records every failed cell. Defaults fill missing values, then nullable
     constraints apply. Missing/extra fields have independent error policies.
 
-    Without target_crs all input CRSs must match. With it, the M09 geodetic
-    audit is retained and reprojection_options controls its strict policies.
+    Without target_crs all input CRSs must match. With it, the transformation
+    report is retained and reprojection_options controls its strict policies.
     Source order and rows are preserved, with five unambiguous provenance
     fields. No geometry union, repair or deduplication is performed.
     """

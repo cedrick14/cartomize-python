@@ -1,11 +1,9 @@
-# M07 — Prétraitement automatique des images
+# Prétraitement automatique des images
 
-Cartomize 1.4.0 raccorde le diagnostic de couverture à la sélection des scènes,
-à la préparation et aux sorties. Le même moteur `preprocess_imagery()` est
-appelé depuis Python/Jupyter, le terminal, le registre de traitements et la
-fenêtre. Ce module concerne la préparation d’images optiques compatibles ;
-les autres procédures de l’[inventaire expert](EXPERT_PROCEDURES.md) conservent
-leur état d’implémentation propre.
+Le prétraitement automatique associe le diagnostic de couverture, la sélection
+des scènes et la préparation des images optiques compatibles. Le moteur
+`preprocess_imagery()` s’utilise depuis Python/Jupyter, le terminal, le registre
+de traitements et l’interface graphique.
 
 ## Parcours exécuté
 
@@ -53,7 +51,7 @@ ce support de calcul. Les pourcentages comptent les cellules de la zone sur la
 grille cible ; ce ne sont pas des superficies polygonales pondérées par fractions
 de pixels.
 
-À partir de la version 1.4.0, `coverage_status` du diagnostic distingue aussi la
+Le champ `coverage_status` du diagnostic distingue la
 couverture réelle complète de l’atteinte du seuil, porté par `threshold_met`.
 Abaisser le seuil ne transforme donc pas une couverture de 85 % en couverture
 complète. Les secteurs non couverts restent NoData dans les images produites.
@@ -201,7 +199,7 @@ Les produits nommés sont `audit`, `coverage`, `gaps`, `preparation` et, selon l
 sorties demandées, `multiband`, `source_index`, `composition`, `report` et
 `band_1`, `band_2`, etc. `@images` seul désigne le manifeste, pas une image.
 
-`plan_cartography(data_kind="scenes", aoi=...)` crée désormais cette préparation
+`plan_cartography(data_kind="scenes", aoi=...)` crée cette préparation
 automatique avant la composition, les indices, la classification ou les étapes
 utilisant `@scientific`. `cartographic_workflow(..., aoi=...)` applique la même
 politique avant le rendu des cartes. Les deux acceptent `coverage_threshold`,

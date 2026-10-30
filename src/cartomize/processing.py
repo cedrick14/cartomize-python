@@ -293,7 +293,7 @@ def _write_vector_rings(result, work, *, cancel=None, progress=None):
 
 def _write_verified_vector_tables(result, work, *, vector_names, table_names,
                                   audit_schema, error_label, cancel=None, progress=None):
-    """Share exact vector/CSV publication between the G09 and G12 results."""
+    """Share exact vector/CSV publication between tabulation and distance-ring results."""
     import hashlib
     import pandas as pd
     from .vector_io import write_geopackage

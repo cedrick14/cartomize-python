@@ -1,22 +1,20 @@
 # Espace de travail Cartomize 1.0
 
-Ce guide décrit l’espace de travail dynamique de la construction **2026103001**. La version publique reste **1.0** ; l’état de distribution est suivi dans [PUBLICATION.md](PUBLICATION.md).
-
 ## Installation
 
 Utiliser un environnement Python 3.11 ou 3.12 dédié à Cartomize. L’option `gui` installe PySide6 et le lecteur PDF nécessaires à l’interface.
+
+Depuis PyPI :
+
+```bash
+python -m pip install "cartomize[gui]"
+python -m cartomize gui
+```
 
 Depuis une archive source extraite :
 
 ```bash
 python -m pip install ".[gui]"
-python -m cartomize gui
-```
-
-Depuis le paquet wheel de la version :
-
-```bash
-python -m pip install "./cartomize-1.0-2026103001-py3-none-any.whl[gui]"
 python -m cartomize gui
 ```
 
@@ -30,7 +28,7 @@ L’interface ne nécessite pas QGIS ni ArcGIS Pro. Une installation de QGIS ne 
 
 ## Organisation
 
-La disposition initiale est conservée : **explorateur et catalogue à gauche, vues au centre, paramètres à droite, console en bas**. Chaque panneau garde son contenu lorsque son emplacement change.
+La disposition initiale comprend **l’explorateur et le catalogue à gauche, les vues au centre, les paramètres à droite et la console en bas**. Chaque panneau garde son contenu lorsque son emplacement change.
 
 **Explorateur de projet** : fichiers locaux, dossier de travail et importation. Le bouton Parent remonte d’un niveau. Un double-clic ouvre un fichier compatible. Une archive CMZ ou un fichier `.cartomize.json` ouvre le projet correspondant.
 
@@ -68,8 +66,8 @@ Les descriptions des 21 pages et les explications longues sont repliées derriè
 
 ### Préparation automatique des images
 
-Le [module M07](IMAGERY_AUTOMATIC.md) est le mode par défaut du prétraitement
-multispectral. Sélectionner les bandes et la zone d’étude, fixer la couverture
+Le [mode automatique](IMAGERY_AUTOMATIC.md) est sélectionné par défaut dans le
+prétraitement multispectral. Sélectionner les bandes et la zone d’étude, fixer la couverture
 utile minimale, puis exécuter : le moteur recalcule le diagnostic, choisit les
 scènes, décide de la mosaïque et prépare les sorties. Un catalogue STAC facultatif
 permet de chercher des compléments dans les limites configurées.

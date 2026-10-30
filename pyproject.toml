@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "cartomize"
 version = "1.0"
-description = "Cartographic layouts, raster analysis and automated geospatial workflows"
+description = "Geospatial analysis and cartographic layouts in Python"
 readme = "README_PYPI.md"
 requires-python = ">=3.11"
 license = "GPL-3.0-only"
@@ -31,7 +31,7 @@ dev = ["pytest>=8,<10", "build>=1,<2", "twine>=6,<8"]
 Homepage = "https://github.com/cedrick14/cartomize-python"
 Repository = "https://github.com/cedrick14/cartomize-python"
 Issues = "https://github.com/cedrick14/cartomize-python/issues"
-Documentation = "https://github.com/cedrick14/cartomize-python/blob/main/docs/DESKTOP.md"
+Documentation = "https://github.com/cedrick14/cartomize-python/blob/main/docs/README.md"
 
 [project.scripts]
 cartomize = "cartomize.cli:main"

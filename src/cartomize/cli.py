@@ -103,7 +103,7 @@ def main(argv=None):
     merge.add_argument('sources', nargs='+', help='Local vector files or directories')
     merge.add_argument('--schema', help='JSON file describing target field types, nullability and defaults')
     merge.add_argument('--crs', help='Explicit target CRS; otherwise source CRSs must match')
-    merge.add_argument('--reprojection-options', help='JSON file containing the M09 geodetic options')
+    merge.add_argument('--reprojection-options', help='JSON file containing geodetic transformation options')
     merge.add_argument('--on-conversion-error', choices=['error', 'null'], default='error')
     merge.add_argument('--missing-fields', choices=['null', 'error'], default='null')
     merge.add_argument('--extra-fields', choices=['error', 'drop'], default='error')
