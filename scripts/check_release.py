@@ -20,7 +20,7 @@ wheel_build = build_config.get('bdist_wheel', 'build_number', fallback='').strip
 wheel_name = f'{name}-{version}' + (f'-{wheel_build}' if wheel_build else '') + '-py3-none-any.whl'
 required_modules=(
     'desktop','desktop_imagery','imagery_pipeline','viewer_data','desktop_canvas',
-    'desktop_tables','desktop_results','desktop_workbench','desktop_theme',
+    'desktop_tables','desktop_results','desktop_workbench','desktop_theme','desktop_docking',
     'desktop_console','desktop_kernel','desktop_explorer','desktop_session',
     'desktop_tools','desktop_processing','imagery_audit','imagery','scenes','quality',
     'nodata','raster','relations','vector','vector_workflows','classification',
@@ -64,7 +64,9 @@ with tarfile.open(directory/f'{name}-{version}.tar.gz') as archive:
     for module in required_modules:
         assert f'{name}-{version}/src/cartomize/{module}.py' in names, f'Missing source archive module: {module}'
     for file in ('README_PYPI.md','LICENSE','NOTICE.md','pyproject.toml','setup.cfg',
-                 'docs/RELEASE_1.0.md','docs/DEMONSTRATION_1.0.md',
+                 'docs/RELEASE_1.0.md','docs/DEMONSTRATION_1.0.md','docs/DYNAMIC_WORKSPACE.md',
+                 'scripts/capture_dynamic_workspace.py','tests/test_desktop_docking.py',
+                 'tests/test_result_docking.py','tests/test_desktop_help.py',
                  'examples/create_imagery_demo.py','scripts/stage_pypi_upload.py',
                  'scripts/build_demo_delivery.py','tests/test_vector_table_publication.py',
                  'tests/test_imagery_demo_workflow.py',

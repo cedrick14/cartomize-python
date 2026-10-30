@@ -60,10 +60,14 @@ class VectorPage(RingsControls, TabulationControls, SelectionControls, VectorQua
                            ('Refuser les valeurs manquantes', 'error')]:
             self.join_null_keys.addItem(label, key)
         self.join_policy_note = QLabel(
+            'Clé manquante : règle choisie. 1:N et N:N : lignes multiples possibles. '
+            'Identifiants textuels : zéros initiaux conservés.')
+        self.join_policy_note.setWordWrap(True)
+        self.join_policy_help = self.context_help(
             'Une clé manquante ne correspond à aucune autre par défaut. « Apparier » relie aussi les clés manquantes ; '
             '« Refuser » interrompt le traitement. N:1 exige une seule ligne du tableau pour chaque clé appariée ; '
-            '1:N et N:N peuvent produire plusieurs lignes par entité. Les identifiants textuels du tableau conservent leurs zéros initiaux.')
-        self.join_policy_note.setWordWrap(True)
+            '1:N et N:N peuvent produire plusieurs lignes par entité. Les identifiants textuels du tableau conservent leurs zéros initiaux.',
+            subject='Cardinalité et clés de jointure')
         self.order_field = field()
         self.x_field = QLineEdit('longitude')
         self.y_field = QLineEdit('latitude')
@@ -81,6 +85,7 @@ class VectorPage(RingsControls, TabulationControls, SelectionControls, VectorQua
             self.form.insertRow(self.form.rowCount()-1, label, widget)
             self._extra_widgets[widget] = self.form.labelForField(widget)
         self.form.insertRow(self.form.rowCount()-1, self.join_policy_note)
+        self.form.insertRow(self.form.rowCount()-1, self.join_policy_help)
         for label,key in self.EXTRA:
             self.operation.addItem(label,key)
         self.init_quality_controls()
@@ -159,7 +164,7 @@ class VectorPage(RingsControls, TabulationControls, SelectionControls, VectorQua
                 self.summary_stat:op=='spatial_summary', self.result_field:op=='spatial_summary',
                 self.left_key:op in {'join_attributes','latest_records'}, self.right_key:op=='join_attributes',
                 self.join_cardinality:op=='join_attributes', self.join_null_keys:op=='join_attributes',
-                self.join_policy_note:op=='join_attributes',
+                self.join_policy_note:op=='join_attributes', self.join_policy_help:op=='join_attributes',
                 self.order_field:op=='latest_records', self.aggregation:op=='dissolve',
                 self.x_field:op=='from_xy', self.y_field:op=='from_xy'}
         for widget, shown in show.items():

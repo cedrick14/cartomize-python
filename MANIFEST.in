@@ -1,6 +1,6 @@
 include LICENSE NOTICE.md README.md README_PYPI.md
 recursive-include scripts *.py
-recursive-include docs *.md *.json
+recursive-include docs *.md *.json *.png
 recursive-include examples *.py
 recursive-include tests *.py
 recursive-include tests/data *.tif *.json *.md

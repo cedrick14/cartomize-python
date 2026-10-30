@@ -159,7 +159,8 @@ class OperationDialog(QDialog):
         self.product=QComboBox();product_label=QLabel('Produit cartographique');layout.addWidget(product_label);layout.addWidget(self.product)
         self.add_map=QCheckBox('Ajouter le résultat à la carte');self.add_map.setChecked(record is not None and record.get('map_layer') is not None);layout.addWidget(self.add_map)
         for widget in (product_label,self.product,self.add_map):widget.setVisible(allow_map)
-        note=QLabel('Choisir un fichier ou le résultat d’une étape précédente. Les identifiants précédés de @ désignent des résultats intermédiaires.');note.setWordWrap(True);layout.addWidget(note)
+        layout.addWidget(Page.context_help('Choisir un fichier ou le résultat d’une étape précédente. Les identifiants précédés de @ désignent des résultats intermédiaires.',
+            subject='Entrées d’une étape',summary='Résultat d’une étape : @identifiant.'))
         buttons=QDialogButtonBox(QDialogButtonBox.StandardButton.Ok|QDialogButtonBox.StandardButton.Cancel);buttons.accepted.connect(self.accept);buttons.rejected.connect(self.reject);layout.addWidget(buttons)
         self.operation.currentIndexChanged.connect(self.changed)
         if record:self.operation.setCurrentIndex(self.operation.findData(record['operation']))

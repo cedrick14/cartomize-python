@@ -56,6 +56,8 @@ class AdaptiveWorkspace(QObject):
         window.workspace_splitter.splitterMoved.connect(self.schedule)
         workbench.font_size.valueChanged.connect(self.schedule)
         window.installEventFilter(self)
+        window.controls_panel.installEventFilter(self)
+        window.parameters_dock.topLevelChanged.connect(self.schedule)
         self.schedule()
 
     def _wrap_parameters(self):
@@ -108,7 +110,8 @@ class AdaptiveWorkspace(QObject):
             if self._transfer_row.direction() != direction:
                 self._transfer_row.setDirection(direction)
         dock = window._workbench.bottom_dock
-        if dock.isFloating() or not dock.isVisible():
+        if (dock.isFloating() or not dock.isVisible() or
+                window.dockWidgetArea(dock) != Qt.DockWidgetArea.BottomDockWidgetArea):
             return
         if window.height() < 850:
             console_active = window._workbench.bottom_tabs.currentWidget() is window.console_panel
@@ -116,10 +119,14 @@ class AdaptiveWorkspace(QObject):
             required = (window.console_panel.minimumSizeHint().height() + tabs.tabBar().sizeHint().height() + 16
                         if console_active else 90)
             tabs.setMinimumHeight(required)
+            if window.dock_manager.user_layout:
+                return
             target = max(150, required + 40)
             window.resizeDocks([dock], [target], Qt.Orientation.Vertical)
 
     def eventFilter(self, watched, event):
+        if watched is self.window.controls_panel and event.type() == QEvent.Type.Resize:
+            self.schedule()
         if watched is self.window:
             if event.type() in (QEvent.Type.Show, QEvent.Type.Resize):
                 self.schedule()

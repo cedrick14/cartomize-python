@@ -54,10 +54,9 @@ class RingsControls:
         self.rings_distances = QLineEdit('100; 250; 500; 1000')
         self.rings_distances.setPlaceholderText('Exemple : 50; 100; 250; 500; 1000')
         _row(form, 'Bornes supérieures en mètres', self.rings_distances)
-        note = QLabel('Séparer les distances par un point-virgule. Utiliser le point pour '
-                      'les décimales. La première borne inférieure est zéro.')
-        note.setWordWrap(True)
-        form.addRow(note)
+        self.add_help('Séparer les distances par un point-virgule. Utiliser le point pour '
+                      'les décimales. La première borne inférieure est zéro.',
+            subject='Format des distances',summary='Séparateur « ; », point décimal.',form=form)
         self.rings_intervals_note = QLabel()
         self.rings_intervals_note.setWordWrap(True)
         form.addRow(self.rings_intervals_note)
@@ -87,10 +86,9 @@ class RingsControls:
         form.addRow(self.rings_crs_note)
         _row(form, 'Unité des surfaces', self.rings_unit)
         _row(form, 'Segments par quart de cercle', self.rings_quad_segs)
-        approximation = QLabel('Les extrémités et les angles sont arrondis. Les cercles sont '
-                               'approchés par des segments ; le bilan conserve cette précision de construction.')
-        approximation.setWordWrap(True)
-        form.addRow(approximation)
+        self.add_help('Les extrémités et les angles sont arrondis. Les cercles sont '
+                      'approchés par des segments ; le bilan conserve cette précision de construction.',
+            subject='Précision des anneaux',summary='Courbes approchées par segments.',form=form)
         self.rings_folder = QLineEdit('anneaux_distance')
         _row(form, 'Nouveau dossier des résultats', self.rings_folder)
 

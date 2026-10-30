@@ -98,14 +98,27 @@ jobs:
         with:
           name: cartomize-demonstration-delivery
           path: delivery-dist/
+      - name: Identify the immutable delivery
+        id: delivery
+        run: |
+          python - <<'PY'
+          import configparser, os, pathlib, tomllib
+          version = tomllib.loads(pathlib.Path('pyproject.toml').read_text())['project']['version']
+          config = configparser.ConfigParser()
+          config.read('setup.cfg')
+          build = config.get('bdist_wheel', 'build_number')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write(f'tag=cartomize-{version}-{build}\n')
+          PY
       - name: Publish the complete Cartomize 1.0 delivery
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_COMMIT: ${{ github.sha }}
+          RELEASE_TAG: ${{ steps.delivery.outputs.tag }}
         run: >-
-          gh release create cartomize-1.0-20261030 pypi-dist/* delivery-dist/*.zip
+          gh release create "$RELEASE_TAG" pypi-dist/* delivery-dist/*.zip
           --target "$RELEASE_COMMIT" --latest
-          --title "Cartomize 1.0 — édition consolidée"
+          --title "Cartomize 1.0 — espace de travail dynamique"
           --notes-file docs/RELEASE_1.0.md
 
   publish:

@@ -6,7 +6,7 @@ Cartomize combines a Python library, Jupyter workflows, a command-line interface
 
 Python 3.11 or 3.12 is recommended for the desktop. Cartomize runs independently of QGIS and ArcGIS Pro; native project bridges are optional.
 
-Install the wheel supplied with this consolidated edition in a new environment:
+Install Cartomize in a new environment:
 
 ```bash
 python -m venv cartomize-env
@@ -16,15 +16,30 @@ Activate that environment, then install one of the following options:
 
 ```bash
 # Desktop application
-python -m pip install "./cartomize-1.0-20261030-py3-none-any.whl[gui]"
+python -m pip install --index-url https://pypi.org/simple "cartomize[gui]==1.0"
 python -m cartomize gui
 
 # Desktop application, JupyterLab and a Python kernel
-python -m pip install "./cartomize-1.0-20261030-py3-none-any.whl[notebook]"
+python -m pip install --index-url https://pypi.org/simple "cartomize[notebook]==1.0"
 python -m jupyter lab
 ```
 
-The Python API alone is installed from the same wheel without an extra. All options use the same processing code. Install the exact delivery file: the historical PyPI release numbered 1.0 predates this consolidated source edition. Publication status is tracked in the [publication guide](https://github.com/cedrick14/cartomize-python/blob/main/docs/PUBLICATION.md).
+The Python API alone is installed with `cartomize==1.0`. All options use the same processing code. This dynamic desktop edition keeps public version **1.0** and uses wheel build **2026103001**. If another edition numbered 1.0 is already installed, replace it explicitly:
+
+```bash
+python -m pip install --index-url https://pypi.org/simple --force-reinstall --no-cache-dir "cartomize[notebook]==1.0"
+python -c "from importlib.metadata import distribution; print(distribution('cartomize').read_text('WHEEL'))"
+```
+
+The installed wheel must report `Build: 2026103001`. Release availability and verification are tracked in the [publication guide](https://github.com/cedrick14/cartomize-python/blob/main/docs/PUBLICATION.md). Complete sources, the wheel and a portable demonstration are available through [GitHub releases](https://github.com/cedrick14/cartomize-python/releases).
+
+## Dynamic desktop workspace
+
+The default arrangement keeps the explorer and tools on the left, results in the centre, parameters on the right and the console below. Panels and result views can be detached, resized, maximized, docked on any side or grouped into tabs. Dragging a title bar displays placement guides and a preview of the target position.
+
+**F11** enlarges the central view. **Escape** restores a focused workspace or cancels a drag. **Affichage → Rétablir la disposition** restores the default arrangement and returns detached results to the central tabs. Tool values and existing map canvases are preserved when moving panels. Local layout preferences and project view positions are saved separately.
+
+The light, dark and system themes are retained. Long descriptions are collapsed into **Aide**, while required units, validation messages and processing diagnostics remain visible. See the [dynamic workspace guide](https://github.com/cedrick14/cartomize-python/blob/main/docs/DYNAMIC_WORKSPACE.md).
 
 ## Automatic satellite preprocessing
 
@@ -97,6 +112,7 @@ The completed modules share their engines between Python, the CLI, processing pl
 
 - [Demonstration: scenes, bands and study area](https://github.com/cedrick14/cartomize-python/blob/main/docs/DEMONSTRATION_1.0.md)
 - [Desktop workspace](https://github.com/cedrick14/cartomize-python/blob/main/docs/WORKBENCH.md)
+- [Movable panels and result views](https://github.com/cedrick14/cartomize-python/blob/main/docs/DYNAMIC_WORKSPACE.md)
 - [Automatic imagery workflow](https://github.com/cedrick14/cartomize-python/blob/main/docs/IMAGERY_AUTOMATIC.md)
 - [Python API](https://github.com/cedrick14/cartomize-python/blob/main/docs/PYTHON_API.md)
 - [Executable Jupyter courses](https://github.com/cedrick14/cartomize-python/tree/main/tutorials)

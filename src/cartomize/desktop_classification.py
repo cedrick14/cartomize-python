@@ -1,7 +1,7 @@
 """Supervised classification and spectral clustering controls."""
 from pathlib import Path
 import json
-from PySide6.QtWidgets import QComboBox,QLineEdit,QPlainTextEdit
+from PySide6.QtWidgets import QComboBox,QLineEdit,QPlainTextEdit,QLabel
 from .desktop import Page,PathField,spin,VECTOR_FILTER
 import cartomize as cm
 
@@ -18,12 +18,15 @@ class ClassificationPage(Page):
         self.trees=spin(100,10,1000);self.clusters=spin(6,2,64);self.samples=spin(50000,20,2000000);self.depth=spin(24,1,64)
         self.output=PathField('directory');self.name=QLineEdit('classification')
         for label,widget in [('Raster scientifique',self.source),('Méthode',self.method),('Échantillons d’apprentissage',self.training),('Champ des classes',self.column),('Champ des libellés',self.labels),('Groupes de validation',self.groups),('Échantillons de validation',self.validation),('Modèle',self.model),('Bandes',self.bands),('Arbres',self.trees),('Profondeur maximale',self.depth),('Groupes spectraux',self.clusters),('Pixels échantillonnés',self.samples),('Répertoire parent',self.output),('Nom du résultat',self.name)]:self.form.addRow(label,widget)
+        self.interpretation_note=QLabel('Groupes non supervisés : interprétation nécessaire.')
+        self.interpretation_note.setWordWrap(True);self.form.addRow(self.interpretation_note)
         self.report=QPlainTextEdit();self.report.setReadOnly(True);self.report.setMaximumHeight(170);self.form.addRow('Validation',self.report)
         self.method.currentIndexChanged.connect(self.changed);self.changed();self.layout.addStretch()
     def changed(self):
         method=self.method.currentData();supervised=method in {'random_forest','extra_trees'}
         for widget in (self.training,self.validation,self.column,self.labels,self.groups,self.trees,self.depth):widget.setEnabled(supervised)
         self.model.setEnabled(method=='model');self.clusters.setEnabled(method=='kmeans');self.samples.setEnabled(method!='model')
+        self.interpretation_note.setVisible(method=='kmeans')
     def job(self,options):
         from .recipes import safe_name
         source=self.source.text();destination=Path(self.destination())/safe_name(self.name.text());method=self.method.currentData()

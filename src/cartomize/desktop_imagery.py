@@ -61,9 +61,9 @@ class PreparationPage(Page):
         self.assets.setMinimumHeight(170)
         self.assets.setMaximumHeight(250)
         self.form.addRow(self.assets)
-        note = QLabel("Cocher les bandes à traiter. En mode personnalisé, renseigner le même identifiant de scène pour les bandes d’une acquisition et le même nom spectral entre scènes (red, green, blue, nir…). Vérifier les facteurs de calibration.")
-        note.setWordWrap(True)
-        self.form.addRow(note)
+        self.add_help("Cocher les bandes à traiter. En mode personnalisé, renseigner le même identifiant de scène pour les bandes d’une acquisition et le même nom spectral entre scènes (red, green, blue, nir…). Vérifier les facteurs de calibration.",
+            subject="Identification des bandes",summary="Seules les bandes cochées sont traitées.")
+        self.assets.setToolTip("Bandes personnalisées : vérifier les identifiants de scène, les noms spectraux et les facteurs de calibration.")
         self.quality_masks = QTableWidget(0, 4)
         self.quality_masks.setHorizontalHeaderLabels(["Scène", "Qualité", "Type", "Saturation"])
         self.quality_masks.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)

@@ -1,5 +1,6 @@
 """Compact displays retain map space and reachable execution controls."""
 import os
+from pathlib import Path
 import time
 
 os.environ.setdefault('QT_QPA_PLATFORM', 'offscreen')
@@ -26,18 +27,19 @@ def wait_for(predicate, timeout=20):
 
 
 @pytest.fixture
-def compact_window(tmp_path):
+def compact_window(tmp_path, monkeypatch):
+    import cartomize.desktop as desktop
     app = QApplication.instance() or QApplication([])
-    old_format = QSettings.defaultFormat()
-    QSettings.setDefaultFormat(QSettings.Format.IniFormat)
-    QSettings.setPath(QSettings.Format.IniFormat, QSettings.Scope.UserScope, str(tmp_path / 'settings'))
+    preferences = tmp_path / 'preferences.ini'
+    monkeypatch.setattr(desktop, 'QSettings', lambda *args:
+                        QSettings(str(preferences), QSettings.Format.IniFormat))
     window = CartomizeWindow()
+    assert Path(window._preferences.fileName()).resolve() == preferences.resolve()
     try:
         yield app, window
     finally:
         window.close()
         app.processEvents()
-        QSettings.setDefaultFormat(old_format)
 
 
 @pytest.mark.parametrize('font_size', [12, 14, 16])

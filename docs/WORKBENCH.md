@@ -1,8 +1,10 @@
-# Espace de travail Cartomize 1.5.0
+# Espace de travail Cartomize 1.0
+
+Ce guide décrit l’espace de travail dynamique de la construction **2026103001**. La version publique reste **1.0** ; l’état de distribution est suivi dans [PUBLICATION.md](PUBLICATION.md).
 
 ## Installation
 
-Utiliser un environnement Python 3.11 ou 3.12 dédié à Cartomize. Le paquet `gui` installe PySide6 et le lecteur PDF nécessaires à l’interface.
+Utiliser un environnement Python 3.11 ou 3.12 dédié à Cartomize. L’option `gui` installe PySide6 et le lecteur PDF nécessaires à l’interface.
 
 Depuis une archive source extraite :
 
@@ -14,7 +16,7 @@ python -m cartomize gui
 Depuis le paquet wheel de la version :
 
 ```bash
-python -m pip install "./cartomize-1.5.0-py3-none-any.whl[gui]"
+python -m pip install "./cartomize-1.0-2026103001-py3-none-any.whl[gui]"
 python -m cartomize gui
 ```
 
@@ -28,15 +30,27 @@ L’interface ne nécessite pas QGIS ni ArcGIS Pro. Une installation de QGIS ne 
 
 ## Organisation
 
+La disposition initiale est conservée : **explorateur et catalogue à gauche, vues au centre, paramètres à droite, console en bas**. Chaque panneau garde son contenu lorsque son emplacement change.
+
 **Explorateur de projet** : fichiers locaux, dossier de travail et importation. Le bouton Parent remonte d’un niveau. Un double-clic ouvre un fichier compatible. Une archive CMZ ou un fichier `.cartomize.json` ouvre le projet correspondant.
 
-**Traitements** : catalogue par catégories et recherche sans distinction de casse ou d’accents. Le menu Traitements donne aussi accès à toutes les pages. Le registre commun comprend 48 opérateurs utilisables dans les chaînes.
+**Traitements** : catalogue de 21 pages, classées par catégories, avec une recherche sans distinction de casse ou d’accents. Le menu Traitements donne aussi accès à ces pages. Les opérations sont également disponibles dans les chaînes de traitement.
 
 **Carte et résultats** : onglets raster, vectoriels, tableaux, graphiques, PDF et SVG. Les données chargées restent accessibles après fermeture de leur onglet.
 
 **Paramètres** : formulaire du traitement sélectionné, moteur de calcul, sortie, Exécuter et Annuler. Les fichiers sources ne sont pas modifiés par un changement de thème ou de disposition.
 
-**Console et résultats** : console Python, journaux, données chargées et environnement. Les panneaux peuvent être déplacés, détachés et réaffichés depuis Affichage. Rétablir la disposition restaure l’organisation initiale.
+**Console et résultats** : console Python, journaux, données chargées et environnement.
+
+## Déplacer les panneaux et les vues
+
+Faire glisser la **barre de titre** d’un panneau : les guides proposent les quatre côtés de l’espace de travail et le regroupement au centre d’un autre panneau. Relâcher sur la cible souhaitée. Le menu **Positionner** permet aussi de choisir un côté ou **Grouper avec** un autre panneau. **Échap** annule le déplacement en cours.
+
+Les commandes de la barre de titre permettent de **Détacher**, **Agrandir**, **Rétablir** ou **Fermer** un panneau. Une vue de résultat détachée propose **Réintégrer dans les vues** pour revenir aux onglets centraux. Fermer une vue conserve son fichier et son entrée dans les données chargées.
+
+**F11** agrandit l’espace central en masquant temporairement les panneaux ; **F11** ou **Échap** retrouve le placement précédent. Le menu **Affichage** rouvre les panneaux fermés. **Affichage > Rétablir la disposition** réintègre les vues détachées et restaure l’organisation initiale.
+
+Le [guide des panneaux et vues mobiles](DYNAMIC_WORKSPACE.md) détaille ces gestes et leur enregistrement.
 
 ## Parcours de traitement
 
@@ -47,6 +61,10 @@ L’interface ne nécessite pas QGIS ni ArcGIS Pro. Une installation de QGIS ne 
 5. Ouvrir le résultat, le comparer ou le transmettre au traitement suivant.
 
 La préparation multispectrale conserve son tableau de scènes et de bandes. La mise en page conserve la configuration des couches, les cadres, la légende, l’échelle et les formats d’export. Les instructions détaillées de chaque domaine restent disponibles dans [DESKTOP.md](DESKTOP.md) et [SIG_WORKFLOWS.md](SIG_WORKFLOWS.md).
+
+### Aide dans les formulaires
+
+Les descriptions des 21 pages et les explications longues sont repliées derrière **Aide**. Cliquer sur le bouton, ou l’atteindre avec **Tab** puis appuyer sur **Espace**, affiche le texte complet. Les valeurs saisies, unités, erreurs, diagnostics et avertissements opérationnels restent visibles dans le formulaire.
 
 ### Préparation automatique des images
 
@@ -84,7 +102,9 @@ Interrompre arrête le processus de console et son calcul. L’exécution suivan
 
 ## Projets
 
-Enregistrer le projet conserve les formulaires, les références aux fichiers, les résultats, les vues et la configuration de production. Exporter le projet portable crée une archive CMZ contenant les données prévues par le format de projet. Les sessions de la disposition antérieure restent prises en charge.
+Enregistrer le projet conserve les formulaires, les références aux fichiers, les résultats, les vues et la configuration de production. Le placement des vues de résultats est enregistré avec la session : onglet central ou panneau, côté, regroupement, position et taille d’une fenêtre détachée. Le placement des panneaux de l’application est également mémorisé localement entre les lancements.
+
+Exporter le projet portable crée une archive CMZ contenant les données prévues par le format de projet. Les sessions de la disposition antérieure restent prises en charge.
 
 L’ouverture et l’enregistrement d’un projet sont désactivés pendant un traitement. Nouveau projet demande confirmation avant de remplacer la session ; les fichiers déjà produits sont conservés sur disque.
 
@@ -100,6 +120,8 @@ L’ouverture et l’enregistrement d’un projet sont désactivés pendant un t
 | Ctrl+K | Rechercher un traitement |
 | F5 | Exécuter le traitement |
 | Maj+F5 | Interrompre le traitement |
+| F11 | Agrandir l’espace central ou retrouver le placement précédent |
+| Échap | Annuler un déplacement ou quitter le mode focus |
 | Ctrl+Entrée | Exécuter le code de la console |
 
 ## Diagnostic

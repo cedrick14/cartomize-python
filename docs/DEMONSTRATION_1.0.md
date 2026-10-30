@@ -1,5 +1,7 @@
 # Démonstration Cartomize 1.0 — Scènes, bandes et zone d’étude
 
+Ce guide de démonstration vise la construction **2026103001**. La version publique reste **1.0** ; l’état de distribution est suivi dans [PUBLICATION.md](PUBLICATION.md).
+
 ## Objectif
 
 Montrer qu’une sélection de scènes téléchargées, de bandes et d’une zone
@@ -16,7 +18,7 @@ Sous Windows, dans un terminal :
 
 ```powershell
 py -3.12 -m venv cartomize-demo
-.\cartomize-demo\Scripts\python.exe -m pip install "./cartomize-1.0-20261030-py3-none-any.whl[notebook]"
+.\cartomize-demo\Scripts\python.exe -m pip install "./cartomize-1.0-2026103001-py3-none-any.whl[notebook]"
 .\cartomize-demo\Scripts\python.exe -m cartomize gui
 ```
 
@@ -27,7 +29,7 @@ Sous Linux ou macOS :
 
 ```bash
 python3 -m venv cartomize-demo
-./cartomize-demo/bin/python -m pip install "./cartomize-1.0-20261030-py3-none-any.whl[notebook]"
+./cartomize-demo/bin/python -m pip install "./cartomize-1.0-2026103001-py3-none-any.whl[notebook]"
 ./cartomize-demo/bin/python -m cartomize gui
 ```
 
@@ -56,6 +58,8 @@ atmosphérique doivent être préparés par le processeur adapté.
 
 ## Parcours sans code
 
+La disposition initiale reste familière : explorateur et catalogue à gauche, vues au centre, paramètres à droite et console en bas. Le bouton **Aide** ouvre les explications repliées ; les champs, les unités et les messages opérationnels restent visibles.
+
 1. Ouvrir **Prétraitement multispectral**.
 2. Conserver **Automatique : contrôler et préparer**.
 3. Cliquer **Sélectionner les bandes…**, ou choisir le dossier de scènes puis
@@ -74,6 +78,15 @@ La grille cible reprend les paramètres compatibles des scènes importées. Les
 réglages de projection et de résolution restent accessibles pour un besoin
 particulier. Les rasters géographiques doivent être associés à un SCR projeté
 adapté pour une résolution exprimée en mètres.
+
+### Présenter les résultats à l’écran
+
+1. Ouvrir le résultat multibande et le rapport dans les vues centrales.
+2. Utiliser **Détacher**, puis déplacer la barre de titre vers un guide latéral pour placer la vue à côté d’une autre. Le centre d’un panneau permet de les regrouper ; le menu **Positionner > Grouper avec** offre aussi cette commande.
+3. Utiliser **F11** pour agrandir l’espace central pendant l’explication. **Échap** ou **F11** retrouve le placement précédent ; **Échap** annule également un déplacement en cours.
+4. Choisir **Réintégrer dans les vues** pour ramener une vue au centre, ou **Affichage > Rétablir la disposition** pour retrouver l’organisation initiale et réintégrer toutes les vues détachées.
+
+Le [guide des panneaux et vues mobiles](DYNAMIC_WORKSPACE.md) présente aussi les commandes **Agrandir**, **Rétablir** et **Fermer**, ainsi que l’enregistrement du placement. Enregistrer le projet avant la séance conserve la disposition des résultats avec leurs réglages d’affichage.
 
 ## Les situations à montrer
 

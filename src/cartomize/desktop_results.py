@@ -1,13 +1,18 @@
 """Integrated results workspace: documents, layers, tables and comparison views."""
+import hashlib
 import json
 from pathlib import Path
+import re
+import uuid
 import numpy as np
 from matplotlib import colormaps
-from PySide6.QtCore import Qt,Signal
-from PySide6.QtGui import QColor, QIcon, QPixmap, QImage
+from PySide6.QtCore import Qt,Signal,QEvent,QPoint,QSize
+from PySide6.QtGui import QAction, QColor, QIcon, QPixmap, QImage
 from PySide6.QtWidgets import (QWidget,QVBoxLayout,QHBoxLayout,QLabel,QPushButton,QToolButton,
-    QComboBox,QSplitter,QTabWidget,QPlainTextEdit,QListWidget,QListWidgetItem,QCheckBox,QFileDialog)
+    QComboBox,QSplitter,QTabWidget,QPlainTextEdit,QListWidget,QListWidgetItem,QCheckBox,QFileDialog,
+    QApplication,QDockWidget,QMainWindow,QMenu,QStyle)
 from .desktop_canvas import GeoCanvas
+from .desktop_docking import panel_icon
 from .desktop_tables import TablePanel
 from .viewer_data import RASTERS,VECTORS,IMAGES,SUPPORTED,identity
 
@@ -30,8 +35,10 @@ class MapDocument(QWidget):
         button('Étendue',self.canvas.fit_extent,toolbar)
         button('1:1',self.canvas.native_scale,toolbar)
         reload_button=button('↻' if compact else 'Actualiser',self.reload,toolbar); reload_button.setToolTip('Relire le résultat et ses métadonnées'); toolbar.addStretch()
-        self.display_settings=QToolButton(); self.display_settings.setText('Affichage'); self.display_settings.setCheckable(True); self.display_settings.setChecked(not compact); toolbar.addWidget(self.display_settings)
-        self.details=QToolButton(); self.details.setText('Infos' if compact else 'Informations'); self.details.setCheckable(True); self.details.setChecked(not compact); toolbar.addWidget(self.details)
+        self.display_settings=QToolButton(); self.display_settings.setText('Style'); self.display_settings.setCheckable(True); self.display_settings.setChecked(not compact); toolbar.addWidget(self.display_settings)
+        self.display_settings.setToolTip('Afficher ou masquer les réglages de rendu du document : bandes, couleurs ou page.')
+        self.details=QToolButton(); self.details.setText('Infos'); self.details.setCheckable(True); self.details.setChecked(not compact); toolbar.addWidget(self.details)
+        self.details.setToolTip('Afficher ou masquer la légende et les métadonnées.')
         layout.addLayout(toolbar)
         self.styles=QWidget(); styles=QHBoxLayout(self.styles); styles.setContentsMargins(0,0,0,0); styles.setSpacing(4)
         self.mode=QComboBox(); self.mode.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon); self.mode.setMinimumContentsLength(10)
@@ -57,14 +64,19 @@ class MapDocument(QWidget):
         metadata.setPlainText(json.dumps(self.canvas.info,ensure_ascii=False,indent=2,default=str)); self.info_tabs.addTab(metadata,'Métadonnées')
         self.content.addWidget(self.info_tabs); self.content.setStretchFactor(0,1); self.content.setSizes([800,200])
         self.info_tabs.setVisible(not compact); self.details.toggled.connect(self.info_tabs.setVisible)
-        self.coordinates=QLabel('Molette : zoom ; glisser : déplacement ; clic : valeurs du pixel'); self.coordinates.setObjectName('muted'); self.coordinates.setWordWrap(True)
-        self.values=QLabel(''); self.values.setWordWrap(True); self.note=QLabel('Chargement de la vue…'); self.note.setWordWrap(True); self.note.setObjectName('muted')
+        self.coordinates=QLabel(''); self.coordinates.setObjectName('muted'); self.coordinates.setWordWrap(True)
+        self.canvas.setToolTip('Molette : zoom ; glisser : déplacement ; clic : valeurs du pixel.')
+        self.values=QLabel(''); self.values.setWordWrap(True); self.note=QLabel('Chargement…'); self.note.setWordWrap(True); self.note.setObjectName('muted')
         layout.addWidget(self.coordinates); layout.addWidget(self.values); layout.addWidget(self.note)
         self.canvas.position.connect(self.coordinates.setText); self.canvas.identified.connect(self.values.setText)
-        self.canvas.error.connect(lambda text:self.note.setText('Affichage impossible : '+text)); self.canvas.rendered.connect(self.show_legend)
+        self.canvas.error.connect(self.show_error); self.canvas.rendered.connect(self.show_legend)
         self._configure_controls(); self.styles.setVisible(self.canvas.kind in {'raster','pdf'} and not compact)
         self.display_settings.setVisible(self.canvas.kind in {'raster','pdf'}); self.display_settings.toggled.connect(self.styles.setVisible)
-        if self.canvas.kind=='svg': self.note.setText('Document vectoriel ; les images incorporées conservent la résolution de l’export.')
+        if self.canvas.kind=='svg':
+            self.note.hide(); self.details.setToolTip(self.details.toolTip()+' Document vectoriel ; les images incorporées conservent la résolution de l’export.')
+
+    def show_error(self,text):
+        self.note.setText('Affichage impossible : '+text); self.note.show()
 
     def _configure_controls(self):
         canvas=self.canvas
@@ -123,7 +135,10 @@ class MapDocument(QWidget):
             elif self.canvas.kind=='pdf': note='PDF rendu à la résolution de la vue ; les rasters incorporés gardent leur résolution d’origine.'
             elif self.canvas.kind=='vector': note='Géométries de l’emprise visible. Symbologie d’exploration ; habillage dans l’outil Mise en page.'
             else: note='Image à résolution native. Agrandissement des pixels au-delà de l’échelle 1:1.'
-        self.note.setText(note)
+        self.details.setToolTip(note)
+        self.canvas.setToolTip('Molette : zoom ; glisser : déplacement ; clic : valeurs du pixel.\n'+note)
+        self.note.setText(note if result.get('warning') else '')
+        self.note.setVisible(bool(result.get('warning')))
 
     def capture(self): return dict(type='map',path=self.path,options=self.options,view=self.canvas.capture(),details=self.details.isChecked())
     def restore(self,state):
@@ -234,10 +249,22 @@ class Comparison(QWidget):
             if doc: doc.dispose()
 
 
+class ResultDock(QDockWidget):
+    """A document host whose close action follows the workspace lifecycle."""
+    def __init__(self,title,document,workspace,parent):
+        super().__init__(title,parent); self.document=document; self.workspace=workspace
+
+    def closeEvent(self,event):
+        if self.document in self.workspace.detached_docks:
+            self.workspace.close_document(self.document)
+        event.accept()
+
+
 class ResultsWorkspace(QWidget):
     """Persistent result catalogue and bounded, reusable embedded document tabs."""
     def __init__(self,parent=None):
         super().__init__(parent); self.records={}; self._documents={}; self._saved={}; self._closed=False
+        self.detached_docks={}; self._titles={}; self._dock_ids={}; self._standalone_host=None; self._active_document=None
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         layout=QVBoxLayout(self); layout.setContentsMargins(0,0,0,0); layout.setSpacing(8)
         heading=QHBoxLayout(); title=QLabel('Visualisation des résultats'); title.setObjectName('panelTitle'); heading.addWidget(title); heading.addStretch()
@@ -247,10 +274,217 @@ class ResultsWorkspace(QWidget):
         row.addWidget(self.catalog,1); button('Afficher',self.open_selected,row); self.compare_button=button('Comparer',self.compare,row); layout.addLayout(row)
         self.catalog.activated.connect(self.open_selected)
         self.tabs=QTabWidget(); self.tabs.setTabsClosable(True); self.tabs.setMovable(True); self.tabs.tabCloseRequested.connect(self.close_tab)
+        self.tabs.tabBar().setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.tabs.tabBar().customContextMenuRequested.connect(self.tab_menu)
+        self.tabs.tabBarDoubleClicked.connect(self.detach_tab)
+        self.tabs.currentChanged.connect(self.tab_selected)
+        actions=QWidget(); action_layout=QHBoxLayout(actions); action_layout.setContentsMargins(0,0,0,0); action_layout.setSpacing(2)
+        self.detach_button=QToolButton()
+        self.detach_button.setToolTip('Détacher la vue'); self.detach_button.setAccessibleName('Détacher la vue')
+        self.detach_button.clicked.connect(lambda:self.detach_document()); action_layout.addWidget(self.detach_button)
+        self.focus_button=QToolButton()
+        self.focus_button.setToolTip('Agrandir la vue'); self.focus_button.setAccessibleName('Agrandir la vue')
+        self.focus_button.clicked.connect(lambda:self.focus_document()); action_layout.addWidget(self.focus_button)
+        for control in (self.detach_button,self.focus_button):
+            control.setObjectName('dockPanelAction'); control.setFixedSize(26,26); control.setIconSize(QSize(16,16)); control.setAutoRaise(True)
+        self.refresh_action_icons()
+        self.tabs.setCornerWidget(actions,Qt.Corner.TopRightCorner)
         layout.addWidget(self.tabs,1); self.empty=QLabel('Cartes, rasters, tableaux, graphiques et rapports\n\nOuvrir un fichier ou exécuter un traitement pour afficher un résultat.')
         self.empty.setAlignment(Qt.AlignmentFlag.AlignCenter); self.empty.setWordWrap(True); self.empty.setObjectName('emptyResults'); self.tabs.addTab(self.empty,'Espace de résultats')
         self.activity=QLabel('Aucun traitement en cours.'); self.activity.setObjectName('muted'); self.activity.setWordWrap(True); layout.addWidget(self.activity)
         self.message=QLabel(''); self.message.setWordWrap(True); layout.addWidget(self.message)
+        self.tab_selected(self.tabs.currentIndex())
+
+    def refresh_action_icons(self):
+        for control,symbol in ((self.detach_button,QStyle.StandardPixmap.SP_TitleBarNormalButton),
+                               (self.focus_button,QStyle.StandardPixmap.SP_TitleBarMaxButton)):
+            control.setIcon(panel_icon(symbol,self.palette(),self.devicePixelRatioF()))
+
+    def changeEvent(self,event):
+        super().changeEvent(event)
+        if event.type()==QEvent.Type.PaletteChange and hasattr(self,'focus_button'):
+            self.refresh_action_icons()
+
+    def all_documents(self):
+        return [self.tabs.widget(i) for i in range(self.tabs.count()) if self.tabs.widget(i) is not self.empty]+list(self.detached_docks)
+
+    def tab_selected(self,index):
+        document=self.tabs.widget(index)
+        available=document is not None and document is not getattr(self,'empty',None)
+        self.detach_button.setEnabled(available); self.focus_button.setEnabled(available)
+        if available: self._active_document=document
+
+    def detach_tab(self,index):
+        if index>=0: self.detach_document(self.tabs.widget(index))
+
+    def tab_menu(self,point):
+        index=self.tabs.tabBar().tabAt(point); document=self.tabs.widget(index)
+        if document is None or document is self.empty: return
+        menu=QMenu(self)
+        menu.addAction('Détacher',lambda:self.detach_document(document))
+        menu.addAction('Agrandir',lambda:self.focus_document(document))
+        menu.addSeparator(); menu.addAction('Fermer',lambda:self.close_document(document))
+        menu.exec(self.tabs.tabBar().mapToGlobal(point))
+
+    def _dock_owner(self):
+        owner=self.window()
+        if isinstance(owner,QMainWindow): return owner
+        if self._standalone_host is None:
+            self._standalone_host=QMainWindow(self,Qt.WindowType.Window)
+            self._standalone_host.setWindowTitle('Résultats — Cartomize')
+            self._standalone_host.resize(900,650)
+        return self._standalone_host
+
+    def _title(self,document):
+        index=self.tabs.indexOf(document)
+        if index>=0: return self.tabs.tabText(index)
+        return self._titles.get(document,Path(document.path).name if hasattr(document,'path') else 'Comparaison')
+
+    def _dock_id(self,document):
+        is_result=hasattr(document,'path')
+        own_dock=self.detached_docks.get(document)
+        key=own_dock.objectName() if own_dock is not None else self._dock_ids.get(document)
+        if key is None:
+            key='result-'+hashlib.sha256(document.path.encode('utf-8')).hexdigest()[:20] if is_result else 'comparison-'+uuid.uuid4().hex
+        used={value for other,value in self._dock_ids.items() if other is not document}
+        used.update(dock.objectName() for dock in self.window().findChildren(QDockWidget) if dock is not own_dock)
+        while key in used:
+            key='result-'+uuid.uuid4().hex[:20] if is_result else 'comparison-'+uuid.uuid4().hex
+        self._dock_ids[document]=key
+        return key
+
+    def _show_dock(self,dock):
+        manager=getattr(dock.parentWidget(),'dock_manager',None)
+        if manager is not None: manager.show(dock)
+        else: dock.show(); dock.raise_(); dock.activateWindow()
+        self._active_document=dock.document
+
+    def detach_document(self,document=None):
+        """Move an existing view into a dock without closing its data readers."""
+        document=document if document is not None else self.tabs.currentWidget()
+        if document is None or document is self.empty or self._closed: return None
+        if document in self.detached_docks:
+            dock=self.detached_docks[document]; self._show_dock(dock); return dock
+        index=self.tabs.indexOf(document)
+        if index<0: return None
+        title=self._title(document); self._titles[document]=title
+        owner=self._dock_owner()
+        dock=ResultDock(title,document,self,owner); dock.setObjectName(self._dock_id(document))
+        dock.setAllowedAreas(Qt.DockWidgetArea.AllDockWidgetAreas)
+        dock.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetClosable|
+                         QDockWidget.DockWidgetFeature.DockWidgetMovable|
+                         QDockWidget.DockWidgetFeature.DockWidgetFloatable)
+        self.tabs.removeTab(index); self.detached_docks[document]=dock
+        dock.setWidget(document); owner.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea,dock)
+        manager=getattr(owner,'dock_manager',None)
+        if manager is not None:
+            manager.register(dock,return_callback=lambda d=document:self.reattach_document(d))
+            manager.set_floating(dock,True)
+        else:
+            for label,callback in [('Réintégrer',lambda:self.reattach_document(document)),
+                                   ('Agrandir',lambda:self.focus_document(document)),
+                                   ('Fermer',dock.close)]:
+                action=QAction(label,dock); action.triggered.connect(callback); dock.addAction(action)
+            dock.setContextMenuPolicy(Qt.ContextMenuPolicy.ActionsContextMenu)
+            dock.setFloating(True)
+        dock.resize(max(520,min(1000,document.width())),max(400,min(760,document.height())))
+        dock.installEventFilter(self); self._show_dock(dock)
+        self.tab_selected(self.tabs.currentIndex())
+        self._active_document=document
+        return dock
+
+    def reattach_document(self,document):
+        """Return the same widget to its tab; no reload, disposal or file write."""
+        dock=self.detached_docks.pop(document,None)
+        if dock is None: return document if self.tabs.indexOf(document)>=0 else None
+        title=self._title(document); owner=dock.parentWidget(); manager=getattr(owner,'dock_manager',None)
+        if manager is not None: manager.unregister(dock)
+        dock.removeEventFilter(self); dock.hide()
+        if isinstance(owner,QMainWindow): owner.removeDockWidget(dock)
+        dock.setWidget(None); document.setParent(self.tabs)
+        if self.tabs.indexOf(self.empty)>=0: self.tabs.removeTab(self.tabs.indexOf(self.empty))
+        index=self.tabs.addTab(document,title)
+        if hasattr(document,'path'): self.tabs.setTabToolTip(index,document.path)
+        self.tabs.setCurrentIndex(index); document.show(); dock.setObjectName(''); dock.deleteLater()
+        self._active_document=document
+        return document
+
+    def focus_document(self,document=None):
+        document=document if document is not None else self.tabs.currentWidget()
+        if document is None or document is self.empty: return None
+        dock=self.detached_docks.get(document)
+        if dock is None and self.tabs.indexOf(document)<0: return None
+        owner=dock.parentWidget() if dock is not None else self.window()
+        manager=getattr(owner,'dock_manager',None)
+        if dock is None: self.tabs.setCurrentWidget(document)
+        else: self._show_dock(dock)
+        if manager is not None: manager.focus(dock)
+        else:
+            target=dock if dock is not None else owner
+            target.showNormal() if target.isMaximized() else target.showMaximized()
+        self._active_document=document
+        return document
+
+    def eventFilter(self,watched,event):
+        if isinstance(watched,ResultDock) and event.type() in (QEvent.Type.WindowActivate,QEvent.Type.FocusIn):
+            self._active_document=watched.document
+        return super().eventFilter(watched,event)
+
+    def _placement(self,document):
+        dock=self.detached_docks.get(document)
+        if dock is None: return dict(mode='tab',dock_id=self._dock_id(document))
+        owner=dock.parentWidget(); area=owner.dockWidgetArea(dock)
+        geometry=dock.normalGeometry() if dock.isMaximized() else dock.geometry()
+        return dict(mode='dock',dock_id=self._dock_id(document),floating=dock.isFloating(),area=area.value,
+                    geometry=[geometry.x(),geometry.y(),geometry.width(),geometry.height()],maximized=dock.isMaximized(),
+                    tabified_with=[other.objectName() for other in owner.tabifiedDockWidgets(dock)])
+
+    def _restore_placement(self,document,placement):
+        if not isinstance(placement,dict): return
+        key=placement.get('dock_id')
+        pattern=r'result-[0-9a-f]{20}' if hasattr(document,'path') else r'comparison-[0-9a-f]{32}'
+        if isinstance(key,str) and re.fullmatch(pattern,key): self._dock_ids[document]=key
+        self._dock_id(document)
+        if placement.get('mode')!='dock': return
+        dock=self.detach_document(document)
+        if dock is None: return
+        owner=dock.parentWidget(); manager=getattr(owner,'dock_manager',None)
+        allowed={area.value:area for area in (Qt.DockWidgetArea.LeftDockWidgetArea,Qt.DockWidgetArea.RightDockWidgetArea,
+                                             Qt.DockWidgetArea.TopDockWidgetArea,Qt.DockWidgetArea.BottomDockWidgetArea)}
+        saved_area=placement.get('area')
+        area=allowed.get(saved_area,Qt.DockWidgetArea.RightDockWidgetArea) if type(saved_area) is int else Qt.DockWidgetArea.RightDockWidgetArea
+        if not placement.get('floating',True):
+            if manager is not None: manager.dock(dock,area)
+            else:
+                dock.setFloating(False); owner.addDockWidget(area,dock)
+                if owner is self._standalone_host: owner.show()
+        geometry=placement.get('geometry')
+        valid_geometry=(isinstance(geometry,list) and len(geometry)==4 and
+                        all(type(v) is int and -(2**31)<=v<2**31 for v in geometry) and
+                        geometry[2]>0 and geometry[3]>0 and
+                        all(-(2**31)<=v<2**31 for v in (geometry[0]+geometry[2]//2,geometry[1]+geometry[3]//2)))
+        if dock.isFloating() and valid_geometry:
+            x,y,width,height=geometry
+            screen=QApplication.screenAt(QPoint(x+width//2,y+height//2)) or QApplication.primaryScreen()
+            if screen is not None:
+                available=screen.availableGeometry()
+                width=max(300,min(width,available.width())); height=max(240,min(height,available.height()))
+                x=min(max(x,available.left()),available.right()-width+1); y=min(max(y,available.top()),available.bottom()-height+1)
+            dock.setGeometry(x,y,width,height)
+        if dock.isFloating() and placement.get('maximized'): dock.showMaximized()
+        self._restore_tabification(document,placement)
+
+    def _restore_tabification(self,document,placement):
+        dock=self.detached_docks.get(document)
+        if dock is None or dock.isFloating() or not isinstance(placement,dict): return
+        names=placement.get('tabified_with',[])
+        if not isinstance(names,list): return
+        owner=dock.parentWidget()
+        for name in names:
+            if not isinstance(name,str): continue
+            other=owner.findChild(QDockWidget,name)
+            if other is not None and other is not dock and not other.isFloating():
+                owner.tabifyDockWidget(other,dock); dock.raise_(); break
 
     def register(self,record):
         if isinstance(record,(str,Path)): record=dict(data=str(record))
@@ -272,21 +506,23 @@ class ResultsWorkspace(QWidget):
 
     def _room(self):
         if self.tabs.indexOf(self.empty)>=0: self.tabs.removeTab(self.tabs.indexOf(self.empty))
-        if self.tabs.count()>=8:
-            self.close_tab(0); self.message.setText('Huit vues actives au maximum. Les résultats fermés restent disponibles dans la liste.')
+        documents=self.all_documents()
+        if len(documents)>=8:
+            self.close_document(documents[0]); self.message.setText('Huit vues actives au maximum. Les résultats fermés restent disponibles dans la liste.')
 
     def open_result(self,path,*,title=None,refresh=False,transient=False):
         path=str(Path(path).resolve()); self.register(path)
         if path not in self.records: return None
         if transient: self.records[path]['transient']=True
         try:
-            old=self._documents.get(path)
+            old=self._documents.get(path); placement=None
             if old is not None:
                 changed=getattr(old,'file_id',None)!=identity(path) or getattr(old,'options',{})!=self.records[path]
                 if refresh or changed:
-                    index=self.tabs.indexOf(old); self.close_tab(index)
+                    placement=self._placement(old); self.close_document(old)
                 else:
-                    self.tabs.setCurrentWidget(old)
+                    if old in self.detached_docks: self._show_dock(self.detached_docks[old])
+                    else: self.tabs.setCurrentWidget(old)
                     self.catalog.setCurrentIndex(self.catalog.findData(path))
                     self.message.clear()
                     return old
@@ -298,8 +534,10 @@ class ResultsWorkspace(QWidget):
                 document.capture=lambda p=path:dict(type='table',path=p)
             self._documents[path]=document
             index=self.tabs.addTab(document,title or self.records[path].get('name') or Path(path).name); self.tabs.setTabToolTip(index,path); self.tabs.setCurrentIndex(index)
+            self._titles[document]=self.tabs.tabText(index)
             self.catalog.setCurrentIndex(self.catalog.findData(path))
             if path in self._saved and hasattr(document,'restore'): document.restore(self._saved[path])
+            if placement: self._restore_placement(document,placement)
             self.message.clear(); return document
         except Exception as exc:
             self.message.setText('Visualisation impossible : '+str(exc)); return None
@@ -308,16 +546,31 @@ class ResultsWorkspace(QWidget):
         paths=[p for p in self.records if Path(p).suffix.lower() in MAP_FORMATS]
         if len(paths)<2: self.message.setText('Charger au moins deux cartes ou couches pour les comparer.'); return None
         left=left or (self.catalog.currentData() if self.catalog.currentData() in paths else paths[-2]); right=right or next(p for p in reversed(paths) if p!=left)
-        self._room(); comparison=Comparison(dict(self.records),left,right); index=self.tabs.addTab(comparison,'Comparaison'); self.tabs.setCurrentIndex(index); return comparison
+        self._room(); comparison=Comparison(dict(self.records),left,right); index=self.tabs.addTab(comparison,'Comparaison'); self.tabs.setCurrentIndex(index); self._titles[comparison]='Comparaison'; return comparison
 
     def close_tab(self,index):
         widget=self.tabs.widget(index)
-        if widget is None or widget is self.empty: return
+        if widget is not None and widget is not self.empty: self.close_document(widget)
+
+    def close_document(self,widget):
+        if widget is self.empty or widget not in self.all_documents(): return
         if hasattr(widget,'path'):
             if hasattr(widget,'capture'): self._saved[widget.path]=widget.capture()
             self._documents.pop(widget.path,None)
+        dock=self.detached_docks.pop(widget,None)
+        if dock is not None:
+            owner=dock.parentWidget(); manager=getattr(owner,'dock_manager',None)
+            if manager is not None: manager.unregister(dock)
+            dock.removeEventFilter(self); dock.hide()
+            if isinstance(owner,QMainWindow): owner.removeDockWidget(dock)
+            dock.setWidget(None); widget.setParent(self); dock.setObjectName(''); dock.deleteLater()
+        else:
+            index=self.tabs.indexOf(widget)
+            if index>=0: self.tabs.removeTab(index)
+        self._titles.pop(widget,None); self._dock_ids.pop(widget,None)
+        if self._active_document is widget: self._active_document=None
         if hasattr(widget,'dispose'): widget.dispose()
-        self.tabs.removeTab(index); widget.deleteLater()
+        widget.deleteLater(); self.tab_selected(self.tabs.currentIndex())
 
     def show_output(self,path):
         """Collect declared products and display the completed output, never a partial file."""
@@ -394,35 +647,50 @@ class ResultsWorkspace(QWidget):
     def capture(self):
         records={p:r for p,r in self.records.items() if not r.get('transient')}
         views=[]
-        for i in range(self.tabs.count()):
-            widget=self.tabs.widget(i)
+        selected=0
+        for widget in self.all_documents():
             if not hasattr(widget,'capture'): continue
             view=widget.capture()
             paths=[v['path'] for v in view.get('views',[])] if view['type']=='comparison' else [view['path']]
-            if all(p in records for p in paths): views.append(view)
-        return dict(records=list(records.values()),views=views,selected=self.tabs.currentIndex())
+            if all(p in records for p in paths):
+                view['placement']=self._placement(widget)
+                if widget is self._active_document: selected=len(views)
+                views.append(view)
+        return dict(records=list(records.values()),views=views,selected=selected)
 
     def restore(self,state):
-        for index in reversed(range(self.tabs.count())): self.close_tab(index)
+        for document in list(self.all_documents()): self.close_document(document)
         self.records={}; self.catalog.clear(); self._saved={}
         for record in state.get('records',[]): self.register(record)
+        restored=[]
         for view in state.get('views',[])[:8]:
+            document=None
             if view.get('type')=='comparison':
                 paths=[v['path'] for v in view.get('views',[]) if Path(v['path']).is_file()]
                 if len(paths)==2:
-                    comparison=self.compare(left=paths[0],right=paths[1])
-                    if comparison: comparison.restore(view)
+                    document=self.compare(left=paths[0],right=paths[1])
+                    if document: document.restore(view)
             elif Path(view.get('path','')).is_file():
                 document=self.open_result(view['path'])
                 if document and hasattr(document,'restore'): document.restore(view)
-        self.tabs.setCurrentIndex(min(state.get('selected',0),self.tabs.count()-1))
+            if document is not None:
+                placement=view.get('placement',{})
+                self._restore_placement(document,placement); restored.append((document,placement))
+        for document,placement in restored:
+            self._restore_tabification(document,placement)
+        if restored:
+            index=state.get('selected',0)
+            if type(index) is not int: index=0
+            document=restored[max(0,min(index,len(restored)-1))][0]
+            if document in self.detached_docks: self._show_dock(self.detached_docks[document])
+            else: self.tabs.setCurrentWidget(document)
 
     def dispose(self):
         if self._closed: return
         self._closed=True
-        for i in range(self.tabs.count()):
-            document=self.tabs.widget(i)
-            if hasattr(document,'dispose'): document.dispose()
+        for document in list(self.all_documents()): self.close_document(document)
+        if self._standalone_host is not None:
+            self._standalone_host.hide(); self._standalone_host.deleteLater(); self._standalone_host=None
 
     def closeEvent(self,event):
         self.dispose(); super().closeEvent(event)
