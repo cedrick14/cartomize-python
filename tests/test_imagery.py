@@ -143,6 +143,57 @@ def test_landsat_discovery_and_band_semantics(write_raster,tmp_path):
     assert scenes[0].quality.name.endswith("QA_PIXEL.TIF")
 
 
+@pytest.mark.parametrize('sensor,thermal_band,optical_bands', [
+    ('LC08', 'B10', (4, 5)), ('LC09', 'B10', (4, 5)),
+    ('LT05', 'B6', (3, 4)), ('LE07', 'B6', (3, 4)),
+])
+def test_l2sp_product_directory_ignores_thermal_companions_for_optical_preparation(
+        write_raster, tmp_path, sensor, thermal_band, optical_bands):
+    prefix = f'{sensor}_L2SP_181063_20260817_20260820_02_T1'
+    for number in optical_bands:
+        write_raster(f'{prefix}_SR_B{number}.TIF',
+                     np.full((2, 2), 16000, dtype='uint16'), nodata=0)
+    write_raster(f'{prefix}_QA_PIXEL.TIF', np.full((2, 2), 64, dtype='uint16'), nodata=0)
+    write_raster(f'{prefix}_QA_RADSAT.TIF', np.zeros((2, 2), dtype='uint16'), nodata=65535)
+    for suffix in (thermal_band, 'ATRAN', 'CDIST', 'DRAD', 'EMIS', 'EMSD', 'QA', 'TRAD', 'URAD'):
+        write_raster(f'{prefix}_ST_{suffix}.TIF', np.full((2, 2), 30000, dtype='uint16'), nodata=0)
+    (tmp_path / f'{prefix}_MTL.txt').write_text('GROUP = LANDSAT_METADATA_FILE\nEND\n')
+
+    scenes = cm.discover_scenes(tmp_path)
+    assert len(scenes) == 1
+    assert set(scenes[0].bands) == {'red', 'nir'}
+    assert scenes[0].quality_kind == 'landsat_qa'
+    aoi = cm.GeoDataFrame(geometry=[box(300000, 9499980, 300020, 9500000)], crs=32733)
+    result = cm.preprocess_imagery(tmp_path, tmp_path / 'optical_result', aoi=aoi)
+    assert result.report['status'] == 'complete'
+    with rasterio.open(result.products[0]['multiband']) as image:
+        assert image.count == 2
+        assert set(image.descriptions) == {'red', 'nir'}
+        np.testing.assert_allclose(image.read(), 16000 * .0000275 - .2)
+
+
+@pytest.mark.parametrize('selection', ['thermal_file', 'mixed_files', 'thermal_directory'])
+def test_explicit_or_unaccompanied_thermal_input_has_an_actionable_error(write_raster, tmp_path, selection):
+    prefix = 'LC08_L2SP_181063_20260817_20260820_02_T1'
+    thermal = write_raster(f'{prefix}_ST_B10.TIF', np.ones((2, 2), dtype='uint16'), nodata=0)
+    if selection == 'thermal_directory':
+        sources = tmp_path
+    else:
+        optical = write_raster(f'{prefix}_SR_B4.TIF', np.ones((2, 2), dtype='uint16'), nodata=0)
+        sources = [thermal, optical] if selection == 'mixed_files' else [thermal]
+    with pytest.raises(ValueError, match=r'thermique.*SR_B\*'):
+        cm.discover_scenes(sources)
+
+
+@pytest.mark.parametrize('suffix', ['ST_B11', 'ST_B6', 'UNKNOWN_B2'])
+def test_thermal_exclusion_does_not_accept_unknown_or_wrong_sensor_bands(write_raster, tmp_path, suffix):
+    prefix = 'LC08_L2SP_181063_20260817_20260820_02_T1'
+    write_raster(f'{prefix}_SR_B4.TIF', np.ones((2, 2), dtype='uint16'), nodata=0)
+    write_raster(f'{prefix}_{suffix}.TIF', np.ones((2, 2), dtype='uint16'), nodata=0)
+    with pytest.raises(ValueError, match='Unrecognized band filenames'):
+        cm.discover_scenes(tmp_path)
+
+
 def test_sentinel_discovery_reads_offsets_and_resolution_variants(write_raster,tmp_path):
     (tmp_path/"MTD_MSIL2A.xml").write_text('<root><PROCESSING_BASELINE>04.00</PROCESSING_BASELINE><BOA_QUANTIFICATION_VALUE>10000</BOA_QUANTIFICATION_VALUE><BOA_ADD_OFFSET band_id="1">-1000</BOA_ADD_OFFSET></root>')
     for resolution in [10,20]:

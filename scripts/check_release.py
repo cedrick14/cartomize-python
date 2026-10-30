@@ -2,6 +2,7 @@
 from pathlib import Path
 from email.parser import BytesParser
 from email import policy
+from configparser import ConfigParser
 import hashlib
 import json
 import os
@@ -13,6 +14,10 @@ import zipfile
 root=Path(__file__).resolve().parents[1]
 project=tomllib.loads((root/'pyproject.toml').read_text())['project']
 name,version=project['name'],project['version']
+build_config = ConfigParser()
+build_config.read(root / 'setup.cfg')
+wheel_build = build_config.get('bdist_wheel', 'build_number', fallback='').strip()
+wheel_name = f'{name}-{version}' + (f'-{wheel_build}' if wheel_build else '') + '-py3-none-any.whl'
 required_modules=(
     'desktop','desktop_imagery','imagery_pipeline','viewer_data','desktop_canvas',
     'desktop_tables','desktop_results','desktop_workbench','desktop_theme',
@@ -29,14 +34,16 @@ required_modules=(
     'vector_rings','desktop_rings',
 )
 directory=Path(sys.argv[1]) if len(sys.argv)>1 else root/'pypi-dist'
-expected={f'{name}-{version}-py3-none-any.whl',f'{name}-{version}.tar.gz'}
+expected={wheel_name,f'{name}-{version}.tar.gz'}
 assert {p.name for p in directory.iterdir() if p.is_file()}==expected, 'The distribution directory must contain only the current wheel and source archive.'
 if os.environ.get('GITHUB_REF_TYPE')=='tag':
     assert os.environ['GITHUB_REF_NAME']==f'python-v{version}', 'Release tag and package version differ.'
-wheel=directory/f'{name}-{version}-py3-none-any.whl'
+wheel=directory/wheel_name
 with zipfile.ZipFile(wheel) as z:
     metadata=BytesParser(policy=policy.default).parsebytes(z.read(f'{name}-{version}.dist-info/METADATA'))
     assert metadata['Name']==name and metadata['Version']==version
+    wheel_metadata=BytesParser(policy=policy.default).parsebytes(z.read(f'{name}-{version}.dist-info/WHEEL'))
+    assert wheel_metadata.get('Build', '') == wheel_build, 'Wheel build identifier differs from setup.cfg.'
     assert metadata['License-Expression']=='GPL-3.0-only'
     assert metadata['Requires-Python']=='>=3.11'
     assert metadata['Description-Content-Type']=='text/markdown'
@@ -56,7 +63,13 @@ with tarfile.open(directory/f'{name}-{version}.tar.gz') as archive:
     names=set(archive.getnames())
     for module in required_modules:
         assert f'{name}-{version}/src/cartomize/{module}.py' in names, f'Missing source archive module: {module}'
-    for file in ('README_PYPI.md','LICENSE','NOTICE.md','pyproject.toml','tests/test_imagery_pipeline.py',
+    for file in ('README_PYPI.md','LICENSE','NOTICE.md','pyproject.toml','setup.cfg',
+                 'docs/RELEASE_1.0.md','docs/DEMONSTRATION_1.0.md',
+                 'examples/create_imagery_demo.py','scripts/stage_pypi_upload.py',
+                 'scripts/build_demo_delivery.py','tests/test_vector_table_publication.py',
+                 'tests/test_imagery_demo_workflow.py',
+                 'tutorials/notebooks/22_demonstration_pretraitement_automatique.ipynb',
+                 'tests/test_imagery_pipeline.py',
                  'tests/test_startup.py','tests/test_results_workspace.py','tests/test_desktop_workbench.py',
                  'tests/test_workbench_viewports.py','docs/RESULTS_WORKSPACE.md','docs/WORKBENCH.md',
                  'tests/test_imagery_audit.py','tests/test_raster_integrity.py',

@@ -783,6 +783,8 @@ def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--wheel',required=True)
     parser.add_argument('--output',required=True)
+    parser.add_argument('--extra',choices=('gui','notebook'),default='gui',
+                        help='Installation profile to verify in the clean environment.')
     args=parser.parse_args()
     wheel=Path(args.wheel).resolve()
     report=Path(args.output).resolve();report.parent.mkdir(parents=True,exist_ok=True)
@@ -795,10 +797,12 @@ def main():
         python=target/('Scripts/python.exe' if os.name=='nt' else 'bin/python')
         environment=dict(os.environ,QT_QPA_PLATFORM='offscreen',MPLBACKEND='Agg')
         environment.pop('PYTHONPATH',None)
-        subprocess.run([str(python),'-m','pip','install','-q',str(wheel)+'[gui]'],cwd=temp,env=environment,check=True,timeout=600)
+        subprocess.run([str(python),'-m','pip','install','-q',str(wheel)+f'[{args.extra}]'],cwd=temp,env=environment,check=True,timeout=600)
         subprocess.run([str(python),'-m','pip','check'],cwd=temp,env=environment,check=True,timeout=60)
         subprocess.run([str(python),'-I',str(Path(__file__).resolve()),'--probe',str(report),version],cwd=temp,env=environment,check=True,timeout=180)
         subprocess.run([str(python),'-I','-m','cartomize','--help'],cwd=temp,env=environment,check=True,timeout=60)
+        if args.extra=='notebook':
+            subprocess.run([str(python),'-I','-m','jupyterlab','--version'],cwd=temp,env=environment,check=True,timeout=60)
 
 
 if __name__=='__main__':

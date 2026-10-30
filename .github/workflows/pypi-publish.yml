@@ -11,6 +11,10 @@ on:
         type: choice
         default: check
         options: [check, testpypi, pypi]
+      delivery:
+        description: 'Publish the verified wheel, sources and demonstration on GitHub'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -52,10 +56,57 @@ jobs:
           python scripts/check_release.py pypi-dist
       - uses: actions/upload-artifact@v4
         with:
-          name: cartomize-pypi-distributions
+          name: cartomize-complete-distributions
           path: pypi-dist/*
           if-no-files-found: error
           retention-days: 14
+      - name: Stage files eligible for the selected public version
+        run: python scripts/stage_pypi_upload.py pypi-dist publish-dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cartomize-pypi-distributions
+          path: publish-dist/*
+          if-no-files-found: error
+          retention-days: 14
+      - name: Build the portable demonstration delivery
+        run: python scripts/build_demo_delivery.py --dist-dir pypi-dist --output delivery-dist/cartomize-1.0-presentation.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cartomize-demonstration-delivery
+          path: delivery-dist/*
+          if-no-files-found: error
+          retention-days: 14
+
+  delivery:
+    needs: [build, windows-conda]
+    if: >-
+      github.repository == 'cedrick14/cartomize-python' && (
+      (github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[publish delivery]')) ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.delivery))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: cartomize-complete-distributions
+          path: pypi-dist/
+      - uses: actions/download-artifact@v4
+        with:
+          name: cartomize-demonstration-delivery
+          path: delivery-dist/
+      - name: Publish the complete Cartomize 1.0 delivery
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_COMMIT: ${{ github.sha }}
+        run: >-
+          gh release create cartomize-1.0-20261030 pypi-dist/* delivery-dist/*.zip
+          --target "$RELEASE_COMMIT" --latest
+          --title "Cartomize 1.0 — édition consolidée"
+          --notes-file docs/RELEASE_1.0.md
 
   publish:
     needs: [build, windows-conda]

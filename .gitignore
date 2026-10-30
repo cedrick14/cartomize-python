@@ -5,5 +5,7 @@ __pycache__/
 build/
 dist/
 pypi-dist/
+publish-dist/
+delivery-dist/
 .venv/
 *.log

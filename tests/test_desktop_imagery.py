@@ -42,6 +42,8 @@ def test_selected_bands_pipeline_and_portable_session(application, write_raster,
     monkeypatch.setattr(QFileDialog,'getOpenFileNames',lambda *a,**kw:(files,''))
     window=CartomizeWindow();window.select_tool('prepare');page=window.tool('prepare')
     page.select_files();assert page.assets.rowCount()==8
+    assert page.preparation_mode.currentData() == 'automatic'
+    assert all(scene.quality and scene.quality_kind == 'landsat_qa' for scene in page.selected_scenes())
     page.aoi.edit.setText(str(aoi));assert page.clip.isChecked()
     page.colour.setChecked(True);page.separate.setChecked(True)
     page.rgb_red.setCurrentIndex(page.rgb_red.findData('nir'))
@@ -60,6 +62,9 @@ def test_selected_bands_pipeline_and_portable_session(application, write_raster,
     restored_page.output.edit.setText(str(tmp_path));restored_page.name.setText('restored')
     restored.start();finish(restored)
     record=json.loads(Path(restored.output_path).read_text())
+    assert record['status'] == 'complete' and record['mosaic']
+    assert len(record['selected_scene_ids']) == 2
+    assert rasterio.crs.CRS.from_user_input(record['parameters']['crs']).to_epsg() == 32733
     with rasterio.open(record['products'][0]['multiband']) as src:
         assert src.width==2 and src.count==4
         np.testing.assert_allclose(src.read(3),10400*.0000275-.2,atol=1e-7)

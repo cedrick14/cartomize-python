@@ -254,6 +254,9 @@ class PreparationPage(Page):
             self.inventory.setText(str(exc))
 
     def load_inputs(self):
+        # A failed reload must never leave the previous scene recommendation
+        # available for a new (or now empty) band selection.
+        self.invalidate_diagnostic()
         self.assets.setRowCount(0)
         self.quality_masks.setRowCount(0)
         sources = list(self.files) if self.files else self.source.text()
@@ -489,7 +492,9 @@ class PreparationPage(Page):
             return f"{record.get(key, 0):.2f}".replace('.', ',')
         advice = {
             'single_scene': "Une scène atteint la couverture demandée ; la mosaïque n’est pas nécessaire pour ce seuil.",
-            'mosaic': "La combinaison des scènes atteint la couverture demandée ; une mosaïque est proposée.",
+            'mosaic': ("La combinaison des scènes atteint la couverture demandée ; la mosaïque sera réalisée automatiquement à l’exécution."
+                       if self.preparation_mode.currentData() == 'automatic' else
+                       "La combinaison des scènes atteint la couverture demandée ; une mosaïque est proposée."),
             'additional_scenes': "La couverture demandée n’est pas atteinte. Compléter les acquisitions pour les secteurs manquants.",
         }.get(record.get('recommended_action'), "Consulter le rapport de couverture.")
         missing = max(0, record.get('aoi_pixels', 0) - record.get('usable_pixels', 0))
@@ -528,8 +533,18 @@ class PreparationPage(Page):
         threshold = f"{record.get('coverage_threshold', self.coverage_threshold.value()):.2f}".replace('.', ',')
         policy = ("Seuil demandé atteint." if record.get('threshold_met') else
                   "Résultat sous le seuil accepté explicitement ; les lacunes restent sans données.")
+        decision = (f"Mosaïque automatique de {len(record.get('selected_scene_ids', []))} scènes."
+                    if record.get('mosaic') else
+                    "Une seule scène retenue ; aucune mosaïque nécessaire.")
+        grid = record.get('parameters', {})
+        grid_details = ""
+        if grid.get('crs') and grid.get('resolution_m') is not None:
+            authority = rasterio.crs.CRS.from_user_input(grid['crs']).to_authority()
+            crs_label = ':'.join(authority) if authority else 'projection personnalisée (voir le rapport)'
+            grid_details = f"Grille commune : {crs_label} ; résolution {grid['resolution_m']:g} m.\n"
         self.coverage_summary.setText(f"{label}.\nCouverture utile : {percentage} % ; seuil : {threshold} %.\n"
-                                      f"{policy}\nScènes retenues : {selected}.\n"
+                                      f"{policy}\n{decision}\n{grid_details}Découpage à la zone d’étude réalisé.\n"
+                                      f"Scènes retenues : {selected}.\n"
                                       "Diagnostic, cartes de lacunes et résultats disponibles dans le projet.")
         self.apply_audit_button.setEnabled(False)
         if partial:
