@@ -8,7 +8,7 @@ import pytest
 pytest.importorskip('PySide6')
 from PySide6.QtCore import Qt
 from PySide6.QtTest import QTest
-from PySide6.QtWidgets import QApplication, QLabel, QLineEdit, QToolButton
+from PySide6.QtWidgets import QApplication, QFormLayout, QLabel, QLineEdit, QToolButton, QVBoxLayout, QWidget
 
 from cartomize.desktop import AtlasPage, Page
 from cartomize.desktop_classification import ClassificationPage
@@ -96,6 +96,54 @@ def test_operational_summary_stays_visible_when_its_details_are_collapsed(applic
             assert detail.isVisible() == checked
     finally:
         help_section.close()
+
+
+@pytest.mark.parametrize('font_size', [12, 16])
+@pytest.mark.parametrize('header_kind', ['summary', 'title'])
+def test_help_header_and_details_wrap_fully_in_a_narrow_form(application, font_size, header_kind):
+    host = QWidget()
+    font = host.font()
+    font.setPixelSize(font_size)
+    host.setFont(font)
+    layout = QVBoxLayout(host)
+    fields = QWidget()
+    form = QFormLayout(fields)
+    form.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
+    form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.WrapAllRows)
+    explanation = 'Toutes les bandes cochées sont incluses dans le résultat multibande de la zone sélectionnée.'
+    if header_kind == 'title':
+        note = QLabel('Traitements vectoriels')
+        note.setWordWrap(True)
+        section = Page.context_help(explanation, heading=note)
+    else:
+        section = Page.context_help(explanation, summary='Seules les bandes cochées sont traitées.')
+        note = section.findChild(QLabel, 'helpSummary')
+    form.addRow(section)
+    layout.addWidget(fields)
+    layout.addStretch()
+    detail = section.findChild(QLabel, 'helpText')
+    button = section.findChild(QToolButton, 'helpToggle')
+    try:
+        for width in (260, 220, 320):
+            host.resize(width, 600)
+            host.show()
+            collapsed_height = None
+            for checked in (False, True, False):
+                button.setChecked(checked)
+                QTest.qWait(20)
+                assert note.isVisible()
+                assert note.height() >= note.heightForWidth(note.width())
+                assert detail.isVisible() == checked
+                if checked:
+                    assert detail.height() >= detail.heightForWidth(detail.width())
+                elif collapsed_height is None:
+                    collapsed_height = section.height()
+                else:
+                    assert section.height() == collapsed_height
+                assert button.geometry().right() < section.width()
+    finally:
+        host.close()
+        application.processEvents()
 
 
 def test_operation_specific_help_and_calibration_controls_remain_scoped(application):

@@ -71,7 +71,8 @@ class Page(QWidget):
     def context_help(text,*,subject="Cet outil",heading=None,summary=None,content=None):
         """Keep explanatory text available without hiding operational messages."""
         section=QWidget();section.setObjectName("contextHelp")
-        section.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Maximum)
+        # Form rows must keep their wrapped height even when the detail is hidden.
+        section.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Expanding)
         layout=QVBoxLayout(section);layout.setContentsMargins(0,0,0,0);layout.setSpacing(3)
         row=QHBoxLayout();row.setContentsMargins(0,0,0,0)
         if heading is not None:
