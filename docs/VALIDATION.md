@@ -2,28 +2,35 @@
 
 ## Cartomize 1.9.0 — M11 / G06, conversion et conditionnement
 
-La suite finale du 30 octobre 2026 réussit **1 283 tests, avec 2 exclusions
-prévues et aucun échec**, en **371,923 s** sous Linux / Python 3.12.14.
-Elle comprend les **152 nouveaux cas** depuis 1.8.0 : 44 pour la conversion
-vectorielle, 58 pour la conversion raster, 14 pour les interfaces publiques,
-21 pour la fenêtre et 15 ajoutés au lecteur vectoriel. Les exclusions locales
-concernent le matériel CUDA et QGIS natif, qui possède un contrôle distant.
+Le dernier passage local de la suite complète, au commit `0dd9bf6`, réussit
+**1 283 tests, avec 2 exclusions prévues et aucun échec**, en **371,923 s**
+sous Linux / Python 3.12.14. Il comprend 152 nouveaux cas. Les exclusions
+locales concernent le matériel CUDA et QGIS natif, qui possède un contrôle
+distant. Ce passage précède le dernier ajustement des deux libellés de boutons.
 
-La première passe avait détecté une attente périmée dans le script de
-démarrage : 20 outils au lieu des 21 désormais présents. Cette assertion a
-été corrigée, les quatre tests de démarrage ont été réexécutés, puis toute
-la suite a été relancée. La première matrice Windows a ensuite révélé un
-débordement du sélecteur de couche dans deux tailles de police. Une consigne
-plus courte corrige sa largeur minimale, avec l’aide complète conservée.
-Les deux nouveaux cas de police élargie échouent contre l’ancien code puis
-passent après correction. Sources, tests et scripts sont à nouveau figés
-pour la suite finale complète ci-dessus. Le précontrôle compact Windows
-inclut désormais ce formulaire avant de lancer la longue suite.
+Après ce passage, le seul changement applicatif est le texte des actions
+de résultats. Les mesures natives Windows identifiaient deux boutons de
+392 px, portant la page à 442 px pour 431 px disponibles. Les actions
+**« Ouvrir le rapport »** et **« Afficher les données »** corrigent cette
+contrainte, après le raccourcissement du sélecteur de couche. Les assertions
+de lisibilité et d’absence de défilement horizontal sont conservées.
+
+Les sources finales réussissent **22 tests G06 sous Linux**, puis **18
+contrôles compacts sous Linux et 18 sous Windows natif**. Le
+[contrôle Windows ciblé](https://github.com/cedrick14/cartomize-python/actions/runs/41037116801/job/124000572042)
+utilise exactement la commande compacte de production. Le cas raster à 12 px
+ajouté après la suite locale porte les régressions nouvelles à **153** :
+44 vectorielles, 58 raster, 14 interfaces publiques, 22 graphiques et 15 pour
+le lecteur vectoriel. Le diagnostic de géométrie reste disponible en cas
+d’échec. La matrice complète du commit final est suivie dans la PR nº 9.
 
 Les **17 notebooks autonomes exécutent 115 cellules**, sans erreur, dans
 des noyaux Jupyter neufs. La wheel 1.9.0 réussit **23 contrôles** après
 installation isolée hors du dépôt, avec `pip check` réussi. Ses **96 modules
-Python** correspondent exactement aux sources testées. Les deux leçons
+Python** correspondent exactement aux sources finales, y compris les deux
+libellés corrigés. Le parcours local des notebooks précède ce dernier
+ajustement graphique ; les moteurs et les cours sont inchangés, et la matrice
+de la PR exécute également le parcours avec la révision livrée. Les deux leçons
 demandant les données privées de `Tuto.zip` restent hors de la passe autonome.
 
 Les [contrôles G06 sur données réelles](VALIDATION_G06_REAL.json) réussissent

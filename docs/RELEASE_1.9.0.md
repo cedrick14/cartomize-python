@@ -72,20 +72,30 @@ courte ; l’aide complète reste dans le formulaire. Deux cas avec caractères
 élargis reproduisent l’échec de l’ancien code et contrôlent la correction,
 sans autoriser de défilement horizontal ni de texte illisible. Ce formulaire
 fait aussi partie du contrôle Windows exécuté avant la suite complète.
+Une mesure native a ensuite isolé les deux boutons de résultats, qui
+imposaient chacun 392 px dans un panneau de 431 px. Leurs libellés deviennent
+« Ouvrir le rapport » et « Afficher les données ». Le cas raster à 12 px
+complète le contrôle, et les 18 vérifications compactes passent ensuite sur
+Windows avec les sources finales.
 
 ## Validation
 
 | Contrôle local final | Résultat |
 |---|---|
-| Suite complète sur Linux / Python 3.12.14 | **1 283 réussis, 2 exclus, 0 échec**, en 371,923 s |
-| Cas ajoutés depuis 1.8.0 | **152**, tous inclus dans la suite complète |
+| Suite locale complète au commit `0dd9bf6`, avant les deux derniers libellés | **1 283 réussis, 2 exclus, 0 échec**, en 371,923 s |
+| Interface G06 finale sous Linux | **22 contrôles réussis** |
+| Commande compacte de production sur les sources finales | **18 réussis sous Linux et 18 sous Windows** |
+| Cas ajoutés depuis 1.8.0 | **153**, dont le dernier cas raster à 12 px couvert par les contrôles compacts |
 | Parcours Jupyter autonome | **17 cours, 115 cellules, 0 erreur** |
 | Wheel installée dans un environnement neuf hors du dépôt | **23 contrôles réussis**, 96 modules identiques aux sources |
 | Données réelles et contrôle analytique portable | **12 contrôles réussis**, entrées inchangées |
 
 Les exclusions locales concernent le matériel CUDA et le moteur QGIS natif.
-Le contrôle QGIS distant et la matrice Windows/Ubuntu restent associés au
-commit de la demande d’intégration. Les deux cours demandant `Tuto.zip` ne
+Le dernier changement applicatif se limite à deux textes de boutons. Le
+rapport distingue les empreintes de la suite locale complète et celles des
+sources finales, contrôlées par l’interface, Windows et le paquet installé.
+Le contrôle QGIS distant et la matrice complète Windows/Ubuntu restent
+associés au commit final de la demande d’intégration. Les deux cours demandant `Tuto.zip` ne
 font pas partie de la passe autonome.
 
 Le [rapport de livraison](VALIDATION_1.9.0.json) conserve les résultats de la
