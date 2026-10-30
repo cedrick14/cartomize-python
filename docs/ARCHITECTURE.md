@@ -168,3 +168,18 @@ moteur au formulaire Vecteur et à ses résultats persistants.
 Le lecteur `vector_io.py` sépare les attributs Arrow et les WKB natifs pour FlatGeobuf, puis aligne les enregistrements par FID vérifié : ce chemin évite un crash natif sur les géométries nulles en conservant les entiers nullables exacts et les sélections. Les autres pilotes conservent leur chemin existant.
 
 Le moteur raster vérifie les pixels par blocs, les masques et les métadonnées avant publication. Les compagnons nécessaires à une livraison font partie de son manifeste et des projets portables. Le binaire COG n’est pas rouvert en écriture après sa création. Voir le [contrat G06](DATA_CONVERSION.md).
+
+## Tables croisées des surfaces — M13
+
+`vector_tabulation.tabulate_area` construit des groupes aux identités typées,
+dissout les zones et catégories, calcule les intersections polygonales et contrôle
+les bilans en unités projetées. `AreaTabulationResult` contient `data`, `table`,
+`matrix`, `zones`, `categories`, `gaps`, `overlaps` et `summary`. Les sorties
+géométriques utilisent le SCR d’analyse et des coordonnées XY.
+
+`processing._write_vector_tabulation` écrit quatre GeoPackage avec le writer
+typé vérifié et trois CSV accompagnés de schémas, relus avec fidélité exacte des
+flottants et libellés. L’audit rassemble tables et empreintes. La publication
+se fait dans le dossier atomique commun ; l’annulation n’expose aucun résultat
+partiel. Le formulaire `desktop_tabulation` appelle ce même opérateur et ses
+produits nommés, avec conservation des choix dans les sessions et projets CMZ.

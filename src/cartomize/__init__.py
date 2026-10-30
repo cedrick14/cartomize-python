@@ -29,7 +29,7 @@ from .relations import analyze_relations
 from .automation import plan_cartography,run_plan,propose_layouts
 from .mapops import snapshot_project,compare_snapshots,record_review,verify_review
 
-__version__ = "1.10.0"
+__version__ = "1.11.0"
 __display_version__ = ".".join(__version__.split(".")[:2])
 
 
@@ -88,6 +88,8 @@ __all__ += ['select_attributes', 'select_location', 'geometry_operation',
             'spatial_summary', 'join_attributes', 'latest_records']
 from .vector_selection import VectorSelectionResult, extract_features
 __all__ += ['VectorSelectionResult', 'extract_features']
+from .vector_tabulation import AreaTabulationResult, tabulate_area
+__all__ += ['AreaTabulationResult', 'tabulate_area']
 from .vector_quality_result import VectorQualityResult
 from .vector_quality import audit_geometries, repair_geometries
 from .vector_topology import check_topology

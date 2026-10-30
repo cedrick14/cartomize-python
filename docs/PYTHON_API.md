@@ -352,3 +352,14 @@ Les dossiers de sortie doivent être nouveaux. Les deux résultats exposent `dat
 ## Extraction attributaire et spatiale avec audit
 
 `cm.extract_features(data, filters=[{"field": "valeur", "comparison": "gt", "value": 0}], mask=masque)` renvoie un `VectorSelectionResult` avec `data`, `rejected`, `report`, `summary`. `cm.execute_operation("vector.extract_features", parametres, dossier_neuf)` publie les partitions et rapports vérifiés. Voir les conventions, types et exemples dans le [guide G07](VECTOR_SELECTION.md).
+
+## Table croisée des surfaces polygonales
+
+`cm.tabulate_area(zones, classes, zone_field="code", class_field="classe",
+metric_crs="EPSG:32733", area_unit="ha")` renvoie un `AreaTabulationResult`
+avec `data`, `table`, `matrix`, `zones`, `categories`, `gaps`, `overlaps`,
+`summary`. Choisir une projection adaptée à l’étude. Les groupes de même
+identité sont dissous ; les recouvrements entre catégories sont refusés par
+défaut. `overlap_policy="report"` les conserve avec un bilan explicite.
+`cm.execute_operation("vector.tabulate_area", parametres, dossier_neuf)`
+publie et vérifie tous les produits. Voir le [contrat G09](VECTOR_TABULATION.md).

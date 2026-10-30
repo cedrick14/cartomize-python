@@ -1,5 +1,37 @@
 # Tests et validation
 
+## Cartomize 1.11.0 — M13 / G09, table croisée des surfaces
+
+La suite complète sur les sources figées réussit **1 619 tests**, avec
+**2 exclusions prévues et aucun échec**, en **408.966 s** sous Linux/Python
+3.12.14. Les 150 nouvelles régressions se répartissent entre le
+moteur (99), les interfaces (14), la fenêtre (16) et l’oracle indépendant (21).
+Les sources, tests, scripts et workflows restent identiques avant et après
+la passe complète.
+
+Les **13 scénarios réels** réussissent : 80 zones × 8 classes donnent 640 cellules,
+dont 283 cellules nulles, avec 357 géométries d’intersection. Les sept fichiers
+sources sont inchangés. Les produits sont rouverts avec contrôle des géométries,
+attributs, tableaux et empreintes.
+
+Le cours 20 exécute **11 cellules** dans un noyau neuf (6.87 s) ; le site
+exporte **21 leçons**. La wheel installée hors du dépôt dans un environnement
+neuf réussit **29 contrôles**, avec `pip check` réussi et **100 modules identiques
+aux sources**. Les deux exclusions locales concernent CUDA et QGIS. Les
+matrices Windows/Ubuntu et le contrôle QGIS distant restent attachés au commit
+exact testé sur GitHub ; leurs résultats sont lus sur la révision finale de la PR.
+
+Les références analytiques utilisent un découpage rectangulaire Python et la
+formule des lacets sur les limites réelles. La comparaison des polygones
+d’occupation du sol partage GEOS avec un ordre d’opérations différent ; la
+reprojection partage PROJ. Les budgets de comparaison et les résidus observés
+figurent dans [VALIDATION_G09_REAL.json](VALIDATION_G09_REAL.json). Le moteur
+conserve sa tolérance de fermeture `1e-6 m² + 1e-8 × surface de référence`.
+
+Les résultats détaillés, versions et empreintes sont dans
+[VALIDATION_1.11.0.json](VALIDATION_1.11.0.json). Voir la
+[note 1.11.0](RELEASE_1.11.0.md) et le [guide G09](VECTOR_TABULATION.md).
+
 ## Cartomize 1.10.0 — M12 / G07, extraction avec bilan
 
 La suite finale sur les sources figées réussit **1 469 tests, 2 exclusions

@@ -63,3 +63,13 @@ la même opération `vector.extract_features`. Voir le [guide G07](VECTOR_SELECT
 ## Conversion et formats — ajouté en 1.9.0
 
 Le module M11/G06 relie une inspection explicite des entrées aux conversions vectorielles et raster, à la comparaison des fichiers relus et au rapport de fidélité. La page dédiée, les commandes `convert-vector` et `convert-raster`, les plans et l’API appellent le même moteur. Le [guide G06](DATA_CONVERSION.md) précise les six formats de livraison, les paramètres, les différences autorisables et les incompatibilités refusées.
+
+## Table croisée des surfaces — ajouté en 1.11.0
+
+M13/G09 complète le croisement de zonages et de catégories polygonales dans
+l’outil Vecteur existant. La même opération `vector.tabulate_area` relie l’API,
+le terminal, les plans, le cours 20 et la fenêtre. Les identités sont typées,
+les doublons de groupe sont dissous, les catégories superposées font l’objet
+d’une règle explicite, et les totaux distinguent couverture, lacunes, emprise
+ambiguë et excès de comptage. Les quatre GeoPackage et les trois tableaux CSV
+sont relus avant publication. Voir le [guide G09](VECTOR_TABULATION.md).

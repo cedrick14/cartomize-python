@@ -257,3 +257,13 @@ Les options de conversion sont celles de l’[API G06](DATA_CONVERSION.md). Les 
 ## Produits de l’extraction G07
 
 L’opération `vector.extract_features` publie `data`, `rejected`, `report`, `audit` et `summary`. Une étape peut prendre `@selection:data` et une autre `@selection:rejected`. Les deux couches conservent le schéma source ; les positions et motifs restent dans le rapport. Voir le [guide G07](VECTOR_SELECTION.md).
+
+## Produits du croisement G09
+
+`vector.tabulate_area` reçoit `zones`, `classes`, `zone_field`, `class_field`,
+les noms de couches, la projection de mesure, l’unité et les politiques de
+recouvrement et de valeurs manquantes. Il publie `data` (primaire), `table`,
+`matrix`, `zones`, `categories`, `gaps`, `overlaps`, `audit`, `summary`.
+Les couches `@surfaces:zones` et `@surfaces:gaps`, par exemple, peuvent devenir
+les sources d’étapes suivantes. Tous les fichiers géométriques utilisent la
+couche `features` dans le SCR projeté d’analyse. Voir le [guide G09](VECTOR_TABULATION.md).

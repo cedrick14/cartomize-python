@@ -125,6 +125,20 @@ def main(argv=None):
         'covered_by', 'touches', 'overlaps', 'crosses', 'disjoint'], default='intersects')
     extraction.add_argument('--combination', choices=['and', 'or'], default='and')
     extraction.add_argument('--invert', action='store_true', help='Invert the final combined selection')
+    tabulation = subs.add_parser('tabulate-area', help='Cross-tabulate polygon categories by zone with area balances and overlap diagnostics')
+    tabulation.add_argument('zones')
+    tabulation.add_argument('classes')
+    tabulation.add_argument('destination', help='New directory for all intersections, tables and diagnostics')
+    tabulation.add_argument('--zone-field', required=True, help='Attribute defining zone groups')
+    tabulation.add_argument('--class-field', required=True, help='Attribute defining category groups')
+    tabulation.add_argument('--zones-layer', help='Explicit zone layer name')
+    tabulation.add_argument('--classes-layer', help='Explicit category layer name')
+    tabulation.add_argument('--metric-crs', help='Projected CRS used for analysis and geometry outputs')
+    tabulation.add_argument('--area-unit', choices=['m2', 'ha', 'km2'], default='ha')
+    tabulation.add_argument('--overlap-policy', choices=['error', 'report'], default='error',
+                            help='Refuse or explicitly report overlaps between different categories')
+    tabulation.add_argument('--zone-overlap-policy', choices=['independent', 'error'], default='independent')
+    tabulation.add_argument('--null-classes', choices=['error', 'unclassified'], default='error')
     conversion_vector = subs.add_parser('convert-vector', help='Convert a selected vector layer and verify every saved record')
     conversion_vector.add_argument('source')
     conversion_vector.add_argument('destination', help='New directory for data, sidecars and verification reports')
@@ -291,6 +305,14 @@ def main(argv=None):
                 parameters.update(block_size=args.block_size, overviews=args.overviews,
                                   resampling=args.resampling, loss_policy=args.loss_policy)
                 result = cm.execute_operation('raster.convert', parameters, args.destination)
+        elif args.command == 'tabulate-area':
+            import cartomize as cm
+            result = cm.execute_operation('vector.tabulate_area', dict(zones=args.zones, classes=args.classes,
+                zone_field=args.zone_field, class_field=args.class_field,
+                zones_layer=args.zones_layer, classes_layer=args.classes_layer,
+                metric_crs=args.metric_crs, area_unit=args.area_unit,
+                overlap_policy=args.overlap_policy, zone_overlap_policy=args.zone_overlap_policy,
+                null_classes=args.null_classes), args.destination)
         elif args.command == 'extract-features':
             import cartomize as cm
             filters = json.loads(Path(args.filters).read_text(encoding='utf-8')) if args.filters else None

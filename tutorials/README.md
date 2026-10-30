@@ -1,6 +1,6 @@
 # Cartomize : projets pratiques
 
-**Sources Cartomize 1.9.0**
+**Sources Cartomize 1.11.0**
 
 Préparer des images, analyser des couches et produire des cartes reproductibles avec Cartomize. Le parcours associe des explications, du code exécutable, des résultats enregistrés et des exercices corrigés.
 
@@ -75,14 +75,15 @@ L’interface de bureau est facultative pour ce parcours. Les calculs et cartes 
 | [15](notebooks/15_reprojection_vectorielle_par_lot.ipynb) | Reprojection vectorielle par lot | 30 min | Découverte multicouche, coordonnées de référence, GeoPackage, emprises et chaîne de tampons |
 | [16](notebooks/16_harmonisation_fusion_vectorielle.ipynb) | Harmonisation et fusion de couches | 30 min | Schéma commun, types exacts, provenance, valeurs manquantes et chaîne de tampons |
 | [17](notebooks/17_g01_controle_reparation_geometries.ipynb) | G01 : contrôle et réparation des géométries | 35 min | Couche source, règles, grille XY, effets séparés, exclusions et comparaison avant/après |
-
 | [18](notebooks/18_conversion_conditionnement.ipynb) | G06 : conversion et conditionnement | 30 min | GeoPackage, GeoJSON, Shapefile, FlatGeobuf, GeoTIFF/COG, NoData et relecture comparative |
+| [19](notebooks/19_extraction_attributaire_spatiale.ipynb) | G07 : extraction avec bilan | 30 min | Retenus, exclus, critères combinés et décisions |
+| [20](notebooks/20_table_croisee_surfaces.ipynb) | G09 : table croisée des surfaces | 35 min | Matrice, catégories, couverture, lacunes et recouvrements |
 
 Pour découvrir la valeur de l’automatisation : **00 → 02 → 13 → 07 → 08**. Pour une formation complète : suivre l’ordre du tableau. Chaque notebook recrée ses entrées pédagogiques et peut être exécuté indépendamment.
 
 ## Cas réels
 
-Les cours 11 et 12 utilisent les cinq jeux de données contenus dans `Tuto.zip`. Le fichier source n’est pas redistribué dans le dépôt. Les cours 00 à 10 et 13 à 18 génèrent leurs propres données et n’exigent aucun téléchargement géographique.
+Les cours 11 et 12 utilisent les cinq jeux de données contenus dans `Tuto.zip`. Le fichier source n’est pas redistribué dans le dépôt. Les cours 00 à 10 et 13 à 20 génèrent leurs propres données et n’exigent aucun téléchargement géographique.
 
 Pour les personnes disposant de l’archive :
 
@@ -115,3 +116,7 @@ Cours et code : ONDON NKOUA Cédrick Belmich / Cartomize. Les scripts suivent la
 ## Cours 19 — Extraction attributaire et spatiale
 
 Le [cours 19](notebooks/19_extraction_attributaire_spatiale.ipynb) utilise des observations simulées pour vérifier les critères multiples, ET/OU, l’inversion, les dates natives, les limites spatiales et la publication des retenus et exclus. Il réutilise ensuite les exclus dans un plan et contrôle l’annulation et les empreintes des entrées. Aucun jeu de données privé n’est nécessaire.
+
+## Table croisée des surfaces
+
+Le [cours 20](notebooks/20_table_croisee_surfaces.ipynb) crée des zones et catégories simulées, vérifie les surfaces à la main, distingue emprise de recouvrement et excès de comptage, puis publie les fichiers, appelle le terminal et reprend les lacunes dans un plan. Il contrôle aussi l’annulation et les empreintes des sources.

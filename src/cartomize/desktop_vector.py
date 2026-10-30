@@ -12,11 +12,12 @@ from .tableio import read_table
 from .desktop_tools_base import VectorPage as BaseVectorPage, write_result
 from .desktop_vector_quality import VectorQualityControls
 from .desktop_selection import SelectionControls
+from .desktop_tabulation import TabulationControls
 from .vector_workflows import (select_attributes, select_location, geometry_operation,
                                spatial_summary, join_attributes, latest_records)
 
 
-class VectorPage(SelectionControls, VectorQualityControls, BaseVectorPage):
+class VectorPage(TabulationControls, SelectionControls, VectorQualityControls, BaseVectorPage):
     EXTRA = [('Sélection par attribut', 'select_attributes'), ('Sélection spatiale', 'select_location'),
              ('Synthèse par zone', 'spatial_summary'), ('Jointure attributaire', 'join_attributes'),
              ('Dernier relevé par identifiant', 'latest_records'), ('Centroïdes', 'centroid'),
@@ -90,12 +91,16 @@ class VectorPage(SelectionControls, VectorQualityControls, BaseVectorPage):
             control.textChanged.connect(lambda *_: self._fields_timer.start())
             control.editingFinished.connect(self.refresh_fields)
         self.init_selection_controls()
+        self.init_tabulation_controls()
         self._advanced_ready = True
         self.changed()
 
     def refresh_fields(self):
         import pyogrio
         op = self.operation.currentData()
+        if op == 'tabulate_area':
+            self.refresh_tabulation_layers()
+            return
         if op == 'extract_features':
             self.refresh_selection_layers()
             return
@@ -173,9 +178,12 @@ class VectorPage(SelectionControls, VectorQualityControls, BaseVectorPage):
         self.update_reprojection_controls()
         self.update_merge_controls()
         self.update_selection_controls()
+        self.update_tabulation_controls()
 
     def job(self, options):
         op = self.operation.currentData()
+        if op == 'tabulate_area':
+            return self.tabulation_job(options)
         if op == 'extract_features':
             return self.selection_job(options)
         if op in {key for _, key in self.QUALITY_OPERATIONS}:
@@ -246,6 +254,7 @@ class VectorPage(SelectionControls, VectorQualityControls, BaseVectorPage):
         """Restore conditional controls after loading a saved desktop session."""
         self.restore_quality_controls()
         self.restore_selection_controls()
+        self.restore_tabulation_controls()
         self.changed()
         self.restore_reprojection_controls()
         self.restore_merge_controls()

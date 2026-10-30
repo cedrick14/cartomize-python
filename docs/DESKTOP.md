@@ -333,3 +333,15 @@ La session conserve les paramètres et les choix de couches. Une source modifié
 ## Extraction avec bilan (G07)
 
 Dans la page Vecteur, choisir « Extraction avec bilan ». Sélectionner les couches source et masque, ajouter les critères, puis choisir ET/OU et l’inversion éventuelle. Les valeurs d’une liste se saisissent une par ligne. Le traitement crée un nouveau dossier contenant les retenus, les exclus et les rapports ; les boutons rouvrent ces produits. Les choix et les résultats sont conservés dans la session. Voir le [guide G07](VECTOR_SELECTION.md).
+
+## Table croisée des surfaces (G09)
+
+Dans la page Vecteur, choisir « Table croisée des surfaces ». Sélectionner
+chaque fichier, sa couche et son champ de regroupement. La projection, l’unité,
+les règles de recouvrement et les catégories manquantes sont explicites. Le
+worker capture les choix avant lancement et conserve les résultats associés
+à cette exécution. Les boutons ouvrent intersections, surfaces par catégorie,
+matrice, bilan par zone, registre, lacunes, recouvrements et synthèse. Le bilan
+par zone s’ouvre sur les attributs de sa couche. Les sources, paramètres et
+produits sont conservés dans les sessions et archives portables. Voir le
+[guide G09](VECTOR_TABULATION.md).
