@@ -5,9 +5,10 @@
   "procedures": [
     "G06"
   ],
-  "generated_at_utc": "2026-10-30T09:06:41.571976+00:00",
+  "generated_at_utc": "2026-10-30T09:38:04.318498+00:00",
   "baseline_commit": "7d06bb4a554ddc316363b3b6296379d9ec422258",
-  "source_identity_note": "Hashes identify the final tested implementation; the baseline commit predates the uncommitted G06 work. Final distribution reuses the exact installed wheel; documentation and proof are then added to the source archive.",
+  "previous_candidate_commit": "8d2d2f0e2266ec1356d832b29f5c730de08cd5cf",
+  "source_identity_note": "The baseline is version 1.8.0. Hashes identify the final tested G06 implementation after the Windows form correction. The final distribution reuses the exact installed wheel; documentation and proof are then added to the source archive.",
   "tested_source_sha256": {
     "src/cartomize/__init__.py": "95b635bfb434334d316e2d7f99c21ffe04e2017178e698cf59f262a1e6cbe3cd",
     "src/cartomize/__main__.py": "79ee6f134c5c5193377cf9b189cbdcc3e2095e49ba9cec310114441c15a917c4",
@@ -42,7 +43,7 @@
     "src/cartomize/desktop_classification.py": "3fbeeb301a8fd5fe74c3e302477b67687f95569504783cb0e38b684bd2ba4e2a",
     "src/cartomize/desktop_connections.py": "d7e3bc8a579ac20ef1bfe2bce60bb0549cb0eaa4be8ccabca7cb5fbb51792c7b",
     "src/cartomize/desktop_console.py": "4b8ff4bc35bc980da89bf76a0e9b15ddb100f30eafe4bdd3b86f9668e15fa9f4",
-    "src/cartomize/desktop_conversion.py": "cca8c2445361bc5bed713bfe3e56110e9b904810bb82fe388b9312c3b7116b64",
+    "src/cartomize/desktop_conversion.py": "1d049e55dcc1c42428bfdfa0fbcd06036ebe5de5bd2096a21f14e581e5870eb0",
     "src/cartomize/desktop_execution.py": "152a0c18e696491fd1cd6f7bb3ff9f248306f07d7c02a47f3922b7a6f29f951b",
     "src/cartomize/desktop_explorer.py": "c05e2456f3b9b01932abd411eb783987a22ce8a17a4f2641b53c9f4f864fc75b",
     "src/cartomize/desktop_imagery.py": "11cd79b0cc7714dadb95a881d8a40fb7aeea929f785796ac696059bf518d83cd",
@@ -117,7 +118,7 @@
     "tests/test_conversion_interfaces.py": "b9d2cd9715309b42fb56eb05c94da050f889b7ecaf8f568e517f9d8e848e9f69",
     "tests/test_desktop.py": "e3cc93f2f79d71a4d2e05dac8c93b9a6b3d2383fbefcf87f755c8dcfb982b208",
     "tests/test_desktop_adaptive.py": "d09431b3e02d975ff4a58df22d63b5f9a518226bb9df5847b99acceb08f5d9ce",
-    "tests/test_desktop_conversion.py": "7f0b9e114a27ce5a4c282342b83e5a10759b6f4bf15387c83534366baccb8975",
+    "tests/test_desktop_conversion.py": "9ffc98aa5a06a61d3e261cbd871bb1d6d903097d4277646341e46e2d64f6afe3",
     "tests/test_desktop_execution.py": "da78421f58554782df5d82c1f8fc38a832287ea4d59782c4b1fce5cd6c1c5b72",
     "tests/test_desktop_expansion.py": "e2a5f6d764e1dc75772b45e64e3a38ac121baa455f676d00bcfed98811c48902",
     "tests/test_desktop_imagery.py": "68760e1dcc91676c39018e746a45b582142b5bedf0eb080209cfd97c72b7e825",
@@ -215,41 +216,48 @@
     }
   },
   "full_suite": {
-    "tests": 1283,
+    "tests": 1285,
     "failures": 0,
     "errors": 0,
     "skipped": 2,
-    "passed": 1281,
-    "junit_seconds": 329.795,
+    "passed": 1283,
+    "junit_seconds": 371.923,
     "skip_reasons": [
       "No CUDA device/runtime: hardware validation required",
       "QGIS runtime not configured"
     ],
     "command": "QT_QPA_PLATFORM=offscreen MPLBACKEND=Agg OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 python -m pytest -q --junitxml=full-suite.xml",
-    "log_sha256": "bcfae74b4a1906abfb355e005d43fc70f939221f9d75d577b3c7bbc17038cc81",
-    "junit_sha256": "03c917a3e182ddb6b2077e8476b7eae02511e8a3b292c045d9eb5514d43fe8d0",
+    "log_sha256": "4ad8f3ef202c1ce81cc94c976f55166ffbacc1ca5bdb6abe86ac702fd06576d2",
+    "junit_sha256": "261a1160f09979d36190fbd443b424b5980ec338aa5956ffd80da7fbbae49c85",
     "application_sources_unchanged": true,
     "all_test_sources_unchanged": true,
     "source_check": "All 96 application modules, all tests and all validation scripts snapshotted before the final complete run.",
-    "initial_gate_correction": "The initial full run passed 1280 tests but check_startup.py still expected 20 tools. Updated this validation assertion to 21; all four startup tests passed, then the full suite was rerun. No application source was changed."
+    "initial_gate_correction": "An early run corrected check_startup.py from 20 to 21 tools. The first complete candidate then passed 1281 local tests. Windows CI revealed two compact vector-form overflows caused by the layer-combo placeholder. The placeholder was shortened without changing the full help, two wide-font regression cases were added, and the final complete gate was rerun."
   },
   "new_regressions": {
-    "net_new_cases": 150,
+    "net_new_cases": 152,
     "new_files": {
       "tests/test_vector_conversion.py": 44,
       "tests/test_raster_conversion.py": 58,
       "tests/test_conversion_interfaces.py": 14,
-      "tests/test_desktop_conversion.py": 19
+      "tests/test_desktop_conversion.py": 21
     },
     "extended_file": "tests/test_vector_io.py",
     "all_included_in_full_suite": true
   },
+  "windows_form_correction": {
+    "first_candidate": "8d2d2f0e2266ec1356d832b29f5c730de08cd5cf",
+    "observed": "All four initial Windows jobs failed only the vector compact-window cases at 12 and 16 px; horizontal overflows were 21 and 5 px.",
+    "change": "Short layer-selector placeholder; full analysis help unchanged. Two wide-font cases retain zero horizontal scrolling, minimum control widths and text readability assertions.",
+    "regression_proof": "Both added cases failed against the previous desktop module loaded in memory, then passed with the correction.",
+    "early_ci_gate": "The existing Windows compact-window gate now includes the conversion form before the full suite."
+  },
   "notebooks": {
     "passed": 17,
     "code_cells": 115,
-    "seconds_sum": 85.44,
+    "seconds_sum": 89.21,
     "requires_local_data": 2,
-    "execution": "One fresh Jupyter TCP kernel per autonomous lesson, using the final application sources. Historical notebook files restored from baseline after execution; G06 output retained.",
+    "execution": "One fresh Jupyter TCP kernel per autonomous lesson, using the final application sources. Notebook source files restored to the previous candidate after execution and source verification; the already executed G06 notebook is retained.",
     "input_notebook_sha256": {
       "tutorials/notebooks/00_premiere_carte.ipynb": "f3f49901f35f9e358567f0f392f076e9fa2349804c1cbd0c7da293c4e65675ad",
       "tutorials/notebooks/01_superposition_vectorielle.ipynb": "cad40e945aa7f299c73afa32c5600e6a321cdffd9ff8f0fbbdb0d4433b6c274e",
@@ -269,10 +277,10 @@
       "tutorials/notebooks/15_reprojection_vectorielle_par_lot.ipynb": "3cb962e6a89458fb306cb9cb47c3e634775114137f714ee96da34a8db36069d2",
       "tutorials/notebooks/16_harmonisation_fusion_vectorielle.ipynb": "2f033e3fa3ef91e44057756de9d3884d92adab743030b74b20e98f10e0cc5a37",
       "tutorials/notebooks/17_g01_controle_reparation_geometries.ipynb": "3a92c89b438c361e0eeade611df7718dc11f9a69d4efd57dcb3721995ed4404f",
-      "tutorials/notebooks/18_conversion_conditionnement.ipynb": "477f60a6377043a0be59cc26b1db4e27cb926ad4a2fc71d867e2ed6ca864db73"
+      "tutorials/notebooks/18_conversion_conditionnement.ipynb": "363d11592d27d1a5f39c05a85f06be64a70fa18251ec93fb0f38a5a142fb64a9"
     },
     "runtime": {
-      "started_at_utc": "2026-10-30T08:59:15.734679+00:00",
+      "started_at_utc": "2026-10-30T09:32:09.385577+00:00",
       "command": [
         "/workspace/scratch/eeb1697666d1/cartomize-env/bin/python",
         "tutorials/scripts/execute.py",
@@ -290,6 +298,8 @@
         "OMP_NUM_THREADS": "2",
         "OPENBLAS_NUM_THREADS": "2"
       },
+      "head": "8d2d2f0e2266ec1356d832b29f5c730de08cd5cf",
+      "dependency_changes_during_this_run": [],
       "dependency_completion": {
         "initial_failure": "Notebook 03 could not import ipywidgets.",
         "requirement": "tutorials/requirements.txt: ipywidgets>=8,<9",
@@ -301,14 +311,8 @@
         "preexisting_packages_changed": false,
         "evidence": "notebooks-initial-environment-install.log"
       },
-      "initial_evidence": [
-        "notebooks-initial-run.log",
-        "notebooks-initial-execution.json",
-        "notebooks-initial-runtime.json",
-        "notebooks-initial-before.json"
-      ],
-      "ended_at_utc": "2026-10-30T09:00:42.006015+00:00",
-      "wall_seconds": 86.264,
+      "ended_at_utc": "2026-10-30T09:33:39.482687+00:00",
+      "wall_seconds": 90.097,
       "runner_exit_code": 0,
       "passed_lessons": 17,
       "passed_code_cells": 115,
@@ -317,80 +321,87 @@
         "11_mvouti_concessions.ipynb",
         "12_okapis_raster_classe.ipynb"
       ],
-      "lesson_seconds_sum": 85.44,
+      "lesson_seconds_sum": 89.21,
       "restoration_evidence": "notebooks-after.json",
-      "historical_notebooks_verified_at_head": 18,
-      "historical_notebooks_with_outputs_restored": 16,
-      "new_notebook_kept_executed": true,
+      "restoration_method": "Verify stable sources, then restore exact pre-run HEAD bytes for all 19 notebooks (00-18). The committed notebook 18 already contains successful execution outputs.",
+      "historical_notebooks_verified_at_head": 19,
+      "historical_notebooks_with_outputs_restored": 17,
+      "notebooks_verified_at_head": 19,
+      "notebooks_with_outputs_restored": 17,
+      "new_notebook_kept_executed": false,
+      "lesson_18_restored_to_committed_successful_execution": true,
       "executed_nonempty_code_cells": 115,
-      "all_notebook_sources_unchanged": true
+      "all_notebook_sources_unchanged": true,
+      "tracked_gallery_restored": true,
+      "gallery_artifacts_moved": 6,
+      "generated_artifacts_git_status": ""
     },
     "results": [
       {
         "notebook": "00_premiere_carte.ipynb",
         "status": "passed",
         "code_cells": 6,
-        "seconds": 5.9
+        "seconds": 8.17
       },
       {
         "notebook": "01_superposition_vectorielle.ipynb",
         "status": "passed",
         "code_cells": 6,
-        "seconds": 4.22
+        "seconds": 4.74
       },
       {
         "notebook": "02_pretraitement_multispectral.ipynb",
         "status": "passed",
         "code_cells": 7,
-        "seconds": 3.44
+        "seconds": 3.85
       },
       {
         "notebook": "03_indices_algebre.ipynb",
         "status": "passed",
         "code_cells": 7,
-        "seconds": 3.43
+        "seconds": 4.61
       },
       {
         "notebook": "04_classification.ipynb",
         "status": "passed",
         "code_cells": 7,
-        "seconds": 4.12
+        "seconds": 4.28
       },
       {
         "notebook": "05_surfaces_changements.ipynb",
         "status": "passed",
         "code_cells": 7,
-        "seconds": 4.38
+        "seconds": 4.94
       },
       {
         "notebook": "06_terrain_reseaux.ipynb",
         "status": "passed",
         "code_cells": 5,
-        "seconds": 3.49
+        "seconds": 2.82
       },
       {
         "notebook": "07_mise_en_page_atlas.ipynb",
         "status": "passed",
         "code_cells": 5,
-        "seconds": 11.11
+        "seconds": 9.74
       },
       {
         "notebook": "08_automatisation.ipynb",
         "status": "passed",
         "code_cells": 6,
-        "seconds": 6.2
+        "seconds": 6.48
       },
       {
         "notebook": "09_projets_controle.ipynb",
         "status": "passed",
         "code_cells": 6,
-        "seconds": 3.14
+        "seconds": 2.37
       },
       {
         "notebook": "10_catalogues_execution.ipynb",
         "status": "passed",
         "code_cells": 4,
-        "seconds": 4.75
+        "seconds": 3.21
       },
       {
         "notebook": "11_mvouti_concessions.ipynb",
@@ -404,66 +415,66 @@
         "notebook": "13_diagnostic_automatique.ipynb",
         "status": "passed",
         "code_cells": 7,
-        "seconds": 3.49
+        "seconds": 4.47
       },
       {
         "notebook": "14_qualite_vectorielle.ipynb",
         "status": "passed",
         "code_cells": 8,
-        "seconds": 7.16
+        "seconds": 9.26
       },
       {
         "notebook": "15_reprojection_vectorielle_par_lot.ipynb",
         "status": "passed",
         "code_cells": 8,
-        "seconds": 6.86
+        "seconds": 6.53
       },
       {
         "notebook": "16_harmonisation_fusion_vectorielle.ipynb",
         "status": "passed",
         "code_cells": 8,
-        "seconds": 5.86
+        "seconds": 5.35
       },
       {
         "notebook": "17_g01_controle_reparation_geometries.ipynb",
         "status": "passed",
         "code_cells": 9,
-        "seconds": 4.46
+        "seconds": 4.57
       },
       {
         "notebook": "18_conversion_conditionnement.ipynb",
         "status": "passed",
         "code_cells": 9,
-        "seconds": 3.43
+        "seconds": 3.82
       }
     ],
-    "log_sha256": "b28c9d7122d6018e8fa367f3f1fea0a51776c4db5995bce0a4ae19c9f82148f7",
+    "log_sha256": "4624157dd27670ccda9b750c72c630e44a42050ce9afbc432cb71eb896ef5a12",
     "environment_correction": "Initial run lacked ipywidgets, already declared in tutorials/requirements.txt. Added ipywidgets 8.1.9, widgetsnbextension 4.0.16 and jupyterlab_widgets 3.0.17; no pre-existing package upgraded or removed. Final complete course rerun passed."
   },
   "real_data": {
     "report": "docs/VALIDATION_G06_REAL.json",
-    "report_sha256": "07eaba6b4639e9f8d4e62e5f46a65727995b7797b16e43728682bdc40f2b6e35",
+    "report_sha256": "f7b46d008e2b244a5698f42acef4f83f2e2487ec3cacda8cf8238594e935f569",
     "script": "scripts/validate_data_conversion_real.py",
     "script_sha256": "526482b4f12857548084837cdd3576fc9467589c6a6c68094e1303bfb5308181",
     "passed": 12,
     "failed": 0,
-    "seconds": 0.813,
+    "seconds": 1.228,
     "source_files": 6,
     "application_module_hashes_match": true,
     "scope": "80 pinned Paris polygons: all 240 scalar attributes and 8366 coordinate pairs per format. Four real Sentinel cutout conversions: 53248 values and masks. Separate 4096-pixel analytic COG/PAM and portable-project check."
   },
   "installed_wheel": {
     "filename": "cartomize-1.9.0-py3-none-any.whl",
-    "sha256": "bd20f70113172c7918e11c6951d42d41ac166df0d275e5eca26189eda5fc5acd",
-    "bytes": 495768,
+    "sha256": "a44754327a6550330acad3424bee8ef1129195d8b3280f079706b8c0c19a5398",
+    "bytes": 495804,
     "python_modules": 96,
     "all_modules_match_sources": true,
     "probe": {
       "status": "passed",
       "version": "1.9.0",
       "python": "3.12.14",
-      "executable": "/tmp/cartomize-install-kba8_xi4/venv/bin/python",
-      "module": "/tmp/cartomize-install-kba8_xi4/venv/lib/python3.12/site-packages/cartomize/__init__.py",
+      "executable": "/tmp/cartomize-install-q6os5l3t/venv/bin/python",
+      "module": "/tmp/cartomize-install-q6os5l3t/venv/lib/python3.12/site-packages/cartomize/__init__.py",
       "check_count": 23,
       "checks": [
         "installed desktop and 21 tool pages",

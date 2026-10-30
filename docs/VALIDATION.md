@@ -2,19 +2,23 @@
 
 ## Cartomize 1.9.0 — M11 / G06, conversion et conditionnement
 
-La suite finale du 30 octobre 2026 réussit **1 281 tests, avec 2 exclusions
-prévues et aucun échec**, en **329,795 s** sous Linux / Python 3.12.14.
-Elle comprend les **150 nouveaux cas** depuis 1.8.0 : 44 pour la conversion
+La suite finale du 30 octobre 2026 réussit **1 283 tests, avec 2 exclusions
+prévues et aucun échec**, en **371,923 s** sous Linux / Python 3.12.14.
+Elle comprend les **152 nouveaux cas** depuis 1.8.0 : 44 pour la conversion
 vectorielle, 58 pour la conversion raster, 14 pour les interfaces publiques,
-19 pour la fenêtre et 15 ajoutés au lecteur vectoriel. Les exclusions locales
+21 pour la fenêtre et 15 ajoutés au lecteur vectoriel. Les exclusions locales
 concernent le matériel CUDA et QGIS natif, qui possède un contrôle distant.
 
 La première passe avait détecté une attente périmée dans le script de
 démarrage : 20 outils au lieu des 21 désormais présents. Cette assertion a
 été corrigée, les quatre tests de démarrage ont été réexécutés, puis toute
-la suite a été relancée. Les modules applicatifs n’ont pas changé entre
-les deux passes ; sources, tests et scripts de validation sont figés pour
-le résultat final ci-dessus.
+la suite a été relancée. La première matrice Windows a ensuite révélé un
+débordement du sélecteur de couche dans deux tailles de police. Une consigne
+plus courte corrige sa largeur minimale, avec l’aide complète conservée.
+Les deux nouveaux cas de police élargie échouent contre l’ancien code puis
+passent après correction. Sources, tests et scripts sont à nouveau figés
+pour la suite finale complète ci-dessus. Le précontrôle compact Windows
+inclut désormais ce formulaire avant de lancer la longue suite.
 
 Les **17 notebooks autonomes exécutent 115 cellules**, sans erreur, dans
 des noyaux Jupyter neufs. La wheel 1.9.0 réussit **23 contrôles** après

@@ -1,8 +1,8 @@
 {
   "schema": "cartomize.validation_g06_real.v1",
-  "generated_at_utc": "2026-10-30T08:50:56.224369+00:00",
+  "generated_at_utc": "2026-10-30T09:32:16.923850+00:00",
   "cartomize_version": "1.9.0",
-  "repository_head_at_validation": "7d06bb4a554ddc316363b3b6296379d9ec422258",
+  "repository_head_at_validation": "8d2d2f0e2266ec1356d832b29f5c730de08cd5cf",
   "code_state": "Module hashes identify the tested working sources; HEAD may precede uncommitted implementation.",
   "validation_script_sha256": "526482b4f12857548084837cdd3576fc9467589c6a6c68094e1303bfb5308181",
   "tested_source_sha256": {
@@ -86,7 +86,7 @@
     "/workspace/scratch/eeb1697666d1/cartomize-python/tests/data/sentinel2_mvouti/nir.tif": "d0d4ace7d2b0a10edc9f6646f9d6284965c243e0cd3540a835fd4e13724df581",
     "/workspace/scratch/eeb1697666d1/cartomize-python/tests/data/sentinel2_mvouti/scl.tif": "49458db506c4d4d650804c123540813c4fc0b5001a192c4350e459e946b1bbd8"
   },
-  "output_directory": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-4jiry4kt",
+  "output_directory": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-iailkzo7",
   "downloaded_files": 0,
   "method": "Original JSON properties/coordinates, independent SQLite/WKB and DBF/SHP decoding, full raster-array comparison; no pass relies solely on a Cartomize summary.",
   "analytic_fixture": "Separate deterministic 64x64 raster with one NoData sample, custom dataset/band metadata and two overview levels.",
@@ -122,8 +122,8 @@
       "row_order_preserved": true,
       "crs_preserved": true,
       "driver": "GPKG",
-      "output": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-4jiry4kt/paris_gpkg/data.gpkg",
-      "output_sha256": "b0cebb022a1171f862f09f5f21c2de46b3fca2713599818b91a2e7c382de4dca"
+      "output": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-iailkzo7/paris_gpkg/data.gpkg",
+      "output_sha256": "02e335a97832ca18e911544dff70c49bea8fcf4d33ff5ab27d415764526d6276"
     },
     {
       "name": "Paris -> GeoJSON: every JSON scalar, coordinate and row",
@@ -137,7 +137,7 @@
       "row_order_preserved": true,
       "crs_preserved": true,
       "driver": "GeoJSON",
-      "output": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-4jiry4kt/paris_geojson/data.geojson",
+      "output": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-iailkzo7/paris_geojson/data.geojson",
       "output_sha256": "43532da5525e70191a3dddf62a6d5af2f4d785e69bb2159bf9c9c39feb68dbc1"
     },
     {
@@ -156,7 +156,7 @@
       "row_order_preserved": true,
       "crs_preserved": true,
       "driver": "FlatGeobuf",
-      "output": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-4jiry4kt/paris_fgb/data.fgb",
+      "output": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-iailkzo7/paris_fgb/data.fgb",
       "output_sha256": "83bb667f41e3345e3d389570b44ffe0c47d7a8ccb702217af396fc7e2103f984"
     },
     {
@@ -177,7 +177,7 @@
       "row_order_preserved": true,
       "crs_preserved": true,
       "driver": "ESRI Shapefile",
-      "output": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-4jiry4kt/paris_shapefile/data.shp",
+      "output": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-iailkzo7/paris_shapefile/data.shp",
       "output_sha256": "f61965052f9b5ab8df6170a97ae7dad05873232fb37e9662b57d1bd6778482cd"
     },
     {
@@ -198,7 +198,7 @@
       "driver": "GTiff",
       "oracle": "Full source arrays and metadata; independent NumPy comparisons; shared GDAL TIFF decoder",
       "source_band": "red",
-      "output": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-4jiry4kt/sentinel_red_gtiff/data.tif",
+      "output": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-iailkzo7/sentinel_red_gtiff/data.tif",
       "output_sha256": "be4cd987f3164a33ce0c5abeaeabd3a69683d191f4f64fea0929599824c51fa2"
     },
     {
@@ -219,7 +219,7 @@
       "driver": "COG",
       "oracle": "Full source arrays and metadata; independent NumPy comparisons; shared GDAL TIFF decoder",
       "source_band": "nir",
-      "output": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-4jiry4kt/sentinel_nir_cog/data.tif",
+      "output": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-iailkzo7/sentinel_nir_cog/data.tif",
       "output_sha256": "f8eb9c519cf0898bd2a93fbc6535ab41e0139b7338ca7e99571a268d48be971c"
     },
     {
@@ -240,7 +240,7 @@
       "driver": "COG",
       "oracle": "Full source arrays and metadata; independent NumPy comparisons; shared GDAL TIFF decoder",
       "source_band": "scl",
-      "output": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-4jiry4kt/sentinel_scl_cog/data.tif",
+      "output": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-iailkzo7/sentinel_scl_cog/data.tif",
       "output_sha256": "911a949e42f4ae01c2eee784db381da8992d7fd27793d199b960be905903943b"
     },
     {
@@ -261,7 +261,7 @@
       "driver": "GTiff",
       "oracle": "Full source arrays and metadata; independent NumPy comparisons; shared GDAL TIFF decoder",
       "source_band": "red",
-      "output": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-4jiry4kt/sentinel_red_float/data.tif",
+      "output": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-iailkzo7/sentinel_red_float/data.tif",
       "output_sha256": "418ea3d5b11c5cde7ec068ed93d745da32783b1dd4f60e8cdd2a9abc3d74fed9"
     },
     {
@@ -282,7 +282,7 @@
       "driver": "COG",
       "oracle": "Full source arrays and metadata; independent NumPy comparisons; shared GDAL TIFF decoder",
       "fixture_type": "analytic",
-      "pam_companion": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-4jiry4kt/analytic_pam/delivery/data.tif.aux.xml",
+      "pam_companion": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-iailkzo7/analytic_pam/delivery/data.tif.aux.xml",
       "pam_band_metadata_parsed_independently": true,
       "pam_band_tag": {
         "sensor": "G06 analytic sensor"
@@ -309,8 +309,8 @@
       "oracle": "Full source arrays and metadata; independent NumPy comparisons; shared GDAL TIFF decoder",
       "fixture_type": "analytic",
       "original_paths_unavailable": true,
-      "portable_archive": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-4jiry4kt/portable_cog.cmz",
-      "restored_data": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-4jiry4kt/portable_restored/assets/fbcf94c0be94e036/data.tif",
+      "portable_archive": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-iailkzo7/portable_cog.cmz",
+      "restored_data": "/workspace/scratch/eeb1697666d1/g06-real-validation/run-iailkzo7/portable_restored/assets/104804da444e636a/data.tif",
       "colocated_pam_exact": true,
       "all_manifest_files_present": true,
       "missing_dependencies": []
@@ -347,5 +347,5 @@
     "src/cartomize/vector_reprojection.py": "bfeb607775acf4b181ce29e05a97c9ad4aa1c62f7d6c055a385327a3a0596d6e"
   },
   "status": "passed",
-  "duration_seconds": 0.813
+  "duration_seconds": 1.228
 }

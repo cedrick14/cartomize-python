@@ -9,7 +9,7 @@ tous les cours avec la version courante.
 
 La réexécution du 30 octobre 2026 réussit **17 notebooks autonomes et
 115 cellules de code non vides, sans erreur**, dans un noyau Jupyter neuf par
-cours. Elle dure **86,264 secondes**, dont **85,44 secondes cumulées** dans
+cours. Elle dure **90,097 secondes**, dont **89,21 secondes cumulées** dans
 les leçons, sous Linux / Python 3.12.14. Les deux études 11 et 12 demandant les
 données locales de `Tuto.zip` sont exclues par le script officiel.
 
@@ -17,9 +17,11 @@ Le [cours 18](notebooks/18_conversion_conditionnement.ipynb) ajoute neuf
 cellules : inspection multicouche, quatre formats vectoriels, vérification
 SQLite des attributs, COG et NoData, comparaison des pixels et masques,
 refus d’un débordement, chaîne de conversions et retrait explicite du NoData.
-Ses résultats et sa figure sont enregistrés. Les fichiers historiques 00 à 17
-retrouvent exactement leur contenu antérieur après la validation ; leurs
-sorties anciennes ne sont pas utilisées comme preuve de cette nouvelle passe.
+Ses résultats et sa figure sont enregistrés. Après le correctif du formulaire
+Windows, les 19 cours ont été relus et les 17 autonomes réexécutés. Les fichiers
+00 à 18 retrouvent exactement leur contenu antérieur après vérification de
+leurs sources ; les sorties déjà enregistrées ne sont pas utilisées comme
+preuve de cette nouvelle passe.
 
 La première passe avait révélé l’absence locale d’`ipywidgets`, pourtant
 déclaré dans `requirements.txt`. Cette dépendance et ses deux composants de

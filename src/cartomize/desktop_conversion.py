@@ -80,7 +80,8 @@ class ConversionPage(Page):
         self.vector_section = QWidget()
         vector = _form(self.vector_section)
         self.layer = _combo([])
-        self.layer.setPlaceholderText('Analyser puis choisir la couche')
+        # Qt includes the placeholder in the minimum width, even after selection.
+        self.layer.setPlaceholderText('Choisir la couche')
         self.layer.setEnabled(False)
         self.vector_driver = _combo(VECTOR_FORMATS)
         self.encoding = _combo([(value, value) for value in ('UTF-8', 'CP1252', 'ISO-8859-1')], editable=True)

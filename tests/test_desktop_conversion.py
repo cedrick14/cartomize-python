@@ -16,8 +16,9 @@ from shapely.geometry import Point
 
 pytest.importorskip('PySide6')
 from PySide6.QtCore import QEventLoop, QSettings, Qt, QTimer
+from PySide6.QtGui import QFont
 from PySide6.QtTest import QTest
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QStyle, QStyleOptionComboBox
 
 from cartomize.desktop_conversion import ConversionPage
 from cartomize.desktop_session import capture_widgets, restore_widgets
@@ -317,9 +318,28 @@ def test_conversion_uses_worker_and_loads_data_report_and_transfers(application,
         application.processEvents()
 
 
-@pytest.mark.parametrize('kind,font_size', [('vector', 12), ('vector', 16), ('raster', 16)])
-def test_conversion_controls_fit_compact_window(application, tmp_path, monkeypatch, kind, font_size):
+@pytest.mark.parametrize('kind,font_size,wide_layer_metrics', [
+    pytest.param('vector', 12, False, id='vector-12'),
+    pytest.param('vector', 16, False, id='vector-16'),
+    pytest.param('raster', 16, False, id='raster-16'),
+    pytest.param('vector', 12, True, id='vector-12-wide-layer'),
+    pytest.param('vector', 16, True, id='vector-16-wide-layer'),
+])
+def test_conversion_controls_fit_compact_window(application, tmp_path, monkeypatch, kind, font_size, wide_layer_metrics):
     import cartomize.desktop as desktop
+    if wide_layer_metrics:
+        import cartomize.desktop_conversion as conversion
+        original_combo = conversion._combo
+
+        def wide_combo(choices, *args, **kwargs):
+            control = original_combo(choices, *args, **kwargs)
+            if not choices:  # Layer selector, before Qt caches its size hint.
+                font = control.font()
+                font.setLetterSpacing(QFont.SpacingType.AbsoluteSpacing, font_size / 2)
+                control.setFont(font)
+            return control
+
+        monkeypatch.setattr(conversion, '_combo', wide_combo)
     monkeypatch.setattr(desktop, 'QSettings', lambda *args: QSettings(str(tmp_path / 'compact.ini'), QSettings.Format.IniFormat))
     window = desktop.CartomizeWindow()
     try:
@@ -355,6 +375,11 @@ def test_conversion_controls_fit_compact_window(application, tmp_path, monkeypat
         if kind == 'vector':
             header = page.field_map.horizontalHeader()
             assert header.height() >= header.fontMetrics().height() + 12
+            option = QStyleOptionComboBox()
+            page.layer.initStyleOption(option)
+            text_area = page.layer.style().subControlRect(QStyle.ComplexControl.CC_ComboBox, option,
+                QStyle.SubControl.SC_ComboBoxEditField, page.layer)
+            assert page.layer.fontMetrics().horizontalAdvance(page.layer.placeholderText()) <= text_area.width()
         assert page.vector_section.isVisible() == (kind == 'vector')
         assert page.raster_section.isVisible() == (kind == 'raster')
     finally:

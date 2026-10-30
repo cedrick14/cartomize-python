@@ -65,12 +65,20 @@ pas rouvert en écriture après sa création ; un compagnon PAM conserve les
 métadonnées que le pilote ne copie pas dans le binaire. Le rapport indique
 explicitement si cette livraison dépend de fichiers associés.
 
+La matrice Windows a révélé un débordement du formulaire vectoriel aux tailles
+de texte 12 et 16 px : Qt utilisait toute la consigne du sélecteur de couche
+pour calculer sa largeur minimale. Le sélecteur affiche désormais une consigne
+courte ; l’aide complète reste dans le formulaire. Deux cas avec caractères
+élargis reproduisent l’échec de l’ancien code et contrôlent la correction,
+sans autoriser de défilement horizontal ni de texte illisible. Ce formulaire
+fait aussi partie du contrôle Windows exécuté avant la suite complète.
+
 ## Validation
 
 | Contrôle local final | Résultat |
 |---|---|
-| Suite complète sur Linux / Python 3.12.14 | **1 281 réussis, 2 exclus, 0 échec**, en 329,795 s |
-| Cas ajoutés depuis 1.8.0 | **150**, tous inclus dans la suite complète |
+| Suite complète sur Linux / Python 3.12.14 | **1 283 réussis, 2 exclus, 0 échec**, en 371,923 s |
+| Cas ajoutés depuis 1.8.0 | **152**, tous inclus dans la suite complète |
 | Parcours Jupyter autonome | **17 cours, 115 cellules, 0 erreur** |
 | Wheel installée dans un environnement neuf hors du dépôt | **23 contrôles réussis**, 96 modules identiques aux sources |
 | Données réelles et contrôle analytique portable | **12 contrôles réussis**, entrées inchangées |
