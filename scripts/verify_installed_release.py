@@ -161,6 +161,7 @@ def probe(output, expected):
         checks.extend(_conversion_checks(cm, root, window, wait_for))
         checks.extend(_selection_checks(cm, root, window, wait_for))
         checks.extend(_tabulation_checks(cm, root, window, wait_for))
+        checks.extend(_rings_checks(cm, root, window, wait_for))
         points=root/'points.gpkg'
         gpd.GeoDataFrame({'nom':['Site A']},geometry=[Point(300300,9499700)],crs=32733).to_file(points)
         assert window.project_explorer.open_path(points) is not None
@@ -692,6 +693,87 @@ def _tabulation_checks(cm, root, window, wait_for):
         'installed G09 API: exact 60/40/0/50 cells and 100/50 coverage; same-class overlap dissolved once',
         'installed G09 worker: explicit numeric layer/field names and chosen policies publish eight verified products',
         'installed G09 views: matrix preserves 001/NA labels; per-zone balances open as attributes with 0/50 uncovered area',
+    ]
+
+
+def _rings_checks(cm, root, window, wait_for):
+    """Verify G12's installed API, actual worker and exact source/balance views."""
+    import geopandas as gpd
+    from shapely.geometry import Point, box
+    from cartomize.tableio import read_table
+
+    polygon = gpd.GeoDataFrame({'code': ['001']}, geometry=[box(0, 0, 10, 10)], crs=3857)
+    result = cm.buffer_rings(polygon, [1, 2], id_field='code', quad_segs=1, area_unit='m2')
+    assert isinstance(result, cm.BufferRingsResult)
+    assert result.table.area.tolist() == [42.0, 46.0]
+    assert result.table.lower_m.tolist() == [0.0, 1.0]
+    assert result.table.upper_m.tolist() == [1.0, 2.0]
+    assert result.balances.expected_area.tolist() == [88.0]
+    assert result.balances.overlap_area.tolist() == [0.0]
+    included = cm.buffer_rings(polygon, [1, 2], include_input=True, quad_segs=1, area_unit='m2')
+    assert included.table.area.tolist() == [142.0, 46.0]
+
+    source = root / 'g12-source.gpkg'
+    gpd.GeoDataFrame({'other': ['Alternative']}, geometry=[Point(0, 0)], crs=3857).to_file(
+        source, layer='background', index=False)
+    gpd.GeoDataFrame({'123': ['001', 'NA']}, geometry=[Point(0, 0), Point(10, 0)], crs=3857).to_file(
+        source, layer='007', index=False)
+    before = source.read_bytes()
+    window.transfer_result({'data': str(source), 'kind': 'vector'}, 'vector')
+    page = window.tool('vector')
+
+    def choose(control, value):
+        index = control.findData(value)
+        assert index >= 0, value
+        control.setCurrentIndex(index)
+
+    choose(page.operation, 'buffer_rings')
+    page.refresh_fields()
+    assert page.rings_layer.currentData() is None
+    choose(page.rings_layer, '007')
+    choose(page.rings_id, '123')
+    page.rings_distances.setText('1; 2')
+    page.rings_crs.setText('EPSG:3857')
+    choose(page.rings_mode, 'independent')
+    choose(page.rings_unit, 'm2')
+    page.rings_include_input.setChecked(False)
+    page.rings_quad_segs.setValue(1)
+    page.output.edit.setText(str(root))
+    page.rings_folder.setText('g12-installed-desktop')
+    window.run_button.click()
+    wait_for(lambda: window.thread is None)
+    operation = root / 'g12-installed-desktop' / 'operation.json'
+    assert operation.is_file(), window.status.text()
+    products = json.loads(operation.read_text(encoding='utf-8'))['products']
+    summary = json.loads(Path(products['summary']).read_text(encoding='utf-8'))
+    assert summary['parameters']['layer'] == '007'
+    assert summary['parameters']['id_field'] == '123'
+    assert summary['parameters']['mode'] == 'independent'
+    assert summary['parameters']['distances'] == [1.0, 2.0]
+    assert summary['parameters']['quad_segs'] == 1
+    assert summary['parameters']['include_input'] is False
+    assert summary['input_features'] == summary['band_count'] == summary['group_count'] == 2
+    assert read_table(products['table']).area.tolist() == [2.0, 6.0, 2.0, 6.0]
+    assert read_table(products['balances']).expected_area.tolist() == [8.0, 8.0]
+    assert source.read_bytes() == before
+    for key in ('data', 'table', 'sources', 'balances', 'summary', 'audit'):
+        assert products[key] in window.workspace.records
+        assert page._rings_buttons[key].isEnabled()
+    source_view = page.open_rings_product('sources')
+    assert source_view.views.currentWidget() is source_view._table
+    wait_for(lambda: len(source_view._table.frame) == 2)
+    assert source_view._table.frame.id_value.tolist() == ['001', 'NA']
+    page.rings_folder.setText('future')
+    page.rings_balances_button.click()
+    assert window.workspace.catalog.currentData() == products['balances']
+    balance_view = page.open_rings_product('balances')
+    wait_for(lambda: len(balance_view.frame) == 2)
+    assert balance_view.frame.closure_error.tolist() == [0.0, 0.0]
+    assert balance_view.frame.overlap_area.tolist() == [0.0, 0.0]
+    return [
+        'installed G12 API: polygon rings measure 42/46 m2; including the input changes only the first band to 142 m2',
+        'installed G12 worker: explicit layer 007, field 123, metre bounds and independent mode produce four verified rings',
+        'installed G12 views: source labels 001/NA and two 8 m2 balances reopen; all inputs remain byte-identical',
     ]
 
 

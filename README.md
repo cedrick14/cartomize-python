@@ -2,7 +2,7 @@
 
 Cartomize associe une bibliothèque Python, une interface graphique et des commandes pour le traitement géospatial et la production cartographique.
 
-La version des sources est **1.11.0**. La bibliothèque, les cellules Jupyter, les commandes du terminal et l’interface de bureau appellent les mêmes traitements. Cette version complète **G09 — Croisement de zonages et occupation du sol** : tables de surfaces, matrice par zone, catégories exactes, couverture, lacunes et recouvrements avec bilan vérifié. Voir la [note de version](docs/RELEASE_1.11.0.md) et le [guide G09](docs/VECTOR_TABULATION.md).
+La version des sources est **1.12.0**. La bibliothèque, les cellules Jupyter, les commandes du terminal et l’interface de bureau appellent les mêmes traitements. Cette version complète **G12 — Zones tampons et anneaux de distance** : couronnes à bornes métriques, fusion globale ou séries par source, intérieur des polygones explicite, identités et bilans de surface vérifiés. Voir la [note de version](docs/RELEASE_1.12.0.md) et le [guide G12](docs/VECTOR_RINGS.md).
 
 ## Installation
 
@@ -71,7 +71,7 @@ fenetre = cm.launch()
 
 Pour ouvrir cette fenêtre depuis un notebook local, installer `.[notebook]`, redémarrer le noyau puis appeler `cm.launch()`. Les notebooks distants peuvent utiliser l’API sans ouvrir de fenêtre native.
 
-Les versions publiées sont indiquées sur [PyPI](https://pypi.org/project/cartomize/). La présence de 1.11.0 dans ce dépôt ne signifie pas sa publication sur cet index. Le [guide d’installation](docs/WORKBENCH.md) décrit également l’installation d’un paquet wheel.
+Les versions publiées sont indiquées sur [PyPI](https://pypi.org/project/cartomize/). La présence de 1.12.0 dans ce dépôt ne signifie pas sa publication sur cet index. Le [guide d’installation](docs/WORKBENCH.md) décrit également l’installation d’un paquet wheel.
 
 ## Espace de travail
 
@@ -91,7 +91,7 @@ Les cartes proposent zoom, déplacement, valeurs de pixels, légendes, métadonn
 | Vecteur | Table croisée de surfaces et bilans par zone, harmonisation de schémas et fusion avec provenance, qualité avec rapports, topologie, doublons, sélections, superpositions, jointures, synthèses par zone, découpage, tampons, dissolution avec agrégation, mesures, reprojection, réparation, géométries dérivées, coordonnées XY et derniers relevés |
 | Terrain et réseaux | Dérivées topographiques, convolution, drainage D8, bassins versants et plus court chemin |
 | Cartographie | Couches, symbologie, étiquettes, 24 maquettes, cadres, légendes, échelles, atlas, PDF/PNG/SVG |
-| Automatisation | Plans, 54 opérateurs chaînables, recettes et production en série |
+| Automatisation | Plans, 55 opérateurs chaînables, recettes et production en série |
 | Projets | Sessions JSON, archives CMZ, catalogue des résultats et restauration des vues |
 
 ## Exemple Python
@@ -112,7 +112,7 @@ Le [parcours automatique](docs/IMAGERY_AUTOMATIC.md) applique le seuil de couver
 
 Le [diagnostic d’imagerie](docs/IMAGERY_AUDIT.md) mesure séparément l’emprise, la présence des bandes et les pixels utilisables après les masques. Il propose une scène unique, une mosaïque ou la recherche de scènes complémentaires. Le [tutoriel 13](tutorials/notebooks/13_diagnostic_automatique.ipynb) exécute cette décision puis le prétraitement, le NDVI et les statistiques zonales sur des données simulées.
 
-L’[inventaire de 123 procédures](docs/EXPERT_PROCEDURES.md), également disponible en [JSON](docs/EXPERT_PROCEDURES.json), relie les procédures QGIS/ArcGIS aux fonctions réellement présentes : **19 disponibles, 42 partielles et 62 absentes**. Ces statuts portent sur des procédures expertes complètes ; ils ne sont pas un comptage des opérateurs du logiciel. Les fonctions partielles gardent leurs limites explicites, notamment pour le radar, les corrections atmosphériques de niveau 1, la validation avancée et les réseaux soumis à des restrictions.
+L’[inventaire de 123 procédures](docs/EXPERT_PROCEDURES.md), également disponible en [JSON](docs/EXPERT_PROCEDURES.json), relie les procédures QGIS/ArcGIS aux fonctions réellement présentes : **20 disponibles, 41 partielles et 62 absentes**. Ces statuts portent sur des procédures expertes complètes ; ils ne sont pas un comptage des opérateurs du logiciel. Les fonctions partielles gardent leurs limites explicites, notamment pour le radar, les corrections atmosphériques de niveau 1, la validation avancée et les réseaux soumis à des restrictions.
 
 Le [module M08](docs/VECTOR_QUALITY.md) et le [cours 14](tutorials/notebooks/14_qualite_vectorielle.ipynb) exécutent les procédures G01–G03 depuis Python, Jupyter et l’interface. Chaque opération conserve les diagnostics et les entités écartées.
 
@@ -125,6 +125,8 @@ Le [module M10](docs/VECTOR_MERGE.md) et le [cours 16](tutorials/notebooks/16_ha
 Le [module M11](docs/DATA_CONVERSION.md) et le [cours 18](tutorials/notebooks/18_conversion_conditionnement.ipynb) terminent G06. Une page « Conversion et formats » réunit le choix de couche, les formats vectoriels, la livraison GeoTIFF/COG et les paramètres de précision, compression et NoData. Chaque sortie est intégralement relue et comparée avant publication.
 
 Le [module M12](docs/VECTOR_SELECTION.md) et le [cours 19](tutorials/notebooks/19_extraction_attributaire_spatiale.ipynb) terminent G07. Dans la page Vecteur, « Extraction avec bilan » combine les critères, publie les retenus et les exclus sans modifier leurs attributs et explique chaque décision dans un rapport. Les deux partitions sont réutilisables dans les plans.
+
+Le [module M14](docs/VECTOR_RINGS.md) et le [cours 21](tutorials/notebooks/21_anneaux_distance.ipynb) terminent G12. Dans la page Vecteur, « Anneaux de distance avec bilan » produit les couronnes, les intervalles, le registre des sources et les bilans. Les géométries, attributs et tables sont relus avant publication.
 
 Le [module M13](docs/VECTOR_TABULATION.md) et le [cours 20](tutorials/notebooks/20_table_croisee_surfaces.ipynb) terminent G09. Dans la page Vecteur, « Table croisée des surfaces » produit intersections, matrice, bilan par zone, catégories, lacunes et recouvrements. Les GeoPackage et CSV sont vérifiés avant publication.
 
@@ -152,7 +154,7 @@ python -m pytest
 python -m build
 python -m twine check --strict dist/*
 python scripts/check_release.py dist
-python scripts/verify_installed_release.py --wheel dist/cartomize-1.11.0-py3-none-any.whl --output reports/installed.json
+python scripts/verify_installed_release.py --wheel dist/cartomize-1.12.0-py3-none-any.whl --output reports/installed.json
 ```
 
 La validation automatise les contrôles Windows et Linux, les traitements, l’interface, les projets, les exports, la console et une installation isolée du paquet construit. Les essais CUDA et QGIS natif demandent leurs environnements respectifs. Les résultats sont associés aux versions, aux données et aux commits inscrits dans les rapports.

@@ -267,3 +267,9 @@ recouvrement et de valeurs manquantes. Il publie `data` (primaire), `table`,
 Les couches `@surfaces:zones` et `@surfaces:gaps`, par exemple, peuvent devenir
 les sources d’étapes suivantes. Tous les fichiers géométriques utilisent la
 couche `features` dans le SCR projeté d’analyse. Voir le [guide G09](VECTOR_TABULATION.md).
+
+## Produits des anneaux G12
+
+`vector.buffer_rings` prend `data`, `distances` et les choix explicites de couche, SCR projeté, mode, étiquette, intérieur des polygones, segments et unité de surface. Les produits sont `primary=data`, `data`, `sources`, `table`, `balances`, `audit` et `summary`. Les deux couches GeoPackage portent le nom `features` ; les CSV sont accompagnés de schémas.
+
+Un plan peut transmettre `@anneaux:data` comme zones à `vector.tabulate_area`, avec `zone_field="ring_id"`. Les neuf fichiers sont publiés ensemble après relecture des quatre fichiers de données. Le dossier source et les résultats existants sont protégés. [Guide G12](VECTOR_RINGS.md).

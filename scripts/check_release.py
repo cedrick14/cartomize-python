@@ -26,6 +26,7 @@ required_modules=(
     'vector_conversion','raster_conversion','desktop_conversion',
     'vector_selection','desktop_selection',
     'vector_tabulation','desktop_tabulation',
+    'vector_rings','desktop_rings',
 )
 directory=Path(sys.argv[1]) if len(sys.argv)>1 else root/'pypi-dist'
 expected={f'{name}-{version}-py3-none-any.whl',f'{name}-{version}.tar.gz'}
@@ -105,6 +106,11 @@ with tarfile.open(directory/f'{name}-{version}.tar.gz') as archive:
                  'tests/test_vector_tabulation.py','tests/test_vector_tabulation_interfaces.py',
                  'tests/test_g09_desktop.py','tests/test_g09_real_oracle.py',
                  'tutorials/notebooks/20_table_croisee_surfaces.ipynb',
+                 'docs/VECTOR_RINGS.md','docs/RELEASE_1.12.0.md','docs/VALIDATION_1.12.0.json',
+                 'docs/VALIDATION_G12_REAL.json','scripts/validate_vector_rings_real.py',
+                 'tests/test_vector_rings.py','tests/test_vector_rings_interfaces.py',
+                 'tests/test_g12_desktop.py','tests/test_g12_real_oracle.py',
+                 'tutorials/notebooks/21_anneaux_distance.ipynb',
                  'scripts/check_startup.py','scripts/check_release.py','scripts/verify_installed_release.py'):
         assert f'{name}-{version}/{file}' in names,file
 print(json.dumps({'name':name,'version':version,'files':[

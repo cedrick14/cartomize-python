@@ -363,3 +363,20 @@ identité sont dissous ; les recouvrements entre catégories sont refusés par
 défaut. `overlap_policy="report"` les conserve avec un bilan explicite.
 `cm.execute_operation("vector.tabulate_area", parametres, dossier_neuf)`
 publie et vérifie tous les produits. Voir le [contrat G09](VECTOR_TABULATION.md).
+
+## Anneaux de distance avec bilan
+
+```python
+result = cm.buffer_rings(
+    "villages.gpkg", [100, 250, 500, 1000],
+    layer="villages", metric_crs="EPSG:32733",
+    id_field="code", mode="dissolved", area_unit="ha",
+)
+result.data       # Anneaux polygonaux dans le SCR du calcul
+result.table      # Tous les intervalles, même de surface nulle
+result.sources    # Identités typées et positions sources
+result.balances   # Contrôles par groupe
+result.summary["totals"]
+```
+
+Les distances sont des bornes supérieures positives croissantes en mètres. `mode="independent"` conserve une série par source et rapporte leurs recouvrements ; `include_input=True` ajoute l’intérieur des polygones au premier intervalle. `quad_segs` règle l’approximation des arcs. Les sources restent intactes. Le SCR de cet exemple doit être adapté au territoire étudié. `execute_operation("vector.buffer_rings", paramètres, nouveau_dossier)` publie tous les produits vérifiés. [Contrat G12](VECTOR_RINGS.md).

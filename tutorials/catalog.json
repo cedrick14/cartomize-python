@@ -124,5 +124,11 @@
     "title": "G09 : table croisée des surfaces et bilans",
     "real": false,
     "minutes": 35
+  },
+  {
+    "slug": "21_anneaux_distance",
+    "title": "G12 : zones tampons et anneaux de distance",
+    "real": false,
+    "minutes": 35
   }
 ]
