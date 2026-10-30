@@ -12,6 +12,7 @@ Voir la [note de l’édition consolidée](RELEASE_1.0.md), le [guide de démons
 |---|---|
 | `cartomize-1.0-20261030-py3-none-any.whl` | Installation de la bibliothèque, des commandes et, avec l’option `gui`, de l’interface ; seul fichier prévu pour la nouvelle publication PyPI `1.0`. |
 | `cartomize-1.0.tar.gz` | Sources complètes, à distribuer avec la livraison GitHub ou sur le site du projet ; ne pas envoyer cette archive à PyPI. |
+| `cartomize-1.0-presentation.zip` | Dossier portable de présentation : roue, sources, guides, notebook et données pédagogiques synthétiques. |
 
 La roue contient `Version: 1.0` dans `METADATA` et `Build: 20261030` dans `WHEEL`. Le numéro de construction est défini dans `setup.cfg`. Les noms, tailles et empreintes SHA-256 des fichiers effectivement construits doivent être enregistrés avec le rapport de validation.
 
@@ -35,6 +36,28 @@ Le contrôle de livraison doit vérifier les deux archives, les modules attendus
 Pour cette édition, **les deux archives sont validées, mais seule la roue avec le numéro de construction `20261030` doit être envoyée à PyPI**. Le dossier transmis à l’éditeur de confiance doit donc être distinct de celui contenant l’ensemble de la livraison.
 
 La CI conserve les deux archives dans l’artefact `cartomize-complete-distributions`. Le script `scripts/stage_pypi_upload.py` sélectionne la nouvelle roue seule pour la version `1.0` ; l’artefact `cartomize-pypi-distributions` contient les fichiers destinés à l’envoi. La présence de ces artefacts ne signifie pas que le job de publication a été exécuté.
+
+## Livraison téléchargeable sur GitHub
+
+Le script suivant réunit les deux archives vérifiées, les guides, le notebook 22
+et des scènes synthétiques dans un dossier portable. Il refuse d’écraser un ZIP
+existant et enregistre les empreintes des archives.
+
+```bash
+python scripts/build_demo_delivery.py --dist-dir pypi-dist --output delivery-dist/cartomize-1.0-presentation.zip
+```
+
+Après les contrôles de construction et Windows Conda, le workflow peut publier
+la livraison complète sous le tag GitHub `cartomize-1.0-20261030`. Cette action
+demande un commit sur `main` contenant `[publish delivery]`, ou l’option manuelle
+`delivery` sur `main`. Elle est indépendante de l’envoi PyPI ; le tag ne correspond
+pas au déclencheur `python-v*`. La création de la release GitHub ne modifie donc
+pas les anciennes releases de PyPI ou de piwheels.
+
+La release comporte le wheel, l’archive source et le paquet de présentation en
+fichiers téléchargeables. Les données incluses sont simulées, avec leurs noms de
+produits et leur calibration de démonstration ; elles ne sont pas présentées
+comme des observations USGS réelles.
 
 ## Installation avant publication PyPI
 

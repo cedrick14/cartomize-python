@@ -66,6 +66,7 @@ with tarfile.open(directory/f'{name}-{version}.tar.gz') as archive:
     for file in ('README_PYPI.md','LICENSE','NOTICE.md','pyproject.toml','setup.cfg',
                  'docs/RELEASE_1.0.md','docs/DEMONSTRATION_1.0.md',
                  'examples/create_imagery_demo.py','scripts/stage_pypi_upload.py',
+                 'scripts/build_demo_delivery.py','tests/test_vector_table_publication.py',
                  'tests/test_imagery_demo_workflow.py',
                  'tutorials/notebooks/22_demonstration_pretraitement_automatique.ipynb',
                  'tests/test_imagery_pipeline.py',

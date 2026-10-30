@@ -67,6 +67,9 @@ LANDSAT_TM = {"B1":"blue", "B2":"green", "B3":"red", "B4":"nir", "B5":"swir1", "
 SENTINEL = {"B01":"coastal", "B02":"blue", "B03":"green", "B04":"red", "B05":"rededge1", "B06":"rededge2", "B07":"rededge3", "B08":"nir", "B8A":"nir_narrow", "B09":"water_vapour", "B11":"swir1", "B12":"swir2"}
 _S2_BANDS = ["B01","B02","B03","B04","B05","B06","B07","B08","B8A","B09","B10","B11","B12"]
 _LANDSAT = re.compile(r"^(L[CET]\d{2}_L2(?:SP|SR)_\d{6}_(\d{8})_\d{8}_02_[A-Z0-9]+)_(?:SR_(B\d+)|(QA_PIXEL|QA_RADSAT))\.(?:tif|tiff)$", re.I)
+_LANDSAT_THERMAL = re.compile(
+    r"^((?:LC0[89]|LE07|LT0[45])_L2SP_\d{6}_\d{8}_\d{8}_02_[A-Z0-9]+)_"
+    r"ST_(B6|B10|ATRAN|CDIST|DRAD|EMIS|EMSD|QA|TRAD|URAD)\.(?:tif|tiff)$", re.I)
 _S2 = re.compile(r"^(T\d{2}[A-Z]{3})_(\d{8}T\d{6})_(B\d{2}|B8A|SCL)_(10|20|60)m\.(?:jp2|tif|tiff)$", re.I)
 
 
@@ -103,11 +106,14 @@ def discover_scenes(inputs):
     inputs is a directory, a file, or a sequence. Metadata/QA companions are
     discovered only in the selected products. Unknown band-like filenames
     raise an error instead of guessing their sensor or wavelength.
+    Recognized L2SP thermal companions are ignored only when found in a
+    directory alongside that product's reflectance bands; explicitly selected
+    thermal files are rejected because this workflow prepares optical bands.
     Sentinel duplicates at 10/20/60 m use the finest *provided* variant.
     """
     if isinstance(inputs, (str, Path)):
         inputs = [inputs]
-    paths = set();explicit=[]
+    paths = set();explicit=[]; selected_files=set()
     for item in inputs:
         if isinstance(item,Scene):explicit.append(item);continue
         p = Path(item).expanduser().resolve()
@@ -120,10 +126,12 @@ def discover_scenes(inputs):
             if p.suffix.lower()=='.json':
                 from .catalogs import load_scenes_manifest
                 explicit.extend(load_scenes_manifest(p))
-            else:paths.add(p)
+            else:
+                paths.add(p)
+                selected_files.add(p)
         else:
             raise FileNotFoundError(p)
-    landsat, sentinel, unknown = {}, {}, []
+    landsat, sentinel, unknown, thermal = {}, {}, [], []
     for p in sorted(paths):
         match = _LANDSAT.match(p.name)
         if match:
@@ -136,6 +144,13 @@ def discover_scenes(inputs):
                     raise ValueError(f"Duplicate Landsat asset: {ident} {label}.")
                 group["files"][label] = p
             continue
+        match = _LANDSAT_THERMAL.match(p.name)
+        if match:
+            ident, code = match.groups()
+            expected = "B10" if ident[2:4] in {"08", "09"} else "B6"
+            if not code.upper().startswith("B") or code.upper() == expected:
+                thermal.append((p, ident))
+                continue
         match = _S2.match(p.name)
         if match:
             tile, acquired, code, resolution = match.groups()
@@ -153,6 +168,18 @@ def discover_scenes(inputs):
             unknown.append(p.name)
     if unknown:
         raise ValueError("Unrecognized band filenames; provide explicit Scene/Band mappings: "+", ".join(unknown[:8]))
+    optical_products = {
+        (directory, ident.casefold())
+        for (directory, ident), group in landsat.items()
+        if any(code in (LANDSAT_OLI if ident[2:4] in {"08", "09"} else LANDSAT_TM)
+               for code in group["files"])
+    }
+    for path, ident in thermal:
+        if path in selected_files or (str(path.parent), ident.casefold()) not in optical_products:
+            raise ValueError(
+                "Fichier thermique Landsat Level-2 non pris en charge par le prétraitement optique : "
+                + path.name + ". Sélectionner les bandes de réflectance SR_B* avec leurs masques QA, "
+                "ou leur dossier de produit complet. Les fichiers ST_* ne sont pas traités.")
     scenes = list(explicit)
     for (directory, ident), group in landsat.items():
         sensor_code = ident[2:4]

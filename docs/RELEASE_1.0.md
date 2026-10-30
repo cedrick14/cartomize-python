@@ -1,6 +1,6 @@
 # Cartomize 1.0 — Édition consolidée
 
-Préparation du 30 octobre 2026 pour la démonstration du 1er novembre 2026.
+Édition du 30 octobre 2026, préparée pour la démonstration du 1er novembre 2026.
 
 ## Contenu retenu
 
@@ -41,7 +41,7 @@ Une couverture insuffisante produit un diagnostic et une carte des lacunes.
 Un résultat partiel n’est produit que selon la politique explicitement choisie.
 Les scènes à dates différentes exigent également un choix explicite.
 
-Le [guide de démonstration](DEMONSTRATION_1.0.md) donne le parcours graphique,
+Le [guide de démonstration](https://github.com/cedrick14/cartomize-python/blob/main/docs/DEMONSTRATION_1.0.md) donne le parcours graphique,
 le code Jupyter et les conditions d’entrée des scènes USGS.
 
 ## Installation et distribution
@@ -50,7 +50,12 @@ Le wheel de cette édition inclut les modules déjà terminés et les points d�
 `cartomize` et `cartomize-desktop`. L’option `gui` installe l’interface ; l’option
 `notebook` installe aussi JupyterLab et son noyau Python.
 
+Les fichiers de livraison comprennent le wheel installable, l’archive source
+et `cartomize-1.0-presentation.zip`, qui rassemble les guides, le notebook 22
+et des scènes pédagogiques synthétiques prêtes à charger dans l’interface.
+Décompresser le ZIP et suivre `LISEZ_MOI.md`.
+
 L’ancienne publication PyPI portant déjà le numéro **1.0** est différente.
 Installer le fichier de cette livraison ou ses sources pour obtenir cette
-édition. Voir [PUBLICATION.md](PUBLICATION.md) avant toute publication sur
+édition. Voir [PUBLICATION.md](https://github.com/cedrick14/cartomize-python/blob/main/docs/PUBLICATION.md) avant toute publication sur
 l’index ou suppression d’une ancienne distribution.

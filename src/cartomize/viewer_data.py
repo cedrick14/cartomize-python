@@ -212,6 +212,7 @@ def table_page(path, offset=0, size=2000, layer=None):
         data = read_vector(path, layer=layer, skip_features=offset, max_features=size+1, ignore_geometry=True)
     else:
         options = {}
+        nullable_floats = {}
         separator = '\t' if path.suffix.lower() == '.tsv' else None
         engine = 'python'
         schema_path = path.with_suffix(path.suffix + '.schema.json')
@@ -225,7 +226,13 @@ def table_page(path, offset=0, size=2000, layer=None):
                 labels = schema.get('label_columns', [])
                 # Empty / NA-looking identifiers are labels. Other missing
                 # report cells are the empty values written by to_csv.
-                options = dict(dtype=types, keep_default_na=False,
+                # Nullable Float64 conversion can bypass the C round-trip
+                # parser. Restore that dtype only after exact double parsing.
+                nullable_floats = {name: dtype for name, dtype in types.items()
+                                   if dtype == 'Float64'}
+                read_types = {name: 'float64' if dtype == 'Float64' else dtype
+                              for name, dtype in types.items()}
+                options = dict(dtype=read_types, keep_default_na=False,
                                na_values={name: [''] for name in types if name not in labels})
                 # Our schema-backed reports use a known delimiter. The C
                 # reader preserves nullable booleans in wholly empty columns;
@@ -235,6 +242,8 @@ def table_page(path, offset=0, size=2000, layer=None):
                 options['float_precision'] = 'round_trip'
         data = pd.read_csv(path, sep=separator, engine=engine,
                            skiprows=range(1, offset+1), nrows=size+1, encoding='utf-8-sig', **options)
+        if nullable_floats:
+            data = data.astype(nullable_floats)
     return dict(frame=data.iloc[:size].copy(), more=len(data)>size, offset=offset, size=size)
 
 

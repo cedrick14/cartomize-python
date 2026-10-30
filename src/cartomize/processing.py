@@ -335,9 +335,16 @@ def _write_verified_vector_tables(result, work, *, vector_names, table_names,
                        measurement_crs=result.summary['measurement_crs']),
                   path.with_suffix('.csv.schema.json'))
         _check_cancel(cancel)
+        # Pandas' nullable Float64 parser can bypass the C round-trip converter.
+        # Parse native doubles first, then restore nullability without changing
+        # the values; exact publication verification must remain exact.
+        read_types = {column: 'float64' if dtype == 'Float64' else dtype
+                      for column, dtype in types.items()}
         reopened = pd.read_csv(path, sep=',', engine='c', float_precision='round_trip',
-                               encoding='utf-8-sig', dtype=types, keep_default_na=False,
+                               encoding='utf-8-sig', dtype=read_types, keep_default_na=False,
                                na_values={column: [''] for column in data if column not in labels})
+        reopened = reopened.astype({column: dtype for column, dtype in types.items()
+                                    if dtype == 'Float64'})
         try:
             pd.testing.assert_frame_equal(reopened, data.reset_index(drop=True),
                                           check_dtype=False, check_exact=True)
