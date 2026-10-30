@@ -75,6 +75,9 @@ class Page(QWidget):
         layout=QVBoxLayout(section);layout.setContentsMargins(0,0,0,0);layout.setSpacing(3)
         row=QHBoxLayout();row.setContentsMargins(0,0,0,0)
         if heading is not None:
+            # Preserve heightForWidth while allowing the title to wrap beside Aide.
+            policy=heading.sizePolicy();policy.setHorizontalPolicy(QSizePolicy.Policy.Ignored)
+            heading.setSizePolicy(policy)
             row.addWidget(heading,1)
         elif summary:
             note=QLabel(summary);note.setWordWrap(True);note.setTextFormat(Qt.TextFormat.PlainText)
