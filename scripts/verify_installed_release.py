@@ -159,6 +159,7 @@ def probe(output, expected):
         checks.extend(_vector_merge_checks(cm, root))
         checks.extend(_g01_checks(cm, root, window, wait_for))
         checks.extend(_conversion_checks(cm, root, window, wait_for))
+        checks.extend(_selection_checks(cm, root, window, wait_for))
         points=root/'points.gpkg'
         gpd.GeoDataFrame({'nom':['Site A']},geometry=[Point(300300,9499700)],crs=32733).to_file(points)
         assert window.project_explorer.open_path(points) is not None
@@ -529,6 +530,82 @@ def _conversion_checks(cm, root, window, wait_for):
     return ['installed G06 vector: FlatGeobuf retains nullable int64 and textual identifiers',
             'installed G06 raster: COG dtype/NoData conversion preserves masks, pixels, grid and metadata',
             'installed G06 desktop: inspection, conversion worker and reopenable report succeed']
+
+
+def _selection_checks(cm, root, window, wait_for):
+    """Check G07's installed API, typed publication and actual report viewer."""
+    from contextlib import closing
+    import sqlite3
+    import geopandas as gpd
+    import numpy as np
+    import pyogrio
+    from pyproj import CRS
+    import shapely
+    from shapely.geometry import Point, box
+
+    source = root / 'g07-source.gpkg'
+    identifiers = [2**53 + i for i in range(1, 5)]
+    shapes = [Point(i, 0) for i in range(4)]
+    pyogrio.raw.write(source, geometry=shapely.to_wkb(shapes),
+        field_data=[np.array(identifiers, dtype='int64'),
+                    np.array(['0001', 'NA', '0003', '0004'], dtype=object),
+                    np.array(['2024-02-29', '2024-03-01', 'NaT', '2024-03-03'], dtype='datetime64[D]')],
+        fields=['identifier', 'code', 'survey_date'], layer='observations', driver='GPKG',
+        geometry_type='Point', crs=CRS(3857).to_wkt(), layer_options={'SPATIAL_INDEX': 'NO'})
+    original = source.read_bytes()
+    mask = gpd.GeoDataFrame(geometry=[box(-.5, -.5, 1.5, .5)], crs=3857)
+    partition = cm.extract_features(source, layer='observations',
+        filters=[dict(field='identifier', comparison='gt', value='9007199254740993.1')],
+        mask=mask, id_field='identifier')
+    assert isinstance(partition, cm.VectorSelectionResult)
+    assert partition.data.identifier.tolist() == [identifiers[1]]
+    assert partition.rejected.identifier.tolist() == [identifiers[i] for i in (0, 2, 3)]
+    assert partition.report.selected.tolist() == [False, True, False, False]
+    assert partition.data.geometry.to_wkb().tolist() == [shapes[1].wkb]
+
+    window.transfer_result({'data': str(source), 'kind': 'vector'}, 'vector')
+    page = window.tool('vector')
+    page.operation.setCurrentIndex(page.operation.findData('extract_features'))
+    page.refresh_fields()
+    assert page.selection_layer.currentData() == 'observations'
+    page.selection_id.setCurrentIndex(page.selection_id.findData('identifier'))
+    page.selection_mode.setCurrentIndex(page.selection_mode.findData('attributes'))
+    page.selection_filters.clear()
+    page.selection_field.setCurrentText('survey_date')
+    page.selection_comparison.setCurrentIndex(page.selection_comparison.findData('ge'))
+    page.selection_value.setPlainText('2024-03-01')
+    assert page.add_selection_filter(), page.selection_value_note.text()
+    page.output.edit.setText(str(root))
+    page.selection_folder.setText('g07-installed-desktop')
+    window.run_button.click()
+    wait_for(lambda: window.thread is None)
+    operation = root / 'g07-installed-desktop' / 'operation.json'
+    assert operation.is_file(), window.status.text()
+    products = json.loads(operation.read_text(encoding='utf-8'))['products']
+    for name, positions in [('data', (1, 3)), ('rejected', (0, 2))]:
+        with closing(sqlite3.connect(products[name])) as connection:
+            types = {row[1]: row[2].upper() for row in connection.execute('PRAGMA table_info(features)')}
+            assert types['survey_date'] == 'DATE' and types['identifier'] == 'INTEGER'
+            saved = connection.execute('SELECT identifier,code,survey_date FROM features ORDER BY rowid').fetchall()
+        expected = [(identifiers[i], ['0001', 'NA', '0003', '0004'][i],
+                     ['2024-02-29', '2024-03-01', None, '2024-03-03'][i]) for i in positions]
+        assert saved == expected
+    assert source.read_bytes() == original
+    assert page.selection_data_button.isEnabled() and page.selection_rejected_button.isEnabled()
+    assert page.selection_report_button.isEnabled() and page.selection_summary_button.isEnabled()
+    page.selection_report_button.click()
+    assert window.workspace.catalog.currentData() == products['report']
+    table = page.open_selection_product('report')
+    wait_for(lambda: len(table.frame) == 4)
+    assert table.frame.selected.tolist() == [False, True, False, True]
+    assert table.frame.spatial_match.isna().all()
+    page.selection_rejected_button.click()
+    assert window.workspace.catalog.currentData() == products['rejected']
+    return [
+        'installed G07 API: exact decimal/int64 and spatial criteria partition unchanged source records',
+        'installed G07 worker: native DATE, missing dates, exact int64 and textual identifiers verified by SQLite',
+        'installed G07 views: retained/excluded products and nullable-Boolean attribute-only report reopen correctly',
+    ]
 
 
 def main():

@@ -58,6 +58,11 @@ LABELS.update({
     'overviews': 'Facteurs des pyramides (liste ; vide : source)',
     'resampling': 'Rééchantillonnage',
     'loss_policy': 'Différences après conversion',
+    'filters': 'Critères attributaires (liste JSON)',
+    'attribute_match': 'Combinaison des critères attributaires',
+    'mask_layer': 'Couche du masque spatial',
+    'combination': 'Combinaison attributs et localisation',
+    'invert': 'Inverser la sélection finale',
 })
 PATHS={'data','source','left','right','mask','zones','before','after','training','validation','model','valid_footprint','outlets','table','observations','aoi'}
 PATHS.update({'reference', 'allowed_gaps'})
@@ -65,12 +70,19 @@ COMPLEX={'inputs','sources','kernel','mapping','products','indices','border_valu
 COMPLEX.update({'keys', 'rules', 'operations', 'area_of_interest'})
 COMPLEX.update({'schema', 'field_maps', 'reprojection_options'})
 COMPLEX.update({'field_map', 'overviews'})
+COMPLEX.add('filters')
 CHOICES={
     'snap':[('Sur le segment le plus proche','edge'),('Sur le sommet le plus proche','node')],
     'null_keys':[('Ne pas apparier','unmatched'),('Apparier les clés manquantes','match'),('Refuser les clés manquantes','error')],
     'value_mode':[('Valeurs physiques (calibration du raster)','physical'),('Valeurs brutes (DN)','raw')],
 }
 OPERATION_CHOICES = {
+    'vector.extract_features': {
+        'attribute_match': [('Tous les critères', 'all'), ('Au moins un critère', 'any')],
+        'combination': [('Attributs ET localisation', 'and'), ('Attributs OU localisation', 'or')],
+        'predicate': [(name, name) for name in ('intersects', 'within', 'contains', 'covers',
+                                               'covered_by', 'touches', 'overlaps', 'crosses', 'disjoint')],
+    },
     'vector.convert': {
         'driver': [('GeoPackage', 'GPKG'), ('GeoJSON', 'GeoJSON'),
                    ('Shapefile', 'ESRI Shapefile'), ('FlatGeobuf', 'FlatGeobuf')],
@@ -197,7 +209,7 @@ class OperationDialog(QDialog):
                     if field['required']:raise ValueError('Renseigner '+LABELS.get(name,name))
                     continue
                 default=field['default']
-                if name in PATHS or name in {'layer', 'id_field'}:value=text
+                if name in PATHS or name in {'layer', 'mask_layer', 'id_field'}:value=text
                 elif name in COMPLEX or isinstance(default,(list,tuple,dict)):value=json.loads(text)
                 elif isinstance(default,int):value=int(text)
                 elif isinstance(default,float):value=float(text)

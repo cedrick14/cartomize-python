@@ -1,7 +1,7 @@
 {
   "schema": "cartomize.expert_procedures.v1",
   "date": "2026-10-30",
-  "source_version": "1.9.0",
+  "source_version": "1.10.0",
   "source_state": "reviewed_source",
   "baseline_commit": "ad4d1d7a89557e347b9a322f73c32205807c077a",
   "inventory": {
@@ -17,7 +17,8 @@
     ]
   },
   "scope": [
-    "Correspondance de l’inventaire expert avec Cartomize 1.9.0 ; modules M01 à M11 implémentés dans leurs périmètres explicites.",
+    "Correspondance de l’inventaire expert avec Cartomize 1.10.0 ; modules M01 à M12 implémentés dans leurs périmètres explicites.",
+    "M12 termine G07 : critères attributaires et spatiaux combinables, retenus et exclus intacts, motifs par ligne et bilans croisés, publication vérifiée ; Python, terminal, plans, fenêtre et cours 19.",
     "M11 termine G06 : conversion vectorielle et raster, choix explicites des formats et couches, encodage, précision, compression et NoData, comparaison complète après relecture et publication atomique ; Python, terminal, plans, fenêtre et cours 18.",
     "Le complément G01 de 1.8.0 termine la sélection de couche, la grille XY facultative, les correspondances avant/après, la publication vérifiée et le parcours de comparaison ; il prolonge M08 sans créer de module M11.",
     "baseline_commit identifie le point de départ du dépôt avant les compléments ; il ne désigne pas un commit final de publication de la version 1.3.0.",
@@ -35,13 +36,13 @@
   },
   "counts": {
     "total": 123,
-    "available": 17,
-    "partial": 44,
+    "available": 18,
+    "partial": 43,
     "absent": 62,
     "by_domain": {
       "Socle SIG et LiDAR": {
-        "available": 13,
-        "partial": 6,
+        "available": 14,
+        "partial": 5,
         "absent": 9
       },
       "Télédétection et images": {
@@ -145,50 +146,57 @@
       "scope": "G06 : formats vectoriels et raster, encodage et champs, compression/type/NoData, relecture comparative complète, rapport de pertes et livraison atomique ; API, terminal, plans, fenêtre et cours 18."
     },
     {
-      "id": "E01",
+      "id": "M12",
       "order": 12,
+      "status": "implemented",
+      "title": "Extraction attributaire et spatiale avec bilan",
+      "scope": "G07 : critères multiples, ET/OU et inversion, partitions complètes, motifs et positions sources, dates natives, publication atomique vérifiée ; API, terminal, plans, fenêtre et cours 19."
+    },
+    {
+      "id": "E01",
+      "order": 13,
       "status": "in_progress",
       "title": "Socle de géotraitement et échanges raster-vecteur",
-      "scope": "G01–G03 terminées par M08, reprojection G04 par M09, harmonisation/fusion G05 par M10, conversion G06 par M11. À poursuivre : sélection, tables, grilles, échanges raster-vecteur et lots."
+      "scope": "G01–G03 terminées par M08, reprojection G04 par M09, harmonisation/fusion G05 par M10, conversion G06 par M11, extraction G07 par M12. À poursuivre : tables, grilles, échanges raster-vecteur et lots."
     },
     {
       "id": "E02",
-      "order": 13,
+      "order": 14,
       "status": "proposed",
       "title": "Qualité thématique et analyses raster usuelles",
       "scope": "Échantillonnage de référence, évaluation externe, unités minimales, transitions, prédicteurs et changements continus."
     },
     {
       "id": "E03",
-      "order": 14,
+      "order": 15,
       "status": "proposed",
       "title": "Séries temporelles et profils optiques",
       "scope": "Calendrier, masques, provenance, composites, lissage ; puis phénologie, tendances et profils forêt/eau/cultures/feux."
     },
     {
       "id": "E04",
-      "order": 15,
+      "order": 16,
       "status": "proposed",
       "title": "Terrain et hydrologie explicites",
       "scope": "Conventions de relief ; surfaces contributives, exutoires, chenaux, bassins, ordres, HAND/TWI/LS et morphométrie."
     },
     {
       "id": "E05",
-      "order": 16,
+      "order": 17,
       "status": "proposed",
       "title": "Indicateurs territoriaux et statistiques spatiales",
       "scope": "Supports et dénominateurs, exposition, carroyage ; puis densités, autocorrélation, interpolation et régressions."
     },
     {
       "id": "E06",
-      "order": 17,
+      "order": 18,
       "status": "proposed",
       "title": "Réseaux, multicritère et paysage",
       "scope": "Coûts réseau et accessibilité ; critères et sensibilité ; composantes, taches et connectivité."
     },
     {
       "id": "E07",
-      "order": 18,
+      "order": 19,
       "status": "proposed",
       "title": "Modules spécialisés avec validation propre",
       "scope": "LiDAR, géoréférencement, correction atmosphérique, SAR/InSAR, apprentissage profond, hydraulique et modèles écologiques/pédoclimatiques."
@@ -619,6 +627,13 @@
       "operators": [
         "raster.convert"
       ]
+    },
+    "cartomize.vector_selection.extract_features": {
+      "path": "src/cartomize/vector_selection.py",
+      "symbol": "extract_features",
+      "operators": [
+        "vector.extract_features"
+      ]
     }
   },
   "procedures": [
@@ -796,25 +811,28 @@
       "procedure": "Extraction attributaire et spatiale",
       "domain": "Socle SIG et LiDAR",
       "theme": "Opérations vectorielles",
-      "status": "partial",
+      "status": "available",
       "api": [
+        "cartomize.vector_selection.extract_features",
         "cartomize.vector_workflows.select_attributes",
         "cartomize.vector_workflows.select_location"
       ],
-      "implemented": "Sélections attributaires et spatiales ; comparaisons entières 64 bits exactes, booléens et dates pris en charge.",
-      "missing": [
-        "Sortie explicite des exclus avec motif et bilan des sélections combinées."
-      ],
+      "implemented": "Extraction de lignes complètes : critères attributaires multiples tous/au moins un, relation à la réunion du masque, ET/OU et inversion finale ; retenus et exclus, motifs par ligne, positions sources et bilan croisé. Dates natives, booléens et entiers 64 bits contrôlés.",
+      "missing": [],
       "conditions": [
-        "Le prédicat spatial porte sur la réunion des géométries du masque ; les attributs et l’ordre source sont conservés."
+        "SCR connus ; nom de couche explicite pour tout fichier multicouche. Masque aligné dans le SCR source, prédicat planaire appliqué à sa réunion.",
+        "Colonnes, valeurs, géométries et ordre source conservés ; correspondances source_row/output_row/rejected_row à partir de zéro, sans injection de champs métier.",
+        "Géométries nulles ou vides : faux pour le bloc spatial ; géométries invalides ou non finies refusées si ce bloc est actif. Inversion finale explicite.",
+        "Deux GeoPackage intégralement relus, y compris les partitions vides ; rapport CSV avec schéma, audit JSON typé et bilan ; nouveau dossier atomique."
       ],
-      "next_module": "E01",
+      "next_module": null,
       "planned_fixes": [],
       "references": [
         "R008"
       ],
       "completed_modules": [
-        "M02"
+        "M02",
+        "M12"
       ]
     },
     {
@@ -3776,7 +3794,7 @@
       "organisme": "QGIS",
       "url": "https://docs.qgis.org/3.44/en/docs/user_manual/processing_algs/qgis/vectorselection.html",
       "nature": "Documentation",
-      "consultation": "2026-10-26"
+      "consultation": "2026-10-30"
     },
     {
       "id": "R009",

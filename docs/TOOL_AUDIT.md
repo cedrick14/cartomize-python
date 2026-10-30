@@ -50,6 +50,16 @@ l’atteinte d’un seuil réduit. Les 48 opérateurs ne correspondent pas à
 
 Voir les [méthodes de traitement](PROCESSING.md), les [moteurs de calcul](EXECUTION.md), la [vue des résultats](RESULTS_WORKSPACE.md) et la [validation](VALIDATION.md).
 
+## Extraction avec bilan — ajouté en 1.10.0
+
+M12/G07 complète les sélections simples dans la page Vecteur : critères
+attributaires multiples, masque choisi par couche, combinaison ET/OU et
+inversion finale. Les produits retenus et exclus conservent leurs champs et
+géométries ; le rapport séparé relie chaque décision à une position source.
+La publication relit intégralement les deux couches, avec leur schéma commun.
+Le terminal `extract-features`, les plans, Python et le cours 19 utilisent
+la même opération `vector.extract_features`. Voir le [guide G07](VECTOR_SELECTION.md).
+
 ## Conversion et formats — ajouté en 1.9.0
 
 Le module M11/G06 relie une inspection explicite des entrées aux conversions vectorielles et raster, à la comparaison des fichiers relus et au rapport de fidélité. La page dédiée, les commandes `convert-vector` et `convert-raster`, les plans et l’API appellent le même moteur. Le [guide G06](DATA_CONVERSION.md) précise les six formats de livraison, les paramètres, les différences autorisables et les incompatibilités refusées.

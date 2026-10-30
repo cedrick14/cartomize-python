@@ -112,5 +112,11 @@
     "title": "G06 : conversion et conditionnement des données",
     "real": false,
     "minutes": 30
+  },
+  {
+    "slug": "19_extraction_attributaire_spatiale",
+    "title": "G07 : extraction attributaire et spatiale avec bilan",
+    "real": false,
+    "minutes": 35
   }
 ]

@@ -71,6 +71,8 @@ def _catalog():
     from .raster_conversion import convert_raster
     add('vector.convert', 'Conversion et conditionnement vectoriel', convert_vector, 'vector', 'conversion')
     add('raster.convert', 'Conversion et conditionnement raster', convert_raster, 'raster', 'conversion')
+    from .vector_selection import extract_features
+    add('vector.extract_features', 'Extraction attributaire et spatiale avec bilan', extract_features, 'vector', 'vector')
     for key, label, function in [
         ('audit_geometries', 'Diagnostic détaillé des géométries', audit_geometries),
         ('repair_geometries', 'Réparation avec rapport des changements', repair_geometries),
@@ -202,6 +204,72 @@ def _write_vector_quality(result, work, *, cancel=None):
     return products
 
 
+def _selection_audit_value(value, *, identity=False):
+    """Keep temporal and index labels typed, and large identifiers exact in JSON."""
+    from datetime import date, datetime
+    from decimal import Decimal
+    import numpy as np
+    import pandas as pd
+    from .vector_io import is_missing
+    if isinstance(value, tuple):
+        return dict(type='tuple', items=[_selection_audit_value(item, identity=True) for item in value])
+    if is_missing(value):
+        return None
+    if isinstance(value, (datetime, pd.Timestamp, np.datetime64)):
+        return dict(type='datetime', value=pd.Timestamp(value).isoformat())
+    if isinstance(value, date):
+        return dict(type='date', value=value.isoformat())
+    if isinstance(value, np.generic):
+        return _selection_audit_value(value.item(), identity=identity)
+    if isinstance(value, Decimal):
+        return dict(type='decimal', value=str(value))
+    if identity and isinstance(value, int) and not isinstance(value, bool):
+        return dict(type='integer', value=str(value))
+    if isinstance(value, float) and not np.isfinite(value):
+        return dict(type='float', value=str(value))
+    return json_value(value)
+
+
+def _write_vector_selection(result, work, *, cancel=None):
+    """Publish both exact partitions and their positional audit together."""
+    from .vector_io import write_geopackage
+    import pandas as pd
+    products = {}
+    for name in ('data', 'rejected'):
+        _check_cancel(cancel)
+        path = work / (name + '.gpkg')
+        write_geopackage(getattr(result, name), path, layer='features',
+                         types=result.summary['source_attribute_types'], cancel=cancel)
+        products[name] = path
+    _check_cancel(cancel)
+    report = result.report
+    report.to_csv(work / 'report.csv', index=False, encoding='utf-8-sig')
+    # Identity labels must not be inferred as floats or missing-value tokens by
+    # the desktop table viewer; typed originals also live in the JSON audit.
+    labels = [name for name in ('source_index', 'source_id') if name in report]
+    types = {}
+    for name in report:
+        dtype = report[name].dtype
+        types[name] = ('string' if name in labels else 'boolean' if pd.api.types.is_bool_dtype(dtype)
+                       else 'Int64' if pd.api.types.is_integer_dtype(dtype) else 'string')
+    save_json(dict(schema='cartomize.table.v1', types=types, label_columns=labels),
+              work / 'report.csv.schema.json')
+    records = []
+    for position, row in enumerate(report.itertuples(index=False, name=None)):
+        if position % 1024 == 0:
+            _check_cancel(cancel)
+        records.append({name: _selection_audit_value(value, identity=name in labels)
+                        for name, value in zip(report.columns, row)})
+    save_json(dict(schema='cartomize.vector_selection.audit.v1',
+                   row_numbering='zero_based_source_order',
+                   columns={name: str(report[name].dtype) for name in report},
+                   records=records), work / 'audit.json')
+    save_json(result.summary, work / 'summary.json')
+    products.update(report=work / 'report.csv', audit=work / 'audit.json', summary=work / 'summary.json')
+    _check_cancel(cancel)
+    return products
+
+
 def operation_catalog():
     """Machine-readable operator names, parameter defaults and output types."""
     rows=[]
@@ -230,6 +298,8 @@ def operation_catalog():
             products += ['data', 'manifest', 'report', 'issues']
         if key in {'vector.convert', 'raster.convert'}:
             products += ['data', 'manifest', 'report']
+        if key == 'vector.extract_features':
+            products += ['data', 'rejected', 'report', 'audit', 'summary']
         if key=='classify':
             from .classification import fit_classifier
             present={p['name'] for p in parameters}
@@ -317,11 +387,16 @@ def execute_operation(operation,parameters,destination,*,workers=1,block_size=51
         from .vector_merge import MergedVectors
         from .vector_conversion import ConvertedVector
         from .raster_conversion import ConvertedRaster
+        from .vector_selection import VectorSelectionResult
         quality_products = None
         reprojection_products = None
         merge_products = None
         conversion_products = None
-        if isinstance(result, VectorQualityResult):
+        selection_products = None
+        if isinstance(result, VectorSelectionResult):
+            selection_products = _write_vector_selection(result, work, cancel=cancel)
+            primary = selection_products['data']
+        elif isinstance(result, VectorQualityResult):
             quality_products = _write_vector_quality(result, work, cancel=cancel)
             primary = quality_products['issues' if operation == 'vector.audit_geometries' else 'data']
         elif isinstance(result, ReprojectedBatch):
@@ -351,7 +426,11 @@ def execute_operation(operation,parameters,destination,*,workers=1,block_size=51
         metadata=getattr(result,'attrs',{}).get('cartomize')
         if metadata is not None:record['metadata']=json_value(metadata)
         products={'primary':record['primary']}
-        if quality_products is not None:
+        if selection_products is not None:
+            products.update({key: str(destination / path.relative_to(work))
+                             for key, path in selection_products.items()})
+            record['metadata'] = json_value(result.summary)
+        elif quality_products is not None:
             products.update({key: str(destination / path.relative_to(work))
                              for key, path in quality_products.items()})
             record['metadata'] = json_value(result.summary)

@@ -1,5 +1,33 @@
 # Tests et validation
 
+## Cartomize 1.10.0 — M12 / G07, extraction avec bilan
+
+La suite finale sur les sources figées réussit **1 469 tests, 2 exclusions
+prévues et aucun échec** en **492,12 s** sous Linux/Python 3.12.14. Les
+**155 nouvelles régressions** couvrent le moteur (109), les interfaces (14),
+la fenêtre (21) et l'oracle géométrique indépendant (11). Les empreintes des
+sources, tests, scripts et workflows sont identiques avant et après la passe.
+
+Le [rapport réel G07](VALIDATION_G07_REAL.json) conserve **9 scénarios
+réussis**, les partitions complètes de Paris/RDC, les décisions, les types
+DATE vérifiés dans SQLite et **10 fichiers d'entrée inchangés**. Le prédicat
+RDC est comparé à un ray casting Python ; la reprojection partage PROJ et
+les intersections parisiennes partagent GEOS. Ces limites sont explicites.
+
+Le cours 19 exécute **9 cellules** dans un noyau Jupyter neuf. La wheel
+installée dans un environnement neuf hors du dépôt réussit **26 contrôles**,
+avec `pip check` réussi et **98 modules identiques aux sources**. Le site
+pédagogique exporte **20 leçons**. Les autres cours autonomes sont exécutés
+par la matrice Windows/Ubuntu ; les deux cours demandant `Tuto.zip` restent
+hors de cette passe autonome.
+
+Les résultats détaillés et empreintes sont dans
+[VALIDATION_1.10.0.json](VALIDATION_1.10.0.json). Ce rapport est créé avant
+l'envoi GitHub ; les résultats distants appartiennent au commit testé de
+la demande d'intégration. Les exclusions locales concernent CUDA et QGIS ;
+QGIS possède un contrôle distant dédié. Voir la
+[note 1.10.0](RELEASE_1.10.0.md) et le [guide G07](VECTOR_SELECTION.md).
+
 ## Cartomize 1.9.0 — M11 / G06, conversion et conditionnement
 
 Le dernier passage local de la suite complète, au commit `0dd9bf6`, réussit

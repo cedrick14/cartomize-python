@@ -348,3 +348,7 @@ print(vecteur.data, vecteur.report, raster.data, raster.report)
 ```
 
 Les dossiers de sortie doivent être nouveaux. Les deux résultats exposent `data`, `report`, `manifest` et `summary`. Une couche multicouche exige une sélection explicite. La politique `loss_policy="error"` refuse une perte de représentation ; `report` autorise seulement les changements mesurés et consignés. Les contrôles de plage, coordonnées, projection et validité restent obligatoires. Voir les [paramètres et formats G06](DATA_CONVERSION.md).
+
+## Extraction attributaire et spatiale avec audit
+
+`cm.extract_features(data, filters=[{"field": "valeur", "comparison": "gt", "value": 0}], mask=masque)` renvoie un `VectorSelectionResult` avec `data`, `rejected`, `report`, `summary`. `cm.execute_operation("vector.extract_features", parametres, dossier_neuf)` publie les partitions et rapports vérifiés. Voir les conventions, types et exemples dans le [guide G07](VECTOR_SELECTION.md).

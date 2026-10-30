@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import operator
+import re
+from datetime import date, datetime
 from decimal import Decimal, InvalidOperation, ROUND_CEILING, ROUND_FLOOR
 import numpy as np
 import pandas as pd
@@ -12,6 +14,8 @@ from ._validation import aligned, frame, measurement_frame
 
 def _finite_decimal(value):
     """Parse a numeric filter without rounding an integer identifier to float."""
+    if isinstance(value, (bool, np.bool_)):
+        raise ValueError('A numeric filter requires a number, not a boolean.')
     try:
         number = Decimal(int(value)) if isinstance(value, (int, np.integer)) else Decimal(str(value))
     except (InvalidOperation, ValueError, TypeError) as exc:
@@ -23,6 +27,9 @@ def _finite_decimal(value):
 
 def _integer_comparison(series, comparison, value):
     """Compare integer/nullable integer fields with exact decimal thresholds."""
+    if isinstance(series.dtype, pd.CategoricalDtype):
+        # Numeric comparisons use category values, not category-code order.
+        series = series.astype(object)
     number = _finite_decimal(value)
     present = series.notna()
     if not present.any():
@@ -45,32 +52,127 @@ def _integer_comparison(series, comparison, value):
 
 
 def _integer_membership(series, values):
+    from .vector_io import is_missing
+    if isinstance(series.dtype, pd.CategoricalDtype):
+        series = series.astype(object)
     present = series.notna()
     minimum = int(series.min()) if present.any() else None
     maximum = int(series.max()) if present.any() else None
     normalized = []
+    include_missing = False
     for value in values:
-        if value is None or value is pd.NA or isinstance(value, (float, np.floating)) and np.isnan(value):
-            # Preserve pandas' explicit missing-value membership convention.
-            normalized.append(value)
+        if is_missing(value):
+            include_missing = True
             continue
         number = _finite_decimal(value)
         if minimum is not None and minimum <= number <= maximum and number == number.to_integral_value():
             normalized.append(int(number))
-    return series.isin(normalized)
+    return series.isin(normalized) | (series.isna() if include_missing else False)
 
 
-def select_attributes(data, field, comparison, value=None):
-    """Select whole records without evaluating Python, SQL or query expressions.
+def _object_number(value):
+    """Keep integers exact in heterogeneous numeric object columns.
 
-    Integer identifiers and numeric text are compared exactly, including signed
-    and unsigned nullable 64-bit fields. Decimal thresholds are not rounded to
-    a neighbouring integer before deciding the comparison.
+    Float values use their round-trip decimal representation. Unlike casting
+    the column or threshold to float, this never rounds an adjacent integer
+    identifier above 2**53 onto another row's value.
     """
-    result = frame(data)
-    if field not in result.columns or field == result.geometry.name:
+    return Decimal(int(value)) if isinstance(value, (int, np.integer)) else Decimal(str(value))
+
+
+def _object_numeric_comparison(series, comparison, value):
+    from .vector_io import is_missing
+    threshold = _finite_decimal(value)
+    compare = getattr(operator, comparison)
+    return pd.Series([False if is_missing(item) else compare(_object_number(item), threshold)
+                      for item in series], index=series.index, dtype=bool)
+
+
+def _object_numeric_membership(series, values):
+    from .vector_io import is_missing
+    include_missing = any(is_missing(value) for value in values)
+    choices = {_finite_decimal(value) for value in values if not is_missing(value)}
+    return pd.Series([include_missing if is_missing(item) else _object_number(item) in choices
+                      for item in series], index=series.index, dtype=bool)
+
+
+def _selection_kind(data, field):
+    """Recognize native DATE/DateTime objects as well as pandas extension types."""
+    from .vector_io import is_missing, value_kind
+    series = data[field]
+    if pd.api.types.is_bool_dtype(series.dtype):
+        return 'boolean'
+    if pd.api.types.is_integer_dtype(series.dtype):
+        return 'integer'
+    if pd.api.types.is_numeric_dtype(series.dtype):
+        return 'numeric'
+    if isinstance(series.dtype, pd.DatetimeTZDtype):
+        return 'datetime_utc'
+    if pd.api.types.is_datetime64_any_dtype(series.dtype):
+        return 'datetime'
+    kinds = {value_kind(value) for value in series if not is_missing(value)}
+    if not kinds:
+        hint = data.attrs.get('_cartomize_temporal_fields', {}).get(field)
+        if hint is None:
+            hint = data.attrs.get('_cartomize_declared_fields', {}).get(field)
+        if hint == 'int64':
+            return 'integer'
+        if hint == 'float64':
+            return 'numeric'
+        return hint if hint in {'date', 'datetime', 'datetime_utc', 'boolean'} else None
+    if kinds == {'int64'}:
+        return 'integer'
+    if kinds == {'boolean'}:
+        return 'boolean'
+    if kinds <= {'int64', 'float64'}:
+        return 'numeric'
+    temporal = {'date', 'datetime', 'datetime_utc'}
+    if kinds & temporal:
+        if len(kinds) != 1:
+            raise ValueError('A temporal field must not mix dates, naive timestamps, timezone-aware timestamps or other values.')
+        return next(iter(kinds))
+    return None
+
+
+def _temporal_filter(value, kind):
+    from .vector_io import is_missing
+    if kind == 'date':
+        if isinstance(value, str):
+            try:
+                if not re.fullmatch(r'[0-9]{4}-[0-9]{2}-[0-9]{2}', value):
+                    raise ValueError('Expected YYYY-MM-DD.')
+                return date.fromisoformat(value)
+            except ValueError as exc:
+                raise ValueError('A date field requires an ISO date without a time.') from exc
+        if isinstance(value, date) and not isinstance(value, datetime):
+            return value
+        raise ValueError('A date field requires a date without a time.')
+    if not isinstance(value, (str, date, datetime, pd.Timestamp, np.datetime64)):
+        raise ValueError('A timestamp field requires an ISO timestamp or a temporal value.')
+    if isinstance(value, str) and not re.fullmatch(
+            r'[0-9]{4}-[0-9]{2}-[0-9]{2}'
+            r'(?:[Tt ][0-9]{2}:[0-9]{2}(?::[0-9]{2}(?:\.[0-9]{1,9})?)?'
+            r'(?:[Zz]|[+-][0-9]{2}(?::?[0-9]{2})?)?)?', value):
+        raise ValueError('A timestamp field requires an ISO date or timestamp, with at most nine fractional digits; relative and ambiguous dates are not accepted.')
+    stamp = pd.Timestamp(value)
+    if is_missing(stamp):
+        raise ValueError('Use is_null or not_null for missing values.')
+    aware = stamp.tzinfo is not None
+    if aware != (kind == 'datetime_utc'):
+        raise ValueError('The filter timestamp and field must have the same timezone awareness; no timezone is assumed or removed.')
+    return stamp
+
+
+def _attribute_mask(result, field, comparison, value=None):
+    """Return a positional Boolean mask shared by simple and audited selection."""
+    from .vector_io import is_missing
+    if not isinstance(field, str) or field not in result.columns or field == result.geometry.name:
         raise ValueError('Select an existing attribute field.')
     series = result[field]
+    if not isinstance(series, pd.Series) or isinstance(series.dtype, gpd.array.GeometryDtype):
+        raise ValueError('Select exactly one existing attribute field.')
+    if not isinstance(comparison, str):
+        raise ValueError('Unsupported attribute comparison.')
     comparisons = {'eq': operator.eq, 'ne': operator.ne, 'lt': operator.lt,
                    'le': operator.le, 'gt': operator.gt, 'ge': operator.ge}
     if comparison == 'is_null':
@@ -86,33 +188,76 @@ def select_attributes(data, field, comparison, value=None):
         if not isinstance(value, (list, tuple, set)):
             raise ValueError('Membership selection requires a list of values.')
         try:
-            mask = _integer_membership(series, value) if pd.api.types.is_integer_dtype(series.dtype) else series.isin(value)
-        except (TypeError, ValueError) as exc:
+            kind = _selection_kind(result, field)
+            if kind == 'integer':
+                mask = _integer_membership(series, value)
+            elif kind == 'numeric' and not pd.api.types.is_numeric_dtype(series.dtype):
+                mask = _object_numeric_membership(series, value)
+            else:
+                normalized = []
+                include_missing = False
+                for item in value:
+                    if is_missing(item):
+                        include_missing = True
+                        continue
+                    if kind == 'boolean' and not isinstance(item, (bool, np.bool_)):
+                        raise ValueError('A Boolean field requires true or false.')
+                    if kind == 'numeric':
+                        if isinstance(item, (bool, np.bool_)):
+                            raise ValueError('A numeric filter requires a number, not a boolean.')
+                        item = float(item)
+                        if not np.isfinite(item):
+                            raise ValueError('A numeric filter requires a finite value.')
+                    normalized.append(_temporal_filter(item, kind)
+                                      if kind in {'date', 'datetime', 'datetime_utc'} else item)
+                mask = series.isin(normalized) | (series.isna() if include_missing else False)
+        except (TypeError, ValueError, OverflowError) as exc:
             raise ValueError(f'Invalid filter value for {field}: {exc}') from exc
         if comparison == 'not_in':
             mask = ~mask & series.notna()
     elif comparison in comparisons:
-        if value is None:
+        if is_missing(value):
             raise ValueError('Use is_null or not_null for missing values.')
         try:
-            if pd.api.types.is_bool_dtype(series.dtype):
+            kind = _selection_kind(result, field)
+            if kind == 'boolean':
                 if not isinstance(value, (bool, np.bool_)):
                     raise ValueError('A Boolean field requires true or false.')
-            elif pd.api.types.is_integer_dtype(series.dtype):
+            elif kind == 'integer':
                 mask = _integer_comparison(series, comparison, value)
-                return result.loc[mask.fillna(False)].copy()
-            elif pd.api.types.is_numeric_dtype(series.dtype):
+                return mask.fillna(False).to_numpy(dtype=bool)
+            elif kind == 'numeric':
+                if not pd.api.types.is_numeric_dtype(series.dtype):
+                    mask = _object_numeric_comparison(series, comparison, value)
+                    return mask.to_numpy(dtype=bool)
+                if isinstance(value, (bool, np.bool_)):
+                    raise ValueError('A numeric filter requires a number, not a boolean.')
                 value = float(value)
                 if not np.isfinite(value):
                     raise ValueError('A numeric filter requires a finite value.')
-            elif pd.api.types.is_datetime64_any_dtype(series.dtype):
-                value = pd.Timestamp(value)
+            elif kind in {'date', 'datetime', 'datetime_utc'}:
+                value = _temporal_filter(value, kind)
             mask = comparisons[comparison](series, value) & series.notna()
-        except (TypeError, ValueError) as exc:
+        except (TypeError, ValueError, OverflowError) as exc:
             raise ValueError(f'Invalid filter value for {field}: {exc}') from exc
     else:
         raise ValueError('Unsupported attribute comparison.')
-    return result.loc[mask.fillna(False)].copy()
+    return mask.fillna(False).to_numpy(dtype=bool)
+
+
+def select_attributes(data, field, comparison, value=None):
+    """Select whole records without evaluating Python, SQL or query expressions.
+
+    Integer identifiers and numeric text are compared exactly, including signed
+    and unsigned nullable 64-bit fields. Decimal thresholds are not rounded to
+    a neighbouring integer before deciding the comparison. Native date fields
+    accept dates or ISO date text without a time; timestamps preserve timezone
+    awareness. Boolean filters require true/false, including membership lists.
+    A missing value in an ``in`` list explicitly matches missing attributes;
+    ``not_in`` always excludes missing attributes.
+    """
+    result = frame(data)
+    return result.iloc[_attribute_mask(result, field, comparison, value)].copy()
 
 
 def select_location(data, mask, *, predicate='intersects'):
@@ -126,10 +271,10 @@ def select_location(data, mask, *, predicate='intersects'):
     if predicate not in allowed:
         raise ValueError('Unsupported spatial predicate.')
     source, mask = aligned(data, mask)
-    valid_mask = mask.geometry.notna() & ~mask.geometry.is_empty
+    valid_mask = ~mask.geometry.isna() & ~mask.geometry.is_empty
     union = mask.loc[valid_mask].geometry.union_all()
     selected = getattr(source.geometry, predicate)(union)
-    selected &= source.geometry.notna() & ~source.geometry.is_empty
+    selected &= ~source.geometry.isna() & ~source.geometry.is_empty
     return source.loc[selected].copy()
 
 

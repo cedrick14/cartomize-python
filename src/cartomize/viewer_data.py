@@ -212,6 +212,8 @@ def table_page(path, offset=0, size=2000, layer=None):
         data = read_vector(path, layer=layer, skip_features=offset, max_features=size+1, ignore_geometry=True)
     else:
         options = {}
+        separator = '\t' if path.suffix.lower() == '.tsv' else None
+        engine = 'python'
         schema_path = path.with_suffix(path.suffix + '.schema.json')
         if schema_path.is_file():
             schema = json.loads(schema_path.read_text(encoding='utf-8'))
@@ -225,7 +227,12 @@ def table_page(path, offset=0, size=2000, layer=None):
                 # report cells are the empty values written by to_csv.
                 options = dict(dtype=types, keep_default_na=False,
                                na_values={name: [''] for name in types if name not in labels})
-        data = pd.read_csv(path, sep='\t' if path.suffix.lower()=='.tsv' else None, engine='python',
+                # Our schema-backed reports use a known delimiter. The C
+                # reader preserves nullable booleans in wholly empty columns;
+                # the inference reader can turn their nulls into literal nan.
+                separator = '\t' if path.suffix.lower() == '.tsv' else ','
+                engine = 'c'
+        data = pd.read_csv(path, sep=separator, engine=engine,
                            skiprows=range(1, offset+1), nrows=size+1, encoding='utf-8-sig', **options)
     return dict(frame=data.iloc[:size].copy(), more=len(data)>size, offset=offset, size=size)
 

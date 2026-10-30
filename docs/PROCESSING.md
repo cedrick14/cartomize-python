@@ -253,3 +253,7 @@ cm.run_plan(plan, "livraison_plan")
 ```
 
 Les options de conversion sont celles de l’[API G06](DATA_CONVERSION.md). Les paramètres refusés et les différences non autorisées empêchent la publication du dossier.
+
+## Produits de l’extraction G07
+
+L’opération `vector.extract_features` publie `data`, `rejected`, `report`, `audit` et `summary`. Une étape peut prendre `@selection:data` et une autre `@selection:rejected`. Les deux couches conservent le schéma source ; les positions et motifs restent dans le rapport. Voir le [guide G07](VECTOR_SELECTION.md).
