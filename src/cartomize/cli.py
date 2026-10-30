@@ -112,6 +112,19 @@ def main(argv=None):
     for command in (merge, merge_options):
         command.add_argument('--recursive', action='store_true')
         command.add_argument('--field-maps', help='JSON file mapping source layer IDs and source fields to target fields')
+    extraction = subs.add_parser('extract-features', help='Extract features and publish rejected records with a decision audit')
+    extraction.add_argument('source')
+    extraction.add_argument('destination', help='New directory for both partitions and reports')
+    extraction.add_argument('--filters', help='JSON file containing a list of field/comparison/value criteria')
+    extraction.add_argument('--attribute-match', choices=['all', 'any'], default='all')
+    extraction.add_argument('--mask', help='Optional vector spatial mask')
+    extraction.add_argument('--layer', help='Explicit source layer name')
+    extraction.add_argument('--mask-layer', help='Explicit spatial mask layer name')
+    extraction.add_argument('--id-field', help='Optional unique, nonmissing source identifier')
+    extraction.add_argument('--predicate', choices=['intersects', 'within', 'contains', 'covers',
+        'covered_by', 'touches', 'overlaps', 'crosses', 'disjoint'], default='intersects')
+    extraction.add_argument('--combination', choices=['and', 'or'], default='and')
+    extraction.add_argument('--invert', action='store_true', help='Invert the final combined selection')
     conversion_vector = subs.add_parser('convert-vector', help='Convert a selected vector layer and verify every saved record')
     conversion_vector.add_argument('source')
     conversion_vector.add_argument('destination', help='New directory for data, sidecars and verification reports')
@@ -278,6 +291,13 @@ def main(argv=None):
                 parameters.update(block_size=args.block_size, overviews=args.overviews,
                                   resampling=args.resampling, loss_policy=args.loss_policy)
                 result = cm.execute_operation('raster.convert', parameters, args.destination)
+        elif args.command == 'extract-features':
+            import cartomize as cm
+            filters = json.loads(Path(args.filters).read_text(encoding='utf-8')) if args.filters else None
+            result = cm.execute_operation('vector.extract_features', dict(data=args.source,
+                filters=filters, attribute_match=args.attribute_match, mask=args.mask,
+                layer=args.layer, mask_layer=args.mask_layer, id_field=args.id_field,
+                predicate=args.predicate, combination=args.combination, invert=args.invert), args.destination)
         elif args.command in {'merge-layers', 'merge-options'}:
             import cartomize as cm
             def json_option(path):

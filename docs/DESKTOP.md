@@ -329,3 +329,7 @@ La page **Projet → Conversion et formats** permet d’analyser une source, de 
 Indiquer le répertoire parent puis le nom d’un nouveau dossier. Après exécution, **Afficher les données converties** et **Ouvrir le rapport de conversion** donnent accès aux produits relus. Le format FlatGeobuf est également reconnu par le visualiseur, l’import et les transferts entre outils.
 
 La session conserve les paramètres et les choix de couches. Une source modifiée doit être analysée de nouveau. Les paramètres du worker sont capturés au lancement. Voir le [guide G06](DATA_CONVERSION.md) pour les formats, les valeurs manquantes et les politiques de précision.
+
+## Extraction avec bilan (G07)
+
+Dans la page Vecteur, choisir « Extraction avec bilan ». Sélectionner les couches source et masque, ajouter les critères, puis choisir ET/OU et l’inversion éventuelle. Les valeurs d’une liste se saisissent une par ligne. Le traitement crée un nouveau dossier contenant les retenus, les exclus et les rapports ; les boutons rouvrent ces produits. Les choix et les résultats sont conservés dans la session. Voir le [guide G07](VECTOR_SELECTION.md).

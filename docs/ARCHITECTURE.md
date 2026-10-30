@@ -148,6 +148,19 @@ provenance et transformations éventuelles. Une reprojection explicitement
 demandée réutilise M09 ; la fusion attributaire n’effectue aucune union de
 géométries. Voir le [contrat M10](VECTOR_MERGE.md).
 
+## Extraction attributaire et spatiale — M12
+
+`vector_selection.extract_features` compose des masques positionnels, conserve
+les deux partitions intactes et produit un rapport par ligne. Le masque
+attributaire commun avec `vector_workflows.select_attributes` traite entiers,
+booléens, dates natives et horodatages sans conversion implicite destructrice.
+Le schéma source est établi avant séparation afin de conserver les types des
+partitions vides ou entièrement nulles. `processing.execute_operation`
+enregistre les deux GeoPackage avec relecture exacte, le CSV et son schéma,
+l'audit JSON typé et la synthèse dans un dossier atomique. Les plans peuvent
+consommer indépendamment `data` et `rejected`. `desktop_selection` raccorde ce
+moteur au formulaire Vecteur et à ses résultats persistants.
+
 ## Conversion et conditionnement — M11
 
 `vector_conversion.py` et `raster_conversion.py` publient des livraisons atomiques après comparaison exhaustive du résultat relu. Les objets `ConvertedVector` et `ConvertedRaster` sont raccordés à `processing.py` par les opérateurs `vector.convert` et `raster.convert`. La CLI, les plans et `desktop_conversion.py` partagent ces moteurs.

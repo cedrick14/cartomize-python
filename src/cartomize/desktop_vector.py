@@ -11,11 +11,12 @@ import cartomize as cm
 from .tableio import read_table
 from .desktop_tools_base import VectorPage as BaseVectorPage, write_result
 from .desktop_vector_quality import VectorQualityControls
+from .desktop_selection import SelectionControls
 from .vector_workflows import (select_attributes, select_location, geometry_operation,
                                spatial_summary, join_attributes, latest_records)
 
 
-class VectorPage(VectorQualityControls, BaseVectorPage):
+class VectorPage(SelectionControls, VectorQualityControls, BaseVectorPage):
     EXTRA = [('Sélection par attribut', 'select_attributes'), ('Sélection spatiale', 'select_location'),
              ('Synthèse par zone', 'spatial_summary'), ('Jointure attributaire', 'join_attributes'),
              ('Dernier relevé par identifiant', 'latest_records'), ('Centroïdes', 'centroid'),
@@ -88,12 +89,16 @@ class VectorPage(VectorQualityControls, BaseVectorPage):
         for control in (self.source.edit, self.secondary.edit):
             control.textChanged.connect(lambda *_: self._fields_timer.start())
             control.editingFinished.connect(self.refresh_fields)
+        self.init_selection_controls()
         self._advanced_ready = True
         self.changed()
 
     def refresh_fields(self):
         import pyogrio
         op = self.operation.currentData()
+        if op == 'extract_features':
+            self.refresh_selection_layers()
+            return
         if op in self.G01_OPERATIONS:
             self.refresh_quality_layers()
         # G01 has its own layer-dependent selector. Leave dormant controls
@@ -167,9 +172,12 @@ class VectorPage(VectorQualityControls, BaseVectorPage):
         self.update_quality_controls()
         self.update_reprojection_controls()
         self.update_merge_controls()
+        self.update_selection_controls()
 
     def job(self, options):
         op = self.operation.currentData()
+        if op == 'extract_features':
+            return self.selection_job(options)
         if op in {key for _, key in self.QUALITY_OPERATIONS}:
             return self.quality_job(options)
         if op not in {key for _,key in self.EXTRA} and op!='dissolve':
@@ -237,6 +245,7 @@ class VectorPage(VectorQualityControls, BaseVectorPage):
     def restore_controls(self):
         """Restore conditional controls after loading a saved desktop session."""
         self.restore_quality_controls()
+        self.restore_selection_controls()
         self.changed()
         self.restore_reprojection_controls()
         self.restore_merge_controls()

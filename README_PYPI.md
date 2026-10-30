@@ -1,6 +1,6 @@
 # Cartomize
 
-**Version 1.9.0**
+**Version 1.10.0**
 
 Cartomize provides a Python API, a command-line interface and a desktop application for geospatial processing and cartographic production. It runs independently of QGIS and ArcGIS Pro. Native project bridges are optional.
 
@@ -18,7 +18,7 @@ python -m cartomize gui
 For a downloaded wheel:
 
 ```bash
-python -m pip install "./cartomize-1.9.0-py3-none-any.whl[gui]"
+python -m pip install "./cartomize-1.10.0-py3-none-any.whl[gui]"
 ```
 
 For the current GitHub sources:
@@ -59,7 +59,7 @@ Imported files are available for viewing and transfer to compatible processing t
 | Classification | Random forests, extra trees, K-means, validation and saved models |
 | Terrain and networks | Terrain derivatives, convolution, D8 drainage, watersheds and shortest paths |
 | Cartography | 24 templates, symbology, labels, legends, scale bars, multiple frames, atlases and PDF/PNG/SVG export |
-| Automation | 52 registered operators, processing plans, reusable recipes, batch production and saved sessions |
+| Automation | 53 registered operators, processing plans, reusable recipes, batch production and saved sessions |
 
 Optional Dask and CUDA execution is available for supported operators. Native GIS bridges and CUDA hardware execution require the corresponding runtime.
 
@@ -98,3 +98,5 @@ Validation covers Windows and Linux, Python 3.11 and 3.12, desktop operations on
 Developed by **ONDON NKOUA Cédrick Belmich**.
 
 Code: **GPL-3.0-only**. Original layout templates: **CC BY 4.0**, attributed to Cartomize / ONDON NKOUA Cédrick Belmich. License and provenance notices are included in the distribution.
+
+Version 1.10.0 completes auditable attribute and spatial extraction: multiple criteria, AND/OR and final inversion, unchanged selected and rejected layers, per-row reasons and a cross-tabulated summary. Native dates and exact integer identifiers remain typed. Both partitions are verified after writing and delivered atomically through Python, the CLI, plans and the vector desktop page. See the [G07 guide](https://github.com/cedrick14/cartomize-python/blob/main/docs/VECTOR_SELECTION.md).

@@ -2,7 +2,7 @@
 
 Cartomize associe une bibliothèque Python, une interface graphique et des commandes pour le traitement géospatial et la production cartographique.
 
-La version des sources est **1.9.0**. La bibliothèque, les cellules Jupyter, les commandes du terminal et l’interface de bureau appellent les mêmes traitements. Cette version complète **G06 — Conversion et conditionnement des données** : formats vectoriels, GeoTIFF/COG, encodage, types numériques, NoData et contrôle complet après relecture. Voir la [note de version](docs/RELEASE_1.9.0.md) et le [guide G06](docs/DATA_CONVERSION.md).
+La version des sources est **1.10.0**. La bibliothèque, les cellules Jupyter, les commandes du terminal et l’interface de bureau appellent les mêmes traitements. Cette version complète **G07 — Extraction attributaire et spatiale** : critères combinables, couches retenues et exclues, motifs par ligne et bilan des sélections. Voir la [note de version](docs/RELEASE_1.10.0.md) et le [guide G07](docs/VECTOR_SELECTION.md).
 
 ## Installation
 
@@ -71,11 +71,11 @@ fenetre = cm.launch()
 
 Pour ouvrir cette fenêtre depuis un notebook local, installer `.[notebook]`, redémarrer le noyau puis appeler `cm.launch()`. Les notebooks distants peuvent utiliser l’API sans ouvrir de fenêtre native.
 
-Les versions publiées sont indiquées sur [PyPI](https://pypi.org/project/cartomize/). La présence de 1.9.0 dans ce dépôt ne signifie pas sa publication sur cet index. Le [guide d’installation](docs/WORKBENCH.md) décrit également l’installation d’un paquet wheel.
+Les versions publiées sont indiquées sur [PyPI](https://pypi.org/project/cartomize/). La présence de 1.10.0 dans ce dépôt ne signifie pas sa publication sur cet index. Le [guide d’installation](docs/WORKBENCH.md) décrit également l’installation d’un paquet wheel.
 
 ## Espace de travail
 
-L’explorateur ouvre les fichiers locaux et les projets Cartomize. Le catalogue classe les vingt pages de traitement par domaine et propose une recherche. Les paramètres restent à droite de la carte. Les résultats s’ouvrent dans des onglets intégrés.
+L’explorateur ouvre les fichiers locaux et les projets Cartomize. Le catalogue classe les 21 pages de traitement par domaine et propose une recherche. Les paramètres restent à droite de la carte. Les résultats s’ouvrent dans des onglets intégrés.
 
 Le panneau inférieur réunit la console Python, les journaux, les données chargées et le diagnostic de l’environnement. La console utilise un processus distinct pour permettre l’interruption du code sans fermer l’application. Les thèmes Clair, Sombre et Système, la taille du texte et la disposition des panneaux sont mémorisés.
 
@@ -91,7 +91,7 @@ Les cartes proposent zoom, déplacement, valeurs de pixels, légendes, métadonn
 | Vecteur | Harmonisation de schémas et fusion avec provenance, qualité avec rapports, topologie, doublons, sélections, superpositions, jointures, synthèses par zone, découpage, tampons, dissolution avec agrégation, mesures, reprojection, réparation, géométries dérivées, coordonnées XY et derniers relevés |
 | Terrain et réseaux | Dérivées topographiques, convolution, drainage D8, bassins versants et plus court chemin |
 | Cartographie | Couches, symbologie, étiquettes, 24 maquettes, cadres, légendes, échelles, atlas, PDF/PNG/SVG |
-| Automatisation | Plans, 50 opérateurs chaînables, recettes et production en série |
+| Automatisation | Plans, 53 opérateurs chaînables, recettes et production en série |
 | Projets | Sessions JSON, archives CMZ, catalogue des résultats et restauration des vues |
 
 ## Exemple Python
@@ -112,7 +112,7 @@ Le [parcours automatique](docs/IMAGERY_AUTOMATIC.md) applique le seuil de couver
 
 Le [diagnostic d’imagerie](docs/IMAGERY_AUDIT.md) mesure séparément l’emprise, la présence des bandes et les pixels utilisables après les masques. Il propose une scène unique, une mosaïque ou la recherche de scènes complémentaires. Le [tutoriel 13](tutorials/notebooks/13_diagnostic_automatique.ipynb) exécute cette décision puis le prétraitement, le NDVI et les statistiques zonales sur des données simulées.
 
-L’[inventaire de 123 procédures](docs/EXPERT_PROCEDURES.md), également disponible en [JSON](docs/EXPERT_PROCEDURES.json), relie les procédures QGIS/ArcGIS aux fonctions réellement présentes : **17 disponibles, 44 partielles et 62 absentes**. Ces statuts portent sur des procédures expertes complètes ; ils ne sont pas un comptage des opérateurs du logiciel. Les fonctions partielles gardent leurs limites explicites, notamment pour le radar, les corrections atmosphériques de niveau 1, la validation avancée et les réseaux soumis à des restrictions.
+L’[inventaire de 123 procédures](docs/EXPERT_PROCEDURES.md), également disponible en [JSON](docs/EXPERT_PROCEDURES.json), relie les procédures QGIS/ArcGIS aux fonctions réellement présentes : **18 disponibles, 43 partielles et 62 absentes**. Ces statuts portent sur des procédures expertes complètes ; ils ne sont pas un comptage des opérateurs du logiciel. Les fonctions partielles gardent leurs limites explicites, notamment pour le radar, les corrections atmosphériques de niveau 1, la validation avancée et les réseaux soumis à des restrictions.
 
 Le [module M08](docs/VECTOR_QUALITY.md) et le [cours 14](tutorials/notebooks/14_qualite_vectorielle.ipynb) exécutent les procédures G01–G03 depuis Python, Jupyter et l’interface. Chaque opération conserve les diagnostics et les entités écartées.
 
@@ -123,6 +123,8 @@ Le [module M09](docs/VECTOR_REPROJECTION.md) et le [cours 15](tutorials/notebook
 Le [module M10](docs/VECTOR_MERGE.md) et le [cours 16](tutorials/notebooks/16_harmonisation_fusion_vectorielle.ipynb) terminent G05. Ils réunissent des schémas différents dans une couche commune, avec conversions contrôlées, valeurs nulles distinctes des zéros et provenance par enregistrement. La fusion conserve les géométries et leurs éventuels recouvrements.
 
 Le [module M11](docs/DATA_CONVERSION.md) et le [cours 18](tutorials/notebooks/18_conversion_conditionnement.ipynb) terminent G06. Une page « Conversion et formats » réunit le choix de couche, les formats vectoriels, la livraison GeoTIFF/COG et les paramètres de précision, compression et NoData. Chaque sortie est intégralement relue et comparée avant publication.
+
+Le [module M12](docs/VECTOR_SELECTION.md) et le [cours 19](tutorials/notebooks/19_extraction_attributaire_spatiale.ipynb) terminent G07. Dans la page Vecteur, « Extraction avec bilan » combine les critères, publie les retenus et les exclus sans modifier leurs attributs et explique chaque décision dans un rapport. Les deux partitions sont réutilisables dans les plans.
 
 ## Projets réels
 
@@ -148,7 +150,7 @@ python -m pytest
 python -m build
 python -m twine check --strict dist/*
 python scripts/check_release.py dist
-python scripts/verify_installed_release.py --wheel dist/cartomize-1.9.0-py3-none-any.whl --output reports/installed.json
+python scripts/verify_installed_release.py --wheel dist/cartomize-1.10.0-py3-none-any.whl --output reports/installed.json
 ```
 
 La validation automatise les contrôles Windows et Linux, les traitements, l’interface, les projets, les exports, la console et une installation isolée du paquet construit. Les essais CUDA et QGIS natif demandent leurs environnements respectifs. Les résultats sont associés aux versions, aux données et aux commits inscrits dans les rapports.

@@ -7,16 +7,22 @@ on:
       - 'src/cartomize/**'
       - 'scripts/real_project_data.py'
       - 'scripts/validate_real_projects.py'
+      - 'scripts/validate_vector_selection_real.py'
+      - 'scripts/validate_vector_quality_real.py'
       - 'scripts/project_comparisons.py'
       - 'tests/test_project_comparisons.py'
+      - 'tests/test_g07_real_oracle.py'
       - '.github/workflows/real-projects.yml'
   pull_request:
     paths:
       - 'src/cartomize/**'
       - 'scripts/real_project_data.py'
       - 'scripts/validate_real_projects.py'
+      - 'scripts/validate_vector_selection_real.py'
+      - 'scripts/validate_vector_quality_real.py'
       - 'scripts/project_comparisons.py'
       - 'tests/test_project_comparisons.py'
+      - 'tests/test_g07_real_oracle.py'
       - '.github/workflows/real-projects.yml'
   workflow_dispatch:
 
@@ -57,6 +63,9 @@ jobs:
           key: real-project-data-v1-72c7f3168e1e4e257caf84eb7b3fcaa47ade09c0-16371473
       - name: Execute original-data scenarios and graphical tools
         run: python scripts/validate_real_projects.py --data .real-project-data --output reports/real-projects
+      - name: Verify G07 selected and excluded records against original data
+        if: '!cancelled()'
+        run: python scripts/validate_vector_selection_real.py --data .real-project-data --work reports/g07-real/products --output reports/g07-real/validation.json
       - name: Check complete regression suite
         if: '!cancelled()'
         run: python -m pytest -q --timeout=180 --junitxml=reports/regressions.xml
@@ -78,6 +87,7 @@ jobs:
             reports/**/*.png
             reports/**/*.pdf
             reports/**/*.svg
+            reports/g07-real/products/**/*.gpkg
             dist-validation/*
           if-no-files-found: error
           retention-days: 30

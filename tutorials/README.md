@@ -111,3 +111,7 @@ Le [workflow Tutoriels](https://github.com/cedrick14/cartomize-python/actions/wo
 Proposer un cas d’étude reproductible dans le [suivi du dépôt](https://github.com/cedrick14/cartomize-python/issues), avec l’objectif, les données diffusables, les étapes et le résultat attendu. Les contributions peuvent porter sur les corrections, les traductions, les exercices, les références ou les essais sur d’autres jeux de données. Une donnée de terrain ou une légende documentée est particulièrement utile pour transformer un exercice exploratoire en étude validée.
 
 Cours et code : ONDON NKOUA Cédrick Belmich / Cartomize. Les scripts suivent la licence GPL-3.0-only du dépôt. Les données externes conservent leurs conditions propres. Les résultats synthétiques sont identifiés comme tels.
+
+## Cours 19 — Extraction attributaire et spatiale
+
+Le [cours 19](notebooks/19_extraction_attributaire_spatiale.ipynb) utilise des observations simulées pour vérifier les critères multiples, ET/OU, l’inversion, les dates natives, les limites spatiales et la publication des retenus et exclus. Il réutilise ensuite les exclus dans un plan et contrôle l’annulation et les empreintes des entrées. Aucun jeu de données privé n’est nécessaire.
