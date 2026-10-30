@@ -52,8 +52,16 @@ jobs:
           python scripts/check_release.py pypi-dist
       - uses: actions/upload-artifact@v4
         with:
-          name: cartomize-pypi-distributions
+          name: cartomize-complete-distributions
           path: pypi-dist/*
+          if-no-files-found: error
+          retention-days: 14
+      - name: Stage files eligible for the selected public version
+        run: python scripts/stage_pypi_upload.py pypi-dist publish-dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cartomize-pypi-distributions
+          path: publish-dist/*
           if-no-files-found: error
           retention-days: 14
 

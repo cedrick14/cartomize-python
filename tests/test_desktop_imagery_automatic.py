@@ -112,6 +112,34 @@ def test_automatic_worker_selects_mosaic_and_registers_all_products(application,
         assert window.tool('indices').source.text() == product['multiband']
         assert window.tool('classification').source.text() == product['multiband']
         assert 'zone entièrement couverte' in page.coverage_summary.text()
+        assert 'Mosaïque automatique de 2 scènes' in page.coverage_summary.text()
+        assert 'EPSG:32733 ; résolution 10 m' in page.coverage_summary.text()
+        assert 'Découpage à la zone d’étude réalisé' in page.coverage_summary.text()
+    finally:
+        close(window, application)
+
+
+def test_automatic_retains_one_sufficient_scene_and_clips_to_aoi(application, write_raster, tmp_path):
+    window = CartomizeWindow()
+    try:
+        page, zone = configure(window, write_raster, tmp_path, width=2)
+        # Both scenes are selected; the user only chooses a smaller study area.
+        cm.GeoDataFrame(geometry=[box(300000, 9499980, 300010, 9500000)], crs=32733).to_file(zone)
+        assert len(page.selected_scenes()) == 2
+        window.start()
+        wait(window)
+        assert window.status.text().startswith('Traitement terminé'), window.status.text()
+        record = json.loads(Path(window.output_path).read_text(encoding='utf-8'))
+        assert record['status'] == 'complete'
+        assert record['selected_scene_ids'] == ['A']
+        assert not record['mosaic']
+        with rasterio.open(record['products'][0]['multiband']) as src:
+            assert (src.width, src.height, src.count) == (1, 2, 2)
+            assert tuple(src.bounds) == (300000, 9499980, 300010, 9500000)
+            np.testing.assert_allclose(src.read(1), .2)
+            assert src.read_masks().min() == 255
+        assert 'Une seule scène retenue ; aucune mosaïque nécessaire' in page.coverage_summary.text()
+        assert 'Découpage à la zone d’étude réalisé' in page.coverage_summary.text()
     finally:
         close(window, application)
 

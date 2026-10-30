@@ -130,5 +130,11 @@
     "title": "G12 : zones tampons et anneaux de distance",
     "real": false,
     "minutes": 35
+  },
+  {
+    "slug": "22_demonstration_pretraitement_automatique",
+    "title": "Démonstration : scènes, bandes et zone d’étude",
+    "real": false,
+    "minutes": 15
   }
 ]

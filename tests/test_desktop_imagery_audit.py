@@ -126,6 +126,31 @@ def test_selection_and_parameters_invalidate_recommendation(application, write_r
         application.processEvents()
 
 
+def test_failed_band_reload_discards_the_previous_recommendation(application, write_raster, tmp_path):
+    window = CartomizeWindow()
+    try:
+        page = configure(window, write_raster, tmp_path)
+        page.diagnose_coverage()
+        wait(window)
+        assert page.apply_audit_button.isEnabled(), window.status.text()
+        previous_report = window.output_path
+
+        page.files = [str(tmp_path / 'band_removed_after_selection.tif')]
+        page.inspect_inputs()
+
+        assert page.assets.rowCount() == 0
+        assert page._audit_report is None
+        assert not page.apply_audit_button.isEnabled()
+        assert page.coverage_scenes.rowCount() == 0
+        assert 'band_removed_after_selection.tif' in page.inventory.text()
+        # The old report remains inspectable, but cannot control the new input.
+        assert Path(previous_report).is_file()
+        assert previous_report in window.workspace.records
+    finally:
+        window.close()
+        application.processEvents()
+
+
 def test_proposal_changes_only_scene_selection_and_mosaic(application, write_raster, tmp_path):
     window = CartomizeWindow()
     try:

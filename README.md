@@ -2,7 +2,7 @@
 
 Cartomize associe une bibliothèque Python, une interface graphique et des commandes pour le traitement géospatial et la production cartographique.
 
-La version des sources est **1.12.0**. La bibliothèque, les cellules Jupyter, les commandes du terminal et l’interface de bureau appellent les mêmes traitements. Cette version complète **G12 — Zones tampons et anneaux de distance** : couronnes à bornes métriques, fusion globale ou séries par source, intérieur des polygones explicite, identités et bilans de surface vérifiés. Voir la [note de version](docs/RELEASE_1.12.0.md) et le [guide G12](docs/VECTOR_RINGS.md).
+Cette édition consolidée porte le numéro **1.0** et réunit tous les modules déjà terminés, jusqu’à **G12 — Zones tampons et anneaux de distance**. La bibliothèque, les cellules Jupyter, les commandes du terminal et l’interface de bureau appellent les mêmes traitements. Voir la [présentation de l’édition](docs/RELEASE_1.0.md) et le [parcours de démonstration](docs/DEMONSTRATION_1.0.md).
 
 ## Installation
 
@@ -71,7 +71,7 @@ fenetre = cm.launch()
 
 Pour ouvrir cette fenêtre depuis un notebook local, installer `.[notebook]`, redémarrer le noyau puis appeler `cm.launch()`. Les notebooks distants peuvent utiliser l’API sans ouvrir de fenêtre native.
 
-Les versions publiées sont indiquées sur [PyPI](https://pypi.org/project/cartomize/). La présence de 1.12.0 dans ce dépôt ne signifie pas sa publication sur cet index. Le [guide d’installation](docs/WORKBENCH.md) décrit également l’installation d’un paquet wheel.
+Pour cette édition consolidée, installer le **wheel fourni avec la livraison** ou les sources de cette branche. Le paquet historique `cartomize==1.0` publié sur [PyPI](https://pypi.org/project/cartomize/) en septembre 2026 est antérieur à cette consolidation ; le numéro seul ne permet pas de les distinguer. Le [suivi de publication](docs/PUBLICATION.md) précise l’état de la distribution et le [guide de démonstration](docs/DEMONSTRATION_1.0.md) donne les commandes d’installation du wheel.
 
 ## Espace de travail
 
@@ -88,7 +88,7 @@ Les cartes proposent zoom, déplacement, valeurs de pixels, légendes, métadonn
 | Préparation multispectrale | Diagnostic de couverture et de lacunes, proposition de scènes, calibration, masques QA/SCL, mosaïque, assemblage multibande, extraction, composition colorée, export des bandes |
 | Raster | 18 indices spectraux, calculatrice, reclassification, statistiques focales, zonales et multirasters, superficies, transitions |
 | Classification | Forêts aléatoires, arbres extrêmement aléatoires, K-moyennes, validation et modèles enregistrés |
-| Vecteur | Table croisée de surfaces et bilans par zone, harmonisation de schémas et fusion avec provenance, qualité avec rapports, topologie, doublons, sélections, superpositions, jointures, synthèses par zone, découpage, tampons, dissolution avec agrégation, mesures, reprojection, réparation, géométries dérivées, coordonnées XY et derniers relevés |
+| Vecteur | Anneaux de distance et bilans, table croisée de surfaces par zone, conversion et conditionnement, harmonisation de schémas et fusion avec provenance, qualité avec rapports, topologie, doublons, sélections, superpositions, jointures, synthèses par zone, découpage, tampons, dissolution avec agrégation, mesures, reprojection, réparation, géométries dérivées, coordonnées XY et derniers relevés |
 | Terrain et réseaux | Dérivées topographiques, convolution, drainage D8, bassins versants et plus court chemin |
 | Cartographie | Couches, symbologie, étiquettes, 24 maquettes, cadres, légendes, échelles, atlas, PDF/PNG/SVG |
 | Automatisation | Plans, 55 opérateurs chaînables, recettes et production en série |
@@ -108,7 +108,7 @@ Les opérations vectorielles utilisent les objets GeoPandas. Les fichiers GeoTIF
 
 ## Couverture et procédures expertes
 
-Le [parcours automatique](docs/IMAGERY_AUTOMATIC.md) applique le seuil de couverture avant de produire les images. Il sélectionne les scènes, effectue la mosaïque utile et peut rechercher des compléments dans un catalogue configuré, avec limites de téléchargement. Un refus conserve les cartes des lacunes ; une couverture partielle acceptée reste identifiée.
+Le [parcours automatique](docs/IMAGERY_AUTOMATIC.md) part des **scènes, des bandes choisies et de la zone d’étude**. Il mesure la couverture, sélectionne les scènes utiles, calibre les valeurs, applique les masques QA/SCL, harmonise les projections et les résolutions, réalise une mosaïque si elle est nécessaire et découpe les produits sur le polygone. Il peut rechercher des compléments dans un catalogue configuré, avec limites de téléchargement. Un refus conserve les cartes des lacunes ; une couverture partielle acceptée reste identifiée. Le [guide de démonstration](docs/DEMONSTRATION_1.0.md) décrit le même parcours dans la fenêtre et dans Jupyter.
 
 Le [diagnostic d’imagerie](docs/IMAGERY_AUDIT.md) mesure séparément l’emprise, la présence des bandes et les pixels utilisables après les masques. Il propose une scène unique, une mosaïque ou la recherche de scènes complémentaires. Le [tutoriel 13](tutorials/notebooks/13_diagnostic_automatique.ipynb) exécute cette décision puis le prétraitement, le NDVI et les statistiques zonales sur des données simulées.
 
@@ -144,7 +144,7 @@ Le dossier de sortie contient la correspondance des étapes, les résultats num�
 
 [Interface](docs/WORKBENCH.md), [traitements graphiques](docs/DESKTOP.md), [visualisation](docs/RESULTS_WORKSPACE.md), [API Python](docs/PYTHON_API.md), [prétraitement multispectral](docs/IMAGERY_SELECTION.md), [statistiques zonales](docs/RASTER_STATISTICS.md), [classification](docs/CLASSIFICATION.md), [chaînes de traitements](docs/PROCESSING.md), [moteurs de calcul](docs/EXECUTION.md), [projets réels](docs/REAL_PROJECTS.md).
 
-Le [parcours de tutoriels](tutorials/README.md) contient les notebooks de préparation multispectrale, d’analyse et de production cartographique. Les [changements 1.3.0](docs/RELEASE_1.3.0.md) complètent la [refonte de l’interface 1.1](docs/RELEASE_1.1.0.md).
+Le [parcours de tutoriels](tutorials/README.md) contient les notebooks de préparation multispectrale, d’analyse et de production cartographique. La [note de l’édition consolidée](docs/RELEASE_1.0.md) récapitule les modules réunis ; les notes antérieures conservent la traçabilité des développements.
 
 ## Développement et validation
 
@@ -154,7 +154,7 @@ python -m pytest
 python -m build
 python -m twine check --strict dist/*
 python scripts/check_release.py dist
-python scripts/verify_installed_release.py --wheel dist/cartomize-1.12.0-py3-none-any.whl --output reports/installed.json
+python scripts/verify_installed_release.py --wheel dist/cartomize-1.0-20261030-py3-none-any.whl --output reports/installed.json
 ```
 
 La validation automatise les contrôles Windows et Linux, les traitements, l’interface, les projets, les exports, la console et une installation isolée du paquet construit. Les essais CUDA et QGIS natif demandent leurs environnements respectifs. Les résultats sont associés aux versions, aux données et aux commits inscrits dans les rapports.
