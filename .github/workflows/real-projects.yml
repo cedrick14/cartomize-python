@@ -7,6 +7,16 @@ on:
       - 'src/cartomize/**'
       - 'scripts/real_project_data.py'
       - 'scripts/validate_real_projects.py'
+      - 'scripts/project_comparisons.py'
+      - 'tests/test_project_comparisons.py'
+      - '.github/workflows/real-projects.yml'
+  pull_request:
+    paths:
+      - 'src/cartomize/**'
+      - 'scripts/real_project_data.py'
+      - 'scripts/validate_real_projects.py'
+      - 'scripts/project_comparisons.py'
+      - 'tests/test_project_comparisons.py'
       - '.github/workflows/real-projects.yml'
   workflow_dispatch:
 

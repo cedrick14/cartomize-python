@@ -1,6 +1,8 @@
 """Attribute-join policies are explicit and preserved by desktop worker jobs."""
 import os
+from datetime import date
 from pathlib import Path
+import sqlite3
 import threading
 
 os.environ.setdefault('QT_QPA_PLATFORM', 'offscreen')
@@ -16,6 +18,8 @@ from PySide6.QtWidgets import QApplication
 
 from cartomize.desktop import Worker
 from cartomize.desktop_vector import VectorPage
+from cartomize.desktop_tools_base import write_result
+from cartomize.vector_io import read_vector, write_geopackage
 
 
 @pytest.fixture(scope='module')
@@ -148,3 +152,66 @@ def test_join_controls_and_explanation_are_specific_to_attribute_join(page):
             assert page.form.labelForField(widget).isHidden()
     page.operation.setCurrentIndex(page.operation.findData('join_attributes'))
     assert all(not widget.isHidden() for widget in controls)
+
+
+def test_geopackage_result_keeps_date_datetime_and_null_storage(tmp_path):
+    frame = gpd.GeoDataFrame({
+        'visit_date': [date(2024, 2, 29), None],
+        'observed_at': [pd.Timestamp('2024-02-29T13:14:15.123'), None],
+        'unknown_date': [None, None],
+    }, geometry=[Point(300000, 9500000), Point(300001, 9500001)], crs=32733)
+    frame.attrs['_cartomize_declared_fields'] = {'unknown_date': 'date'}
+    destination = tmp_path / 'dates.gpkg'
+    write_result(frame, destination)
+    with sqlite3.connect(destination) as connection:
+        layer = connection.execute('SELECT table_name FROM gpkg_contents').fetchone()[0]
+        fields = {row[1]: row[2] for row in connection.execute(f'PRAGMA table_info("{layer}")')}
+        assert fields['visit_date'] == 'DATE'
+        assert fields['observed_at'] == 'DATETIME'
+        assert fields['unknown_date'] == 'DATE'
+        stored = connection.execute(f'SELECT visit_date, observed_at, unknown_date FROM "{layer}"').fetchall()
+        assert stored[0][0] == '2024-02-29'
+        assert pd.Timestamp(stored[0][1]) == pd.Timestamp('2024-02-29T13:14:15.123')
+        assert stored[0][2] is None and stored[1] == (None, None, None)
+    reloaded = read_vector(destination)
+    assert type(reloaded.visit_date.iloc[0]) is date
+    assert reloaded.visit_date.iloc[0] == date(2024, 2, 29)
+    assert reloaded.observed_at.iloc[0] == pd.Timestamp('2024-02-29T13:14:15.123')
+    assert pd.isna(reloaded.visit_date.iloc[1])
+
+
+def test_latest_records_worker_preserves_native_date_fields(page, tmp_path):
+    source = tmp_path / 'visits.gpkg'
+    frame = gpd.GeoDataFrame({
+        'pcode': ['a', 'a', 'b'],
+        'visit_date': [date(2023, 1, 1), date(2024, 2, 29), date(2024, 1, 1)],
+        'value': [10, 20, 30],
+    }, geometry=[Point(300000 + i, 9500000) for i in range(3)], crs=32733)
+    write_geopackage(frame, source)
+    destination = tmp_path / 'latest.gpkg'
+    page.operation.setCurrentIndex(page.operation.findData('latest_records'))
+    page.source.edit.setText(str(source))
+    page.left_key.setCurrentText('pcode')
+    page.order_field.setCurrentText('visit_date')
+    page.output.edit.setText(str(destination))
+    successes, failures = execute(page.job({'overwrite': False}))
+    assert not failures, failures
+    assert successes == [str(destination)]
+    result = read_vector(destination).set_index('pcode')
+    assert type(result.loc['a', 'visit_date']) is date
+    assert result.loc['a', 'visit_date'] == date(2024, 2, 29)
+    assert result.loc['a', 'value'] == 20
+    assert result.loc['b', 'visit_date'] == date(2024, 1, 1)
+
+
+def test_unrepresentable_datetime_does_not_replace_existing_result(tmp_path):
+    destination = tmp_path / 'existing.gpkg'
+    frame = gpd.GeoDataFrame({'observed_at': [pd.Timestamp('2024-02-29T13:14:15.123')]},
+                             geometry=[Point(300000, 9500000)], crs=32733)
+    write_result(frame, destination)
+    original = destination.read_bytes()
+    frame.loc[0, 'observed_at'] = pd.Timestamp('2024-02-29T13:14:15.123456')
+    with pytest.raises(ValueError, match='sub-millisecond'):
+        write_result(frame, destination, overwrite=True)
+    assert destination.read_bytes() == original
+    assert not list(tmp_path.glob('.cartomize-output-*'))
