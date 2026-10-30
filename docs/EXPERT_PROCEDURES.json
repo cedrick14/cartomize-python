@@ -1,7 +1,7 @@
 {
   "schema": "cartomize.expert_procedures.v1",
-  "date": "2026-10-26",
-  "source_version": "1.8.0",
+  "date": "2026-10-30",
+  "source_version": "1.9.0",
   "source_state": "reviewed_source",
   "baseline_commit": "ad4d1d7a89557e347b9a322f73c32205807c077a",
   "inventory": {
@@ -17,7 +17,8 @@
     ]
   },
   "scope": [
-    "Correspondance de l’inventaire expert avec Cartomize 1.8.0 ; modules M01 à M10 implémentés dans leurs périmètres explicites.",
+    "Correspondance de l’inventaire expert avec Cartomize 1.9.0 ; modules M01 à M11 implémentés dans leurs périmètres explicites.",
+    "M11 termine G06 : conversion vectorielle et raster, choix explicites des formats et couches, encodage, précision, compression et NoData, comparaison complète après relecture et publication atomique ; Python, terminal, plans, fenêtre et cours 18.",
     "Le complément G01 de 1.8.0 termine la sélection de couche, la grille XY facultative, les correspondances avant/après, la publication vérifiée et le parcours de comparaison ; il prolonge M08 sans créer de module M11.",
     "baseline_commit identifie le point de départ du dépôt avant les compléments ; il ne désigne pas un commit final de publication de la version 1.3.0.",
     "M10 relie inspection des schémas, correspondances de champs, conversions contrôlées, fusion avec provenance et publication atomique à Python, au terminal, aux plans et à la fenêtre. La validation de chaque version reste décrite dans son rapport propre.",
@@ -34,13 +35,13 @@
   },
   "counts": {
     "total": 123,
-    "available": 16,
-    "partial": 45,
+    "available": 17,
+    "partial": 44,
     "absent": 62,
     "by_domain": {
       "Socle SIG et LiDAR": {
-        "available": 12,
-        "partial": 7,
+        "available": 13,
+        "partial": 6,
         "absent": 9
       },
       "Télédétection et images": {
@@ -137,50 +138,57 @@
       "scope": "G05 : inspection et correspondance des schémas, types/conversions/manquants explicites, concaténation avec provenance et contrôle des sorties ; API, terminal, plans, fenêtre et cours 16."
     },
     {
-      "id": "E01",
+      "id": "M11",
       "order": 11,
+      "status": "implemented",
+      "title": "Conversion et conditionnement des données",
+      "scope": "G06 : formats vectoriels et raster, encodage et champs, compression/type/NoData, relecture comparative complète, rapport de pertes et livraison atomique ; API, terminal, plans, fenêtre et cours 18."
+    },
+    {
+      "id": "E01",
+      "order": 12,
       "status": "in_progress",
       "title": "Socle de géotraitement et échanges raster-vecteur",
-      "scope": "G01–G03 terminées par M08, reprojection G04 par M09, harmonisation/fusion G05 par M10. À poursuivre : conversion, sélection, tables, grilles, échanges raster-vecteur et lots."
+      "scope": "G01–G03 terminées par M08, reprojection G04 par M09, harmonisation/fusion G05 par M10, conversion G06 par M11. À poursuivre : sélection, tables, grilles, échanges raster-vecteur et lots."
     },
     {
       "id": "E02",
-      "order": 12,
+      "order": 13,
       "status": "proposed",
       "title": "Qualité thématique et analyses raster usuelles",
       "scope": "Échantillonnage de référence, évaluation externe, unités minimales, transitions, prédicteurs et changements continus."
     },
     {
       "id": "E03",
-      "order": 13,
+      "order": 14,
       "status": "proposed",
       "title": "Séries temporelles et profils optiques",
       "scope": "Calendrier, masques, provenance, composites, lissage ; puis phénologie, tendances et profils forêt/eau/cultures/feux."
     },
     {
       "id": "E04",
-      "order": 14,
+      "order": 15,
       "status": "proposed",
       "title": "Terrain et hydrologie explicites",
       "scope": "Conventions de relief ; surfaces contributives, exutoires, chenaux, bassins, ordres, HAND/TWI/LS et morphométrie."
     },
     {
       "id": "E05",
-      "order": 15,
+      "order": 16,
       "status": "proposed",
       "title": "Indicateurs territoriaux et statistiques spatiales",
       "scope": "Supports et dénominateurs, exposition, carroyage ; puis densités, autocorrélation, interpolation et régressions."
     },
     {
       "id": "E06",
-      "order": 16,
+      "order": 17,
       "status": "proposed",
       "title": "Réseaux, multicritère et paysage",
       "scope": "Coûts réseau et accessibilité ; critères et sensibilité ; composantes, taches et connectivité."
     },
     {
       "id": "E07",
-      "order": 17,
+      "order": 18,
       "status": "proposed",
       "title": "Modules spécialisés avec validation propre",
       "scope": "LiDAR, géoréférencement, correction atmosphérique, SAR/InSAR, apprentissage profond, hydraulique et modèles écologiques/pédoclimatiques."
@@ -587,6 +595,30 @@
       "operators": [
         "vector.merge_layers"
       ]
+    },
+    "cartomize.vector_conversion.inspect_vector_conversion": {
+      "path": "src/cartomize/vector_conversion.py",
+      "symbol": "inspect_vector_conversion",
+      "operators": []
+    },
+    "cartomize.vector_conversion.convert_vector": {
+      "path": "src/cartomize/vector_conversion.py",
+      "symbol": "convert_vector",
+      "operators": [
+        "vector.convert"
+      ]
+    },
+    "cartomize.raster_conversion.inspect_raster_conversion": {
+      "path": "src/cartomize/raster_conversion.py",
+      "symbol": "inspect_raster_conversion",
+      "operators": []
+    },
+    "cartomize.raster_conversion.convert_raster": {
+      "path": "src/cartomize/raster_conversion.py",
+      "symbol": "convert_raster",
+      "operators": [
+        "raster.convert"
+      ]
     }
   },
   "procedures": [
@@ -735,27 +767,29 @@
       "procedure": "Conversion et conditionnement des données",
       "domain": "Socle SIG et LiDAR",
       "theme": "Coordonnées et formats",
-      "status": "partial",
+      "status": "available",
       "api": [
-        "cartomize.vector.read_file",
-        "cartomize.tableio.read_table",
-        "cartomize.processing.execute_operation"
+        "cartomize.vector_conversion.inspect_vector_conversion",
+        "cartomize.vector_conversion.convert_vector",
+        "cartomize.raster_conversion.inspect_raster_conversion",
+        "cartomize.raster_conversion.convert_raster"
       ],
-      "implemented": "Lecture vectorielle, lecture CSV/TSV avec types et encodage explicites, export des résultats des opérateurs.",
-      "missing": [
-        "Recette de conversion avec choix du format et des couches",
-        "Rapport de pertes éventuelles et relecture comparative."
-      ],
+      "implemented": "Conversion d’une couche choisie vers GeoPackage, GeoJSON, Shapefile ou FlatGeobuf ; rasters vers GeoTIFF ou COG. Types, noms, encodage, compression, précision et NoData explicites. Relecture exhaustive, rapport des différences et publication atomique. API, terminal, plans, fenêtre et cours 18.",
+      "missing": [],
       "conditions": [
-        "Les formats vectoriels dépendent des pilotes disponibles ; read_table ne lit pas les classeurs Excel."
+        "Pilotes GDAL installés. Les formats de sortie sont explicitement pris en charge ; un fichier multicouche exige le choix de la couche.",
+        "Aucune reprojection implicite. La politique par défaut refuse toute perte ; report permet seulement les changements explicitement mesurés et consignés. Les incompatibilités de CRS, géométrie, plage numérique et masque restent refusées.",
+        "Une conversion vectorielle publie une couche ; une recette permet de répéter les conversions. Les formats qui ne peuvent représenter fidèlement les données exigent une préparation ou un autre format."
       ],
-      "next_module": "E01",
+      "next_module": null,
       "planned_fixes": [],
       "references": [
         "R009",
         "R005"
       ],
-      "completed_modules": []
+      "completed_modules": [
+        "M11"
+      ]
     },
     {
       "id": "G07",

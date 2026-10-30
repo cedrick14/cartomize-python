@@ -11,7 +11,8 @@ GOALS={'general':'Carte générale','administrative':'Carte administrative','lan
 TOOL_LABELS={'processing':'Chaîne de traitements','classification':'Classification', 'recipes':'Recettes et production en série', 'native':'Projets SIG', 'mapops':'Révision cartographique', 'terrain':'Analyse de terrain', 'project':'Analyse du projet','prepare':'Prétraitement multispectral','composite':'Composition colorée',
              'vector':'Traitements vectoriels','raster':'Traitements raster','indices':'Indices spectraux',
              'calculator':'Calculatrice raster','focal':'Statistiques focales','temporal':'Statistiques multirasters',
-             'mapping':'Mise en page','atlas':'Atlas cartographique','workflow':'Production automatisée','inspect':'Analyse des couches'}
+             'mapping':'Mise en page','atlas':'Atlas cartographique','workflow':'Production automatisée','inspect':'Analyse des couches',
+             'conversion':'Conversion et formats'}
 
 
 def assess_project(inputs,*,data_kind='layers',goal='general',aoi=None,progress=None,cancel=None):

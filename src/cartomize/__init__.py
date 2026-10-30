@@ -29,7 +29,7 @@ from .relations import analyze_relations
 from .automation import plan_cartography,run_plan,propose_layouts
 from .mapops import snapshot_project,compare_snapshots,record_review,verify_review
 
-__version__ = "1.8.0"
+__version__ = "1.9.0"
 __display_version__ = ".".join(__version__.split(".")[:2])
 
 
@@ -97,3 +97,9 @@ from .vector_reprojection import (ReprojectedBatch, discover_vector_layers,
 __all__ += ['ReprojectedBatch', 'discover_vector_layers', 'inspect_reprojection', 'reproject_batch']
 from .vector_merge import MergedVectors, inspect_merge, merge_layers
 __all__ += ['MergedVectors', 'inspect_merge', 'merge_layers']
+from .vector_conversion import (ConvertedVector, VectorConversionError, vector_conversion_formats,
+                                inspect_vector_conversion, convert_vector)
+from .raster_conversion import ConvertedRaster, inspect_raster_conversion, convert_raster
+__all__ += ['ConvertedVector', 'inspect_vector_conversion', 'convert_vector',
+            'VectorConversionError', 'vector_conversion_formats',
+            'ConvertedRaster', 'inspect_raster_conversion', 'convert_raster']

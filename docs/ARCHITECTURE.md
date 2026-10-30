@@ -147,3 +147,11 @@ nouveau dossier. Le manifeste conserve schéma, correspondances, politiques,
 provenance et transformations éventuelles. Une reprojection explicitement
 demandée réutilise M09 ; la fusion attributaire n’effectue aucune union de
 géométries. Voir le [contrat M10](VECTOR_MERGE.md).
+
+## Conversion et conditionnement — M11
+
+`vector_conversion.py` et `raster_conversion.py` publient des livraisons atomiques après comparaison exhaustive du résultat relu. Les objets `ConvertedVector` et `ConvertedRaster` sont raccordés à `processing.py` par les opérateurs `vector.convert` et `raster.convert`. La CLI, les plans et `desktop_conversion.py` partagent ces moteurs.
+
+Le lecteur `vector_io.py` sépare les attributs Arrow et les WKB natifs pour FlatGeobuf, puis aligne les enregistrements par FID vérifié : ce chemin évite un crash natif sur les géométries nulles en conservant les entiers nullables exacts et les sélections. Les autres pilotes conservent leur chemin existant.
+
+Le moteur raster vérifie les pixels par blocs, les masques et les métadonnées avant publication. Les compagnons nécessaires à une livraison font partie de son manifeste et des projets portables. Le binaire COG n’est pas rouvert en écriture après sa création. Voir le [contrat G06](DATA_CONVERSION.md).

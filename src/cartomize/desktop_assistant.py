@@ -79,7 +79,7 @@ class AssistantPage(Page):
     def scene_options(self):
         for widget in (self.spectral_bands,self.composition,self.resolution,self.coverage_threshold,self.allow_partial):widget.setEnabled(self.kind.currentData()=='scenes')
     def add_files(self):
-        paths=QFileDialog.getOpenFileNames(self,'Données géographiques',filter='Données SIG (*.tif *.tiff *.jp2 *.vrt *.img *.gpkg *.shp *.geojson *.json)')[0]
+        paths=QFileDialog.getOpenFileNames(self,'Données géographiques',filter='Données SIG (*.tif *.tiff *.jp2 *.vrt *.img *.gpkg *.shp *.geojson *.json *.fgb)')[0]
         self.inputs.addItems(paths)
     def add_folder(self):
         path=QFileDialog.getExistingDirectory(self,'Scènes satellites')

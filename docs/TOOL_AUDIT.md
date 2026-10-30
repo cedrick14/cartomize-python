@@ -49,3 +49,7 @@ l’atteinte d’un seuil réduit. Les 48 opérateurs ne correspondent pas à
 - L’import QGIS transfère les couches et les styles pris en charge. Les expressions, SVG natifs, propriétés définies par les données et certains effets figurent dans le rapport des propriétés non transférées. Le rendu natif nécessite QGIS ou ArcGIS Pro selon le projet. La validation ArcGIS Pro reste à effectuer sur une installation licenciée.
 
 Voir les [méthodes de traitement](PROCESSING.md), les [moteurs de calcul](EXECUTION.md), la [vue des résultats](RESULTS_WORKSPACE.md) et la [validation](VALIDATION.md).
+
+## Conversion et formats — ajouté en 1.9.0
+
+Le module M11/G06 relie une inspection explicite des entrées aux conversions vectorielles et raster, à la comparaison des fichiers relus et au rapport de fidélité. La page dédiée, les commandes `convert-vector` et `convert-raster`, les plans et l’API appellent le même moteur. Le [guide G06](DATA_CONVERSION.md) précise les six formats de livraison, les paramètres, les différences autorisables et les incompatibilités refusées.

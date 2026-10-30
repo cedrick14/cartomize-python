@@ -6,7 +6,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QGroupBox,QHBoxLayout,QComboBox,QPushButton,QVBoxLayout
 
 RASTERS={'.tif','.tiff','.jp2','.vrt','.img'}
-VECTORS={'.gpkg','.shp','.geojson'}
+VECTORS={'.gpkg','.shp','.geojson','.fgb'}
 NON_SPECTRAL_PRODUCTS={'display_rgba','imagery_coverage','imagery_gaps','source_index'}
 
 
@@ -37,7 +37,7 @@ class ProjectConnections:
     def result_targets(self):
         self.result_target.clear();index=self.result_choice.currentIndex()
         if not 0<=index<len(self.results):return
-        layer=self.results[index];targets=['project','mapping','atlas','inspect']
+        layer=self.results[index];targets=['project','mapping','atlas','inspect','conversion']
         if layer['kind']=='vector':targets+=['vector']
         else:
             targets+=['raster','calculator','focal','temporal','terrain']
@@ -63,7 +63,7 @@ class ProjectConnections:
                 with rasterio.open(path) as src:
                     if src.tags().get('CARTOMIZE_PRODUCT') in NON_SPECTRAL_PRODUCTS or layer.get('purpose')=='diagnostic':raise ValueError('Utiliser le multibande scientifique pour les indices et la classification.')
             page.source.edit.setText(path)
-            if target=='inspect':page.kind.setCurrentIndex(page.kind.findData(layer['kind']))
+            if target in {'inspect','conversion'}:page.kind.setCurrentIndex(page.kind.findData(layer['kind']))
         self.select_tool(target);self.status.setText('Résultat transmis : '+Path(path).name)
     def collect_result(self,path):
         path=Path(path)
@@ -84,6 +84,20 @@ class ProjectConnections:
             self.register_result(layer)
             confidence=path.parent/'confidence.tif'
             if path.name=='classification.tif' and confidence.is_file():self.register_result(dict(data=confidence))
+        elif isinstance(record,dict) and (record.get('operation') in {'vector.convert','raster.convert'} or
+                record.get('schema') in {'cartomize.vector_conversion.v1','cartomize.raster_conversion.v1'}):
+            products=record.get('products',record)
+            def resolved(value):
+                if not isinstance(value,str):return None
+                candidate=Path(value);candidate=candidate if candidate.is_absolute() else path.parent/candidate
+                return candidate.resolve() if candidate.is_file() else None
+            data=resolved(products.get('data') or products.get('primary'))
+            report=resolved(products.get('report'))
+            if data:
+                layer=dict(data=str(data))
+                if report:layer['report']=str(report)
+                self.register_result(layer)
+            if report:self.workspace.register(dict(data=str(report),name='Rapport de conversion'))
         elif path.name=='imagery.json' or (isinstance(record,dict) and record.get('schema')=='cartomize.imagery.automatic.v1'):
             if record is None:record=json.loads(path.read_text(encoding='utf-8'))
             if record.get('status')=='partial':self._result_partial_coverage=True

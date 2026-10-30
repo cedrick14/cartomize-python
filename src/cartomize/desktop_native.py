@@ -45,7 +45,7 @@ class NativePage(Page):
         layers=[];unavailable=[]
         for item in (self.inventory or {}).get('layers',[]):
             source=item.get('source');provider_options=item.get('provider_options')
-            if source and not provider_options and Path(source).is_file() and item.get('visible',True) and Path(source).suffix.lower() in {'.tif','.tiff','.jp2','.vrt','.img','.gpkg','.shp','.geojson'}:layers.append(dict(data=source,name=item['name'],**item.get('options',{})))
+            if source and not provider_options and Path(source).is_file() and item.get('visible',True) and Path(source).suffix.lower() in {'.tif','.tiff','.jp2','.vrt','.img','.gpkg','.shp','.geojson','.fgb'}:layers.append(dict(data=source,name=item['name'],**item.get('options',{})))
             elif item.get('visible',True):unavailable.append(item['name'])
         if layers:self.layersRequested.emit(layers)
         if unavailable:self.report.appendPlainText('Sources à ouvrir dans le moteur natif (service, sous-couche ou format non pris en charge) : '+', '.join(unavailable))

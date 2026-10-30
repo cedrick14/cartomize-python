@@ -44,6 +44,94 @@ def _nullable_type(arrow_type):
     }.get(arrow_type)
 
 
+def _read_flatgeobuf(path, options, info):
+    """Keep exact Arrow attributes without its unsafe nullable-WKB buffer.
+
+    GDAL 3.12's FlatGeobuf Arrow stream can expose malformed geometry buffers
+    for NULL geometries. Its attribute stream and the native WKB reader remain
+    usable. Reading them separately also preserves nullable int64 values; a
+    NumPy attribute fallback would round integers above 2**53. Identical FIDs
+    are required before combining the two independently filtered reads.
+    """
+    caller_fids = options.get('fid_as_index', False)
+    attribute_options = {**options, 'ignore_geometry': True,
+                         'read_geometry': False, 'fid_as_index': True}
+    # FlatGeobuf's Arrow attribute-only optimization can ignore spatial
+    # filters. Read the selected layer/query attributes without row filters,
+    # then apply the native geometry reader's explicitly returned FIDs.
+    for name in ('bbox', 'mask', 'where', 'fids', 'rows', 'skip_features', 'max_features'):
+        attribute_options.pop(name, None)
+    attributes = read_vector(path, **attribute_options)
+    raw = dict(options)
+    for name in ('engine', 'use_arrow', 'arrow_to_pandas_kwargs', 'mixed_offsets_as_utc',
+                 'datetime_as_string', 'ignore_geometry', 'fid_as_index',
+                 'columns', 'ignore_fields', 'include_fields'):
+        raw.pop(name, None)
+    invalid = raw.pop('on_invalid', 'raise')
+    # OGR needs the fields referenced by WHERE even though we discard its
+    # NumPy attribute arrays. All published attributes still come from Arrow.
+    raw.update(columns=None if raw.get('where') else [], read_geometry=True, return_fids=True)
+    rows = raw.pop('rows', None)
+    empty_rows = False
+    if rows is not None:
+        if isinstance(rows, int):
+            if rows < 0:
+                raise ValueError('Negative row limits are not supported.')
+            empty_rows = rows == 0
+            raw['max_features'] = 1 if empty_rows else rows
+        elif isinstance(rows, slice) and rows.step in (None, 1):
+            if rows.start is not None and rows.start < 0 or rows.stop is not None and rows.stop < 0:
+                raise ValueError('Negative row slices are not supported.')
+            raw['skip_features'] = rows.start or 0
+            empty_rows = rows.stop is not None and rows.stop <= raw['skip_features']
+            raw['max_features'] = 1 if empty_rows else None if rows.stop is None else rows.stop - raw['skip_features']
+        else:
+            raise ValueError('rows must be an integer or a forward slice with step 1.')
+    bbox, mask = raw.get('bbox'), raw.get('mask')
+    if bbox is not None and mask is not None:
+        raise ValueError('mask and bbox cannot be set together.')
+    if bbox is not None:
+        if isinstance(bbox, (gpd.GeoDataFrame, gpd.GeoSeries)):
+            bbox = tuple(bbox.to_crs(info['crs']).total_bounds)
+        elif isinstance(bbox, shapely.Geometry):
+            bbox = bbox.bounds
+        if len(bbox) != 4:
+            raise ValueError('bbox must contain four bounds.')
+        raw['bbox'] = bbox
+    if mask is not None:
+        if isinstance(mask, (gpd.GeoDataFrame, gpd.GeoSeries)):
+            if info['crs'] is not None and mask.crs is not None:
+                mask = mask.to_crs(info['crs'])
+            mask = shapely.union_all(mask.geometry.to_numpy())
+        elif isinstance(mask, dict) or hasattr(mask, '__geo_interface__'):
+            mask = shape(mask)
+        raw['mask'] = mask
+    metadata, fids, geometries, _ = pyogrio.raw.read(path, **raw)
+    # GDAL interprets max_features=0 as unlimited, while pandas/geopandas
+    # rows=0 and empty forward slices mean no rows. Retain a real result
+    # schema from the native reader, then return an empty selection.
+    if empty_rows:
+        fids = fids[:0]
+        geometries = None if geometries is None else geometries[:0]
+    if not attributes.index.is_unique or any(fid not in attributes.index for fid in fids):
+        raise ValueError('FlatGeobuf geometry and attribute reads disagree on feature identity.')
+    attributes = attributes.loc[fids].copy()
+    if geometries is None:
+        # A SQL statement may intentionally return no spatial column.
+        result = attributes
+    else:
+        active = 'geometry' if 'geometry' not in attributes else '_cartomize_geometry'
+        while active in attributes:
+            active += '_'
+        hints = attributes.attrs.copy()
+        attributes[active] = shapely.from_wkb(geometries, on_invalid=invalid)
+        result = gpd.GeoDataFrame(attributes, geometry=active, crs=metadata['crs'])
+        result.attrs = hints
+    if not caller_fids:
+        result = result.reset_index(drop=True)
+    return result
+
+
 def read_vector(path, **kwargs):
     """Read with nullable integers and exact, individually parsed datetimes.
 
@@ -61,6 +149,14 @@ def read_vector(path, **kwargs):
     restore_temporal = 'datetime_as_string' not in options
     options.setdefault('datetime_as_string', True)
     info = pyogrio.read_info(path, layer=options.get('layer'))
+    if (info['driver'] == 'FlatGeobuf' and not options.get('ignore_geometry', False)
+            and options.get('read_geometry', True)):
+        # Pass the original datetime option state so the recursive attribute
+        # read performs the same date/time restoration as other file formats.
+        flat_options = dict(options)
+        if restore_temporal:
+            flat_options.pop('datetime_as_string', None)
+        return _read_flatgeobuf(path, flat_options, info)
     if 'geometry' in info['fields'] or options.get('sql') is not None:
         # The standard adapter assigns df['geometry'], overwriting a
         # business field with that name. SQL also needs its own result

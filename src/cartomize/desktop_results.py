@@ -263,7 +263,7 @@ class ResultsWorkspace(QWidget):
             if record.get(key) and str(record[key])!=path: self.register(record[key])
 
     def browse(self):
-        paths=QFileDialog.getOpenFileNames(self,'Résultats à visualiser',filter='Résultats (*.tif *.tiff *.jp2 *.vrt *.img *.gpkg *.shp *.geojson *.png *.jpg *.jpeg *.svg *.pdf *.csv *.tsv *.json)')[0]
+        paths=QFileDialog.getOpenFileNames(self,'Résultats à visualiser',filter='Résultats (*.tif *.tiff *.jp2 *.vrt *.img *.gpkg *.shp *.geojson *.fgb *.png *.jpg *.jpeg *.svg *.pdf *.csv *.tsv *.json)')[0]
         for path in paths: self.register(path); self.open_result(path)
 
     def open_selected(self,*args):
@@ -285,7 +285,11 @@ class ResultsWorkspace(QWidget):
                 changed=getattr(old,'file_id',None)!=identity(path) or getattr(old,'options',{})!=self.records[path]
                 if refresh or changed:
                     index=self.tabs.indexOf(old); self.close_tab(index)
-                else: self.tabs.setCurrentWidget(old); return old
+                else:
+                    self.tabs.setCurrentWidget(old)
+                    self.catalog.setCurrentIndex(self.catalog.findData(path))
+                    self.message.clear()
+                    return old
             self._room()
             if Path(path).suffix.lower() in MAP_FORMATS:
                 document=MapDocument(path,self.records[path]); document.reload_handler=lambda p=path:self.open_result(p,refresh=True)
@@ -362,6 +366,11 @@ class ResultsWorkspace(QWidget):
                         products.append(p)
             for key in ('primary','multiband','composite','quality_report'):
                 if p:=valid(record.get(key)): products.append(p)
+            if record.get('schema') in {'cartomize.vector_conversion.v1','cartomize.raster_conversion.v1'}:
+                if p:=valid(record.get('data')): primary.append(p)
+                if p:=valid(record.get('report')):
+                    self.register(dict(data=str(p),name='Rapport de conversion'))
+                    products.append(p)
             for layer in record.get('layers',[]):
                 if isinstance(layer,dict) and (p:=valid(layer.get('data'))): self.register({**layer,'data':str(p)}); products.append(p)
             for key in ('results','products'):

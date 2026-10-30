@@ -1,6 +1,6 @@
 # Cartomize : projets pratiques
 
-**Sources Cartomize 1.8.0**
+**Sources Cartomize 1.9.0**
 
 Préparer des images, analyser des couches et produire des cartes reproductibles avec Cartomize. Le parcours associe des explications, du code exécutable, des résultats enregistrés et des exercices corrigés.
 
@@ -76,11 +76,13 @@ L’interface de bureau est facultative pour ce parcours. Les calculs et cartes 
 | [16](notebooks/16_harmonisation_fusion_vectorielle.ipynb) | Harmonisation et fusion de couches | 30 min | Schéma commun, types exacts, provenance, valeurs manquantes et chaîne de tampons |
 | [17](notebooks/17_g01_controle_reparation_geometries.ipynb) | G01 : contrôle et réparation des géométries | 35 min | Couche source, règles, grille XY, effets séparés, exclusions et comparaison avant/après |
 
+| [18](notebooks/18_conversion_conditionnement.ipynb) | G06 : conversion et conditionnement | 30 min | GeoPackage, GeoJSON, Shapefile, FlatGeobuf, GeoTIFF/COG, NoData et relecture comparative |
+
 Pour découvrir la valeur de l’automatisation : **00 → 02 → 13 → 07 → 08**. Pour une formation complète : suivre l’ordre du tableau. Chaque notebook recrée ses entrées pédagogiques et peut être exécuté indépendamment.
 
 ## Cas réels
 
-Les cours 11 et 12 utilisent les cinq jeux de données contenus dans `Tuto.zip`. Le fichier source n’est pas redistribué dans le dépôt. Les cours 00 à 10 et 13 à 16 génèrent leurs propres données et n’exigent aucun téléchargement géographique.
+Les cours 11 et 12 utilisent les cinq jeux de données contenus dans `Tuto.zip`. Le fichier source n’est pas redistribué dans le dépôt. Les cours 00 à 10 et 13 à 18 génèrent leurs propres données et n’exigent aucun téléchargement géographique.
 
 Pour les personnes disposant de l’archive :
 

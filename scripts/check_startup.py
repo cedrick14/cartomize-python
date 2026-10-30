@@ -43,7 +43,7 @@ GUI = '''
 window = cm.launch(block=False)
 window._application.processEvents()
 assert window.isVisible() and not window.windowIcon().isNull()
-assert len(window.tool_pages) == 20
+assert len(window.tool_pages) == 21
 window.close()
 window._application.processEvents()
 print('CARTOMIZE_GUI_OK', flush=True)

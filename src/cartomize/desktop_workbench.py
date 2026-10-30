@@ -19,7 +19,7 @@ from .desktop_theme import apply_theme
 
 
 CATEGORIES = {
-    'Projet': ('assistant', 'inspect', 'project'),
+    'Projet': ('assistant', 'inspect', 'conversion', 'project'),
     'Raster': ('prepare', 'composite', 'classification', 'indices', 'calculator',
                'focal', 'temporal', 'raster'),
     'Vecteur': ('vector',),

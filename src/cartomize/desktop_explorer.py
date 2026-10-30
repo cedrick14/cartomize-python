@@ -78,7 +78,7 @@ class ProjectExplorer(QDockWidget):
     def import_files(self):
         paths, _ = QFileDialog.getOpenFileNames(
             self, 'Importer des données', self.path_label.text(),
-            'Données et projets (*.tif *.tiff *.vrt *.img *.jp2 *.gpkg *.shp *.geojson '
+            'Données et projets (*.tif *.tiff *.vrt *.img *.jp2 *.gpkg *.shp *.geojson *.fgb '
             '*.png *.jpg *.jpeg *.pdf *.svg *.csv *.tsv *.json *.cmz);;Tous les fichiers (*)',
         )
         for path in paths:

@@ -1,5 +1,55 @@
 # Tests et validation
 
+## Cartomize 1.9.0 — M11 / G06, conversion et conditionnement
+
+Le dernier passage local de la suite complète, au commit `0dd9bf6`, réussit
+**1 283 tests, avec 2 exclusions prévues et aucun échec**, en **371,923 s**
+sous Linux / Python 3.12.14. Il comprend 152 nouveaux cas. Les exclusions
+locales concernent le matériel CUDA et QGIS natif, qui possède un contrôle
+distant. Ce passage précède le dernier ajustement des deux libellés de boutons.
+
+Après ce passage, le seul changement applicatif est le texte des actions
+de résultats. Les mesures natives Windows identifiaient deux boutons de
+392 px, portant la page à 442 px pour 431 px disponibles. Les actions
+**« Ouvrir le rapport »** et **« Afficher les données »** corrigent cette
+contrainte, après le raccourcissement du sélecteur de couche. Les assertions
+de lisibilité et d’absence de défilement horizontal sont conservées.
+
+Les sources finales réussissent **22 tests G06 sous Linux**, puis **18
+contrôles compacts sous Linux et 18 sous Windows natif**. Le
+[contrôle Windows ciblé](https://github.com/cedrick14/cartomize-python/actions/runs/41037116801/job/124000572042)
+utilise exactement la commande compacte de production. Le cas raster à 12 px
+ajouté après la suite locale porte les régressions nouvelles à **153** :
+44 vectorielles, 58 raster, 14 interfaces publiques, 22 graphiques et 15 pour
+le lecteur vectoriel. Le diagnostic de géométrie reste disponible en cas
+d’échec. La matrice complète du commit final est suivie dans la PR nº 9.
+
+Les **17 notebooks autonomes exécutent 115 cellules**, sans erreur, dans
+des noyaux Jupyter neufs. La wheel 1.9.0 réussit **23 contrôles** après
+installation isolée hors du dépôt, avec `pip check` réussi. Ses **96 modules
+Python** correspondent exactement aux sources finales, y compris les deux
+libellés corrigés. Le parcours local des notebooks précède ce dernier
+ajustement graphique ; les moteurs et les cours sont inchangés, et la matrice
+de la PR exécute également le parcours avec la révision livrée. Les deux leçons
+demandant les données privées de `Tuto.zip` restent hors de la passe autonome.
+
+Les [contrôles G06 sur données réelles](VALIDATION_G06_REAL.json) réussissent
+**12 contrôles, sans échec**. Pour chacun des quatre formats vectoriels,
+les **80 quartiers de Paris, 240 valeurs attributaires et 8 366 couples de
+coordonnées** sont comparés au JSON d’origine. SQLite/WKB et DBF/SHP sont
+relus indépendamment du moteur de conversion. Les quatre conversions des
+extraits Sentinel comparent **53 248 valeurs et autant de masques**, avec
+grille et métadonnées conservées. Un cas analytique distinct vérifie les
+4 096 pixels d’un COG, son compagnon PAM et leur reprise depuis un projet
+portable après retrait des chemins d’origine. Les six fichiers sources
+conservent leurs empreintes.
+
+Le [rapport de livraison 1.9.0](VALIDATION_1.9.0.json) contient les résultats,
+les empreintes des modules et des scripts, les versions des bibliothèques
+et les limites. Le [guide G06](DATA_CONVERSION.md) décrit les paramètres et
+les changements admissibles. Les contrôles GitHub restent attachés aux
+commits testés dans la demande d’intégration.
+
 ## Cartomize 1.7.0 — M10, harmonisation et fusion de couches
 
 La suite complète finale réussit **1 074 tests, avec 2 exclusions prévues et

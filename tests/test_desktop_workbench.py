@@ -59,7 +59,7 @@ def test_workbench_layout_catalogue_and_themes(window, application):
     assert window.tools_dock.widget() is window.catalogue
     assert window.bottom_dock.widget() is workbench.bottom_tabs
     assert workbench.bottom_tabs.count() == 4
-    assert window.navigation.count() == len(window.tool_pages) == 20
+    assert window.navigation.count() == len(window.tool_pages) == 21
     workbench.category.setCurrentIndex(workbench.category.findData('Raster'))
     window.tool_search.setText('INDICES')
     visible = [window.navigation.item(i).text() for i in range(window.navigation.count())

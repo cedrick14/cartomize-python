@@ -134,8 +134,8 @@ def probe(output, expected):
     try:
         window.show();app.processEvents()
         assert window.windowTitle()=='Cartomize'
-        assert len(window.tool_pages)==20
-        checks.append('installed desktop and 20 tool pages')
+        assert len(window.tool_pages)==21
+        checks.append('installed desktop and 21 tool pages')
         for theme in ('light','dark','system'):
             window.theme_selector.setCurrentIndex(window.theme_selector.findData(theme))
             app.processEvents()
@@ -158,6 +158,7 @@ def probe(output, expected):
         checks.extend(_vector_reprojection_checks(cm, root))
         checks.extend(_vector_merge_checks(cm, root))
         checks.extend(_g01_checks(cm, root, window, wait_for))
+        checks.extend(_conversion_checks(cm, root, window, wait_for))
         points=root/'points.gpkg'
         gpd.GeoDataFrame({'nom':['Site A']},geometry=[Point(300300,9499700)],crs=32733).to_file(points)
         assert window.project_explorer.open_path(points) is not None
@@ -466,6 +467,68 @@ def _vector_merge_checks(cm, root):
     return ['installed vector merge: two heterogeneous GeoPackage schemas mapped to three rows with complete provenance',
             'installed merge types: exact nullable int64 above 2**53, leading-zero codes, DATE and UTC DATETIME verified by SQLite',
             'installed merge plan: named data product feeds 25 m buffers with typed attributes and source files intact']
+
+
+def _conversion_checks(cm, root, window, wait_for):
+    """Exercise the installed G06 engines and the dedicated desktop worker."""
+    from contextlib import closing
+    import sqlite3
+    import geopandas as gpd
+    import numpy as np
+    import pandas as pd
+    import rasterio
+    from rasterio.transform import from_origin
+    from shapely.geometry import Point
+
+    source = root / 'g06-source.gpkg'
+    frame = gpd.GeoDataFrame({
+        'code': pd.Series(['001', 'NA'], dtype='string'),
+        'identifier': pd.Series([2**53 + 1, None], dtype='Int64'),
+    }, geometry=[Point(300000, 9500000), Point(300030, 9500030)], crs=32733)
+    frame.to_file(source, layer='observations', index=False)
+    converted = cm.convert_vector(source, root / 'g06-fgb', driver='FlatGeobuf')
+    saved = cm.read_file(converted.data)
+    assert saved.code.tolist() == ['001', 'NA']
+    assert int(saved.identifier.iloc[0]) == 2**53 + 1 and pd.isna(saved.identifier.iloc[1])
+    assert converted.summary['difference_count'] == 0
+
+    raster = root / 'g06-source.tif'
+    pixels = np.array([[0, 1, 65535], [2, 3, 1]], dtype='uint16')
+    with rasterio.open(raster, 'w', driver='GTiff', width=3, height=2, count=1, dtype='uint16',
+                       crs=32733, transform=from_origin(300000, 9500000, 30, 30), nodata=65535) as dataset:
+        dataset.write(pixels, 1)
+        dataset.set_band_description(1, 'classes')
+        dataset.update_tags(1, survey='G06 installed probe')
+        dataset.update_tags(1, ns='VALIDATION', origin='analytic fixture')
+    delivered = cm.convert_raster(raster, root / 'g06-cog', driver='COG', dtype='uint8', nodata=255)
+    with rasterio.open(raster) as before, rasterio.open(delivered.data) as after:
+        assert before.crs == after.crs and before.transform == after.transform
+        np.testing.assert_array_equal(before.read_masks(), after.read_masks())
+        valid = before.read_masks() > 0
+        np.testing.assert_array_equal(before.read()[valid], after.read()[valid])
+        assert after.tags(1)['survey'] == 'G06 installed probe'
+        assert after.tags(1, ns='VALIDATION')['origin'] == 'analytic fixture'
+        assert after.tags(ns='IMAGE_STRUCTURE')['LAYOUT'] == 'COG'
+
+    window.transfer_result({'data': str(source), 'kind': 'vector'}, 'conversion')
+    page = window.tool('conversion')
+    page.inspect_button.click()
+    wait_for(lambda: window.thread is None)
+    assert page.layer.currentIndex() >= 0, window.status.text()
+    page.vector_driver.setCurrentIndex(page.vector_driver.findData('GPKG'))
+    page.output.edit.setText(str(root))
+    page.folder.setText('g06-installed-desktop')
+    window.run_button.click()
+    wait_for(lambda: window.thread is None)
+    result = Path(page.converted_data.text())
+    assert result.is_file(), window.status.text()
+    with closing(sqlite3.connect(result)) as connection:
+        assert connection.execute('SELECT code, identifier FROM features ORDER BY rowid').fetchall() == [
+            ('001', 2**53 + 1), ('NA', None)]
+    assert Path(page.converted_report.text()).is_file()
+    return ['installed G06 vector: FlatGeobuf retains nullable int64 and textual identifiers',
+            'installed G06 raster: COG dtype/NoData conversion preserves masks, pixels, grid and metadata',
+            'installed G06 desktop: inspection, conversion worker and reopenable report succeed']
 
 
 def main():
