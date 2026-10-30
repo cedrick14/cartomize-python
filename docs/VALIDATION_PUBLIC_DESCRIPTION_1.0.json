@@ -1,0 +1,297 @@
+{
+  "schema": "cartomize.publication-verification.v1",
+  "checked_at_utc": "2026-10-30T23:39:06.769455+00:00",
+  "status": "passed",
+  "source_commit": "ba092d534be1d0b5f3d19c4a827742709cd9a508",
+  "version": "1.0",
+  "build": "2026103101",
+  "description_matches_public_readme": true,
+  "description_sha256": "e49a32f987c65e7e2cabf87f8132212af81b5ef77775494f0305323fa9afe806",
+  "python_sources_identical": 103,
+  "source_archive_identical": true,
+  "portable_package_distributions_identical": true,
+  "collapsed_preprocessing_help_included": true,
+  "dynamic_desktop_included": true,
+  "files": [
+    {
+      "filename": "cartomize-1.0-2026103101-py3-none-any.whl",
+      "bytes": 549795,
+      "sha256": "7cae9238bfa8811f1cd3e2b2743917f4388619d995c32a96d700b16dc4862195",
+      "url": "https://github.com/cedrick14/cartomize-python/releases/download/cartomize-1.0-2026103101/cartomize-1.0-2026103101-py3-none-any.whl"
+    },
+    {
+      "filename": "cartomize-1.0-presentation.zip",
+      "bytes": 3436588,
+      "sha256": "4edbab9a6258843d4834ca9956d3f5f70d9bd37bdadc551c3b4ce3a5285c898c",
+      "url": "https://github.com/cedrick14/cartomize-python/releases/download/cartomize-1.0-2026103101/cartomize-1.0-presentation.zip"
+    },
+    {
+      "filename": "cartomize-1.0.tar.gz",
+      "bytes": 2214310,
+      "sha256": "36f95b2548b90b6298f9e8209d186d891b4213ee7c3e1046cf0648b9df5fb956",
+      "url": "https://github.com/cedrick14/cartomize-python/releases/download/cartomize-1.0-2026103101/cartomize-1.0.tar.gz"
+    }
+  ],
+  "release_url": "https://github.com/cedrick14/cartomize-python/releases/tag/cartomize-1.0-2026103101",
+  "state": "github_published_pypi_pending_release_recreation",
+  "interface_audit": {
+    "scope": "Desktop string literals and actual widgets of all 21 pages, including nested-tab states; no user data loaded and no full processing suite rerun.",
+    "desktop_files_inspected": 34,
+    "string_literals_checked": 5459,
+    "runtime_text_values_checked": 2356,
+    "tool_pages": 21,
+    "findings": [],
+    "long_visible_labels": [],
+    "change": {
+      "file": "src/cartomize/desktop.py",
+      "location": "WorkflowPage / Prétraitement",
+      "behavior": "Unchanged technical paragraph moved to the existing collapsed help control.",
+      "help_subject": "Prétraitement des scènes",
+      "collapsed_initially": true,
+      "opens_and_closes": true,
+      "computation_changed": false,
+      "docking_or_theme_changed": false
+    },
+    "existing_targeted_tests": {
+      "passed": 11,
+      "seconds": 10.26,
+      "scope": "tests/test_desktop_help.py and tests/test_desktop.py::test_default_workflow_produces_multiband_rgb_and_map"
+    }
+  },
+  "release_validation": {
+    "workflow_url": "https://github.com/cedrick14/cartomize-python/actions/runs/41144499000",
+    "jobs": [
+      {
+        "id": 124366296151,
+        "name": "build",
+        "conclusion": "success",
+        "steps": [
+          {
+            "name": "Set up job",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run actions/setup-python@v5",
+            "conclusion": "success"
+          },
+          {
+            "name": "Install runtime and build dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Verify result view lifecycle before desktop processing",
+            "conclusion": "success"
+          },
+          {
+            "name": "Test",
+            "conclusion": "success"
+          },
+          {
+            "name": "Build and validate the two release files",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run actions/upload-artifact@v4",
+            "conclusion": "success"
+          },
+          {
+            "name": "Stage files eligible for the selected public version",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run actions/upload-artifact@v4",
+            "conclusion": "success"
+          },
+          {
+            "name": "Build the portable demonstration delivery",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run actions/upload-artifact@v4",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Run actions/setup-python@v5",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "conclusion": "success"
+          }
+        ]
+      },
+      {
+        "id": 124366296607,
+        "name": "windows-conda / startup",
+        "conclusion": "success",
+        "steps": [
+          {
+            "name": "Set up job",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run conda-incubator/setup-miniconda@v4",
+            "conclusion": "success"
+          },
+          {
+            "name": "Install previous release for the initial comparison",
+            "conclusion": "skipped"
+          },
+          {
+            "name": "Observe previous release in a fresh Conda process",
+            "conclusion": "skipped"
+          },
+          {
+            "name": "Install the candidate with notebook dependencies",
+            "conclusion": "success"
+          },
+          {
+            "name": "Verify installed startup, XML, raster, vector and GUI",
+            "conclusion": "success"
+          },
+          {
+            "name": "Verify notebook event loop and desktop processing",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Run conda-incubator/setup-miniconda@v4",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "conclusion": "success"
+          }
+        ]
+      },
+      {
+        "id": 124369613952,
+        "name": "publish",
+        "conclusion": "failure",
+        "steps": [
+          {
+            "name": "Set up job",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run actions/download-artifact@v4",
+            "conclusion": "success"
+          },
+          {
+            "name": "Verify the release description before upload",
+            "conclusion": "failure"
+          },
+          {
+            "name": "Publish to PyPI",
+            "conclusion": "skipped"
+          },
+          {
+            "name": "Publish to TestPyPI",
+            "conclusion": "skipped"
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "conclusion": "success"
+          }
+        ]
+      },
+      {
+        "id": 124369614038,
+        "name": "delivery",
+        "conclusion": "success",
+        "steps": [
+          {
+            "name": "Set up job",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run actions/download-artifact@v4",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run actions/download-artifact@v4",
+            "conclusion": "success"
+          },
+          {
+            "name": "Identify the immutable delivery",
+            "conclusion": "success"
+          },
+          {
+            "name": "Publish the complete Cartomize 1.0 delivery",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "conclusion": "success"
+          }
+        ]
+      }
+    ],
+    "linux_full_suite": {
+      "passed": 1898,
+      "skipped": 2
+    },
+    "linux_result_precheck": {
+      "passed": 19
+    },
+    "windows_conda": {
+      "passed": 52
+    },
+    "metadata_preflight_unit_tests": {
+      "passed": 20
+    }
+  },
+  "pypi": {
+    "version": "1.0",
+    "new_build_uploaded": false,
+    "description_matches": false,
+    "reason": "PyPI retains the first metadata of an existing release.",
+    "required_owner_action": "Delete only release 1.0; retain the project and its trusted publisher.",
+    "resume": {
+      "workflow_run_id": 41144499000,
+      "job_id": 124369613952,
+      "job_name": "publish",
+      "artifact_name": "cartomize-pypi-distributions",
+      "artifact_id": 13020646186,
+      "artifact_expires_at": "2026-11-13T23:36:54Z",
+      "scope": "Rerun only publish after the old release is removed; do not rebuild."
+    },
+    "observed_at_utc": "2026-10-30T23:40:55.870647+00:00",
+    "observed_description_sha256": "b317c05bb2b5f0c727bce0afa0bcfad585913a9770781366cbf974a53e755b90",
+    "observed_files": [
+      "cartomize-1.0-2026103001-py3-none-any.whl",
+      "cartomize-1.0-20261030-py3-none-any.whl"
+    ]
+  }
+}
