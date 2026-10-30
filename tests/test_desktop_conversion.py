@@ -18,7 +18,7 @@ pytest.importorskip('PySide6')
 from PySide6.QtCore import QEventLoop, QSettings, Qt, QTimer
 from PySide6.QtGui import QFont
 from PySide6.QtTest import QTest
-from PySide6.QtWidgets import QApplication, QStyle, QStyleOptionComboBox
+from PySide6.QtWidgets import QApplication, QLabel, QStyle, QStyleOptionComboBox, QWidget
 
 from cartomize.desktop_conversion import ConversionPage
 from cartomize.desktop_session import capture_widgets, restore_widgets
@@ -362,9 +362,36 @@ def test_conversion_controls_fit_compact_window(application, tmp_path, monkeypat
                         page.loss_policy, page.output, page.report_button):
             scroll.ensureWidgetVisible(control)
             QTest.qWait(10)
-            assert scroll.horizontalScrollBar().maximum() == 0, dict(
+            geometry = dict(
                 viewport=scroll.viewport().size().toTuple(), page=page.size().toTuple(),
-                minimum=page.minimumSizeHint().toTuple(), kind=kind, font_size=font_size)
+                minimum=page.minimumSizeHint().toTuple(), kind=kind, font_size=font_size,
+                wide_layer_metrics=wide_layer_metrics, style=application.style().objectName(),
+                horizontal_range=scroll.horizontalScrollBar().maximum())
+            if geometry['horizontal_range']:
+                names = {id(value): key for key, value in vars(page).items() if isinstance(value, QWidget)}
+
+                def dimensions(widget):
+                    text = getattr(widget, 'text', getattr(widget, 'currentText', lambda: ''))()
+                    return dict(type=type(widget).__name__, name=names.get(id(widget), widget.objectName()),
+                        text=text[:120], text_width=widget.fontMetrics().horizontalAdvance(text),
+                        minimum_size_hint=widget.minimumSizeHint().toTuple(),
+                        size_hint=widget.sizeHint().toTuple(), minimum_size=widget.minimumSize().toTuple(),
+                        geometry=widget.geometry().getRect(), font_family=widget.font().family(),
+                        font_pixels=widget.font().pixelSize(), font_points=widget.font().pointSizeF(),
+                        horizontal_policy=widget.sizePolicy().horizontalPolicy().name,
+                        word_wrap=widget.wordWrap() if isinstance(widget, QLabel) else None)
+
+                geometry['page_dimensions'] = dimensions(page)
+                geometry['vector_section'] = dimensions(page.vector_section)
+                geometry['vector_layout_minimum'] = page.vector_section.layout().minimumSize().toTuple()
+                geometry['page_layout_minimum'] = page.layout.minimumSize().toTuple()
+                geometry['controls'] = sorted([
+                    dimensions(child) for child in page.findChildren(QWidget)
+                    if child.isVisible() and (id(child) in names or isinstance(child, QLabel)
+                        or child.parentWidget() in (page.source, page.output))
+                ], key=lambda item: item['minimum_size_hint'][0], reverse=True)
+                print('Conversion form geometry: ' + json.dumps(geometry, ensure_ascii=False))
+            assert scroll.horizontalScrollBar().maximum() == 0, json.dumps(geometry, ensure_ascii=False)
             assert control.width() <= scroll.viewport().width()
             assert control.width() >= 100
         for control in ([page.kind, page.layer, page.vector_driver, page.encoding, page.loss_policy]
