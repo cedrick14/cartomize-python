@@ -1,5 +1,6 @@
 """Compact displays retain map space and reachable execution controls."""
 import os
+from pathlib import Path
 import time
 
 os.environ.setdefault('QT_QPA_PLATFORM', 'offscreen')
@@ -33,7 +34,7 @@ def compact_window(tmp_path, monkeypatch):
     monkeypatch.setattr(desktop, 'QSettings', lambda *args:
                         QSettings(str(preferences), QSettings.Format.IniFormat))
     window = CartomizeWindow()
-    assert window._preferences.fileName() == str(preferences)
+    assert Path(window._preferences.fileName()).resolve() == preferences.resolve()
     try:
         yield app, window
     finally:
