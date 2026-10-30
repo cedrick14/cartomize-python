@@ -321,6 +321,7 @@ def test_conversion_uses_worker_and_loads_data_report_and_transfers(application,
 @pytest.mark.parametrize('kind,font_size,wide_layer_metrics', [
     pytest.param('vector', 12, False, id='vector-12'),
     pytest.param('vector', 16, False, id='vector-16'),
+    pytest.param('raster', 12, False, id='raster-12'),
     pytest.param('raster', 16, False, id='raster-16'),
     pytest.param('vector', 12, True, id='vector-12-wide-layer'),
     pytest.param('vector', 16, True, id='vector-16-wide-layer'),
@@ -359,7 +360,7 @@ def test_conversion_controls_fit_compact_window(application, tmp_path, monkeypat
         QTest.qWait(40)
         scroll = window.stack.currentWidget()
         for control in (page.source, page.field_map if kind == 'vector' else page.compression,
-                        page.loss_policy, page.output, page.report_button):
+                        page.loss_policy, page.output, page.report_button, page.data_button):
             scroll.ensureWidgetVisible(control)
             QTest.qWait(10)
             geometry = dict(
