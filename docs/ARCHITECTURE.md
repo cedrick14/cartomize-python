@@ -183,3 +183,9 @@ flottants et libellés. L’audit rassemble tables et empreintes. La publication
 se fait dans le dossier atomique commun ; l’annulation n’expose aucun résultat
 partiel. Le formulaire `desktop_tabulation` appelle ce même opérateur et ses
 produits nommés, avec conservation des choix dans les sessions et projets CMZ.
+
+## Anneaux de distance — M14
+
+`vector_rings.buffer_rings` construit les tampons cumulés, retire l’emprise déjà occupée et contrôle la partition de surface. `BufferRingsResult` sépare anneaux, table dense, registre source, bilans et résumé. Le mode fusionné réunit les tampons de toutes les sources à chaque distance ; le mode indépendant conserve une série par ligne et mesure les recouvrements globaux.
+
+`processing` partage avec G09 la publication vérifiée des GeoPackage et CSV, dans un nouveau dossier atomique. `desktop_rings` est intégré à la page Vecteur et réutilise le worker, les vues, les sessions et les produits nommés. Le cours 21 vérifie aussi une chaîne G12→G09. [Contrat complet](VECTOR_RINGS.md).

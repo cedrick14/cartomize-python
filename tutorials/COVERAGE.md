@@ -1,11 +1,14 @@
 # Couverture des outils
 
-Le registre comprend 52 opérateurs. Cette matrice relie 44 d’entre eux aux cours qui exécutent leurs fonctions publiques. Les huit opérateurs vectoriels ajoutés en 1.3 sont documentés dans le guide SIG et vérifiés par les tests d’intégration ; un cours dédié reste à rédiger. Elle décrit la couverture pédagogique des familles, sans prétendre tester toutes les combinaisons de paramètres. Le cours 08 montre leur insertion dans des plans ; le cours 13 exécute le prétraitement automatique M07. Le cours 14 exécute les quatre opérateurs de qualité vectorielle M08 ; le cours 15 vérifie la reprojection par lot M09 et raccorde une couche nommée à l’étape suivante. Le cours 16 harmonise les schémas, contrôle les valeurs enregistrées et poursuit la couche fusionnée dans un plan.
+Le registre comprend 55 opérateurs. Cette matrice relie 47 d’entre eux aux cours qui exécutent leurs fonctions publiques. Les huit opérateurs vectoriels ajoutés en 1.3 sont documentés dans le guide SIG et vérifiés par les tests d’intégration ; un cours dédié reste à rédiger. Elle décrit la couverture pédagogique des familles, sans prétendre tester toutes les combinaisons de paramètres. Le cours 08 montre leur insertion dans des plans ; le cours 13 exécute le prétraitement automatique M07. Le cours 14 exécute les quatre opérateurs de qualité vectorielle M08 ; le cours 15 vérifie la reprojection par lot M09 et raccorde une couche nommée à l’étape suivante. Le cours 16 harmonise les schémas, contrôle les valeurs enregistrées et poursuit la couche fusionnée dans un plan.
 
 | Opérateur | Fonction | Cours |
 |---|---|---|
 | `vector.clip` | Découpage vectoriel | [01](notebooks/01_superposition_vectorielle.ipynb) |
 | `vector.buffer` | Zone tampon | [01](notebooks/01_superposition_vectorielle.ipynb) |
+| `vector.buffer_rings` | Anneaux de distance, identités et bilans | [21](notebooks/21_anneaux_distance.ipynb) |
+| `vector.extract_features` | Extraction avec retenus, exclus et bilan | [19](notebooks/19_extraction_attributaire_spatiale.ipynb) |
+| `vector.tabulate_area` | Tables croisées, couverture et recouvrements | [20](notebooks/20_table_croisee_surfaces.ipynb) |
 | `vector.sjoin` | Jointure spatiale | [01](notebooks/01_superposition_vectorielle.ipynb) |
 | `vector.nearest` | Jointure de proximité | [01](notebooks/01_superposition_vectorielle.ipynb) |
 | `vector.dissolve` | Dissolution | [01](notebooks/01_superposition_vectorielle.ipynb) |
@@ -69,3 +72,5 @@ Les exercices autonomes n’exécutent pas QGIS, ArcGIS Pro ni CUDA. Le service 
 | Opérateurs de qualité vectorielle | Cours |
 |---|---|
 | `vector.audit_geometries`, `vector.repair_geometries`, `vector.check_topology`, `vector.deduplicate` | [14 — Qualité vectorielle](notebooks/14_qualite_vectorielle.ipynb) |
+
+Le cours 21 contrôle les anneaux par formules indépendantes, publie les sorties vérifiées et exécute une commande du terminal ainsi qu’un plan G12→G09. Les exemples sont explicitement simulés.

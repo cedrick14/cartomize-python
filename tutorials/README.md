@@ -1,6 +1,6 @@
 # Cartomize : projets pratiques
 
-**Sources Cartomize 1.11.0**
+**Sources Cartomize 1.12.0**
 
 Préparer des images, analyser des couches et produire des cartes reproductibles avec Cartomize. Le parcours associe des explications, du code exécutable, des résultats enregistrés et des exercices corrigés.
 
@@ -78,12 +78,13 @@ L’interface de bureau est facultative pour ce parcours. Les calculs et cartes 
 | [18](notebooks/18_conversion_conditionnement.ipynb) | G06 : conversion et conditionnement | 30 min | GeoPackage, GeoJSON, Shapefile, FlatGeobuf, GeoTIFF/COG, NoData et relecture comparative |
 | [19](notebooks/19_extraction_attributaire_spatiale.ipynb) | G07 : extraction avec bilan | 30 min | Retenus, exclus, critères combinés et décisions |
 | [20](notebooks/20_table_croisee_surfaces.ipynb) | G09 : table croisée des surfaces | 35 min | Matrice, catégories, couverture, lacunes et recouvrements |
+| [21](notebooks/21_anneaux_distance.ipynb) | G12 : anneaux de distance | 35 min | Bornes, modes fusionné/indépendant, surfaces, publication et chaîne G12→G09 |
 
 Pour découvrir la valeur de l’automatisation : **00 → 02 → 13 → 07 → 08**. Pour une formation complète : suivre l’ordre du tableau. Chaque notebook recrée ses entrées pédagogiques et peut être exécuté indépendamment.
 
 ## Cas réels
 
-Les cours 11 et 12 utilisent les cinq jeux de données contenus dans `Tuto.zip`. Le fichier source n’est pas redistribué dans le dépôt. Les cours 00 à 10 et 13 à 20 génèrent leurs propres données et n’exigent aucun téléchargement géographique.
+Les cours 11 et 12 utilisent les cinq jeux de données contenus dans `Tuto.zip`. Le fichier source n’est pas redistribué dans le dépôt. Les cours 00 à 10 et 13 à 21 génèrent leurs propres données et n’exigent aucun téléchargement géographique.
 
 Pour les personnes disposant de l’archive :
 

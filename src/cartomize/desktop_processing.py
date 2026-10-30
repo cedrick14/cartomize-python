@@ -71,6 +71,9 @@ LABELS.update({
     'overlap_policy': 'Recouvrements entre catégories',
     'zone_overlap_policy': 'Recouvrements entre zones',
     'null_classes': 'Catégories manquantes',
+    'distances': 'Bornes supérieures en mètres (liste JSON)',
+    'include_input': 'Inclure les polygones sources dans le premier intervalle',
+    'quad_segs': 'Segments par quart de cercle',
 })
 PATHS={'data','source','left','right','mask','zones','before','after','training','validation','model','valid_footprint','outlets','table','observations','aoi'}
 PATHS.update({'reference', 'allowed_gaps'})
@@ -79,12 +82,18 @@ COMPLEX.update({'keys', 'rules', 'operations', 'area_of_interest'})
 COMPLEX.update({'schema', 'field_maps', 'reprojection_options'})
 COMPLEX.update({'field_map', 'overviews'})
 COMPLEX.add('filters')
+COMPLEX.add('distances')
 CHOICES={
     'snap':[('Sur le segment le plus proche','edge'),('Sur le sommet le plus proche','node')],
     'null_keys':[('Ne pas apparier','unmatched'),('Apparier les clés manquantes','match'),('Refuser les clés manquantes','error')],
     'value_mode':[('Valeurs physiques (calibration du raster)','physical'),('Valeurs brutes (DN)','raw')],
 }
 OPERATION_CHOICES = {
+    'vector.buffer_rings': {
+        'mode': [('Réunir toutes les sources', 'dissolved'),
+                 ('Traiter chaque source séparément', 'independent')],
+        'area_unit': [('Hectares (ha)', 'ha'), ('Mètres carrés (m²)', 'm2'), ('Kilomètres carrés (km²)', 'km2')],
+    },
     'vector.tabulate_area': {
         'area_unit': [('Hectares (ha)', 'ha'), ('Mètres carrés (m²)', 'm2'), ('Kilomètres carrés (km²)', 'km2')],
         'overlap_policy': [('Interrompre si des catégories se recouvrent', 'error'),
@@ -188,6 +197,10 @@ class OperationDialog(QDialog):
                 label='Fichiers, dossiers ou couches sélectionnées (liste JSON) *'
             if spec['id'] == 'vector.tabulate_area' and name == 'classes':
                 label='Couche d’occupation du sol *'
+            if spec['id'] == 'vector.buffer_rings' and name == 'mode':
+                label='Organisation des anneaux'
+            if spec['id'] == 'vector.buffer_rings' and name == 'id_field':
+                label='Étiquette source (facultatif)'
             if name in self._choices:
                 widget=QComboBox();widget.setPlaceholderText('Choisir une valeur')
                 for title,value in self._choices[name]:widget.addItem(title,value)

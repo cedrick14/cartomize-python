@@ -44,5 +44,6 @@
   "vector.convert": "18_conversion_conditionnement",
   "raster.convert": "18_conversion_conditionnement",
   "vector.extract_features": "19_extraction_attributaire_spatiale",
-  "vector.tabulate_area": "20_table_croisee_surfaces"
+  "vector.tabulate_area": "20_table_croisee_surfaces",
+  "vector.buffer_rings": "21_anneaux_distance"
 }

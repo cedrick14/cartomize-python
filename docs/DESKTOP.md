@@ -345,3 +345,9 @@ matrice, bilan par zone, registre, lacunes, recouvrements et synthèse. Le bilan
 par zone s’ouvre sur les attributs de sa couche. Les sources, paramètres et
 produits sont conservés dans les sessions et archives portables. Voir le
 [guide G09](VECTOR_TABULATION.md).
+
+## Anneaux de distance et bilans — G12
+
+Dans la page **Vecteur**, choisir **Anneaux de distance avec bilan**, sélectionner la couche et éventuellement son étiquette source, puis saisir les bornes en mètres séparées par des points-virgules. Les choix de regroupement, intérieur des polygones, SCR projeté, unité et finesse des arcs sont explicites. Les intervalles sont affichés immédiatement.
+
+Le traitement crée un nouveau dossier et propose les anneaux, surfaces par intervalle, sources, bilans, résumé et audit. Ces vues restent liées au calcul terminé quand le formulaire change. Les sessions et projets portables conservent les paramètres et les liens vers les résultats. [Guide G12](VECTOR_RINGS.md).

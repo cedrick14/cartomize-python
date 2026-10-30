@@ -73,3 +73,7 @@ les doublons de groupe sont dissous, les catégories superposées font l’objet
 d’une règle explicite, et les totaux distinguent couverture, lacunes, emprise
 ambiguë et excès de comptage. Les quatre GeoPackage et les trois tableaux CSV
 sont relus avant publication. Voir le [guide G09](VECTOR_TABULATION.md).
+
+## Anneaux de distance — ajouté en 1.12.0
+
+M14/G12 complète les tampons par une liste de bornes métriques, une construction fusionnée ou indépendante et des bilans de surface. Les polygones sources sont inclus ou exclus explicitement. Les identités, les composantes de petite surface et les résidus sont conservés. Les sorties sont relues avant publication ; le terminal, les plans, le notebook 21 et la fenêtre appellent le même moteur. [Guide G12](VECTOR_RINGS.md).

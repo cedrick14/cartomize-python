@@ -75,6 +75,8 @@ def _catalog():
     add('vector.extract_features', 'Extraction attributaire et spatiale avec bilan', extract_features, 'vector', 'vector')
     from .vector_tabulation import tabulate_area
     add('vector.tabulate_area', 'Table croisée des surfaces par zone', tabulate_area, 'vector', 'vector')
+    from .vector_rings import buffer_rings
+    add('vector.buffer_rings', 'Anneaux de distance avec bilan des surfaces', buffer_rings, 'vector', 'vector')
     for key, label, function in [
         ('audit_geometries', 'Diagnostic détaillé des géométries', audit_geometries),
         ('repair_geometries', 'Réparation avec rapport des changements', repair_geometries),
@@ -274,6 +276,24 @@ def _write_vector_selection(result, work, *, cancel=None):
 
 def _write_vector_tabulation(result, work, *, cancel=None, progress=None):
     """Publish all area products after exact vector and table readback."""
+    return _write_verified_vector_tables(result, work,
+        vector_names=('data', 'zones', 'gaps', 'overlaps'),
+        table_names=('table', 'matrix', 'categories'),
+        audit_schema='cartomize.vector_tabulation.audit.v1',
+        error_label='Area table', cancel=cancel, progress=progress)
+
+
+def _write_vector_rings(result, work, *, cancel=None, progress=None):
+    """Publish the rings, source registry and balances as one verified result."""
+    return _write_verified_vector_tables(result, work,
+        vector_names=('data', 'sources'), table_names=('table', 'balances'),
+        audit_schema='cartomize.vector_rings.audit.v1',
+        error_label='Ring table', cancel=cancel, progress=progress)
+
+
+def _write_verified_vector_tables(result, work, *, vector_names, table_names,
+                                  audit_schema, error_label, cancel=None, progress=None):
+    """Share exact vector/CSV publication between the G09 and G12 results."""
     import hashlib
     import pandas as pd
     from .vector_io import write_geopackage
@@ -281,15 +301,16 @@ def _write_vector_tabulation(result, work, *, cancel=None, progress=None):
     products = {}
     tables = {}
     verified = {}
+    steps = len(vector_names) + len(table_names) + 2
 
     def advance(step):
         _check_cancel(cancel)
         if progress is not None:
-            progress(8000 + 2000 * step // 9, 10000)
+            progress(8000 + 2000 * step // steps, 10000)
         _check_cancel(cancel)
 
     advance(0)
-    for number, name in enumerate(('data', 'zones', 'gaps', 'overlaps'), 1):
+    for number, name in enumerate(vector_names, 1):
         data = getattr(result, name)
         path = work / (name + '.gpkg')
         write_geopackage(data, path, layer='features', cancel=cancel)
@@ -298,7 +319,7 @@ def _write_vector_tabulation(result, work, *, cancel=None, progress=None):
         verified[path.name] = dict(rows=len(data), sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
                                    verification='exact_attributes_geometry_and_crs')
         advance(number)
-    for number, name in enumerate(('table', 'matrix', 'categories'), 5):
+    for number, name in enumerate(table_names, len(vector_names) + 1):
         data = getattr(result, name)
         path = work / (name + '.csv')
         types = {}
@@ -321,7 +342,7 @@ def _write_vector_tabulation(result, work, *, cancel=None, progress=None):
             pd.testing.assert_frame_equal(reopened, data.reset_index(drop=True),
                                           check_dtype=False, check_exact=True)
         except AssertionError as error:
-            raise ValueError('Area table readback differs from the computed values: ' + name) from error
+            raise ValueError(error_label + ' readback differs from the computed values: ' + name) from error
         tables[name] = data
         products[name] = path
         verified[path.name] = dict(rows=len(data), sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
@@ -335,15 +356,15 @@ def _write_vector_tabulation(result, work, *, cancel=None, progress=None):
                 _check_cancel(cancel)
             rows.append({column: _selection_audit_value(value) for column, value in zip(table.columns, row)})
         records[name] = dict(columns={column: str(table[column].dtype) for column in table}, records=rows)
-    save_json(dict(schema='cartomize.vector_tabulation.audit.v1',
+    save_json(dict(schema=audit_schema,
                    area_unit=result.summary['area_unit'], measurement_crs=result.summary['measurement_crs'],
                    label_encoding='canonical_text_with_explicit_type',
                    verified_files=verified, tables=records), work / 'audit.json')
     products['audit'] = work / 'audit.json'
-    advance(8)
+    advance(steps - 1)
     save_json(result.summary, work / 'summary.json')
     products['summary'] = work / 'summary.json'
-    advance(9)
+    advance(steps)
     return products
 
 
@@ -379,6 +400,8 @@ def operation_catalog():
             products += ['data', 'rejected', 'report', 'audit', 'summary']
         if key == 'vector.tabulate_area':
             products += ['data', 'table', 'matrix', 'zones', 'categories', 'gaps', 'overlaps', 'audit', 'summary']
+        if key == 'vector.buffer_rings':
+            products += ['data', 'table', 'sources', 'balances', 'audit', 'summary']
         if key=='classify':
             from .classification import fit_classifier
             present={p['name'] for p in parameters}
@@ -453,7 +476,7 @@ def execute_operation(operation,parameters,destination,*,workers=1,block_size=51
         if operation=='classify' and p.get('model'):p.setdefault('training',None)
         for name,value in [('progress',progress),('cancel',cancel)]:
             if name in signature.parameters or 'options' in signature.parameters:p[name]=value
-        if operation == 'vector.tabulate_area' and progress is not None:
+        if operation in {'vector.tabulate_area', 'vector.buffer_rings'} and progress is not None:
             p['progress'] = lambda done, total: progress(int(8000 * done / max(total, 1)), 10000)
         from .imagery_automatic import ImageryCoverageError, diagnostic_destination
         try:
@@ -470,13 +493,18 @@ def execute_operation(operation,parameters,destination,*,workers=1,block_size=51
         from .raster_conversion import ConvertedRaster
         from .vector_selection import VectorSelectionResult
         from .vector_tabulation import AreaTabulationResult
+        from .vector_rings import BufferRingsResult
         quality_products = None
         reprojection_products = None
         merge_products = None
         conversion_products = None
         selection_products = None
         tabulation_products = None
-        if isinstance(result, AreaTabulationResult):
+        rings_products = None
+        if isinstance(result, BufferRingsResult):
+            rings_products = _write_vector_rings(result, work, cancel=cancel, progress=progress)
+            primary = rings_products['data']
+        elif isinstance(result, AreaTabulationResult):
             tabulation_products = _write_vector_tabulation(result, work, cancel=cancel, progress=progress)
             primary = tabulation_products['data']
         elif isinstance(result, VectorSelectionResult):
@@ -512,7 +540,11 @@ def execute_operation(operation,parameters,destination,*,workers=1,block_size=51
         metadata=getattr(result,'attrs',{}).get('cartomize')
         if metadata is not None:record['metadata']=json_value(metadata)
         products={'primary':record['primary']}
-        if tabulation_products is not None:
+        if rings_products is not None:
+            products.update({key: str(destination / path.relative_to(work))
+                             for key, path in rings_products.items()})
+            record['metadata'] = json_value(result.summary)
+        elif tabulation_products is not None:
             products.update({key: str(destination / path.relative_to(work))
                              for key, path in tabulation_products.items()})
             record['metadata'] = json_value(result.summary)

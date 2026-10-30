@@ -139,6 +139,18 @@ def main(argv=None):
                             help='Refuse or explicitly report overlaps between different categories')
     tabulation.add_argument('--zone-overlap-policy', choices=['independent', 'error'], default='independent')
     tabulation.add_argument('--null-classes', choices=['error', 'unclassified'], default='error')
+    rings = subs.add_parser('buffer-rings', help='Build disjoint distance bands with source identities and surface balances')
+    rings.add_argument('data', help='Input vector dataset')
+    rings.add_argument('destination', help='New directory for rings, tables and audit')
+    rings.add_argument('--distances', nargs='+', type=float, required=True,
+                       help='Strictly increasing positive upper bounds in metres, e.g. 100 250 500 1000')
+    rings.add_argument('--layer', help='Explicit source layer name')
+    rings.add_argument('--metric-crs', help='Projected CRS used for analysis and geometry outputs')
+    rings.add_argument('--mode', choices=['dissolved', 'independent'], default='dissolved')
+    rings.add_argument('--id-field', help='Optional source label field; repeated labels remain distinct rows')
+    rings.add_argument('--include-input', action='store_true', help='Include source polygon interiors in the first band')
+    rings.add_argument('--quad-segs', type=int, default=16, help='Straight segments per quadrant for round curves')
+    rings.add_argument('--area-unit', choices=['m2', 'ha', 'km2'], default='ha')
     conversion_vector = subs.add_parser('convert-vector', help='Convert a selected vector layer and verify every saved record')
     conversion_vector.add_argument('source')
     conversion_vector.add_argument('destination', help='New directory for data, sidecars and verification reports')
@@ -305,6 +317,12 @@ def main(argv=None):
                 parameters.update(block_size=args.block_size, overviews=args.overviews,
                                   resampling=args.resampling, loss_policy=args.loss_policy)
                 result = cm.execute_operation('raster.convert', parameters, args.destination)
+        elif args.command == 'buffer-rings':
+            import cartomize as cm
+            result = cm.execute_operation('vector.buffer_rings', dict(data=args.data,
+                distances=args.distances, layer=args.layer, metric_crs=args.metric_crs,
+                mode=args.mode, id_field=args.id_field, include_input=args.include_input,
+                quad_segs=args.quad_segs, area_unit=args.area_unit), args.destination)
         elif args.command == 'tabulate-area':
             import cartomize as cm
             result = cm.execute_operation('vector.tabulate_area', dict(zones=args.zones, classes=args.classes,

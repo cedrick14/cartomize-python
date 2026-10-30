@@ -13,11 +13,12 @@ from .desktop_tools_base import VectorPage as BaseVectorPage, write_result
 from .desktop_vector_quality import VectorQualityControls
 from .desktop_selection import SelectionControls
 from .desktop_tabulation import TabulationControls
+from .desktop_rings import RingsControls
 from .vector_workflows import (select_attributes, select_location, geometry_operation,
                                spatial_summary, join_attributes, latest_records)
 
 
-class VectorPage(TabulationControls, SelectionControls, VectorQualityControls, BaseVectorPage):
+class VectorPage(RingsControls, TabulationControls, SelectionControls, VectorQualityControls, BaseVectorPage):
     EXTRA = [('Sélection par attribut', 'select_attributes'), ('Sélection spatiale', 'select_location'),
              ('Synthèse par zone', 'spatial_summary'), ('Jointure attributaire', 'join_attributes'),
              ('Dernier relevé par identifiant', 'latest_records'), ('Centroïdes', 'centroid'),
@@ -92,12 +93,16 @@ class VectorPage(TabulationControls, SelectionControls, VectorQualityControls, B
             control.editingFinished.connect(self.refresh_fields)
         self.init_selection_controls()
         self.init_tabulation_controls()
+        self.init_rings_controls()
         self._advanced_ready = True
         self.changed()
 
     def refresh_fields(self):
         import pyogrio
         op = self.operation.currentData()
+        if op == 'buffer_rings':
+            self.refresh_rings_layers()
+            return
         if op == 'tabulate_area':
             self.refresh_tabulation_layers()
             return
@@ -179,9 +184,12 @@ class VectorPage(TabulationControls, SelectionControls, VectorQualityControls, B
         self.update_merge_controls()
         self.update_selection_controls()
         self.update_tabulation_controls()
+        self.update_rings_controls()
 
     def job(self, options):
         op = self.operation.currentData()
+        if op == 'buffer_rings':
+            return self.rings_job(options)
         if op == 'tabulate_area':
             return self.tabulation_job(options)
         if op == 'extract_features':
@@ -255,6 +263,7 @@ class VectorPage(TabulationControls, SelectionControls, VectorQualityControls, B
         self.restore_quality_controls()
         self.restore_selection_controls()
         self.restore_tabulation_controls()
+        self.restore_rings_controls()
         self.changed()
         self.restore_reprojection_controls()
         self.restore_merge_controls()
