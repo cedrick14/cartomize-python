@@ -21,38 +21,40 @@
     9526920.0
   ],
   "aoi_pixels": 442031,
-  "valid_pixels": 441823,
-  "coverage_percent": 99.95294447674485,
+  "valid_pixels": 442023,
+  "coverage_percent": 99.99819017218249,
   "overlap": "first",
   "resampling": "nearest",
   "mask_clouds": true,
   "mask_saturation": false,
   "dates": [
-    "2024-07-20"
+    "2025-08-19"
   ],
   "allow_mixed_dates": false,
   "upsampled_bands": [],
   "scenes": [
     {
       "index": 1,
-      "id": "S2B_33MWR_20240720_0_L2A",
+      "id": "S2C_33MWR_20250819_0_L2A",
       "sensor": "sentinel-2",
       "level": "L2A-SR",
-      "acquired": "2024-07-20",
+      "acquired": "2025-08-19",
       "quality_mask": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/data/SCL.tif",
       "saturation_mask": null,
-      "contributed_pixels": 441823,
+      "contributed_pixels": 442023,
       "notes": [
         "Earth Search COG harmonisé blue : scale déclaré=0.0001, offset déclaré=-0.1, offset effectif=0 ; earthsearch:boa_offset_applied=true, aucune seconde application du décalage BOA.",
         "Earth Search COG harmonisé green : scale déclaré=0.0001, offset déclaré=-0.1, offset effectif=0 ; earthsearch:boa_offset_applied=true, aucune seconde application du décalage BOA.",
         "Earth Search COG harmonisé red : scale déclaré=0.0001, offset déclaré=-0.1, offset effectif=0 ; earthsearch:boa_offset_applied=true, aucune seconde application du décalage BOA.",
-        "Earth Search COG harmonisé nir : scale déclaré=0.0001, offset déclaré=-0.1, offset effectif=0 ; earthsearch:boa_offset_applied=true, aucune seconde application du décalage BOA."
+        "Earth Search COG harmonisé nir : scale déclaré=0.0001, offset déclaré=-0.1, offset effectif=0 ; earthsearch:boa_offset_applied=true, aucune seconde application du décalage BOA.",
+        "Earth Search COG harmonisé swir16 : scale déclaré=0.0001, offset déclaré=-0.1, offset effectif=0 ; earthsearch:boa_offset_applied=true, aucune seconde application du décalage BOA.",
+        "Spectral cloud fallback sentinel_spectral_fallback_v1: 4 pixels détectés (0.0009 %)."
       ]
     }
   ],
   "assets": [
     {
-      "scene": "S2B_33MWR_20240720_0_L2A",
+      "scene": "S2C_33MWR_20250819_0_L2A",
       "band": "blue",
       "path": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/data/B02.tif",
       "index": 1,
@@ -69,10 +71,10 @@
         537730.0,
         9526920.0
       ],
-      "size_bytes": 701014
+      "size_bytes": 609706
     },
     {
-      "scene": "S2B_33MWR_20240720_0_L2A",
+      "scene": "S2C_33MWR_20250819_0_L2A",
       "band": "green",
       "path": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/data/B03.tif",
       "index": 1,
@@ -89,10 +91,10 @@
         537730.0,
         9526920.0
       ],
-      "size_bytes": 688606
+      "size_bytes": 599246
     },
     {
-      "scene": "S2B_33MWR_20240720_0_L2A",
+      "scene": "S2C_33MWR_20250819_0_L2A",
       "band": "red",
       "path": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/data/B04.tif",
       "index": 1,
@@ -109,10 +111,10 @@
         537730.0,
         9526920.0
       ],
-      "size_bytes": 693980
+      "size_bytes": 613804
     },
     {
-      "scene": "S2B_33MWR_20240720_0_L2A",
+      "scene": "S2C_33MWR_20250819_0_L2A",
       "band": "nir",
       "path": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/data/B08.tif",
       "index": 1,
@@ -129,7 +131,7 @@
         537730.0,
         9526920.0
       ],
-      "size_bytes": 707538
+      "size_bytes": 638890
     }
   ],
   "limitations": [

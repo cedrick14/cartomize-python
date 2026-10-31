@@ -1,2 +1,2 @@
 name,scope,ndvi_count,ndvi_min,ndvi_max,ndvi_mean,ndvi_sum,ndvi_std,ndvi_zone_pixels,ndvi_raster_pixels,ndvi_coverage_percent
-Fenêtre de démonstration Kinshasa,emprise d'analyse; pas une limite administrative,441823,-0.3734409213066101,0.8263953924179077,0.09025278298082691,39875.75533493789,0.18650513074255717,442031,442031,99.95294447674485
+Fenêtre de démonstration Kinshasa,emprise d'analyse; pas une limite administrative,442023,-0.2355460375547409,0.6399999856948853,0.016900940640961478,7470.604484939715,0.15321709751096738,442031,442031,99.99819017218249

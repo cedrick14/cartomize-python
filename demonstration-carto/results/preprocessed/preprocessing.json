@@ -5,12 +5,12 @@
   "coverage_threshold": 95.0,
   "threshold_met": true,
   "allow_partial": false,
-  "usable_percent": 99.95294447674485,
+  "usable_percent": 99.99819017218249,
   "selected_scene_ids": [
-    "S2B_33MWR_20240720_0_L2A"
+    "S2C_33MWR_20250819_0_L2A"
   ],
   "recommended_action": "single_scene",
-  "initial_usable_percent": 99.95294447674485,
+  "initial_usable_percent": 99.99819017218249,
   "catalog": null,
   "acquisitions": [],
   "downloaded_bytes": 0,
@@ -18,7 +18,7 @@
   "products": [
     {
       "scenes": [
-        "S2B_33MWR_20240720_0_L2A"
+        "S2C_33MWR_20250819_0_L2A"
       ],
       "multiband": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/products/scene_001/multibande.tif",
       "bands": {
@@ -48,6 +48,238 @@
   "audit": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/diagnostic/report.json",
   "coverage": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/diagnostic/coverage.tif",
   "gaps": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/diagnostic/gaps.tif",
+  "initial_preprocessing_plan": {
+    "schema": "cartomize.preprocessing.plan.v1",
+    "automatic": true,
+    "ready": true,
+    "mask_clouds": true,
+    "mask_saturation": false,
+    "scenes": [
+      {
+        "scene_id": "S2C_33MWR_20250819_0_L2A",
+        "sensor": "sentinel-2",
+        "processing_level": "L2A-SR",
+        "acquired": "2025-08-19",
+        "ready": true,
+        "levels": [
+          {
+            "level": 1,
+            "name": "radiometric_calibration",
+            "status": "ready",
+            "action": "apply_declared_scale_offset",
+            "missing_bands": [],
+            "bands": [
+              {
+                "band": "blue",
+                "unit": "reflectance",
+                "scale": 0.0001,
+                "offset": 0.0,
+                "action": "apply_scale_offset"
+              },
+              {
+                "band": "green",
+                "unit": "reflectance",
+                "scale": 0.0001,
+                "offset": 0.0,
+                "action": "apply_scale_offset"
+              },
+              {
+                "band": "red",
+                "unit": "reflectance",
+                "scale": 0.0001,
+                "offset": 0.0,
+                "action": "apply_scale_offset"
+              },
+              {
+                "band": "nir",
+                "unit": "reflectance",
+                "scale": 0.0001,
+                "offset": 0.0,
+                "action": "apply_scale_offset"
+              },
+              {
+                "band": "swir1",
+                "unit": "reflectance",
+                "scale": 0.0001,
+                "offset": 0.0,
+                "action": "apply_scale_offset"
+              }
+            ]
+          },
+          {
+            "level": 2,
+            "name": "atmospheric_correction",
+            "status": "already_applied",
+            "action": "none",
+            "method": "provider_surface_reflectance",
+            "missing": []
+          },
+          {
+            "level": 3,
+            "name": "quality_detection",
+            "status": "ready",
+            "action": "use_declared_quality_mask",
+            "quality_mask": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/data/SCL.tif",
+            "quality_kind": "sentinel_scl",
+            "saturation_mask": null,
+            "missing": []
+          },
+          {
+            "level": 4,
+            "name": "cloud_masking",
+            "status": "ready",
+            "action": "mask_before_resampling",
+            "quality_kind": "sentinel_scl",
+            "missing": []
+          },
+          {
+            "level": 5,
+            "name": "orchestration",
+            "status": "ready",
+            "action": "execute_pipeline",
+            "missing": []
+          }
+        ],
+        "missing": []
+      }
+    ],
+    "execution": {
+      "level": 5,
+      "name": "orchestration",
+      "status": "ready",
+      "action": "execute_pipeline"
+    },
+    "policy": {
+      "never_assume_atmospheric_correction": true,
+      "prefer_provider_surface_reflectance": true,
+      "never_disable_cloud_mask_silently": true,
+      "restart_after_missing_inputs_are_added": true,
+      "no_scientific_output_when_blocked": true,
+      "custom_inputs_are_user_declarations": true
+    }
+  },
+  "preprocessing_plan": {
+    "schema": "cartomize.preprocessing.plan.v1",
+    "automatic": true,
+    "ready": true,
+    "mask_clouds": true,
+    "mask_saturation": false,
+    "scenes": [
+      {
+        "scene_id": "S2C_33MWR_20250819_0_L2A",
+        "sensor": "sentinel-2",
+        "processing_level": "L2A-SR",
+        "acquired": "2025-08-19",
+        "ready": true,
+        "levels": [
+          {
+            "level": 1,
+            "name": "radiometric_calibration",
+            "status": "ready",
+            "action": "apply_declared_scale_offset",
+            "missing_bands": [],
+            "bands": [
+              {
+                "band": "blue",
+                "unit": "reflectance",
+                "scale": 0.0001,
+                "offset": 0.0,
+                "action": "apply_scale_offset"
+              },
+              {
+                "band": "green",
+                "unit": "reflectance",
+                "scale": 0.0001,
+                "offset": 0.0,
+                "action": "apply_scale_offset"
+              },
+              {
+                "band": "red",
+                "unit": "reflectance",
+                "scale": 0.0001,
+                "offset": 0.0,
+                "action": "apply_scale_offset"
+              },
+              {
+                "band": "nir",
+                "unit": "reflectance",
+                "scale": 0.0001,
+                "offset": 0.0,
+                "action": "apply_scale_offset"
+              },
+              {
+                "band": "swir1",
+                "unit": "reflectance",
+                "scale": 0.0001,
+                "offset": 0.0,
+                "action": "apply_scale_offset"
+              }
+            ]
+          },
+          {
+            "level": 2,
+            "name": "atmospheric_correction",
+            "status": "already_applied",
+            "action": "none",
+            "method": "provider_surface_reflectance",
+            "missing": []
+          },
+          {
+            "level": 3,
+            "name": "quality_detection",
+            "status": "ready",
+            "action": "use_declared_quality_mask",
+            "quality_mask": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/data/SCL.tif",
+            "quality_kind": "sentinel_scl",
+            "saturation_mask": null,
+            "missing": []
+          },
+          {
+            "level": 4,
+            "name": "cloud_masking",
+            "status": "ready",
+            "action": "mask_before_resampling",
+            "quality_kind": "sentinel_scl",
+            "missing": []
+          },
+          {
+            "level": 5,
+            "name": "orchestration",
+            "status": "ready",
+            "action": "execute_pipeline",
+            "missing": []
+          }
+        ],
+        "missing": []
+      }
+    ],
+    "execution": {
+      "level": 5,
+      "name": "orchestration",
+      "status": "ready",
+      "action": "execute_pipeline"
+    },
+    "policy": {
+      "never_assume_atmospheric_correction": true,
+      "prefer_provider_surface_reflectance": true,
+      "never_disable_cloud_mask_silently": true,
+      "restart_after_missing_inputs_are_added": true,
+      "no_scientific_output_when_blocked": true,
+      "custom_inputs_are_user_declarations": true
+    }
+  },
+  "recovery": [],
+  "spectral_cloud_detection": [
+    {
+      "scene_id": "S2C_33MWR_20250819_0_L2A",
+      "status": "applied",
+      "path": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/spectral_cloud/scene_0001_spectral_cloud.tif",
+      "method": "sentinel_spectral_fallback_v1",
+      "observed_pixels": 442888,
+      "cloud_pixels": 4,
+      "cloud_percent": 0.0009031628763931287
+    }
+  ],
   "mosaic": false,
   "parameters": {
     "band_order": [
@@ -76,5 +308,56 @@
     "coverage_threshold": 95.0,
     "max_pixels": 250000000,
     "aoi": null
-  }
+  },
+  "atmospheric_method": "auto",
+  "executed_steps": [
+    "radiometric_calibration",
+    "quality_detection",
+    "cloud_masking",
+    "spectral_cloud_detection",
+    "grid_harmonization",
+    "scene_selection",
+    "single_scene",
+    "aoi_clip"
+  ],
+  "quality_statistics": [
+    {
+      "scene_id": "S2C_33MWR_20250819_0_L2A",
+      "kind": "sentinel_scl",
+      "evaluated_pixels": 442031,
+      "clear_pixels": 442027,
+      "clear_percent": 99.99909508609124,
+      "rejected_pixels": 4,
+      "rejected_percent": 0.000904913908753006,
+      "cloud_pixels": 132,
+      "cloud_percent": 0.029862158988849197,
+      "cloud_low_probability_pixels": 128,
+      "cloud_low_probability_percent": 0.028957245080096193,
+      "cloud_medium_probability_pixels": 4,
+      "cloud_medium_probability_percent": 0.000904913908753006,
+      "cloud_high_probability_pixels": 0,
+      "cloud_high_probability_percent": 0.0,
+      "cirrus_pixels": 0,
+      "cirrus_percent": 0.0,
+      "cloud_shadow_pixels": 0,
+      "cloud_shadow_percent": 0.0,
+      "snow_pixels": 0,
+      "snow_percent": 0.0,
+      "saturated_or_defective_pixels": 0,
+      "saturated_or_defective_percent": 0.0,
+      "quality_nodata_pixels": 0,
+      "quality_nodata_percent": 0.0
+    }
+  ],
+  "spectral_cloud_statistics": [
+    {
+      "scene_id": "S2C_33MWR_20250819_0_L2A",
+      "method": "sentinel_spectral_fallback_v1",
+      "evaluated_pixels": 442031,
+      "cloud_pixels": 4,
+      "cloud_percent": 0.000904913908753006,
+      "clear_pixels": 442027,
+      "nodata_pixels": 0
+    }
+  ]
 }

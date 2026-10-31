@@ -36,28 +36,64 @@
   "footprint_percent": 100.0,
   "present_pixels": 442031,
   "present_percent": 100.0,
-  "usable_pixels": 441823,
-  "usable_percent": 99.95294447674485,
+  "usable_pixels": 442023,
+  "usable_percent": 99.99819017218249,
   "scenes": [
     {
       "index": 1,
-      "id": "S2B_33MWR_20240720_0_L2A",
+      "id": "S2C_33MWR_20250819_0_L2A",
       "sensor": "sentinel-2",
       "level": "L2A-SR",
-      "acquired": "2024-07-20",
+      "acquired": "2025-08-19",
       "quality_mask": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/data/SCL.tif",
+      "spectral_cloud_mask": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/spectral_cloud/scene_0001_spectral_cloud.tif",
+      "spectral_cloud_method": "sentinel_spectral_fallback_v1",
       "saturation_mask": null,
       "footprint_pixels": 442031,
       "footprint_percent": 100.0,
       "present_pixels": 442031,
       "present_percent": 100.0,
-      "usable_pixels": 441823,
-      "usable_percent": 99.95294447674485
+      "usable_pixels": 442023,
+      "usable_percent": 99.99819017218249,
+      "quality_statistics": {
+        "kind": "sentinel_scl",
+        "evaluated_pixels": 442031,
+        "clear_pixels": 442027,
+        "clear_percent": 99.99909508609124,
+        "rejected_pixels": 4,
+        "rejected_percent": 0.000904913908753006,
+        "cloud_pixels": 132,
+        "cloud_percent": 0.029862158988849197,
+        "cloud_low_probability_pixels": 128,
+        "cloud_low_probability_percent": 0.028957245080096193,
+        "cloud_medium_probability_pixels": 4,
+        "cloud_medium_probability_percent": 0.000904913908753006,
+        "cloud_high_probability_pixels": 0,
+        "cloud_high_probability_percent": 0.0,
+        "cirrus_pixels": 0,
+        "cirrus_percent": 0.0,
+        "cloud_shadow_pixels": 0,
+        "cloud_shadow_percent": 0.0,
+        "snow_pixels": 0,
+        "snow_percent": 0.0,
+        "saturated_or_defective_pixels": 0,
+        "saturated_or_defective_percent": 0.0,
+        "quality_nodata_pixels": 0,
+        "quality_nodata_percent": 0.0
+      },
+      "spectral_cloud_statistics": {
+        "method": "sentinel_spectral_fallback_v1",
+        "evaluated_pixels": 442031,
+        "cloud_pixels": 4,
+        "cloud_percent": 0.000904913908753006,
+        "clear_pixels": 442027,
+        "nodata_pixels": 0
+      }
     }
   ],
   "assets": [
     {
-      "scene": "S2B_33MWR_20240720_0_L2A",
+      "scene": "S2C_33MWR_20250819_0_L2A",
       "band": "blue",
       "path": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/data/B02.tif",
       "index": 1,
@@ -74,10 +110,10 @@
         537730.0,
         9526920.0
       ],
-      "size_bytes": 701014
+      "size_bytes": 609706
     },
     {
-      "scene": "S2B_33MWR_20240720_0_L2A",
+      "scene": "S2C_33MWR_20250819_0_L2A",
       "band": "green",
       "path": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/data/B03.tif",
       "index": 1,
@@ -94,10 +130,10 @@
         537730.0,
         9526920.0
       ],
-      "size_bytes": 688606
+      "size_bytes": 599246
     },
     {
-      "scene": "S2B_33MWR_20240720_0_L2A",
+      "scene": "S2C_33MWR_20250819_0_L2A",
       "band": "red",
       "path": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/data/B04.tif",
       "index": 1,
@@ -114,10 +150,10 @@
         537730.0,
         9526920.0
       ],
-      "size_bytes": 693980
+      "size_bytes": 613804
     },
     {
-      "scene": "S2B_33MWR_20240720_0_L2A",
+      "scene": "S2C_33MWR_20250819_0_L2A",
       "band": "nir",
       "path": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/data/B08.tif",
       "index": 1,
@@ -134,17 +170,19 @@
         537730.0,
         9526920.0
       ],
-      "size_bytes": 707538
+      "size_bytes": 638890
     }
   ],
   "coverage_status": "partial",
   "threshold_met": true,
   "recommended_action": "single_scene",
   "recommended_scene_ids": [
-    "S2B_33MWR_20240720_0_L2A"
+    "S2C_33MWR_20250819_0_L2A"
   ],
   "mosaic_recommended": false,
   "coverage_method": "target_grid_pixel_count",
+  "quality_statistics_scope": "per_scene_common_band_footprint_on_target_grid",
+  "spectral_cloud_statistics_scope": "per_scene_common_band_footprint_on_target_grid",
   "gap_classes": {
     "0": "usable",
     "1": "outside_footprint",
@@ -155,6 +193,8 @@
   "notes": [
     "All selected bands must be present in the same scene for a pixel to count.",
     "Percentages use AOI pixels on the target grid; they are not fractional polygon areas.",
-    "Recommendations do not change the selected sources or authorize mixing dates."
+    "Recommendations do not change the selected sources or authorize mixing dates.",
+    "Quality statistics are reported per scene on its common selected-band footprint; scene counts are not additive where scenes overlap.",
+    "When available, Sentinel spectral fallback statistics are reported separately from SCL so official and supplemental cloud detections remain distinguishable."
   ]
 }

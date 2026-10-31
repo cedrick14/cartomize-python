@@ -4,30 +4,74 @@
   "source": "Earth Search / Sentinel-2 Level-2A",
   "stac_endpoint": "https://earth-search.aws.element84.com/v1",
   "collection": "sentinel-2-l2a",
-  "search_datetime": "2024-06-01T00:00:00Z/2024-09-30T23:59:59Z",
+  "search_datetime": "2022-06-01T00:00:00Z/2025-09-30T23:59:59Z",
   "search_bbox_wgs84": [
     15.28,
     -4.34,
     15.34,
     -4.28
   ],
-  "selected_item_id": "S2B_33MWR_20240720_0_L2A",
-  "selected_datetime": "2024-07-20T09:21:50.068000Z",
-  "platform": "sentinel-2b",
+  "selected_item_id": "S2C_33MWR_20250819_0_L2A",
+  "selected_datetime": "2025-08-19T09:22:06.156000Z",
+  "platform": "sentinel-2c",
   "mgrs_tile": null,
-  "global_cloud_cover_percent": 9.286346,
+  "global_cloud_cover_percent": 11.730018,
   "aoi_footprint_percent_before_processing": 99.99999999999999,
   "aoi_observed_in_overlap_percent": 100.0,
-  "aoi_scl_valid_in_overlap_percent": 99.95310583651973,
-  "aoi_scl_usable_percent_before_processing": 99.95310583651971,
+  "aoi_scl_valid_in_overlap_percent": 99.99909818916385,
+  "aoi_scl_usable_percent_before_processing": 99.99909818916383,
+  "aoi_hybrid_usable_percent_before_processing": 99.99864525568539,
+  "aoi_spectral_cloud_percent_before_processing": 0.0004515814381965644,
   "selection_candidates": [
+    {
+      "id": "S2C_33MWR_20250819_0_L2A",
+      "cloud_cover": 11.730018,
+      "footprint_percent": 99.99999999999999,
+      "observed_in_overlap_percent": 100.0,
+      "scl_valid_in_overlap_percent": 99.99909818916385,
+      "usable_aoi_percent": 99.99909818916383,
+      "spectral_cloud_percent": 0.0004515814381965644,
+      "hybrid_usable_percent": 99.99864525568539
+    },
+    {
+      "id": "S2B_33MWR_20230805_0_L2A",
+      "cloud_cover": 10.59515,
+      "footprint_percent": 99.99999999999999,
+      "observed_in_overlap_percent": 100.0,
+      "scl_valid_in_overlap_percent": 99.98106197244066,
+      "usable_aoi_percent": 99.98106197244064,
+      "spectral_cloud_percent": 0.008354256606636442,
+      "hybrid_usable_percent": 99.9726793229891
+    },
     {
       "id": "S2B_33MWR_20240720_0_L2A",
       "cloud_cover": 9.286346,
       "footprint_percent": 99.99999999999999,
       "observed_in_overlap_percent": 100.0,
       "scl_valid_in_overlap_percent": 99.95310583651973,
-      "usable_aoi_percent": 99.95310583651971
+      "usable_aoi_percent": 99.95310583651971,
+      "spectral_cloud_percent": 0.03409439858384061,
+      "hybrid_usable_percent": 99.9191669225628
+    },
+    {
+      "id": "S2B_33MWR_20230726_0_L2A",
+      "cloud_cover": 9.730057,
+      "footprint_percent": 99.99999999999999,
+      "observed_in_overlap_percent": 100.0,
+      "scl_valid_in_overlap_percent": 99.95941851237285,
+      "usable_aoi_percent": 99.95941851237284,
+      "spectral_cloud_percent": 0.10499268438070121,
+      "hybrid_usable_percent": 99.86813822004659
+    },
+    {
+      "id": "S2A_33MWR_20250712_0_L2A",
+      "cloud_cover": 10.091956,
+      "footprint_percent": 99.99999999999999,
+      "observed_in_overlap_percent": 100.0,
+      "scl_valid_in_overlap_percent": 99.87194286126542,
+      "usable_aoi_percent": 99.87194286126541,
+      "spectral_cloud_percent": 0.06073770343743791,
+      "hybrid_usable_percent": 99.83720489153012
     },
     {
       "id": "S2A_33MWR_20240824_0_L2A",
@@ -35,7 +79,9 @@
       "footprint_percent": 99.99999999999999,
       "observed_in_overlap_percent": 100.0,
       "scl_valid_in_overlap_percent": 99.87735372628238,
-      "usable_aoi_percent": 99.87735372628237
+      "usable_aoi_percent": 99.87735372628237,
+      "spectral_cloud_percent": 0.05689926121276711,
+      "hybrid_usable_percent": 99.82862484420438
     },
     {
       "id": "S2B_33MWR_20240809_0_L2A",
@@ -43,7 +89,89 @@
       "footprint_percent": 99.99999999999999,
       "observed_in_overlap_percent": 100.0,
       "scl_valid_in_overlap_percent": 98.96111391674482,
-      "usable_aoi_percent": 98.96111391674482
+      "usable_aoi_percent": 98.96111391674482,
+      "spectral_cloud_percent": 1.3956124347464822,
+      "hybrid_usable_percent": 98.15506403424793
+    },
+    {
+      "id": "S2C_33MWR_20250620_0_L2A",
+      "cloud_cover": 1.766826,
+      "footprint_percent": 99.99999999999999,
+      "observed_in_overlap_percent": 100.0,
+      "scl_valid_in_overlap_percent": 98.93135415915158,
+      "usable_aoi_percent": 98.93135415915157,
+      "spectral_cloud_percent": 1.2529127002763678,
+      "hybrid_usable_percent": 98.08100467838369
+    },
+    {
+      "id": "S2A_33MWR_20240804_0_L2A",
+      "cloud_cover": 21.505696,
+      "footprint_percent": 99.99999999999999,
+      "observed_in_overlap_percent": 100.0,
+      "scl_valid_in_overlap_percent": 96.96450472548878,
+      "usable_aoi_percent": 96.96450472548877,
+      "spectral_cloud_percent": 0.3091074944455483,
+      "hybrid_usable_percent": 96.78541753219774
+    },
+    {
+      "id": "S2B_33MWR_20230914_0_L2A",
+      "cloud_cover": 19.808215,
+      "footprint_percent": 99.99999999999999,
+      "observed_in_overlap_percent": 100.0,
+      "scl_valid_in_overlap_percent": 97.30538922155688,
+      "usable_aoi_percent": 97.30538922155687,
+      "spectral_cloud_percent": 1.8320658947634616,
+      "hybrid_usable_percent": 96.21416701287907
+    },
+    {
+      "id": "S2B_33MWR_20230716_0_L2A",
+      "cloud_cover": 12.209229,
+      "footprint_percent": 99.99999999999999,
+      "observed_in_overlap_percent": 100.0,
+      "scl_valid_in_overlap_percent": 61.03004833706082,
+      "usable_aoi_percent": 61.030048337060805,
+      "spectral_cloud_percent": 0.0002257907190982822,
+      "hybrid_usable_percent": 61.00820071891764
+    },
+    {
+      "id": "S2C_33MWR_20250918_0_L2A",
+      "cloud_cover": 11.851958,
+      "footprint_percent": 99.99999999999999,
+      "observed_in_overlap_percent": 100.0,
+      "scl_valid_in_overlap_percent": 51.73688767044225,
+      "usable_aoi_percent": 51.73688767044225,
+      "spectral_cloud_percent": 24.409331478838894,
+      "hybrid_usable_percent": 49.75772655840753
+    },
+    {
+      "id": "S2C_33MWR_20250829_0_L2A",
+      "cloud_cover": 22.96904,
+      "footprint_percent": 99.99999999999999,
+      "observed_in_overlap_percent": 100.0,
+      "scl_valid_in_overlap_percent": 28.063451410432148,
+      "usable_aoi_percent": 28.063451410432144,
+      "spectral_cloud_percent": 45.290005599609835,
+      "hybrid_usable_percent": 26.10479398854789
+    },
+    {
+      "id": "S2B_33MWR_20230904_1_L2A",
+      "cloud_cover": 16.151954,
+      "footprint_percent": 99.99999999999999,
+      "observed_in_overlap_percent": 100.0,
+      "scl_valid_in_overlap_percent": 19.898456099848495,
+      "usable_aoi_percent": 19.89845609984849,
+      "spectral_cloud_percent": 44.444419356586764,
+      "hybrid_usable_percent": 17.267571033760227
+    },
+    {
+      "id": "S2B_33MWR_20230904_0_L2A",
+      "cloud_cover": 19.357236,
+      "footprint_percent": 99.99999999999999,
+      "observed_in_overlap_percent": 100.0,
+      "scl_valid_in_overlap_percent": 9.53755140321766,
+      "usable_aoi_percent": 9.537551403217659,
+      "spectral_cloud_percent": 45.134887375589315,
+      "hybrid_usable_percent": 8.907669659146329
     },
     {
       "id": "S2A_33MWR_20240807_0_L2A",
@@ -62,74 +190,106 @@
       "usable_aoi_percent": 1.3644397951085778
     },
     {
+      "id": "S2B_33MWR_20250824_1_L2A",
+      "cloud_cover": 22.686391,
+      "footprint_percent": 99.99999999999999,
+      "observed_in_overlap_percent": 100.0,
+      "scl_valid_in_overlap_percent": 2.094906572397374,
+      "usable_aoi_percent": 2.0949065723973734,
+      "spectral_cloud_percent": 92.375047416051,
+      "hybrid_usable_percent": 1.025089864706201
+    },
+    {
       "id": "S2B_33MWR_20240921_0_L2A",
       "cloud_cover": 16.258827,
       "footprint_percent": 99.99999999999999,
       "observed_in_overlap_percent": 1.1849794387129355,
       "scl_valid_in_overlap_percent": 0.5239520958083832,
       "usable_aoi_percent": 0.5239520958083831
+    },
+    {
+      "id": "S2A_33MWR_20250824_0_L2A",
+      "cloud_cover": 4.626261,
+      "footprint_percent": 99.99999999999999,
+      "observed_in_overlap_percent": 0.3336700093788327,
+      "scl_valid_in_overlap_percent": 0.29399033258783636,
+      "usable_aoi_percent": 0.2939903325878363
     }
   ],
   "source_assets": {
     "blue": {
       "key": "blue",
-      "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2024/7/S2B_33MWR_20240720_0_L2A/B02.tif"
+      "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2C_33MWR_20250819_0_L2A/B02.tif"
     },
     "green": {
       "key": "green",
-      "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2024/7/S2B_33MWR_20240720_0_L2A/B03.tif"
+      "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2C_33MWR_20250819_0_L2A/B03.tif"
     },
     "red": {
       "key": "red",
-      "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2024/7/S2B_33MWR_20240720_0_L2A/B04.tif"
+      "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2C_33MWR_20250819_0_L2A/B04.tif"
     },
     "nir": {
       "key": "nir",
-      "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2024/7/S2B_33MWR_20240720_0_L2A/B08.tif"
+      "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2C_33MWR_20250819_0_L2A/B08.tif"
+    },
+    "swir1": {
+      "key": "swir16",
+      "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2C_33MWR_20250819_0_L2A/B11.tif"
     },
     "scl": {
       "key": "scl",
-      "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2024/7/S2B_33MWR_20240720_0_L2A/SCL.tif"
+      "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2C_33MWR_20250819_0_L2A/SCL.tif"
+    },
+    "product_metadata": {
+      "key": "product_metadata",
+      "href": "https://sentinel-s2-l2a.s3.amazonaws.com/tiles/33/M/WR/2025/8/19/0/product_metadata.xml",
+      "status": "remote_404_not_required_for_declared_stac_calibration"
     }
   },
   "calibration_notes": [
     "Earth Search COG harmonisé blue : scale déclaré=0.0001, offset déclaré=-0.1, offset effectif=0 ; earthsearch:boa_offset_applied=true, aucune seconde application du décalage BOA.",
     "Earth Search COG harmonisé green : scale déclaré=0.0001, offset déclaré=-0.1, offset effectif=0 ; earthsearch:boa_offset_applied=true, aucune seconde application du décalage BOA.",
     "Earth Search COG harmonisé red : scale déclaré=0.0001, offset déclaré=-0.1, offset effectif=0 ; earthsearch:boa_offset_applied=true, aucune seconde application du décalage BOA.",
-    "Earth Search COG harmonisé nir : scale déclaré=0.0001, offset déclaré=-0.1, offset effectif=0 ; earthsearch:boa_offset_applied=true, aucune seconde application du décalage BOA."
+    "Earth Search COG harmonisé nir : scale déclaré=0.0001, offset déclaré=-0.1, offset effectif=0 ; earthsearch:boa_offset_applied=true, aucune seconde application du décalage BOA.",
+    "Earth Search COG harmonisé swir16 : scale déclaré=0.0001, offset déclaré=-0.1, offset effectif=0 ; earthsearch:boa_offset_applied=true, aucune seconde application du décalage BOA."
   ],
   "files": {
     "B02.tif": {
-      "bytes": 701014,
-      "sha256": "30710007459f3fefa9d08c1754ae1de941836d7a061fd80863bb65860aaa97ec"
+      "bytes": 609706,
+      "sha256": "3c06b7df51b4f912824353a4084e05dc0c608760c7278a5e2e79e67538d2b6d5"
     },
     "B03.tif": {
-      "bytes": 688606,
-      "sha256": "948b90b5e82d4de469be569219cbc419e41fd76b064fb3b56e60003d7039af6b"
+      "bytes": 599246,
+      "sha256": "7cb23b894a925c01c8d66a9786150e0a53fe2b1a18fa0fa460bc382e37ce6013"
     },
     "B04.tif": {
-      "bytes": 693980,
-      "sha256": "e88112a9ee9c5cf99d67d82c4f664fae8945c546c2ad6c24b0171bd93f98dc66"
+      "bytes": 613804,
+      "sha256": "6c9842d4371d0a5cf04dfb4aa0b21eb8d06cf9e835c72e4d2810df411b8425bf"
     },
     "B08.tif": {
-      "bytes": 707538,
-      "sha256": "3b36994136944664230c01bf7cd8fa6b570a36e965e4c838bc402706737e45bf"
+      "bytes": 638890,
+      "sha256": "28e0990cf644a0daf53aff3f23ab3006a08b9ed82f2446cd5b05c5e858cb5487"
+    },
+    "B11.tif": {
+      "bytes": 186670,
+      "sha256": "f2100330606efc642fab1617efa977157d67b52187ed62a4501ac62974167f4b"
     },
     "SCL.tif": {
-      "bytes": 4908,
-      "sha256": "3e713d5d3fb995a9fec2ff04ff7ab524017410c9d6c1ba22b9e08f883d50b7a0"
+      "bytes": 4460,
+      "sha256": "2226af2881adcbb5f70d61121acacd4ae0097373d01110e9d9da653f340fa12e"
     },
     "aoi.geojson": {
       "bytes": 860,
       "sha256": "5821f48a307f9559ff8c6271eb9c5bd8ecb9933c5a701d500f051d074a43d2ec"
     },
     "scenes.json": {
-      "bytes": 1850,
-      "sha256": "559938842c6157decc4cfb3308e191d7cfc947b1a00dad6e51aaaaacc23579f8"
+      "bytes": 2237,
+      "sha256": "8c5108a9e02e8cb44898c753dbe9b8dab675151a836459aa169354b5ae3ce8fb"
     },
     "source_item.json": {
-      "bytes": 7261,
-      "sha256": "a9aeab8086cd4ed053b0d5eae586280ad4a3ed6a3d3751f5b711e4ebe676a549"
+      "bytes": 7872,
+      "sha256": "3415e0091d3e1b4307d27c5434a577bbce2ae1b5798cf413ed31888e1e1d1bd8"
     }
   },
   "aoi_note": "Fenêtre d'analyse définie pour la démonstration; elle n'est pas présentée comme une limite administrative."
