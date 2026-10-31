@@ -9,6 +9,8 @@ import re
 import xml.etree.ElementTree as ET
 from .storage import read_json,save_json,new_directory
 from .imagery import _check_cancel
+from .sensor_profiles import (SENTINEL2, LANDSAT_OLI, LANDSAT_ETM_TM,
+    semantic_band_name, native_band_code, sensor_from_text, quality_asset_role)
 
 
 def _url(value):
@@ -375,8 +377,6 @@ def scene_from_stac(item,*,base=None,band_mapping=None,quality_asset=None,qualit
                 else:
                     import rasterio
 
-from .sensor_profiles import (SENTINEL2, LANDSAT_OLI, LANDSAT_ETM_TM,
-    semantic_band_name, native_band_code, sensor_from_text, quality_asset_role)
                     with rasterio.open(path) as source:
                         if index>source.count:raise ValueError('Indice de bande hors du raster : '+key)
                         scale,offset=source.scales[index-1],source.offsets[index-1]
