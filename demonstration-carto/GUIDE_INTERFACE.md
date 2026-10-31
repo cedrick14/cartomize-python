@@ -14,7 +14,7 @@ Ouvrir **Prétraitement multispectral**.
 
 - Source : `demonstration-carto/data`.
 - Zone d'étude : `demonstration-carto/data/aoi.geojson`.
-- Bandes : `blue`, `green`, `red`, `nir`.
+- Bandes : `blue`, `green`, `red`, `nir`, `swir1`.
 - Masque de qualité : activé, avec la couche SCL Sentinel-2.
 - Seuil de couverture : **95 %**.
 - Multibande : activé.
@@ -47,23 +47,20 @@ Le composite sert à la visualisation. Les calculs scientifiques utilisent le **
 
 ## 5. Indices spectraux : choix de l'utilisateur
 
-Ouvrir **Indices spectraux** et sélectionner un ou plusieurs indices compatibles avec les bandes disponibles.
+Après le prétraitement et la création du composite, ouvrir **Indices spectraux**.
 
-Avec B02, B03, B04 et B08, le tutoriel a vérifié notamment :
+L'interface **ne calcule aucun indice automatiquement**. L'utilisateur choisit lui-même dans la liste l'indice qu'il souhaite produire, par exemple :
 
 - NDVI ;
-- NDWI ;
+- NDBI ;
 - EVI ;
-- EVI2 ;
+- NDWI ;
 - SAVI ;
-- OSAVI ;
-- MSAVI ;
-- GNDVI ;
-- ARVI ;
-- VARI ;
-- SR.
+- ou tout autre indice compatible avec les bandes réellement présentes.
 
-Un indice qui exige une bande absente, par exemple SWIR ou red-edge, ne doit pas être calculé en inventant une correspondance. Il faut d'abord disposer de la bande requise.
+Il sélectionne l'indice, choisit le fichier de sortie, puis clique **Exécuter**.
+
+Cartomize vérifie les bandes nécessaires. Par exemple, NDBI nécessite NIR + SWIR1 ; c'est pour cela que B11 est incluse dans ce jeu de démonstration.
 
 ## 6. Statistiques
 
@@ -96,6 +93,6 @@ Sans ROI / vérité terrain, ne pas présenter une classification supervisée co
 
 La séquence à montrer est donc :
 
-**bandes → contrôle automatique → couverture → découpage → mosaïque si nécessaire → multibande → composite → choix d'indices → statistiques → export.**
+**bandes → contrôle automatique → couverture → découpage → mosaïque si nécessaire → multibande → composite → choix manuel d’un indice → exécution → résultat → statistiques → export.**
 
 La mise en page Cartomize n'est pas utilisée dans cette démonstration.

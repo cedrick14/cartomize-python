@@ -12,7 +12,7 @@ La classification n'est pas exécutée. Elle reste disponible comme extension si
 
 ## Données
 
-Le dossier `data/` contient les sous-jeux réels B02, B03, B04, B08 et SCL téléchargés depuis Earth Search, ainsi que :
+Le dossier `data/` contient les sous-jeux réels B02, B03, B04, B08, B11 et SCL téléchargés depuis Earth Search, ainsi que :
 
 - `aoi.geojson` : fenêtre d'analyse de démonstration ;
 - `source_item.json` : métadonnées STAC de la scène ;
@@ -33,12 +33,11 @@ Il exécute :
 2. contrôle des bandes, CRS, résolution et calibration ;
 3. prétraitement automatique avec SCL et découpage ;
 4. composite en couleurs naturelles ;
-5. identification automatique des indices compatibles avec les bandes présentes ;
-6. calcul d'un choix d'indices ;
-7. statistiques par indice ;
+5. calcul de NDVI, NDBI et EVI ;
+6. statistiques de ces indices ;
 8. enregistrement du rapport `metrics.json`.
 
-Les indices sélectionnés par défaut pour la démonstration sont NDVI, NDWI, EVI, EVI2, SAVI, OSAVI, MSAVI, GNDVI, ARVI, VARI et SR. La liste peut être modifiée dans une seule cellule.
+Dans le notebook, NDVI, NDBI et EVI sont calculés directement. Dans l'interface graphique, aucun indice n'est imposé : l'utilisateur choisit celui qu'il veut calculer après le prétraitement.
 
 ## Interface graphique
 

@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data"
 RESULTS = ROOT / "results"
 
-EXPECTED = ["NDVI", "NDWI", "EVI", "EVI2", "SAVI", "OSAVI", "MSAVI", "GNDVI", "ARVI", "VARI", "SR"]
+EXPECTED = ["NDVI", "NDBI", "EVI"]
 
 
 def main():
@@ -36,8 +36,8 @@ def main():
         assert path.is_file() and path.stat().st_size > 0, path
 
     with rasterio.open(multiband) as src:
-        assert src.count == 4
-        assert tuple(name.lower() for name in src.descriptions) == ("blue", "green", "red", "nir")
+        assert src.count == 5
+        assert tuple(name.lower() for name in src.descriptions) == ("blue", "green", "red", "nir", "swir1")
         assert src.crs is not None
 
     with rasterio.open(indices) as src:
