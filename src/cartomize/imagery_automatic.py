@@ -354,6 +354,7 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
             )
             raise ValueError(
                 "Prétraitement automatique bloqué après récupération des entrées : " + detail
+                + ". Fournir les métadonnées ou le quality mask (QA/SCL) requis."
             )
     if not scenes and (not band_order or target_crs is None or resolution is None):
         raise ValueError("Sans scène locale, définir band_order, target_crs projeté et resolution.")
