@@ -72,6 +72,7 @@ _LANDSAT_THERMAL = re.compile(
     r"^((?:LC0[89]|LE07|LT0[45])_L2SP_\d{6}_\d{8}_\d{8}_02_[A-Z0-9]+)_"
     r"ST_(B6|B10|ATRAN|CDIST|DRAD|EMIS|EMSD|QA|TRAD|URAD)\.(?:tif|tiff)$", re.I)
 _S2 = re.compile(r"^(T\d{2}[A-Z]{3})_(\d{8}T\d{6})_(B\d{2}|B8A|SCL)_(10|20|60)m\.(?:jp2|tif|tiff)$", re.I)
+_S2_L1 = re.compile(r"^(T\d{2}[A-Z]{3})_(\d{8}T\d{6})_(B\d{2}|B8A)(?:_(10|20|60)m)?\.(?:jp2|tif|tiff)$", re.I)
 
 
 def _landsat_l1_metadata(directory, ident):
@@ -122,6 +123,36 @@ def _landsat_l1_metadata(directory, ident):
     return path, calibration, sun_elevation
 
 
+def _sentinel_l1_metadata(path):
+    for parent in path.parents:
+        candidate = parent / "MTD_MSIL1C.xml"
+        if not candidate.is_file():
+            continue
+        if candidate.stat().st_size > 20_000_000:
+            raise ValueError("Sentinel Level-1C product metadata is unexpectedly large.")
+        root = ET.parse(candidate).getroot()
+        quantification, baseline, offsets = None, None, {}
+        for item in root.iter():
+            tag = item.tag.rsplit("}", 1)[-1]
+            if tag == "QUANTIFICATION_VALUE":
+                quantification = float(item.text)
+            elif tag == "PROCESSING_BASELINE":
+                baseline = float(item.text)
+            elif tag == "RADIO_ADD_OFFSET":
+                index = int(item.attrib["band_id"])
+                if not 0 <= index < len(_S2_BANDS):
+                    raise ValueError("Unknown Sentinel Level-1C metadata band_id.")
+                offsets[_S2_BANDS[index]] = float(item.text)
+        if quantification is None or not np.isfinite(quantification) or quantification <= 0:
+            raise ValueError(f"Missing/invalid QUANTIFICATION_VALUE in {candidate}.")
+        if not offsets and (baseline is None or baseline >= 4):
+            raise ValueError(f"Missing RADIO_ADD_OFFSET for this Sentinel Level-1C baseline: {candidate}.")
+        return candidate, quantification, offsets, baseline
+    raise ValueError(
+        f"Missing MTD_MSIL1C.xml for {path.name}. Keep the SAFE metadata with Sentinel-2 Level-1C."
+    )
+
+
 def _sentinel_metadata(path):
     for parent in path.parents:
         candidate = parent/"MTD_MSIL2A.xml"
@@ -150,7 +181,7 @@ def _sentinel_metadata(path):
 
 
 def discover_scenes(inputs):
-    """Discover standard Landsat Collection 2 L1/L2 and Sentinel-2 L2A bands.
+    """Discover Landsat Collection 2 L1/L2 and Sentinel-2 L1C/L2A bands.
 
     inputs is a directory, a file, or a sequence. Metadata/QA companions are
     discovered only in the selected products. Unknown band-like filenames
@@ -180,7 +211,7 @@ def discover_scenes(inputs):
                 selected_files.add(p)
         else:
             raise FileNotFoundError(p)
-    landsat, landsat_l1, sentinel, unknown, thermal = {}, {}, {}, [], []
+    landsat, landsat_l1, sentinel, sentinel_l1, unknown, thermal = {}, {}, {}, {}, [], []
     for p in sorted(paths):
         match = _LANDSAT.match(p.name)
         if match:
@@ -223,6 +254,25 @@ def discover_scenes(inputs):
             if previous is None or candidate[0] < previous[0]:
                 group["files"][code] = candidate
             continue
+        match = _S2_L1.match(p.name)
+        if match:
+            tile, acquired, code, resolution = match.groups()
+            try:
+                metadata = _sentinel_l1_metadata(p)
+            except ValueError:
+                metadata = None
+            if metadata is not None:
+                key = (str(metadata[0]), tile, acquired)
+                group = sentinel_l1.setdefault(key, {"files": {}, "metadata": metadata})
+                code = code.upper()
+                native = int(resolution) if resolution else 999
+                candidate = (native, p)
+                previous = group["files"].get(code)
+                if previous and candidate[0] == previous[0] and candidate[1] != previous[1]:
+                    raise ValueError(f"Duplicate Sentinel Level-1C asset: {tile} {code}.")
+                if previous is None or candidate[0] < previous[0]:
+                    group["files"][code] = candidate
+                continue
         if re.search(r"(?:^|_)(?:SR_)?B\d{1,2}[A-Z]?(?:_|\.)",p.name,re.I):
             unknown.append(p.name)
     if unknown:
@@ -294,6 +344,30 @@ def discover_scenes(inputs):
             scenes.append(Scene(ident,bands,sensor=f"landsat-{int(sensor_code)}",acquired=f"{acquired[:4]}-{acquired[4:6]}-{acquired[6:8]}",
                                 level="C2-L2-SR",quality=files.get("QA_PIXEL"),quality_kind="landsat_qa",
                                 saturation=files.get("QA_RADSAT")))
+    for (metadata_path, tile, acquired), group in sentinel_l1.items():
+        metadata, quantification, offsets, baseline = group["metadata"]
+        bands = {}
+        for code, (_, path) in group["files"].items():
+            if code not in SENTINEL:
+                continue
+            if (baseline is None or baseline >= 4) and code not in offsets:
+                raise ValueError(f"No RADIO_ADD_OFFSET for {code} in {metadata}.")
+            bands[SENTINEL[code]] = Band(
+                path,
+                scale=1 / quantification,
+                offset=offsets.get(code, 0) / quantification,
+                nodata=0,
+                unit="toa_reflectance",
+            )
+        if bands:
+            scenes.append(Scene(
+                f"{tile}_{acquired}_{metadata.parent.name}",
+                bands,
+                sensor="sentinel-2",
+                level="L1C-TOA",
+                acquired=f"{acquired[:4]}-{acquired[4:6]}-{acquired[6:8]}",
+                notes=("Sentinel-2 Level-1C TOA reflectance calibrated from product metadata.",),
+            ))
     for (metadata_path,tile,acquired),group in sentinel.items():
         metadata, quantification, offsets, baseline = group["metadata"]
         files = group["files"]
