@@ -530,3 +530,83 @@ def test_explicit_cloud_disable_allows_scene_without_quality(write_raster, tmp_p
         [scene], tmp_path / "noqa_allowed", aoi=_zone(), mask_clouds=False
     )
     assert result.report["status"] == "complete"
+
+
+def test_dos1_fallback_converts_to_surface_reflectance(write_raster, tmp_path):
+    transform = from_origin(300000, 9500000, 10, 10)
+    raw = np.array([[1000, 2000, 3000, 4000]], dtype="float32")
+    path = write_raster("toa_red.tif", raw, transform=transform, nodata=-9999)
+    qa = write_raster("toa_qa.tif", np.full((1, 4), 64, dtype="uint16"),
+                      transform=transform, nodata=None)
+    scene = cm.Scene(
+        "LC08_L1TP_181063_20261026_20261031_02_T1",
+        {"red": cm.Band(path, scale=.0001, offset=0, nodata=-9999, unit="toa_reflectance")},
+        sensor="landsat-8", acquired="2026-10-26", level="C2-L1",
+        quality=qa, quality_kind="landsat_qa",
+    )
+    corrected = cm.dos1_scene(scene, dark_percentile=0, max_samples=100)
+    assert corrected.level == "DOS1-SR"
+    assert corrected.bands["red"].unit == "reflectance"
+    # Dark TOA reflectance is 0.1; DOS1 assumes 0.01 surface reflectance.
+    assert corrected.bands["red"].offset == pytest.approx(-0.09)
+    product = cm.prepare_imagery([corrected], tmp_path / "dos1.tif")
+    with rasterio.open(product.path) as src:
+        np.testing.assert_allclose(src.read(1), [[.01, .11, .21, .31]], atol=1e-6)
+
+
+def test_dos1_rejects_non_toa_units(write_raster):
+    path = write_raster("already_sr.tif", np.ones((2, 2), dtype="float32"))
+    scene = cm.Scene(
+        "sr", {"red": cm.Band(path, unit="reflectance")},
+        sensor="landsat-8", level="C2-L1",
+    )
+    with pytest.raises(ValueError, match="calibrated TOA reflectance"):
+        cm.dos1_scene(scene, max_samples=100)
+
+
+def test_automatic_atmosphere_uses_dos1_without_catalog(write_raster, tmp_path):
+    transform = from_origin(300000, 9500000, 10, 10)
+    red = write_raster("l1_red.tif", np.full((2, 4), 2000, dtype="float32"),
+                       transform=transform, nodata=-9999)
+    nir = write_raster("l1_nir.tif", np.full((2, 4), 4000, dtype="float32"),
+                       transform=transform, nodata=-9999)
+    qa = write_raster("l1_qa.tif", np.full((2, 4), 64, dtype="uint16"),
+                      transform=transform, nodata=None)
+    scene = cm.Scene(
+        "LC08_L1TP_181063_20261026_20261031_02_T1",
+        {
+            "red": cm.Band(red, scale=.0001, unit="toa_reflectance", nodata=-9999),
+            "nir": cm.Band(nir, scale=.0001, unit="toa_reflectance", nodata=-9999),
+        },
+        sensor="landsat-8", acquired="2026-10-26", level="C2-L1",
+        quality=qa, quality_kind="landsat_qa",
+    )
+    result = cm.preprocess_imagery(
+        [scene], tmp_path / "auto_dos1", aoi=_zone(),
+        atmospheric_method="auto",
+    )
+    assert result.report["status"] == "complete"
+    assert result.report["preprocessing_plan"]["ready"] is True
+    assert any(item.get("reason") == "dos1_local_fallback"
+               for item in result.report["recovery"])
+    plan_scene = result.report["preprocessing_plan"]["scenes"][0]
+    atmosphere = next(level for level in plan_scene["levels"]
+                      if level["name"] == "atmospheric_correction")
+    assert atmosphere["method"] == "dos1_reflectance_approximation"
+
+
+def test_provider_only_blocks_toa_without_catalog(write_raster, tmp_path):
+    source = _scene(write_raster, "toa_provider", width=4)
+    scene = cm.Scene(
+        "LC08_L1TP_181063_20261026_20261031_02_T1",
+        {name: cm.Band(band.path, scale=.001, offset=-.1, nodata=band.nodata,
+                       unit="toa_reflectance")
+         for name, band in source.bands.items()},
+        sensor="landsat-8", acquired=source.acquired, level="C2-L1",
+        quality=source.quality, quality_kind=source.quality_kind,
+    )
+    with pytest.raises(ValueError, match="Prétraitement automatique bloqué"):
+        cm.preprocess_imagery(
+            [scene], tmp_path / "provider_only", aoi=_zone(),
+            atmospheric_method="provider",
+        )
