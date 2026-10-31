@@ -1,60 +1,65 @@
-# Démonstration Cartomize — données Sentinel-2 L2A réelles
+# Démonstration Cartomize — automatisation sur Sentinel-2 L2A réel
 
-Ce dossier prépare la démonstration technique de Cartomize avec **des données satellitaires réelles**. Aucune image synthétique, valeur d'indice ou statistique n'est écrite à l'avance.
+Ce dossier contient une démonstration technique reproductible de Cartomize utilisant **des données Sentinel-2 Level-2A réelles**. Aucun raster synthétique ni résultat scientifique n'est inventé.
+
+## Objectif
+
+La démonstration montre le workflow principal :
+
+**contrôle automatique des bandes → contrôle de couverture → découpage sur la zone d'étude → mosaïque si nécessaire → raster multibande → composite → indices choisis par l'utilisateur → statistiques.**
+
+La classification n'est pas exécutée. Elle reste disponible comme extension si l'utilisateur fournit des ROI d'apprentissage et, pour l'évaluation, des données de validation indépendantes.
 
 ## Données
 
-Le script `download_real_data.py` interroge le catalogue public **Earth Search** pour la collection **Sentinel-2 Level-2A** sur une période fixe de saison sèche. Il évalue la couche **SCL** sur l'emprise de démonstration et retient une scène dont la couverture réellement utilisable sur l'emprise est au moins de 95 %.
+Le dossier `data/` contient les sous-jeux réels B02, B03, B04, B08 et SCL téléchargés depuis Earth Search, ainsi que :
 
-L'emprise est une petite **fenêtre d'analyse située à Kinshasa**. Elle sert uniquement à limiter le volume de données de la démonstration et n'est jamais présentée comme une limite administrative.
+- `aoi.geojson` : fenêtre d'analyse de démonstration ;
+- `source_item.json` : métadonnées STAC de la scène ;
+- `scenes.json` : manifeste explicite Cartomize ;
+- `provenance.json` : identifiant, date, URLs sources, couverture et SHA-256.
 
-Après validation par GitHub Actions, ce dossier contient :
+L'emprise est une fenêtre d'analyse située à Kinshasa ; elle n'est pas présentée comme une limite administrative.
 
-- `data/B02.tif` — bleu ;
-- `data/B03.tif` — vert ;
-- `data/B04.tif` — rouge ;
-- `data/B08.tif` — proche infrarouge ;
-- `data/SCL.tif` — Scene Classification Layer ;
-- `data/aoi.geojson` — emprise de démonstration ;
-- `data/source_item.json` — item STAC retenu avec les métadonnées utiles ;
-- `data/scenes.json` — manifeste explicite lu par Cartomize ;
-- `data/provenance.json` — identifiant de scène, date, nuages, URLs sources et empreintes SHA-256.
+## Notebook
 
-## Tutoriel Jupyter
+Ouvrir :
 
-Ouvrir `Tutoriel_Demonstration_Cartomize.ipynb` et exécuter les cellules dans l'ordre.
+`Tutoriel_Demonstration_Cartomize.ipynb`
 
-Le parcours vérifié est :
+Il exécute :
 
 1. lecture de la provenance ;
-2. contrôle des bandes, projections, résolutions et calibration ;
-3. prétraitement automatique avec masque SCL et découpage sur la zone d'étude ;
-4. composition en couleurs naturelles ;
-5. calcul réel de **NDVI**, **NDWI** et **EVI** ;
-6. statistiques exactes sur les indices ;
-7. statistiques zonales NDVI ;
-8. bilan des classes SCL ;
-9. export des résultats et d'un fichier `metrics.json`.
+2. contrôle des bandes, CRS, résolution et calibration ;
+3. prétraitement automatique avec SCL et découpage ;
+4. composite en couleurs naturelles ;
+5. identification automatique des indices compatibles avec les bandes présentes ;
+6. calcul d'un choix d'indices ;
+7. statistiques par indice ;
+8. enregistrement du rapport `metrics.json`.
 
-La classification supervisée **n'est volontairement pas exécutée**, car ce jeu de démonstration ne contient pas de vérité terrain indépendante. Cartomize dispose du module, mais présenter une précision ou des classes thématiques sans échantillons de référence serait méthodologiquement incorrect.
+Les indices sélectionnés par défaut pour la démonstration sont NDVI, NDWI, EVI, EVI2, SAVI, OSAVI, MSAVI, GNDVI, ARVI, VARI et SR. La liste peut être modifiée dans une seule cellule.
 
 ## Interface graphique
 
 Le même parcours est décrit dans [GUIDE_INTERFACE.md](GUIDE_INTERFACE.md).
 
-## Mise en page
+## Résultats vérifiés
 
-La fonction de mise en page n'est **pas utilisée dans cette démonstration**. Les résultats scientifiques sont produits en GeoTIFF/GeoJSON/CSV ; leur finalisation cartographique peut ensuite être faite dans QGIS, ArcGIS Pro ou CartoMAP. La stratégie d'échange de projet sera traitée séparément après la démonstration.
+Le dossier `results/` contient notamment :
 
-## Reproduire la préparation
+- le raster scientifique multibande ;
+- le composite couleur ;
+- `indices.tif` ;
+- `indices_stats.csv` ;
+- `indices_overview.png` ;
+- `metrics.json` ;
+- `verification.json`.
 
-Dans un environnement Cartomize 1.0 :
+## Classification
 
-```bash
-python demonstration-carto/download_real_data.py
-jupyter nbconvert --to notebook --execute demonstration-carto/Tutoriel_Demonstration_Cartomize.ipynb \
-  --output Tutoriel_Demonstration_Cartomize.ipynb --output-dir demonstration-carto
-python demonstration-carto/verify_demo.py
-```
+Elle est volontairement hors du parcours principal. Si l'utilisateur possède des ROI correctement étiquetés, il peut ensuite utiliser les fonctions de classification de Cartomize. Aucun score de classification n'est présenté sans données de référence indépendantes.
 
-Le workflow `.github/workflows/demonstration-carto.yml` exécute ces étapes sur GitHub et refuse de publier les résultats si les contrôles échouent.
+## Reproductibilité
+
+Le workflow GitHub Actions `.github/workflows/demonstration-carto.yml` télécharge les données réelles, exécute le notebook puis contrôle les produits avant publication.

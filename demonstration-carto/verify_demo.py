@@ -1,4 +1,4 @@
-"""Vérifications factuelles de la démonstration Cartomize."""
+"""Vérifications factuelles de la démonstration Cartomize centrée sur l'automatisation."""
 from pathlib import Path
 import json
 import math
@@ -8,6 +8,8 @@ import rasterio
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data"
 RESULTS = ROOT / "results"
+
+EXPECTED = ["NDVI", "NDWI", "EVI", "EVI2", "SAVI", "OSAVI", "MSAVI", "GNDVI", "ARVI", "VARI", "SR"]
 
 
 def main():
@@ -20,37 +22,52 @@ def main():
     assert provenance["source_assets"]
     assert metrics["preprocessing"]["threshold_met"] is True
     assert metrics["preprocessing"]["usable_percent"] >= 95.0
+    assert metrics["selected_indices"] == EXPECTED
 
     multiband = RESULTS / "preprocessed" / metrics["products"]["multiband"]
     indices = RESULTS / "indices.tif"
-    for path in (multiband, indices, RESULTS / "natural_color.png", RESULTS / "indices.png", RESULTS / "scl.png"):
+    required = [
+        multiband, indices,
+        RESULTS / "natural_color.png",
+        RESULTS / "indices_overview.png",
+        RESULTS / "indices_stats.csv",
+    ]
+    for path in required:
         assert path.is_file() and path.stat().st_size > 0, path
 
     with rasterio.open(multiband) as src:
         assert src.count == 4
         assert tuple(name.lower() for name in src.descriptions) == ("blue", "green", "red", "nir")
         assert src.crs is not None
-    with rasterio.open(indices) as src:
-        assert src.count == 3
-        assert tuple(src.descriptions) == ("NDVI", "NDWI", "EVI")
 
-    for name in ("NDVI", "NDWI", "EVI"):
+    with rasterio.open(indices) as src:
+        assert src.count == len(EXPECTED)
+        assert list(src.descriptions) == EXPECTED
+
+    for name in EXPECTED:
         stats = metrics["indices"][name]
         assert stats["count"] > 0
         assert all(math.isfinite(float(stats[key])) for key in ("min", "max", "mean", "std", "p05", "p50", "p95"))
 
-    total = sum(row["pixels"] for row in metrics["scl"])
-    assert total > 0
-    assert abs(sum(row["percent"] for row in metrics["scl"]) - 100.0) < 1e-6
+    # The main demo must not manufacture a classification product.
+    assert not (RESULTS / "classification.tif").exists()
 
     report = {
         "status": "passed",
         "scene": provenance["selected_item_id"],
         "usable_percent": metrics["preprocessing"]["usable_percent"],
-        "checked_outputs": ["multiband", "indices", "natural_color.png", "indices.png", "scl.png"],
-        "note": "Toutes les statistiques proviennent des rasters Sentinel-2 L2A téléchargés et traités pendant cette exécution.",
+        "indices": EXPECTED,
+        "checked_outputs": [
+            "multiband", "natural_color.png", "indices.tif",
+            "indices_stats.csv", "indices_overview.png",
+        ],
+        "classification_executed": False,
+        "note": "Les indices et statistiques proviennent des rasters Sentinel-2 L2A réellement téléchargés et traités.",
     }
-    (RESULTS / "verification.json").write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
+    (RESULTS / "verification.json").write_text(
+        json.dumps(report, indent=2, ensure_ascii=False),
+        encoding="utf-8",
+    )
     print(json.dumps(report, indent=2, ensure_ascii=False))
 
 
