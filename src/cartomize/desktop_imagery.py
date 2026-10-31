@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QFormLayout, QHeaderView,
     QWidget, QVBoxLayout, QSizePolicy)
 
 import cartomize as cm
+from .sensor_profiles import semantic_band_name
 from .desktop import Page, PathField, RASTER_FILTER, VECTOR_FILTER, spin, real
 
 
@@ -284,7 +285,12 @@ class PreparationPage(Page):
             for path in paths:
                 with rasterio.open(path) as src:
                     for index in src.indexes:
-                        name = src.descriptions[index - 1] or (path.stem if src.count == 1 else f"band_{index}")
+                        raw_name = src.descriptions[index - 1] or (path.stem if src.count == 1 else f"band_{index}")
+                        tags = src.tags(index)
+                        name = next((semantic_band_name(value) for value in (
+                            raw_name, tags.get("semantic_name"), tags.get("common_name"),
+                            tags.get("eo:common_name"), tags.get("band_name")
+                        ) if value), None) or raw_name
                         # Temporary unique keys; duplicates remain visible for manual correction.
                         bands[f"asset_{len(bands)}"] = (name, cm.Band(str(path.resolve()), index=index,
                             scale=src.scales[index - 1], offset=src.offsets[index - 1], unit=src.units[index - 1] or "source units"))
