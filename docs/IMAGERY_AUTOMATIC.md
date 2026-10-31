@@ -243,3 +243,16 @@ cours ne sont pas publiés. Un rapport diagnostic antérieur reste conservé.
 - [Tests du moteur et des catalogues](../tests/test_imagery_automatic.py).
 - [Tests API, terminal, registre, plans et cartes](../tests/test_imagery_automatic_interfaces.py).
 - [Tests de la fenêtre](../tests/test_desktop_imagery_automatic.py).
+
+
+## Statistiques de qualité par scène
+
+Le diagnostic de couverture renseigne, pour chaque scène disposant d’un masque de qualité compatible, le nombre et le pourcentage de pixels associés aux catégories de qualité sur l’emprise commune des bandes sélectionnées.
+
+- **Sentinel-2 SCL** : pixels clairs, nuages de probabilité moyenne et élevée, cirrus, ombres de nuages, neige/glace, pixels saturés ou défectueux et NoData de qualité.
+- **Landsat Collection 2 QA_PIXEL** : pixels clairs, nuages, nuages dilatés, cirrus, ombres de nuages, neige et remplissage.
+- **Masque personnalisé valid_mask** : pixels valides et rejetés ; aucune interprétation « nuage » n’est créée lorsque le masque ne code pas cette information.
+
+La clé `cloud_pixels` représente l’union des indicateurs nuage/cirrus pertinents pour le capteur. Les pourcentages sont calculés par scène sur l’emprise commune des bandes sélectionnées. Lorsque plusieurs scènes se chevauchent, leurs comptes ne doivent pas être additionnés.
+
+Lorsque `mask_clouds=True`, les pixels rejetés par QA/SCL sont transformés en NoData avant tout rééchantillonnage spectral, ce qui évite la contamination des pixels voisins lors d’une interpolation.
