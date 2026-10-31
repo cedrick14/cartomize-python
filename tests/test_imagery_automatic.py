@@ -496,3 +496,37 @@ def test_recovery_rejects_ambiguous_catalog_match(write_raster, tmp_path, catalo
             [local], tmp_path / "ambiguous", aoi=_zone(), catalog=catalog_service["config"],
             band_order=["red", "nir"]
         )
+
+
+def test_unknown_processing_level_blocks_automatic_pipeline(write_raster, tmp_path):
+    path = write_raster("unknown_reflectance.tif", np.ones((2, 2), dtype="float32"))
+    quality = write_raster("unknown_quality.tif", np.ones((2, 2), dtype="uint8"), nodata=None)
+    scene = cm.Scene(
+        "unknown", {"red": cm.Band(path, unit="reflectance")},
+        sensor="custom", level="custom",
+        quality=quality, quality_kind="valid_mask",
+    )
+    plan = cm.assess_preprocessing([scene])
+    atmospheric = next(level for level in plan["scenes"][0]["levels"]
+                       if level["name"] == "atmospheric_correction")
+    assert atmospheric["status"] == "undetermined"
+    assert plan["ready"] is False
+    with pytest.raises(ValueError, match="Prétraitement automatique bloqué"):
+        cm.preprocess_imagery([scene], tmp_path / "blocked_unknown", aoi=_zone())
+
+
+def test_explicit_cloud_disable_allows_scene_without_quality(write_raster, tmp_path):
+    source = _scene(write_raster, "explicit_noqa", width=4)
+    scene = cm.Scene(
+        source.scene_id, source.bands, sensor="landsat-8", acquired=source.acquired,
+        level="C2-L2-SR"
+    )
+    plan = cm.assess_preprocessing([scene], mask_clouds=False)
+    quality = next(level for level in plan["scenes"][0]["levels"]
+                   if level["name"] == "quality_detection")
+    assert quality["status"] == "disabled"
+    assert plan["ready"] is True
+    result = cm.preprocess_imagery(
+        [scene], tmp_path / "noqa_allowed", aoi=_zone(), mask_clouds=False
+    )
+    assert result.report["status"] == "complete"
