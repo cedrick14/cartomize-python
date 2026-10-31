@@ -148,32 +148,33 @@ def _asset_local_path(item,key,base):
 
 
 def _native_code(name):
-    match=re.fullmatch(r'(?:(?:SR|OLI|TM|ETM)_)?(B\d{1,2}[A-Z]?)',str(name).upper())
-    if match:
-        code=match.group(1)
-        return 'B'+code[1:].zfill(2) if code[1:].isdigit() else code
-    return None
+    code = native_band_code(name)
+    if code is None:
+        return None
+    if code != "B8A" and code[1:].isdigit():
+        return "B" + code[1:].zfill(2)
+    return code
 
 
 def _band_role(family,sensor,key,band,override=None):
-    from .scenes import SENTINEL,LANDSAT_OLI,LANDSAT_TM
     code=_native_code(band.get('name')) or _native_code(key)
     if override is not None:return override,code
     common=band.get('eo:common_name') or band.get('common_name')
+    # Descriptive semantic names are safe across supported optical products.
+    for candidate in (common,key,band.get('name')):
+        role=semantic_band_name(candidate,sensor=sensor)
+        if role:
+            return role,code
     if family=='sentinel':
-        role=SENTINEL.get(code)
-        if role:return role,code
-        named={**{v:v for v in SENTINEL.values()},'nir08':'nir_narrow','nir09':'water_vapour','swir16':'swir1','swir22':'swir2'}
-        return named.get(key.lower()) or named.get(common),code
+        normalized=code
+        if normalized and normalized!='B8A' and normalized[1:].isdigit():
+            normalized='B'+normalized[1:].zfill(2)
+        return SENTINEL2.get(normalized),code
     if family=='landsat':
-        roles=LANDSAT_OLI if sensor in {'landsat-8','landsat-9'} else LANDSAT_TM
-        code='B'+str(int(code[1:])) if code and code[1:].isdigit() else code
-        if code in roles:return roles[code],code
-        aliases={'swir16':'swir1','swir22':'swir2','nir08':'nir'}
-        role=aliases.get(common,common) or aliases.get(key.lower(),key.lower())
-        return (role if role in set(roles.values()) else None),code
-    aliases={'swir16':'swir1','swir22':'swir2','nir08':'nir','nir09':'nir_narrow'}
-    return aliases.get(common,common),code
+        roles=LANDSAT_OLI if sensor in {'landsat-8','landsat-9'} else LANDSAT_ETM_TM
+        normalized='B'+str(int(code[1:])) if code and code!='B8A' and code[1:].isdigit() else code
+        return roles.get(normalized),code
+    return None,code
 
 
 def _spectral_assets(item,band_mapping=None,*,require_bands=True):
@@ -234,6 +235,17 @@ def _mask_assets(item,quality_asset=None,quality_kind=None,saturation_asset=None
     expected='landsat_qa' if family=='landsat' else 'sentinel_scl' if family=='sentinel' else None
     automatic=_companion_key(item,{'qa_pixel'}) if family=='landsat' else _companion_key(item,{'scl'}) if family=='sentinel' else None
     if automatic is None and family=='sentinel':automatic=_companion_key(item,{'scl-jp2'})
+    if automatic is None and family in {'landsat','sentinel'}:
+        candidates=[]
+        for asset_key,asset in item['assets'].items():
+            role,kind=quality_asset_role(asset_key,sensor=sensor)
+            title=asset.get('title') if isinstance(asset,dict) else None
+            if role is None and title:
+                role,kind=quality_asset_role(title,sensor=sensor)
+            if role=='quality' and kind==expected:
+                candidates.append(asset_key)
+        if len(candidates)==1:
+            automatic=candidates[0]
     quality=quality_asset if quality_asset is not None else automatic
     if quality is not None:
         if quality not in item['assets']:raise ValueError('Asset de qualité absent : '+str(quality))
@@ -362,6 +374,9 @@ def scene_from_stac(item,*,base=None,band_mapping=None,quality_asset=None,qualit
                     notes.append('Calibration Sentinel lue dans les métadonnées produit pour '+role+'.')
                 else:
                     import rasterio
+
+from .sensor_profiles import (SENTINEL2, LANDSAT_OLI, LANDSAT_ETM_TM,
+    semantic_band_name, native_band_code, sensor_from_text, quality_asset_role)
                     with rasterio.open(path) as source:
                         if index>source.count:raise ValueError('Indice de bande hors du raster : '+key)
                         scale,offset=source.scales[index-1],source.offsets[index-1]
