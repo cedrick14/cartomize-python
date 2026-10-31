@@ -129,7 +129,6 @@ def assert_controls_reachable(window):
 
 def inspect_dock_icons(window):
     """Inspect the real icon pixels, including after a theme change."""
-    ink = window.palette().windowText().color()
     observed = {}
     groups = {}
     for dock in (window.project_explorer, window.tools_dock,
@@ -142,6 +141,9 @@ def inspect_dock_icons(window):
     for group, buttons in groups.items():
         observed[group] = {}
         for name, button in buttons.items():
+            # Icons follow the button palette, which may differ from the top-level
+            # window palette after a lightweight theme update on native Qt styles.
+            ink = button.palette().buttonText().color()
             image = button.icon().pixmap(button.iconSize()).toImage()
             assert button.isEnabled() and not image.isNull()
             matches = 0
