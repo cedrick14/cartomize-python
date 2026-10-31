@@ -149,6 +149,9 @@ def audit_imagery(scenes, destination, *, aoi, band_order=None, target_crs=None,
                         if progress:
                             progress(done, total)
                     readers.append(bands)
+                    quality_readers.append(
+                        (quality_reader(scene.quality), scene.quality_kind)
+                        if scene.quality is not None else None)
 
                 with rasterio.open(work / "coverage.tif", "w", **profile) as coverage, \
                      rasterio.open(work / "gaps.tif", "w", **{**profile, "count": 1}) as gaps:
