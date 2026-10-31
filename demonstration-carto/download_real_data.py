@@ -13,6 +13,7 @@ import hashlib
 import json
 import math
 import shutil
+from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 import numpy as np
@@ -411,10 +412,28 @@ def main() -> None:
     metadata_key = next((key for key in selected.get("assets", {}) if key.lower() in {"product-metadata", "product_metadata"}), None)
     if metadata_key:
         metadata_asset = deepcopy(selected["assets"][metadata_key])
-        _download_small_file(metadata_asset["href"], DATA / "MTD_MSIL2A.xml")
-        metadata_asset["href"] = "MTD_MSIL2A.xml"
-        local_assets[metadata_key] = metadata_asset
-        source_assets["product_metadata"] = {"key": metadata_key, "href": _https(selected["assets"][metadata_key]["href"])}
+        try:
+            _download_small_file(metadata_asset["href"], DATA / "MTD_MSIL2A.xml")
+        except HTTPError as exc:
+            if exc.code != 404:
+                raise
+            # Earth Search COGs normally carry explicit raster:bands scale/offset.
+            # A stale optional product-metadata link must not invalidate those
+            # declared coefficients; scene_from_stac will still fail below if
+            # any selected band actually lacks calibration.
+            source_assets["product_metadata"] = {
+                "key": metadata_key,
+                "href": _https(selected["assets"][metadata_key]["href"]),
+                "status": "remote_404_not_required_for_declared_stac_calibration",
+            }
+        else:
+            metadata_asset["href"] = "MTD_MSIL2A.xml"
+            local_assets[metadata_key] = metadata_asset
+            source_assets["product_metadata"] = {
+                "key": metadata_key,
+                "href": _https(selected["assets"][metadata_key]["href"]),
+                "status": "downloaded",
+            }
 
     local_item["assets"] = local_assets
     (DATA / "source_item.json").write_text(json.dumps(local_item, indent=2, ensure_ascii=False), encoding="utf-8")
