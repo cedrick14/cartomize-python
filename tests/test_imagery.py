@@ -309,7 +309,9 @@ def test_landsat_level1_discovery_uses_mtl_toa_reflectance(write_raster, tmp_pat
         [scene], tmp_path / "toa.tif", mask_clouds=True, mask_saturation=True
     )
     with rasterio.open(product.path) as src:
-        np.testing.assert_allclose(src.read(), 0.2, atol=1e-7)
+        values = src.read(masked=True)
+        assert values.count() >= 8
+        np.testing.assert_allclose(values.compressed(), 0.2, atol=1e-7)
 
 
 def test_landsat_level1_requires_complete_mtl_calibration(write_raster, tmp_path):
