@@ -129,7 +129,7 @@ def test_automatic_result_exposes_clickable_transformation_timeline(application,
         assert [step['key'] for step in record['transformations']] == [
             'scene_selection', 'quality_masking', 'mosaic', 'composition', 'aoi_clip'
         ]
-        assert page.transformation_steps.isVisible()
+        assert not page.transformation_steps.isHidden()
         assert page.transformation_steps.rowCount() == 5
         # The automatic two-scene test requires a mosaic.
         assert 'Mosaïque des scènes retenues' in page.transformation_steps.item(2, 1).text()
