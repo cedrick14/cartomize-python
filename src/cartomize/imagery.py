@@ -135,6 +135,8 @@ def _calibrate(asset, scene, destination, mask_clouds, mask_saturation, cancel=N
                        tiled=True,blockxsize=256,blockysize=256,compress="lzw",BIGTIFF="IF_SAFER")
         masks=[]
         requested = [(scene.quality,scene.quality_kind)] if mask_clouds else []
+        if mask_clouds and scene.spectral_cloud:
+            requested.append((scene.spectral_cloud,"valid_mask"))
         if mask_saturation and scene.saturation:
             requested.append((scene.saturation,"saturation"))
         for path,kind in requested:
