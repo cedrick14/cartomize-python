@@ -28,12 +28,13 @@ ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data"
 STAC_ENDPOINT = "https://earth-search.aws.element84.com/v1"
 COLLECTION = "sentinel-2-l2a"
-DATE_RANGE = "2024-06-01T00:00:00Z/2024-09-30T23:59:59Z"
+DATE_RANGE = "2022-06-01T00:00:00Z/2025-09-30T23:59:59Z"
+DRY_MONTHS = {6, 7, 8, 9}
 
 # Fenêtre d'analyse de démonstration à Kinshasa.
 # Il ne s'agit PAS d'une limite administrative.
 AOI_BBOX_WGS84 = (15.28, -4.34, 15.34, -4.28)
-MAX_GLOBAL_CLOUD = 20.0
+MAX_GLOBAL_CLOUD = 25.0
 MIN_AOI_USABLE = 95.0
 VALID_SCL = {2, 4, 5, 6, 7}
 
@@ -296,7 +297,7 @@ def main() -> None:
         bbox=AOI_BBOX_WGS84,
         datetime_range=DATE_RANGE,
         collections=[COLLECTION],
-        limit=100,
+        limit=250,
     )
     candidates = []
     for item in collection["features"]:
@@ -304,6 +305,13 @@ def main() -> None:
             for role in ("blue", "green", "red", "nir", "swir1", "scl"):
                 _asset(item, role)
         except KeyError:
+            continue
+        timestamp = str(item.get("properties", {}).get("datetime") or "")
+        try:
+            month = int(timestamp[5:7])
+        except (TypeError, ValueError):
+            continue
+        if month not in DRY_MONTHS:
             continue
         cloud = item.get("properties", {}).get("eo:cloud_cover")
         if cloud is None:
@@ -317,7 +325,7 @@ def main() -> None:
 
     tested = []
     item_by_id = {}
-    for cloud, item in sorted(candidates, key=lambda row: (row[0], row[1].get("id", "")))[:24]:
+    for cloud, item in sorted(candidates, key=lambda row: (row[0], row[1].get("id", "")))[:60]:
         metrics = _scl_metrics(item)
         tested.append({"id": item["id"], "cloud_cover": cloud, **metrics})
         item_by_id[item["id"]] = item
@@ -331,7 +339,7 @@ def main() -> None:
     ]
     shortlist.sort(key=lambda row: (row["cloud_cover"], -row["usable_aoi_percent"], row["id"]))
     hybrid_tested = []
-    for row in shortlist[:12]:
+    for row in shortlist[:24]:
         hybrid = _hybrid_cloud_metrics(item_by_id[row["id"]], row)
         hybrid_tested.append(hybrid)
     if not hybrid_tested:
