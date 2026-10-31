@@ -256,3 +256,18 @@ Le diagnostic de couverture renseigne, pour chaque scène disposant d’un masqu
 La clé `cloud_pixels` représente l’union des indicateurs nuage/cirrus pertinents pour le capteur. Les pourcentages sont calculés par scène sur l’emprise commune des bandes sélectionnées. Lorsque plusieurs scènes se chevauchent, leurs comptes ne doivent pas être additionnés.
 
 Lorsque `mask_clouds=True`, les pixels rejetés par QA/SCL sont transformés en NoData avant tout rééchantillonnage spectral, ce qui évite la contamination des pixels voisins lors d’une interpolation.
+
+
+## Plan automatique N1 à N5
+
+Le mode automatique produit un plan de prétraitement auditable avant toute sortie scientifique.
+
+1. **N1 — Calibration radiométrique** : vérifie les unités, facteurs d’échelle et offsets ; applique uniquement les paramètres déclarés ou reconnus pour le produit.
+2. **N2 — Correction atmosphérique** : reconnaît les produits de réflectance de surface déjà corrigés. Un produit L1/TOA n’est pas transformé silencieusement ; Cartomize recherche d’abord un produit Level-2/SR correspondant lorsqu’un catalogue compatible est configuré, sinon le traitement est bloqué.
+3. **N3 — Qualité** : détecte les couches QA/SCL et les masques de saturation disponibles. Une couche manquante peut être récupérée automatiquement uniquement si une acquisition strictement correspondante est identifiée.
+4. **N4 — Nuages et pixels non utilisables** : calcule les statistiques de nuages, cirrus, ombres, neige et autres indicateurs disponibles, puis applique le masque avant le rééchantillonnage.
+5. **N5 — Orchestration** : réévalue le plan après toute récupération, sélectionne les scènes utiles, réalise la mosaïque si nécessaire, harmonise la grille, découpe à la zone d’étude et publie les produits finaux.
+
+Le manifeste final conserve `initial_preprocessing_plan`, `recovery`, `preprocessing_plan` et `executed_steps` afin de distinguer l’état initial, les données récupérées, la décision finale et les opérations réellement exécutées.
+
+Une récupération automatique est refusée si plusieurs candidats compatibles subsistent. Pour Landsat, l’identité utilise notamment le capteur, la date et le path/row ; pour Sentinel-2, le capteur, la date et la tuile MGRS. Cartomize préfère une absence explicitement signalée à une association ambiguë.
