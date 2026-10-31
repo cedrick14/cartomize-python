@@ -85,7 +85,18 @@ def _atmosphere(scene):
     }
 
 
-def _quality(scene):
+def _quality(scene, required=True):
+    if not required:
+        return {
+            "level": 3,
+            "name": "quality_detection",
+            "status": "disabled",
+            "action": "none",
+            "quality_mask": str(Path(scene.quality)) if scene.quality is not None else None,
+            "quality_kind": scene.quality_kind,
+            "saturation_mask": str(Path(scene.saturation)) if scene.saturation is not None else None,
+            "missing": [],
+        }
     missing = []
     if scene.quality is None:
         missing.append("quality_mask")
@@ -148,12 +159,12 @@ def assess_preprocessing(scenes, *, mask_clouds=True, mask_saturation=True):
         levels = [
             _radiometry(scene),
             _atmosphere(scene),
-            _quality(scene),
+            _quality(scene, required=mask_clouds),
             _clouds(scene, mask_clouds),
         ]
         blockers = []
         for item in levels:
-            if item["status"] in {"insufficient_metadata", "required_but_unavailable", "missing_inputs", "unavailable"}:
+            if item["status"] in {"insufficient_metadata", "required_but_unavailable", "missing_inputs", "unavailable", "undetermined", "not_assessed"}:
                 blockers.extend(item.get("missing", []))
         # Surface-reflectance L2 products are ready when QA/SCL requirements are met.
         scene_ready = not blockers
