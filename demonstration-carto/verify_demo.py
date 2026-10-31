@@ -4,6 +4,7 @@ import json
 import math
 
 import rasterio
+import geopandas as gpd
 
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data"
@@ -24,9 +25,10 @@ def main():
     multiband = RESULTS / "preprocessed" / metrics["products"]["multiband"]
     indices = RESULTS / "indices.tif"
     visual_files = (
+        RESULTS / "scene_and_aoi_before.png",
         RESULTS / "natural_color.png",
+        RESULTS / "before_after.png",
         RESULTS / "indices.png",
-        RESULTS / "cloud_diagnostic.png",
         RESULTS / "scl.png",
     )
     for path in (multiband, indices, *visual_files):
@@ -36,6 +38,18 @@ def main():
         assert src.count == 4
         assert tuple(name.lower() for name in src.descriptions) == ("blue", "green", "red", "nir")
         assert src.crs is not None
+
+    before_red = DATA / "before_diagnostic" / "B04.tif"
+    assert before_red.is_file(), before_red
+    aoi = gpd.read_file(DATA / "aoi.geojson")
+    with rasterio.open(before_red) as src:
+        bounds = aoi.to_crs(src.crs).total_bounds
+        scene_width = src.bounds.right - src.bounds.left
+        scene_height = src.bounds.top - src.bounds.bottom
+        aoi_width = bounds[2] - bounds[0]
+        aoi_height = bounds[3] - bounds[1]
+        assert scene_width > aoi_width * 1.2
+        assert scene_height > aoi_height * 1.2
     with rasterio.open(indices) as src:
         assert src.count == 3
         assert tuple(src.descriptions) == ("NDVI", "NDWI", "EVI")
@@ -72,10 +86,12 @@ def main():
         )
     ]
     assert not notebook_errors
-    assert notebook_image_outputs + len(markdown_visuals) >= 3, (
-        "Le notebook doit rendre au moins 3 figures via sorties PNG embarquées "
-        "ou liens Markdown vers des PNG vérifiés."
+    assert notebook_image_outputs + len(markdown_visuals) >= 4, (
+        "Le notebook doit rendre au moins 4 figures pédagogiques vérifiées."
     )
+    assert "scene_and_aoi_before.png" in markdown
+    assert "before_after.png" in markdown
+    assert "AVANT" in markdown and "APRÈS" in markdown
 
     total = sum(row["pixels"] for row in metrics["scl"])
     assert total > 0
@@ -86,12 +102,15 @@ def main():
         "scene": provenance["selected_item_id"],
         "usable_percent": metrics["preprocessing"]["usable_percent"],
         "checked_outputs": [
-            "multiband", "indices", "natural_color.png", "indices.png",
-            "cloud_diagnostic.png", "scl.png"
+            "multiband", "indices", "scene_and_aoi_before.png",
+            "natural_color.png", "before_after.png", "indices.png", "scl.png"
         ],
         "notebook_image_outputs": notebook_image_outputs,
         "notebook_markdown_visuals": [path.name for path in markdown_visuals],
-        "note": "Toutes les statistiques proviennent des rasters Sentinel-2 L2A téléchargés et traités pendant cette exécution.",
+        "note": (
+            "Le tutoriel vérifie une scène candidate plus large que l'AOI, "
+            "le journal du diagnostic automatique et le résultat final découpé."
+        ),
     }
     (RESULTS / "verification.json").write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
     print(json.dumps(report, indent=2, ensure_ascii=False))
