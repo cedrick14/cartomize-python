@@ -51,6 +51,21 @@ def main():
         assert stats["count"] > 0
         assert all(math.isfinite(float(stats[key])) for key in ("min", "max", "mean", "std", "p05", "p50", "p95"))
 
+    # The GitHub notebook must already contain the visual results.
+    notebook = json.loads((ROOT / "Tutoriel_Demonstration_Cartomize.ipynb").read_text(encoding="utf-8"))
+    embedded_png_outputs = 0
+    executed_cells = 0
+    for cell in notebook.get("cells", []):
+        if cell.get("cell_type") != "code":
+            continue
+        if cell.get("execution_count") is not None:
+            executed_cells += 1
+        for output in cell.get("outputs", []):
+            if "image/png" in output.get("data", {}):
+                embedded_png_outputs += 1
+    assert executed_cells == sum(1 for cell in notebook["cells"] if cell.get("cell_type") == "code")
+    assert embedded_png_outputs >= 4  # composite + NDVI + NDBI + EVI
+
     # The main demo must not manufacture a classification product.
     assert not (RESULTS / "classification.tif").exists()
 
@@ -64,6 +79,8 @@ def main():
             "ndvi.png", "ndbi.png", "evi.png", "indices_stats.csv",
         ],
         "classification_executed": False,
+        "executed_notebook_cells": executed_cells,
+        "embedded_png_outputs": embedded_png_outputs,
         "note": "Les indices et statistiques proviennent des rasters Sentinel-2 L2A réellement téléchargés et traités.",
     }
     (RESULTS / "verification.json").write_text(
