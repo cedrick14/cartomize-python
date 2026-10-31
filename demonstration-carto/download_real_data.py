@@ -360,23 +360,6 @@ def main() -> None:
             "Changer la période ou l'emprise; ne pas relâcher le contrôle."
         )
     selected = item_by_id[winner["id"]]
-    rejected_for_comparison = [
-        row for row in hybrid_tested
-        if row["id"] != winner["id"]
-        and row["footprint_percent"] >= 95.0
-        and row["hybrid_usable_percent"] < MIN_AOI_USABLE
-    ]
-    if rejected_for_comparison:
-        before_row = max(
-            rejected_for_comparison,
-            key=lambda row: (row["spectral_cloud_percent"], row["cloud_cover"])
-        )
-    else:
-        before_row = max(
-            (row for row in hybrid_tested if row["id"] != winner["id"]),
-            key=lambda row: (row["spectral_cloud_percent"], row["cloud_cover"])
-        )
-    before_item = item_by_id[before_row["id"]]
     tested = sorted(
         [
             next((hybrid for hybrid in hybrid_tested if hybrid["id"] == row["id"]), row)
@@ -429,30 +412,31 @@ def main() -> None:
         local_assets[key] = local_asset
         source_assets[role] = {"key": source_key, "href": _https(source_asset["href"])}
 
-    # Keep one cloudy/rejected acquisition on the same AOI for the visual
-    # "before diagnostic" comparison. It is never used as a scientific output.
-    before_dir = DATA / "before_diagnostic"
-    before_dir.mkdir(parents=True, exist_ok=True)
-    before_local = deepcopy(before_item)
-    before_local["links"] = []
-    before_assets = {}
-    before_source_assets = {}
+    # Preserve a wider view of the same selected Sentinel-2 acquisition.
+    # This view is used only for the instructional visualization of spatial
+    # coverage before the AOI clip; scientific products still use the AOI.
+    input_dir = DATA / "input_scene"
+    input_dir.mkdir(parents=True, exist_ok=True)
+    input_local = deepcopy(selected)
+    input_local["links"] = []
+    input_assets = {}
+    input_source_assets = {}
     for role, filename in {
         "blue": "B02.tif", "green": "B03.tif", "red": "B04.tif", "scl": "SCL.tif"
     }.items():
-        source_key, source_asset = _asset(before_item, role)
+        source_key, source_asset = _asset(selected, role)
         key, local_asset = _copy_window(
-            before_item, role, before_dir / filename, bbox=PREVIEW_BBOX_WGS84
+            selected, role, input_dir / filename, bbox=PREVIEW_BBOX_WGS84
         )
         local_asset["href"] = filename
-        before_assets[key] = local_asset
-        before_source_assets[role] = {
+        input_assets[key] = local_asset
+        input_source_assets[role] = {
             "key": source_key,
             "href": _https(source_asset["href"]),
         }
-    before_local["assets"] = before_assets
-    (before_dir / "source_item.json").write_text(
-        json.dumps(before_local, indent=2, ensure_ascii=False), encoding="utf-8"
+    input_local["assets"] = input_assets
+    (input_dir / "source_item.json").write_text(
+        json.dumps(input_local, indent=2, ensure_ascii=False), encoding="utf-8"
     )
 
     metadata_key = next((key for key in selected.get("assets", {}) if key.lower() in {"product-metadata", "product_metadata"}), None)
@@ -521,7 +505,7 @@ def main() -> None:
                 "sha256": _sha256(path),
             }
     properties = selected.get("properties", {})
-    before_properties = before_item.get("properties", {})
+    input_properties = selected.get("properties", {})
     provenance = {
         "schema": "cartomize.demonstration.real-data.v1",
         "data_are_synthetic": False,
@@ -541,22 +525,17 @@ def main() -> None:
         "aoi_scl_usable_percent_before_processing": winner["usable_aoi_percent"],
         "aoi_hybrid_usable_percent_before_processing": winner["hybrid_usable_percent"],
         "aoi_spectral_cloud_percent_before_processing": winner["spectral_cloud_percent"],
-        "before_diagnostic": {
-            "item_id": before_item["id"],
-            "datetime": before_properties.get("datetime"),
-            "platform": before_properties.get("platform"),
-            "global_cloud_cover_percent": float(before_properties.get("eo:cloud_cover")),
-            "aoi_scl_usable_percent": before_row["usable_aoi_percent"],
-            "aoi_spectral_cloud_percent": before_row["spectral_cloud_percent"],
-            "aoi_hybrid_usable_percent": before_row["hybrid_usable_percent"],
-            "decision": (
-                "rejected_below_quality_threshold"
-                if before_row["hybrid_usable_percent"] < MIN_AOI_USABLE
-                else "not_selected_lower_quality_rank"
-            ),
-            "local_item": "before_diagnostic/source_item.json",
+        "input_scene": {
+            "item_id": selected["id"],
+            "datetime": input_properties.get("datetime"),
+            "platform": input_properties.get("platform"),
+            "global_cloud_cover_percent": float(input_properties.get("eo:cloud_cover")),
+            "aoi_scl_usable_percent": winner["usable_aoi_percent"],
+            "aoi_spectral_cloud_percent": winner["spectral_cloud_percent"],
+            "aoi_hybrid_usable_percent": winner["hybrid_usable_percent"],
+            "local_item": "input_scene/source_item.json",
             "preview_bbox_wgs84": list(PREVIEW_BBOX_WGS84),
-            "source_assets": before_source_assets,
+            "source_assets": input_source_assets,
         },
         "selection_candidates": tested,
         "source_assets": source_assets,
