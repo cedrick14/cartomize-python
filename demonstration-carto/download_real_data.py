@@ -133,13 +133,18 @@ def _scl_metrics(item: dict) -> dict:
         src.close()
         env.__exit__(None, None, None)
     observed = ~np.ma.getmaskarray(data)
-    if not observed.any():
-        valid_overlap = 0.0
+    if not data.size:
+        observed_overlap = valid_overlap = 0.0
     else:
         valid = observed & np.isin(data.data, tuple(VALID_SCL))
-        valid_overlap = 100.0 * float(valid.sum()) / float(observed.sum())
+        observed_overlap = 100.0 * float(observed.sum()) / float(data.size)
+        # The denominator includes NoData inside the raster bounds. This is
+        # essential for Sentinel granules whose MGRS raster extent is complete
+        # but whose actual swath occupies only part of the tile.
+        valid_overlap = 100.0 * float(valid.sum()) / float(data.size)
     return {
         "footprint_percent": float(footprint_percent),
+        "observed_in_overlap_percent": float(observed_overlap),
         "scl_valid_in_overlap_percent": float(valid_overlap),
         "usable_aoi_percent": float(footprint_percent * valid_overlap / 100.0),
     }
@@ -228,7 +233,8 @@ def main() -> None:
     if winner["usable_aoi_percent"] < MIN_AOI_USABLE:
         raise RuntimeError(
             f"Meilleure scène : {winner['usable_aoi_percent']:.2f} % de l'emprise réellement utilisable "
-            f"(empreinte {winner['footprint_percent']:.2f} %, SCL valide dans le recouvrement "
+            f"(empreinte {winner['footprint_percent']:.2f} %, pixels observés "
+            f"{winner.get('observed_in_overlap_percent', 0):.2f} %, SCL utilisable "
             f"{winner['scl_valid_in_overlap_percent']:.2f} %), sous le seuil de {MIN_AOI_USABLE:g} %. "
             "Changer la période ou l'emprise; ne pas relâcher le contrôle."
         )
@@ -332,6 +338,7 @@ def main() -> None:
         "mgrs_tile": properties.get("s2:mgrs_tile"),
         "global_cloud_cover_percent": float(properties.get("eo:cloud_cover")),
         "aoi_footprint_percent_before_processing": winner["footprint_percent"],
+        "aoi_observed_in_overlap_percent": winner["observed_in_overlap_percent"],
         "aoi_scl_valid_in_overlap_percent": winner["scl_valid_in_overlap_percent"],
         "aoi_scl_usable_percent_before_processing": winner["usable_aoi_percent"],
         "selection_candidates": tested,
