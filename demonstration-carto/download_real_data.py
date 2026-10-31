@@ -22,6 +22,7 @@ from rasterio.windows import Window, from_bounds, bounds as window_bounds
 from rasterio.warp import transform_bounds
 
 import cartomize as cm
+from cartomize.clouds import sentinel_spectral_cloud_candidates
 
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data"
@@ -223,25 +224,10 @@ def _hybrid_cloud_metrics(item: dict, scl_metrics: dict) -> dict:
     valid &= scl_observed
     scl_valid = np.isin(scl.astype("uint8"), tuple(VALID_SCL))
 
-    eps = 1e-6
-    blue, red, nir, swir = data["blue"], data["red"], data["nir"], data["swir1"]
-    visible = (blue + data["green"] + red) / 3.0
-    ndvi = (nir - red) / (nir + red + eps)
-    b2_b11 = blue / (swir + eps)
-    nir_b11 = nir / (swir + eps)
-    red_b11 = red / (swir + eps)
-    potential = (
-        valid
-        & (blue >= 0.15)
-        & (visible >= 0.15)
-        & (ndvi < 0.36)
-        & (b2_b11 >= 0.70)
-        & (b2_b11 <= 4.0)
-        & (nir_b11 >= 0.90)
-        & (red_b11 <= 6.0)
+    spectral_cloud = sentinel_spectral_cloud_candidates(
+        data["blue"], data["green"], data["red"],
+        data["nir"], data["swir1"], valid
     )
-    water_like = valid & (b2_b11 > 2.0) & (blue < 0.20) & (nir < red)
-    spectral_cloud = potential & ~water_like
     hybrid_valid = valid & scl_valid & ~spectral_cloud
     denominator = float(hybrid_valid.size)
     hybrid_percent = 100.0 * float(hybrid_valid.sum()) / denominator if denominator else 0.0
