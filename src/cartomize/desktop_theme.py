@@ -1,5 +1,6 @@
 """Window-local appearance; scientific layer styles remain unchanged."""
 from PySide6.QtCore import Qt
+import os
 from PySide6.QtGui import QColor, QPalette
 from PySide6.QtWidgets import QApplication
 
@@ -41,9 +42,20 @@ def apply_theme(window, *_):
         size = max(11, min(16, int(window._preferences.value('appearance/font_size', 12))))
     except (TypeError, ValueError):
         size = 12
+    # Font inheritance is much cheaper than a universal QWidget QSS selector.
+    # The previous "QMainWindow, QWidget" rule forced Qt to repolish the complete
+    # (large) Cartomize widget tree on Windows and could stall startup.
+    font = window.font()
+    font.setPixelSize(size)
+    window.setFont(font)
+    if os.environ.get('CARTOMIZE_SAFE_THEME', '').strip() == '1':
+        window.setStyleSheet('')
+        if hasattr(window, 'dock_manager'):
+            window.dock_manager._sync_titles()
+        return
     c = dict(colors, size=size)
-    window.setStyleSheet('''
-        QMainWindow, QWidget { background: %(bg)s; color: %(text)s; font-size: %(size)spx; }
+    stylesheet = '''
+        QMainWindow { background: %(bg)s; color: %(text)s; }
         QLabel#brand { font-size: 21px; font-weight: 700; }
         QLabel#panelTitle { font-size: 15px; font-weight: 600; }
         QLabel#pageTitle { font-size: 18px; font-weight: 600; padding: 2px 0 5px; }
@@ -103,6 +115,10 @@ def apply_theme(window, *_):
         QScrollBar::handle { background: %(line)s; border-radius: 4px; min-height: 24px; min-width: 24px; }
         QScrollBar::add-line, QScrollBar::sub-line { width: 0; height: 0; }
         QScrollBar::add-page, QScrollBar::sub-page { background: transparent; }
-    ''' % c)
+    ''' % c
+    # Avoid needless repolish when the effective theme and font did not change.
+    if getattr(window, '_cartomize_stylesheet', None) != stylesheet:
+        window.setStyleSheet(stylesheet)
+        window._cartomize_stylesheet = stylesheet
     if hasattr(window, 'dock_manager'):
         window.dock_manager._sync_titles()
