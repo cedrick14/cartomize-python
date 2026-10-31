@@ -35,6 +35,9 @@ DRY_MONTHS = {6, 7, 8, 9}
 # Fenêtre d'analyse de démonstration à Kinshasa.
 # Il ne s'agit PAS d'une limite administrative.
 AOI_BBOX_WGS84 = (15.28, -4.34, 15.34, -4.28)
+# Vue pédagogique plus large : la zone d'étude apparaît comme un rectangle
+# plus petit à l'intérieur de la scène candidate.
+PREVIEW_BBOX_WGS84 = (15.255, -4.365, 15.365, -4.255)
 MAX_GLOBAL_CLOUD = 25.0
 MIN_AOI_USABLE = 95.0
 VALID_SCL = {2, 4, 5, 6, 7}
@@ -243,11 +246,11 @@ def _hybrid_cloud_metrics(item: dict, scl_metrics: dict) -> dict:
     }
 
 
-def _copy_window(item: dict, role: str, destination: Path) -> tuple[str, dict]:
+def _copy_window(item: dict, role: str, destination: Path, *, bbox=AOI_BBOX_WGS84) -> tuple[str, dict]:
     key, asset = _asset(item, role)
     env, src = _read_remote(asset["href"])
     try:
-        window = _window(src)
+        window = _window(src, bbox=bbox)
         array = src.read(1, window=window)
         profile = src.profile.copy()
         profile.update(
@@ -438,7 +441,9 @@ def main() -> None:
         "blue": "B02.tif", "green": "B03.tif", "red": "B04.tif", "scl": "SCL.tif"
     }.items():
         source_key, source_asset = _asset(before_item, role)
-        key, local_asset = _copy_window(before_item, role, before_dir / filename)
+        key, local_asset = _copy_window(
+            before_item, role, before_dir / filename, bbox=PREVIEW_BBOX_WGS84
+        )
         local_asset["href"] = filename
         before_assets[key] = local_asset
         before_source_assets[role] = {
@@ -550,6 +555,7 @@ def main() -> None:
                 else "not_selected_lower_quality_rank"
             ),
             "local_item": "before_diagnostic/source_item.json",
+            "preview_bbox_wgs84": list(PREVIEW_BBOX_WGS84),
             "source_assets": before_source_assets,
         },
         "selection_candidates": tested,
