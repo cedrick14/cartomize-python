@@ -348,17 +348,32 @@ def main() -> None:
         hybrid_tested.append(hybrid)
     if not hybrid_tested:
         raise RuntimeError("Aucune scène Sentinel-2 ne couvre suffisamment l'emprise pour le diagnostic hybride.")
-    hybrid_tested.sort(
-        key=lambda row: (-row["hybrid_usable_percent"], row["cloud_cover"], row["id"])
-    )
-    winner = hybrid_tested[0]
-    if winner["hybrid_usable_percent"] < MIN_AOI_USABLE:
+    eligible = [
+        row for row in hybrid_tested
+        if row["hybrid_usable_percent"] >= MIN_AOI_USABLE
+    ]
+    if not eligible:
+        best = max(hybrid_tested, key=lambda row: row["hybrid_usable_percent"])
         raise RuntimeError(
-            f"Meilleure scène après contrôle hybride : {winner['hybrid_usable_percent']:.2f} % utilisable "
-            f"(SCL {winner['usable_aoi_percent']:.2f} %, nuages spectraux supplémentaires "
-            f"{winner['spectral_cloud_percent']:.2f} %), sous le seuil de {MIN_AOI_USABLE:g} %. "
-            "Changer la période ou l'emprise; ne pas relâcher le contrôle."
+            f"Meilleure acquisition après contrôle hybride : {best['hybrid_usable_percent']:.2f} % utilisable "
+            f"(SCL {best['usable_aoi_percent']:.2f} %, nuages spectraux supplémentaires "
+            f"{best['spectral_cloud_percent']:.2f} %), sous le seuil de {MIN_AOI_USABLE:g} %. "
+            "Modifier la période ou l'emprise sans relâcher le contrôle de qualité."
         )
+
+    # Pour la démonstration, privilégier une acquisition valide présentant
+    # une couverture nuageuse modérée sur l'AOI. Cela permet de visualiser
+    # l'effet du diagnostic et du masquage sur la même scène.
+    TARGET_SPECTRAL_CLOUD_PERCENT = 1.0
+    winner = min(
+        eligible,
+        key=lambda row: (
+            abs(row["spectral_cloud_percent"] - TARGET_SPECTRAL_CLOUD_PERCENT),
+            -row["hybrid_usable_percent"],
+            row["cloud_cover"],
+            row["id"],
+        ),
+    )
     selected = item_by_id[winner["id"]]
     tested = sorted(
         [
