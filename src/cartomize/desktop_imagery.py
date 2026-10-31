@@ -676,8 +676,8 @@ class PreparationPage(Page):
         missing_masks = [scene.scene_id for scene in scenes if scene.quality is None]
         if self.clouds.isChecked() and missing_masks and not (automatic and catalog is not None):
             raise ValueError(
-                "Masque de qualité absent pour : " + ', '.join(missing_masks)
-                + ". Fournir QA/SCL, configurer un catalogue pour une récupération automatique, "
+                "Associer un masque de qualité (quality mask QA/SCL) aux scènes : " + ', '.join(missing_masks)
+                + ". Configurer un catalogue pour une récupération automatique, "
                   "ou désactiver explicitement le masque en mode expert."
             )
         rgb = tuple(control.currentData() for control in (self.rgb_red, self.rgb_green, self.rgb_blue)) if self.colour.isChecked() else None
