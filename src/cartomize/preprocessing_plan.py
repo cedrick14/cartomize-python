@@ -12,6 +12,7 @@ _TOA_LEVELS = {"L1C-TOA", "L1-TOA", "C2-L1"}
 
 def _radiometry(scene):
     bands = []
+    custom = str(scene.level or "").lower() == "custom"
     needs_scale = False
     missing = []
     for name, band in scene.bands.items():
@@ -27,7 +28,10 @@ def _radiometry(scene):
             "offset": band.offset,
             "action": "apply_scale_offset" if declared else "none",
         })
-    if missing:
+    if missing and custom:
+        status = "user_declared_values"
+        action = "preserve_declared_values"
+    elif missing:
         status = "insufficient_metadata"
         action = "provide_calibration_metadata"
     elif needs_scale:
@@ -66,14 +70,23 @@ def _atmosphere(scene):
             "method": None,
             "missing": ["surface_reflectance_product_or_atmospheric_parameters"],
         }
+    if str(scene.level or "").lower() == "custom":
+        return {
+            "level": 2,
+            "name": "atmospheric_correction",
+            "status": "user_declared",
+            "action": "none",
+            "method": "user_declared_custom_input",
+            "missing": [],
+        }
     if all(str(b.unit).lower() == "reflectance" for b in scene.bands.values()):
         return {
             "level": 2,
             "name": "atmospheric_correction",
-            "status": "undetermined",
-            "action": "verify_input_reflectance_level",
-            "method": None,
-            "missing": ["declared_processing_level"],
+            "status": "declared_reflectance",
+            "action": "none",
+            "method": "user_declared_reflectance",
+            "missing": [],
         }
     return {
         "level": 2,
@@ -205,5 +218,6 @@ def assess_preprocessing(scenes, *, mask_clouds=True, mask_saturation=True):
             "never_disable_cloud_mask_silently": True,
             "restart_after_missing_inputs_are_added": True,
             "no_scientific_output_when_blocked": True,
+            "custom_inputs_are_user_declarations": True,
         },
     }
