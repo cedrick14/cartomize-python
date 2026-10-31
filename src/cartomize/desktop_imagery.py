@@ -540,6 +540,25 @@ class PreparationPage(Page):
         decision = (f"Mosaïque automatique de {len(record.get('selected_scene_ids', []))} scènes."
                     if record.get('mosaic') else
                     "Une seule scène retenue ; aucune mosaïque nécessaire.")
+        plan = record.get('preprocessing_plan') or {}
+        plan_lines = []
+        for scene in plan.get('scenes', []):
+            statuses = []
+            for level in scene.get('levels', []):
+                number = level.get('level')
+                status = str(level.get('status', '')).replace('_', ' ')
+                if number:
+                    statuses.append(f"N{number} {status}")
+            if statuses:
+                plan_lines.append(f"{scene.get('scene_id', 'Scène')} : " + " · ".join(statuses))
+        plan_details = ("Plan automatique :\n" + "\n".join(plan_lines) + "\n") if plan_lines else ""
+        recovery = record.get('recovery') or []
+        recovered = [item for item in recovery if item.get('status') == 'recovered']
+        recovery_details = ""
+        if recovery:
+            recovery_details = (
+                f"Récupération automatique : {len(recovered)}/{len(recovery)} acquisition(s) résolue(s).\n"
+            )
         grid = record.get('parameters', {})
         grid_details = ""
         if grid.get('crs') and grid.get('resolution_m') is not None:
@@ -547,9 +566,10 @@ class PreparationPage(Page):
             crs_label = ':'.join(authority) if authority else 'projection personnalisée (voir le rapport)'
             grid_details = f"Grille commune : {crs_label} ; résolution {grid['resolution_m']:g} m.\n"
         self.coverage_summary.setText(f"{label}.\nCouverture utile : {percentage} % ; seuil : {threshold} %.\n"
-                                      f"{policy}\n{decision}\n{grid_details}Découpage à la zone d’étude réalisé.\n"
+                                      f"{policy}\n{decision}\n{recovery_details}{plan_details}{grid_details}"
+                                      "Découpage à la zone d’étude réalisé.\n"
                                       f"Scènes retenues : {selected}.\n"
-                                      "Diagnostic, cartes de lacunes et résultats disponibles dans le projet.")
+                                      "Diagnostic, plan N1–N5, cartes de lacunes et résultats disponibles dans le projet.")
         self.apply_audit_button.setEnabled(False)
         if partial:
             window = self.window()
@@ -642,9 +662,12 @@ class PreparationPage(Page):
             if not scenes and (not self.crs.text().strip() or not self.resolution.value()):
                 raise ValueError("Renseigner le système projeté cible et la résolution pour une recherche sans images locales.")
         missing_masks = [scene.scene_id for scene in scenes if scene.quality is None]
-        if self.clouds.isChecked() and missing_masks:
-            raise ValueError("Associer un masque de qualité aux scènes : " + ', '.join(missing_masks) +
-                             ". Sans masque disponible, désactiver explicitement l’application des masques QA/SCL.")
+        if self.clouds.isChecked() and missing_masks and not (automatic and catalog is not None):
+            raise ValueError(
+                "Masque de qualité absent pour : " + ', '.join(missing_masks)
+                + ". Fournir QA/SCL, configurer un catalogue pour une récupération automatique, "
+                  "ou désactiver explicitement le masque en mode expert."
+            )
         rgb = tuple(control.currentData() for control in (self.rgb_red, self.rgb_green, self.rgb_blue)) if self.colour.isChecked() else None
         if rgb and None in rgb:
             raise ValueError("Affecter une bande à chacun des trois canaux rouge, vert et bleu.")
