@@ -29,9 +29,10 @@ def _matches(data,values):
 def detect_background(source,*,max_size=1024,keep_values=()):
     """Inspect spatial evidence; only conservative padding candidates are selected.
 
-    NoData metadata remains authoritative. Binary 0/1 and uniform rasters never
-    receive automatic additional masks. An ambiguous real class touching the
-    border cannot be distinguished from padding without semantic information.
+    NoData metadata remains authoritative. For single-band integer thematic
+    rasters, any class code may be proposed as visual background only when it
+    is strongly concentrated on the perimeter/corners and scarce in the center.
+    Binary 0/1 and uniform rasters never receive automatic additional masks.
     """
     if not isinstance(max_size,int) or max_size<32:raise ValueError('max_size must be at least 32.')
     with rasterio.open(source) as src:
@@ -52,11 +53,18 @@ def detect_background(source,*,max_size=1024,keep_values=()):
         corners[:s,:s]=True;corners[:s,-s:]=True;corners[-s:,:s]=True;corners[-s:,-s:]=True
         center=np.zeros((h,w),bool);center[h//4:max(h//4+1,3*h//4),w//4:max(w//4+1,3*w//4)]=True
         candidates=[]
-        values=[0.,255.] if native_rgb else [float(v) for v in unique if v==0 or v==255 or v<=-999 or v>=9999] if categorical else []
+        # QGIS-style visual NoData logic: provider masks/NoData remain authoritative,
+        # while an undeclared classified-raster background may be inferred from
+        # strong spatial concentration at the perimeter. Never infer a wavelength
+        # or class meaning from the numeric code itself.
+        values=[0.,255.] if native_rgb else [float(v) for v in unique] if categorical else []
         for value in values:
             matched=_matches(data,(value,))&valid
             b=float(matched[border].mean());c=float(matched[center].mean());k=float(matched[corners].mean())
-            strong=b>=.8 and k>=.9 and c<=.35 and b-c>=.5
+            border_signal=b-c
+            strong_perimeter=(b>=.65 and c<=.38 and border_signal>=.42)
+            strong_corners=(k>=.85 and b>=.55 and c<=.55 and border_signal>=.25)
+            strong=strong_perimeter or strong_corners
             automatic=strong and not binary and value not in keep_values and not matched.all()
             if b or k:
                 candidates.append(dict(value=value,border_fraction=b,center_fraction=c,corner_fraction=k,
