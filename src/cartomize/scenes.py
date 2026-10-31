@@ -45,6 +45,8 @@ class Scene:
     quality: str | Path | None = None
     quality_kind: str | None = None
     saturation: str | Path | None = None
+    spectral_cloud: str | Path | None = None
+    spectral_cloud_method: str | None = None
     notes: tuple[str, ...] = ()
 
     def __post_init__(self):
