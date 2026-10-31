@@ -59,6 +59,10 @@ class Scene:
             object.__setattr__(self,"acquired",date.fromisoformat(acquired).isoformat() if acquired else None)
         if self.quality is not None and self.quality_kind not in {"landsat_qa", "sentinel_scl", "valid_mask"}:
             raise ValueError("Declare the quality mask kind.")
+        if self.spectral_cloud is None and self.spectral_cloud_method is not None:
+            raise ValueError("spectral_cloud_method requires spectral_cloud.")
+        if self.spectral_cloud is not None and not self.spectral_cloud_method:
+            raise ValueError("Declare spectral_cloud_method for a spectral cloud mask.")
         if any(not isinstance(k, str) or not k for k in self.bands):
             raise ValueError("Band names must be nonempty strings.")
         object.__setattr__(self, "bands", {k: v if isinstance(v, Band) else Band(v) for k, v in self.bands.items()})
