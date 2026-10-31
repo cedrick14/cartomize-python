@@ -39,6 +39,24 @@ def main():
         assert stats["count"] > 0
         assert all(math.isfinite(float(stats[key])) for key in ("min", "max", "mean", "std", "p05", "p50", "p95"))
 
+    notebook = json.loads((ROOT / "Tutoriel_Demonstration_Cartomize.ipynb").read_text(encoding="utf-8"))
+    notebook_errors = [
+        output
+        for cell in notebook.get("cells", [])
+        for output in cell.get("outputs", [])
+        if output.get("output_type") == "error"
+    ]
+    notebook_image_outputs = sum(
+        1
+        for cell in notebook.get("cells", [])
+        for output in cell.get("outputs", [])
+        if "image/png" in output.get("data", {})
+    )
+    assert not notebook_errors
+    assert notebook_image_outputs >= 3, (
+        f"Le notebook doit contenir au moins 3 sorties image/png, trouvé : {notebook_image_outputs}"
+    )
+
     total = sum(row["pixels"] for row in metrics["scl"])
     assert total > 0
     assert abs(sum(row["percent"] for row in metrics["scl"]) - 100.0) < 1e-6
@@ -48,6 +66,7 @@ def main():
         "scene": provenance["selected_item_id"],
         "usable_percent": metrics["preprocessing"]["usable_percent"],
         "checked_outputs": ["multiband", "indices", "natural_color.png", "indices.png", "scl.png"],
+        "notebook_image_outputs": notebook_image_outputs,
         "note": "Toutes les statistiques proviennent des rasters Sentinel-2 L2A téléchargés et traités pendant cette exécution.",
     }
     (RESULTS / "verification.json").write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
