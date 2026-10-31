@@ -298,7 +298,7 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
             for level in scene["levels"]:
                 if level["status"] in {
                     "insufficient_metadata", "required_but_unavailable",
-                    "missing_inputs", "unavailable"
+                    "missing_inputs", "unavailable", "undetermined", "not_assessed"
                 }:
                     blockers.append((scene["scene_id"], level["name"], level.get("missing", [])))
         if blockers:
