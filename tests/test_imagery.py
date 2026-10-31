@@ -77,7 +77,7 @@ def test_explicit_calibration_preserves_valid_zero(write_raster,tmp_path):
 
 @pytest.mark.parametrize("kind,quality,expected",[
     ("landsat_qa",[64,72,80,96,66,68,192],[True,False,False,False,False,False,True]),
-    ("sentinel_scl",[4,8,9,10,3,11,6],[True,False,False,False,False,False,True]),
+    ("sentinel_scl",[4,7,8,9,10,3,11,6],[True,False,False,False,False,False,False,True]),
 ])
 def test_quality_flags(write_raster,tmp_path,kind,quality,expected):
     from cartomize.imagery import _quality_valid
