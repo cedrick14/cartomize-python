@@ -321,3 +321,60 @@ def test_landsat_level1_requires_complete_mtl_calibration(write_raster, tmp_path
     )
     with pytest.raises(ValueError, match="Incomplete reflectance calibration"):
         cm.discover_scenes(tmp_path)
+
+
+def test_sentinel_level1c_discovery_uses_product_metadata(write_raster, tmp_path):
+    safe = tmp_path / "S2A_MSIL1C_20260817T091031_N0511_R050_T33MUP_20260817T120000.SAFE"
+    granule = safe / "GRANULE" / "L1C_T33MUP_A000001_20260817T091031" / "IMG_DATA"
+    granule.mkdir(parents=True)
+    metadata = safe / "MTD_MSIL1C.xml"
+    metadata.write_text(
+        """<root>
+        <PROCESSING_BASELINE>05.11</PROCESSING_BASELINE>
+        <QUANTIFICATION_VALUE>10000</QUANTIFICATION_VALUE>
+        <RADIO_ADD_OFFSET band_id="1">-1000</RADIO_ADD_OFFSET>
+        <RADIO_ADD_OFFSET band_id="2">-1000</RADIO_ADD_OFFSET>
+        <RADIO_ADD_OFFSET band_id="3">-1000</RADIO_ADD_OFFSET>
+        <RADIO_ADD_OFFSET band_id="7">-1000</RADIO_ADD_OFFSET>
+        </root>""",
+        encoding="utf-8",
+    )
+    transform = from_origin(300000, 9500000, 10, 10)
+    for code in ("B02", "B03", "B04", "B08"):
+        write_raster(
+            str(granule / f"T33MUP_20260817T091031_{code}.tif"),
+            np.full((2, 2), 3000, dtype="uint16"),
+            transform=transform, nodata=0,
+        )
+    scenes = cm.discover_scenes(safe)
+    assert len(scenes) == 1
+    scene = scenes[0]
+    assert scene.sensor == "sentinel-2"
+    assert scene.level == "L1C-TOA"
+    assert scene.quality is None
+    assert set(scene.bands) == {"blue", "green", "red", "nir"}
+    assert all(band.unit == "toa_reflectance" for band in scene.bands.values())
+    assert scene.bands["red"].scale == pytest.approx(.0001)
+    assert scene.bands["red"].offset == pytest.approx(-.1)
+    product = cm.prepare_imagery(
+        [scene], tmp_path / "s2_toa.tif", mask_clouds=False, mask_saturation=False
+    )
+    with rasterio.open(product.path) as src:
+        np.testing.assert_allclose(src.read(), .2, atol=1e-7)
+
+
+def test_sentinel_level1c_requires_radio_offset_for_modern_baseline(write_raster, tmp_path):
+    safe = tmp_path / "S2A_MSIL1C_20260817T091031_N0511_R050_T33MUP_20260817T120000.SAFE"
+    granule = safe / "GRANULE" / "L1C_T33MUP" / "IMG_DATA"
+    granule.mkdir(parents=True)
+    (safe / "MTD_MSIL1C.xml").write_text(
+        "<root><PROCESSING_BASELINE>05.11</PROCESSING_BASELINE>"
+        "<QUANTIFICATION_VALUE>10000</QUANTIFICATION_VALUE></root>",
+        encoding="utf-8",
+    )
+    write_raster(
+        str(granule / "T33MUP_20260817T091031_B04.tif"),
+        np.ones((2, 2), dtype="uint16"), nodata=0,
+    )
+    with pytest.raises(ValueError, match="RADIO_ADD_OFFSET"):
+        cm.discover_scenes(safe)
