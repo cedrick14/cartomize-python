@@ -56,12 +56,10 @@ def sentinel_spectral_cloud_mask(scene, destination, *, cancel=None):
     if scene.sensor != "sentinel-2" or scene.quality_kind != "sentinel_scl":
         return None
     nir_name = "nir_narrow" if "nir_narrow" in scene.bands else "nir" if "nir" in scene.bands else None
-    required = {"blue", "red", "swir1"}
+    required = {"blue", "green", "red", "swir1"}
     if nir_name is None or not required.issubset(scene.bands):
         return None
-    names = ["blue", "red", nir_name, "swir1"]
-    if "green" in scene.bands:
-        names.append("green")
+    names = ["blue", "green", "red", nir_name, "swir1"]
     if any(str(scene.bands[name].unit).lower() != "reflectance" for name in names):
         return None
 
@@ -94,28 +92,28 @@ def sentinel_spectral_cloud_mask(scene, destination, *, cancel=None):
                 nir, swir = data[nir_name], data["swir1"]
                 eps = 1e-6
                 ndvi = (nir - red) / (nir + red + eps)
+                green = data["green"]
                 b2_b11 = blue / (swir + eps)
                 nir_b11 = nir / (swir + eps)
                 red_b11 = red / (swir + eps)
-                if "green" in data:
-                    visible = (blue + data["green"] + red) / 3.0
-                else:
-                    visible = (blue + red) / 2.0
+                nir_green = nir / (green + eps)
 
-                # Conservative high-confidence cloud candidate.
-                potential = (
+                # Conservative subset of the published Sen2Cor cloud-screening
+                # sequence. We deliberately use only tests whose required bands
+                # are present in the local L2A scene.
+                cloud = (
                     valid
-                    & (blue >= 0.15)
-                    & (visible >= 0.15)
-                    & (ndvi < 0.36)
-                    & (b2_b11 >= 0.70)
-                    & (b2_b11 <= 4.0)
-                    & (nir_b11 >= 0.90)
-                    & (red_b11 <= 6.0)
+                    & (red > 0.07)
+                    & (ndvi < 0.40)
+                    & (nir_green < 2.50)
+                    & (b2_b11 > 0.80)
+                    & (b2_b11 < (2.10 + blue))
+                    & (nir_b11 > 0.90)
+                    & (red_b11 < 6.0)
                 )
-                # Sen2Cor-like water safeguard: bright-blue water with NIR below red.
+                # Explicit water safeguard from the same family of tests.
                 water_like = valid & (b2_b11 > 2.0) & (blue < 0.20) & (nir < red)
-                cloud = potential & ~water_like
+                cloud &= ~water_like
                 mask = np.full(valid.shape, 255, dtype="uint8")
                 mask[valid & ~cloud] = 1
                 mask[cloud] = 0
@@ -127,7 +125,7 @@ def sentinel_spectral_cloud_mask(scene, destination, *, cancel=None):
                 CARTOMIZE_PRODUCT="sentinel_spectral_cloud_mask",
                 method=SENTINEL_SPECTRAL_METHOD,
                 semantics="1=valid,0=spectral_cloud,255=insufficient_spectral_data",
-                required_bands="blue,red,nir_or_nir_narrow,swir1",
+                required_bands="blue,green,red,nir_or_nir_narrow,swir1",
             )
     return {
         "path": destination,
@@ -154,7 +152,7 @@ def augment_sentinel_cloud_masks(scenes, destination, *, cancel=None, stage=None
                 "scene_id": scene.scene_id,
                 "status": "not_available",
                 "method": SENTINEL_SPECTRAL_METHOD,
-                "reason": "requires Sentinel-2 SCL plus reflectance blue/red/nir/swir1",
+                "reason": "requires Sentinel-2 SCL plus reflectance blue/green/red/nir/swir1",
             })
             continue
         if stage:
