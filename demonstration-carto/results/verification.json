@@ -1,13 +1,21 @@
 {
   "status": "passed",
   "scene": "S2B_33MWR_20240720_0_L2A",
-  "usable_percent": 99.95294447674485,
+  "usable_percent": 99.95291859443896,
+  "indices": [
+    "NDVI",
+    "NDBI",
+    "EVI"
+  ],
   "checked_outputs": [
     "multiband",
-    "indices",
     "natural_color.png",
-    "indices.png",
-    "scl.png"
+    "indices.tif",
+    "ndvi.png",
+    "ndbi.png",
+    "evi.png",
+    "indices_stats.csv"
   ],
-  "note": "Toutes les statistiques proviennent des rasters Sentinel-2 L2A téléchargés et traités pendant cette exécution."
+  "classification_executed": false,
+  "note": "Les indices et statistiques proviennent des rasters Sentinel-2 L2A réellement téléchargés et traités."
 }

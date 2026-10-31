@@ -242,6 +242,47 @@
         "reflectance"
       ]
     },
+    "swir16": {
+      "href": "B11.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "SWIR 1 (band 11) - 20m",
+      "eo:bands": [
+        {
+          "name": "swir16",
+          "common_name": "swir16",
+          "description": "SWIR 1 (band 11)",
+          "center_wavelength": 1.61,
+          "full_width_half_max": 0.143
+        }
+      ],
+      "gsd": 20,
+      "proj:shape": [
+        5490,
+        5490
+      ],
+      "proj:transform": [
+        20,
+        0,
+        499980,
+        0,
+        -20,
+        9600040
+      ],
+      "raster:bands": [
+        {
+          "nodata": 0,
+          "data_type": "uint16",
+          "bits_per_sample": 15,
+          "spatial_resolution": 20,
+          "scale": 0.0001,
+          "offset": -0.1
+        }
+      ],
+      "roles": [
+        "data",
+        "reflectance"
+      ]
+    },
     "scl": {
       "href": "SCL.tif",
       "type": "image/tiff; application=geotiff; profile=cloud-optimized",

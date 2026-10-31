@@ -1,109 +1,75 @@
 {
-  "schema": "cartomize.demonstration.metrics.v1",
+  "schema": "cartomize.demonstration.automation.v2",
   "scene": {
     "id": "S2B_33MWR_20240720_0_L2A",
     "datetime": "2024-07-20T09:21:50.068000Z",
     "platform": "sentinel-2b",
-    "mgrs_tile": null,
     "global_cloud_cover_percent": 9.286346
   },
   "preprocessing": {
     "status": "partial",
-    "usable_percent": 99.95294447674485,
+    "usable_percent": 99.95291859443896,
     "threshold_met": true,
     "selected_scene_ids": [
       "S2B_33MWR_20240720_0_L2A"
     ],
-    "mosaic": false
+    "mosaic": false,
+    "band_order": [
+      "blue",
+      "green",
+      "red",
+      "nir",
+      "swir1"
+    ],
+    "resolution_m": 20.0,
+    "crs": "PROJCS[\"WGS 84 / UTM zone 33S\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",15],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",10000000],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH],AUTHORITY[\"EPSG\",\"32733\"]]"
   },
+  "selected_indices": [
+    "NDVI",
+    "NDBI",
+    "EVI"
+  ],
   "indices": {
     "NDVI": {
-      "count": 441823,
-      "min": -0.3734409213066101,
-      "max": 0.8263953924179077,
-      "mean": 0.09025278298082691,
-      "std": 0.1865051307425572,
-      "p05": -0.1617074191570282,
-      "p50": 0.11378203332424164,
-      "p95": 0.4301570385694503
+      "count": 110395,
+      "min": -0.3180212080478668,
+      "max": 0.8199513554573059,
+      "mean": 0.09079609577618389,
+      "std": 0.18641288401515674,
+      "p05": -0.1615182176232338,
+      "p50": 0.11428570002317429,
+      "p95": 0.42906734645366595
     },
-    "NDWI": {
-      "count": 441823,
-      "min": -0.9985326528549194,
-      "max": 0.37527430057525635,
-      "mean": -0.2204076276070092,
-      "std": 0.17580296437272006,
-      "p05": -0.5195005714893342,
-      "p50": -0.24857373535633087,
-      "p95": 0.03250479698181152
+    "NDBI": {
+      "count": 110395,
+      "min": -0.9975278377532959,
+      "max": 0.6368328928947449,
+      "mean": -0.07125731698566246,
+      "std": 0.30060992305654477,
+      "p05": -0.5182348728179932,
+      "p50": 0.09124767035245895,
+      "p95": 0.24923356771469113
     },
     "EVI": {
-      "count": 441823,
-      "min": -0.12234532833099365,
-      "max": 0.7693825960159302,
-      "mean": 0.05356643557245003,
-      "std": 0.08522927374803842,
-      "p05": -0.039065653830766676,
-      "p50": 0.050113044679164886,
-      "p95": 0.21103305965661998
+      "count": 110395,
+      "min": -0.08168426901102066,
+      "max": 0.7482237815856934,
+      "mean": 0.05376285823907011,
+      "std": 0.08516591199477884,
+      "p05": -0.039046647027134895,
+      "p50": 0.05037025734782219,
+      "p95": 0.21087224483489958
     }
   },
-  "scl": [
-    {
-      "code": 4,
-      "classe_SCL": "Vegetation",
-      "pixels": 15,
-      "percent": 0.013581174681068748,
-      "area_ha": 0.6
-    },
-    {
-      "code": 5,
-      "classe_SCL": "Not vegetated",
-      "pixels": 69107,
-      "percent": 62.57028257897453,
-      "area_ha": 2764.28
-    },
-    {
-      "code": 6,
-      "classe_SCL": "Water",
-      "pixels": 41226,
-      "percent": 37.326500493449345,
-      "area_ha": 1649.04
-    },
-    {
-      "code": 7,
-      "classe_SCL": "Unclassified",
-      "pixels": 47,
-      "percent": 0.04255434733401541,
-      "area_ha": 1.8800000000000001
-    },
-    {
-      "code": 8,
-      "classe_SCL": "Cloud medium probability",
-      "pixels": 52,
-      "percent": 0.04708140556103833,
-      "area_ha": 2.08
-    }
-  ],
-  "zonal_ndvi": [
-    {
-      "name": "Fenêtre de démonstration Kinshasa",
-      "scope": "emprise d'analyse; pas une limite administrative",
-      "ndvi_count": 441823,
-      "ndvi_min": -0.3734409213066101,
-      "ndvi_max": 0.8263953924179077,
-      "ndvi_mean": 0.09025278298082691,
-      "ndvi_sum": 39875.75533493789,
-      "ndvi_std": 0.18650513074255717,
-      "ndvi_zone_pixels": 442031,
-      "ndvi_raster_pixels": 442031,
-      "ndvi_coverage_percent": 99.95294447674485
-    }
-  ],
   "products": {
     "multiband": "products/scene_001/multibande.tif",
     "composition": "products/scene_001/composition_coloree.tif",
     "indices": "indices.tif",
-    "zonal": "ndvi_zonal.gpkg"
+    "statistics": "indices_stats.csv",
+    "images": {
+      "NDVI": "ndvi.png",
+      "NDBI": "ndbi.png",
+      "EVI": "evi.png"
+    }
   }
 }

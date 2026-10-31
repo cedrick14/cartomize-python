@@ -87,6 +87,10 @@
       "key": "nir",
       "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2024/7/S2B_33MWR_20240720_0_L2A/B08.tif"
     },
+    "swir1": {
+      "key": "swir16",
+      "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2024/7/S2B_33MWR_20240720_0_L2A/B11.tif"
+    },
     "scl": {
       "key": "scl",
       "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2024/7/S2B_33MWR_20240720_0_L2A/SCL.tif"
@@ -96,7 +100,8 @@
     "Earth Search COG harmonisé blue : scale déclaré=0.0001, offset déclaré=-0.1, offset effectif=0 ; earthsearch:boa_offset_applied=true, aucune seconde application du décalage BOA.",
     "Earth Search COG harmonisé green : scale déclaré=0.0001, offset déclaré=-0.1, offset effectif=0 ; earthsearch:boa_offset_applied=true, aucune seconde application du décalage BOA.",
     "Earth Search COG harmonisé red : scale déclaré=0.0001, offset déclaré=-0.1, offset effectif=0 ; earthsearch:boa_offset_applied=true, aucune seconde application du décalage BOA.",
-    "Earth Search COG harmonisé nir : scale déclaré=0.0001, offset déclaré=-0.1, offset effectif=0 ; earthsearch:boa_offset_applied=true, aucune seconde application du décalage BOA."
+    "Earth Search COG harmonisé nir : scale déclaré=0.0001, offset déclaré=-0.1, offset effectif=0 ; earthsearch:boa_offset_applied=true, aucune seconde application du décalage BOA.",
+    "Earth Search COG harmonisé swir16 : scale déclaré=0.0001, offset déclaré=-0.1, offset effectif=0 ; earthsearch:boa_offset_applied=true, aucune seconde application du décalage BOA."
   ],
   "files": {
     "B02.tif": {
@@ -115,6 +120,10 @@
       "bytes": 707538,
       "sha256": "3b36994136944664230c01bf7cd8fa6b570a36e965e4c838bc402706737e45bf"
     },
+    "B11.tif": {
+      "bytes": 202532,
+      "sha256": "74f7fe375058d27772bbaa702e362e48c473d851eacd86ba8e6807b2393a7d3c"
+    },
     "SCL.tif": {
       "bytes": 4908,
       "sha256": "3e713d5d3fb995a9fec2ff04ff7ab524017410c9d6c1ba22b9e08f883d50b7a0"
@@ -124,12 +133,12 @@
       "sha256": "5821f48a307f9559ff8c6271eb9c5bd8ecb9933c5a701d500f051d074a43d2ec"
     },
     "scenes.json": {
-      "bytes": 1850,
-      "sha256": "559938842c6157decc4cfb3308e191d7cfc947b1a00dad6e51aaaaacc23579f8"
+      "bytes": 2237,
+      "sha256": "d924931c2e860953d21f2c0116df49c00a7138c086da4785c7b4fad234aedc08"
     },
     "source_item.json": {
-      "bytes": 7261,
-      "sha256": "a9aeab8086cd4ed053b0d5eae586280ad4a3ed6a3d3751f5b711e4ebe676a549"
+      "bytes": 8139,
+      "sha256": "7cc482d929fa70624262bf1fb31acc88567076775f91f2565e09e2a491805d3b"
     }
   },
   "aoi_note": "Fenêtre d'analyse définie pour la démonstration; elle n'est pas présentée comme une limite administrative."

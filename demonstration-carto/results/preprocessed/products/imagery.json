@@ -31,6 +31,10 @@
         "4": {
           "name": "nir",
           "path": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/products/scene_001/bandes/04_nir.tif"
+        },
+        "5": {
+          "name": "swir1",
+          "path": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/products/scene_001/bandes/05_swir1.tif"
         }
       },
       "composition": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/products/scene_001/composition_coloree.tif",

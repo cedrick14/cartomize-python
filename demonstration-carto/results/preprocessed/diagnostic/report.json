@@ -8,18 +8,19 @@
       "blue",
       "green",
       "red",
-      "nir"
+      "nir",
+      "swir1"
     ],
     "crs": "PROJCS[\"WGS 84 / UTM zone 33S\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",15],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",10000000],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH],AUTHORITY[\"EPSG\",\"32733\"]]",
-    "resolution_m": 10.0,
-    "width": 667,
-    "height": 664,
+    "resolution_m": 20.0,
+    "width": 334,
+    "height": 332,
     "transform": [
-      10.0,
+      20.0,
       0.0,
       531060.0,
       0.0,
-      -10.0,
+      -20.0,
       9526920.0
     ],
     "resampling": "nearest",
@@ -31,13 +32,13 @@
     "max_pixels": 250000000,
     "aoi": null
   },
-  "aoi_pixels": 442031,
-  "footprint_pixels": 442031,
+  "aoi_pixels": 110447,
+  "footprint_pixels": 110447,
   "footprint_percent": 100.0,
-  "present_pixels": 442031,
+  "present_pixels": 110447,
   "present_percent": 100.0,
-  "usable_pixels": 441823,
-  "usable_percent": 99.95294447674485,
+  "usable_pixels": 110395,
+  "usable_percent": 99.95291859443896,
   "scenes": [
     {
       "index": 1,
@@ -47,12 +48,12 @@
       "acquired": "2024-07-20",
       "quality_mask": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/data/SCL.tif",
       "saturation_mask": null,
-      "footprint_pixels": 442031,
+      "footprint_pixels": 110447,
       "footprint_percent": 100.0,
-      "present_pixels": 442031,
+      "present_pixels": 110447,
       "present_percent": 100.0,
-      "usable_pixels": 441823,
-      "usable_percent": 99.95294447674485
+      "usable_pixels": 110395,
+      "usable_percent": 99.95291859443896
     }
   ],
   "assets": [
@@ -135,6 +136,26 @@
         9526920.0
       ],
       "size_bytes": 707538
+    },
+    {
+      "scene": "S2B_33MWR_20240720_0_L2A",
+      "band": "swir1",
+      "path": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/data/B11.tif",
+      "index": 1,
+      "scale": 0.0001,
+      "offset": 0.0,
+      "unit": "reflectance",
+      "declared_nodata": 0.0,
+      "source_crs": "EPSG:32733",
+      "resolution_m": 20.0,
+      "resolution_method": "native_affine",
+      "bounds": [
+        531060.0,
+        9520280.0,
+        537740.0,
+        9526920.0
+      ],
+      "size_bytes": 202532
     }
   ],
   "coverage_status": "partial",
