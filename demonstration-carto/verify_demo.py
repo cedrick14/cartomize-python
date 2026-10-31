@@ -25,9 +25,9 @@ def main():
     multiband = RESULTS / "preprocessed" / metrics["products"]["multiband"]
     indices = RESULTS / "indices.tif"
     visual_files = (
-        RESULTS / "scene_and_aoi_before.png",
+        RESULTS / "kinshasa_scene_input.png",
         RESULTS / "natural_color.png",
-        RESULTS / "before_after.png",
+        RESULTS / "kinshasa_preprocessing_comparison.png",
         RESULTS / "indices.png",
         RESULTS / "scl.png",
     )
@@ -39,7 +39,7 @@ def main():
         assert tuple(name.lower() for name in src.descriptions) == ("blue", "green", "red", "nir")
         assert src.crs is not None
 
-    before_red = DATA / "before_diagnostic" / "B04.tif"
+    before_red = DATA / "input_scene" / "B04.tif"
     assert before_red.is_file(), before_red
     aoi = gpd.read_file(DATA / "aoi.geojson")
     with rasterio.open(before_red) as src:
@@ -93,9 +93,10 @@ def main():
     assert notebook_image_outputs + len(markdown_visuals) >= 4, (
         "Le notebook doit rendre au moins 4 figures pédagogiques vérifiées."
     )
-    assert "scene_and_aoi_before.png" in markdown
-    assert "before_after.png" in markdown
-    assert "AVANT" in notebook_source and "APRÈS" in notebook_source
+    assert "kinshasa_scene_input.png" in markdown
+    assert "kinshasa_preprocessing_comparison.png" in markdown
+    assert "Sentinel-2 L2A — Kinshasa" in notebook_source
+    assert "Produit prétraité" in notebook_source
 
     total = sum(row["pixels"] for row in metrics["scl"])
     assert total > 0
@@ -106,8 +107,8 @@ def main():
         "scene": provenance["selected_item_id"],
         "usable_percent": metrics["preprocessing"]["usable_percent"],
         "checked_outputs": [
-            "multiband", "indices", "scene_and_aoi_before.png",
-            "natural_color.png", "before_after.png", "indices.png", "scl.png"
+            "multiband", "indices", "kinshasa_scene_input.png",
+            "natural_color.png", "kinshasa_preprocessing_comparison.png", "indices.png", "scl.png"
         ],
         "notebook_image_outputs": notebook_image_outputs,
         "notebook_markdown_visuals": [path.name for path in markdown_visuals],
