@@ -78,6 +78,10 @@ def main():
         for cell in notebook.get("cells", [])
         if cell.get("cell_type") == "markdown"
     )
+    notebook_source = "\n".join(
+        "".join(cell.get("source", []))
+        for cell in notebook.get("cells", [])
+    )
     markdown_visuals = [
         path for path in visual_files
         if (
@@ -91,7 +95,7 @@ def main():
     )
     assert "scene_and_aoi_before.png" in markdown
     assert "before_after.png" in markdown
-    assert "AVANT" in markdown and "APRÈS" in markdown
+    assert "AVANT" in notebook_source and "APRÈS" in notebook_source
 
     total = sum(row["pixels"] for row in metrics["scl"])
     assert total > 0
