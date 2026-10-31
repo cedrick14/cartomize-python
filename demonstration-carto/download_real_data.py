@@ -329,7 +329,7 @@ def main() -> None:
 
     tested = []
     item_by_id = {}
-    for cloud, item in sorted(candidates, key=lambda row: (row[0], row[1].get("id", "")))[:60]:
+    for cloud, item in sorted(candidates, key=lambda row: (row[0], row[1].get("id", "")))[:30]:
         metrics = _scl_metrics(item)
         tested.append({"id": item["id"], "cloud_cover": cloud, **metrics})
         item_by_id[item["id"]] = item
@@ -343,7 +343,7 @@ def main() -> None:
     ]
     shortlist.sort(key=lambda row: (row["cloud_cover"], -row["usable_aoi_percent"], row["id"]))
     hybrid_tested = []
-    for row in shortlist[:24]:
+    for row in shortlist[:12]:
         hybrid = _hybrid_cloud_metrics(item_by_id[row["id"]], row)
         hybrid_tested.append(hybrid)
     if not hybrid_tested:
