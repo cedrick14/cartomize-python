@@ -68,6 +68,18 @@ def test_changed_existing_description_blocks_upload(tmp_path):
         checker.check_upload(tmp_path, opener=opener)
 
 
+def test_changed_existing_description_can_be_explicitly_allowed(tmp_path):
+    make_wheel(tmp_path)
+    def opener(_request, **_kwargs):
+        return json_response({"info": {"description": "An older presentation."}})
+    result = checker.check_upload(
+        tmp_path,
+        opener=opener,
+        allow_existing_description_mismatch=True,
+    )
+    assert result["status"] == "description_mismatch_allowed"
+
+
 def test_absent_release_is_allowed_only_for_404(tmp_path):
     make_wheel(tmp_path)
     def opener(request, **_kwargs):
@@ -129,6 +141,24 @@ def test_cli_exits_nonzero_for_description_mismatch(tmp_path, monkeypatch, capsy
     output = capsys.readouterr()
     assert "will not update that description" in output.err
     assert output.out == ""
+
+
+def test_cli_can_explicitly_allow_existing_description_mismatch(tmp_path, monkeypatch, capsys):
+    make_wheel(tmp_path)
+    monkeypatch.setattr(
+        checker,
+        "urlopen",
+        lambda *_a, **_k: json_response({"info": {"description": "Old description"}}),
+    )
+    assert checker.main([
+        str(tmp_path),
+        "--index",
+        "pypi",
+        "--allow-existing-description-mismatch",
+    ]) == 0
+    output = capsys.readouterr()
+    assert "description_mismatch_allowed" in output.out
+    assert output.err == ""
 
 
 def test_cli_disallows_arbitrary_index_urls(tmp_path):
