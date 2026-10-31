@@ -332,6 +332,22 @@ class Workbench(QObject):
         self.bottom_tabs.setCurrentWidget(self.console)
         self.console.editor.setFocus()
 
+    def show_logs(self):
+        self.window.dock_manager.show(self.bottom_dock)
+        self.bottom_tabs.setCurrentWidget(self.logs)
+
+    def begin_processing(self, title, *, focus_logs=False):
+        if focus_logs:
+            self.show_logs()
+        self.log("— " + str(title) + " —")
+
+    def log_stage(self, text):
+        text = str(text).strip()
+        if not text:
+            return
+        self.log(text)
+        self._last_status = text
+
     def show_environment(self):
         self.environment.refresh()
         self.window.dock_manager.show(self.bottom_dock)
