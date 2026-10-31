@@ -42,6 +42,37 @@ def _read_reflectance(vrt, band, window):
     return data, valid
 
 
+def sentinel_spectral_cloud_candidates(blue, green, red, nir, swir1, valid):
+    """Return the shared high-confidence Sentinel-2 spectral cloud candidate mask."""
+    blue = np.asarray(blue, dtype="float64")
+    green = np.asarray(green, dtype="float64")
+    red = np.asarray(red, dtype="float64")
+    nir = np.asarray(nir, dtype="float64")
+    swir1 = np.asarray(swir1, dtype="float64")
+    valid = np.asarray(valid, dtype=bool)
+    shapes = {array.shape for array in (blue, green, red, nir, swir1, valid)}
+    if len(shapes) != 1:
+        raise ValueError("Sentinel spectral cloud arrays must share one grid.")
+    eps = 1e-6
+    ndvi = (nir - red) / (nir + red + eps)
+    b2_b11 = blue / (swir1 + eps)
+    nir_b11 = nir / (swir1 + eps)
+    red_b11 = red / (swir1 + eps)
+    nir_green = nir / (green + eps)
+    cloud = (
+        valid
+        & (red > 0.07)
+        & (ndvi < 0.40)
+        & (nir_green < 2.50)
+        & (b2_b11 > 0.80)
+        & (b2_b11 < (2.10 + blue))
+        & (nir_b11 > 0.90)
+        & (red_b11 < 6.0)
+    )
+    water_like = valid & (b2_b11 > 2.0) & (blue < 0.20) & (nir < red)
+    return cloud & ~water_like
+
+
 def sentinel_spectral_cloud_mask(scene, destination, *, cancel=None):
     """Create a conservative cloud-validity mask for Sentinel-2 L2A.
 
@@ -88,32 +119,10 @@ def sentinel_spectral_cloud_mask(scene, destination, *, cancel=None):
                     values, available = _read_reflectance(vrt, band, window)
                     data[name] = values
                     valid = available if valid is None else valid & available
-                blue, red = data["blue"], data["red"]
-                nir, swir = data[nir_name], data["swir1"]
-                eps = 1e-6
-                ndvi = (nir - red) / (nir + red + eps)
-                green = data["green"]
-                b2_b11 = blue / (swir + eps)
-                nir_b11 = nir / (swir + eps)
-                red_b11 = red / (swir + eps)
-                nir_green = nir / (green + eps)
-
-                # Conservative subset of the published Sen2Cor cloud-screening
-                # sequence. We deliberately use only tests whose required bands
-                # are present in the local L2A scene.
-                cloud = (
-                    valid
-                    & (red > 0.07)
-                    & (ndvi < 0.40)
-                    & (nir_green < 2.50)
-                    & (b2_b11 > 0.80)
-                    & (b2_b11 < (2.10 + blue))
-                    & (nir_b11 > 0.90)
-                    & (red_b11 < 6.0)
+                cloud = sentinel_spectral_cloud_candidates(
+                    data["blue"], data["green"], data["red"],
+                    data[nir_name], data["swir1"], valid
                 )
-                # Explicit water safeguard from the same family of tests.
-                water_like = valid & (b2_b11 > 2.0) & (blue < 0.20) & (nir < red)
-                cloud &= ~water_like
                 mask = np.full(valid.shape, 255, dtype="uint8")
                 mask[valid & ~cloud] = 1
                 mask[cloud] = 0
