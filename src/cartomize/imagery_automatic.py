@@ -542,6 +542,9 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
                 "radiometric_calibration",
                 "quality_detection" if mask_clouds else "quality_detection_disabled",
                 "cloud_masking" if mask_clouds else "cloud_masking_disabled",
+                "spectral_cloud_detection" if any(
+                    item.get("status") == "applied" for item in spectral_cloud_reports
+                ) else "spectral_cloud_detection_unavailable",
                 "grid_harmonization",
                 "scene_selection",
                 "mosaic" if len(selected) > 1 else "single_scene",
@@ -549,7 +552,12 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
             ],
             quality_statistics=[dict(scene_id=scene["id"], **scene["quality_statistics"])
                                 for scene in final_audit.report.get("scenes", [])
-                                if scene.get("quality_statistics")])
+                                if scene.get("quality_statistics")],
+            spectral_cloud_statistics=[
+                dict(scene_id=scene["id"], **scene["spectral_cloud_statistics"])
+                for scene in final_audit.report.get("scenes", [])
+                if scene.get("spectral_cloud_statistics")
+            ])
         shutil.rmtree(rounds, ignore_errors=True)
         save_json(report, work / "preprocessing.json")
         replace = relocate_products(work, destination)
