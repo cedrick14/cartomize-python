@@ -21,6 +21,7 @@ from .scenes import Scene, discover_scenes
 from .preprocessing_plan import assess_preprocessing
 from .imagery_recovery import recover_scene
 from .atmospheric import dos1_scene
+from .clouds import augment_sentinel_cloud_masks
 from .storage import new_directory, read_json, relocate_products, save_json
 
 
@@ -197,7 +198,9 @@ def _empty_audit(destination, zones, *, target_crs, resolution, band_order,
 def _snapshot(scenes, names, mask_clouds, mask_saturation):
     paths = {Path(scene.bands[name].path).resolve() for scene in scenes for name in names}
     paths.update(Path(path).resolve() for scene in scenes for path in (
-        scene.quality if mask_clouds else None, scene.saturation if mask_saturation else None) if path)
+        scene.quality if mask_clouds else None,
+        scene.spectral_cloud if mask_clouds else None,
+        scene.saturation if mask_saturation else None) if path)
     return {str(path): (path.stat().st_size, path.stat().st_mtime_ns) for path in paths}
 
 
@@ -270,6 +273,7 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
         announce_early("N4 — Diagnostic nuages et pixels non utilisables")
     initial_preprocessing_plan = copy.deepcopy(preprocessing_plan) if preprocessing_plan is not None else None
     recovery_records = []
+    spectral_cloud_reports = []
     if preprocessing_plan is not None and config is not None and atmospheric_method in {"auto", "provider"}:
         needs_recovery = {
             scene["scene_id"]
@@ -355,6 +359,17 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
             raise ValueError(
                 "Prétraitement automatique bloqué après récupération des entrées : " + detail
                 + ". Fournir les métadonnées ou le quality mask (QA/SCL) requis."
+            )
+    if scenes and mask_clouds:
+        spectral_root = Path(destination).expanduser().resolve().with_name(
+            Path(destination).expanduser().resolve().name + "_spectral_cloud"
+        )
+        scenes, spectral_cloud_reports = augment_sentinel_cloud_masks(
+            scenes, spectral_root, cancel=cancel, stage=stage
+        )
+        if any(item.get("status") == "applied" for item in spectral_cloud_reports):
+            preprocessing_plan = assess_preprocessing(
+                scenes, mask_clouds=mask_clouds, mask_saturation=mask_saturation
             )
     if not scenes and (not band_order or target_crs is None or resolution is None):
         raise ValueError("Sans scène locale, définir band_order, target_crs projeté et resolution.")
@@ -486,7 +501,8 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
             download_directory=str(work / "acquisitions") if (work / "acquisitions").exists() else None,
             products=[], preparation=None, audit=str(audit.manifest), coverage=str(audit.coverage), gaps=str(audit.gaps),
             initial_preprocessing_plan=initial_preprocessing_plan,
-            preprocessing_plan=preprocessing_plan, recovery=recovery_records)
+            preprocessing_plan=preprocessing_plan, recovery=recovery_records,
+            spectral_cloud_detection=spectral_cloud_reports)
         if not audit.report["usable_pixels"] or (not report["threshold_met"] and not allow_partial):
             _check_cancel(cancel)
             raise ImageryCoverageError(audit, report).preserve(diagnostic_destination(destination), cancel=cancel)
@@ -523,6 +539,7 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
             preprocessing_plan=assess_preprocessing(
                 selected, mask_clouds=mask_clouds, mask_saturation=mask_saturation),
             recovery=recovery_records,
+            spectral_cloud_detection=spectral_cloud_reports,
             atmospheric_method=atmospheric_method,
             executed_steps=[
                 "radiometric_calibration",
