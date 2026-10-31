@@ -104,6 +104,7 @@ def audit_imagery(scenes, destination, *, aoi, band_order=None, target_crs=None,
     counts = np.zeros(3, dtype="int64")
     scene_counts = np.zeros((len(scenes), 3), dtype="int64")
     quality_counts = [dict() for _ in scenes]
+    spectral_cloud_counts = [dict(cloud=0, clear=0, nodata=0) for _ in scenes]
     aoi_pixels = 0
 
     with new_directory(destination) as work:
@@ -124,6 +125,7 @@ def audit_imagery(scenes, destination, *, aoi, band_order=None, target_crs=None,
                         dtype="float64", nodata=np.nan, resampling=Resampling.nearest))
 
                 quality_readers = []
+                spectral_cloud_readers = []
                 for scene_index, scene in enumerate(scenes):
                     bands = []
                     for band_index, name in enumerate(names):
@@ -152,6 +154,9 @@ def audit_imagery(scenes, destination, *, aoi, band_order=None, target_crs=None,
                     quality_readers.append(
                         (quality_reader(scene.quality), scene.quality_kind)
                         if scene.quality is not None else None)
+                    spectral_cloud_readers.append(
+                        quality_reader(scene.spectral_cloud)
+                        if mask_clouds and scene.spectral_cloud is not None else None)
 
                 with rasterio.open(work / "coverage.tif", "w", **profile) as coverage, \
                      rasterio.open(work / "gaps.tif", "w", **{**profile, "count": 1}) as gaps:
@@ -174,13 +179,22 @@ def audit_imagery(scenes, destination, *, aoi, band_order=None, target_crs=None,
                                     common[kind] &= cache[key]
                             scene_counts[scene_index] += common.sum(axis=(1, 2))
                             quality = quality_readers[scene_index]
+                            domain = common[0]
                             if quality is not None:
                                 quality_values = _read(quality[0], 1, window=window)
                                 categories = _quality_categories(quality_values, quality[1])
-                                domain = common[0]
                                 summary = quality_counts[scene_index]
                                 for name, category in categories.items():
                                     summary[name] = summary.get(name, 0) + int((domain & category).sum())
+                            spectral = spectral_cloud_readers[scene_index]
+                            if spectral is not None:
+                                values = _read(spectral, 1, window=window)
+                                observed = ~np.ma.getmaskarray(values) & np.isfinite(values.data)
+                                raw = np.nan_to_num(values.filled(255), nan=255).astype("uint8")
+                                summary = spectral_cloud_counts[scene_index]
+                                summary["cloud"] += int((domain & observed & (raw == 0)).sum())
+                                summary["clear"] += int((domain & observed & (raw == 1)).sum())
+                                summary["nodata"] += int((domain & ~observed).sum())
                             combined |= common
                         counts += combined.sum(axis=(1, 2))
                         encoded = np.where(inside[None, :, :], combined, 255).astype("uint8")
@@ -220,16 +234,35 @@ def audit_imagery(scenes, destination, *, aoi, band_order=None, target_crs=None,
                 result[f"{name}_percent"] = 100. * value / denominator if denominator else 0.
             return result
 
+        def spectral_cloud_summary(index, scene):
+            if scene.spectral_cloud is None:
+                return None
+            values = spectral_cloud_counts[index]
+            evaluated = int(values["cloud"] + values["clear"])
+            return {
+                "method": scene.spectral_cloud_method,
+                "evaluated_pixels": evaluated,
+                "cloud_pixels": int(values["cloud"]),
+                "cloud_percent": 100. * values["cloud"] / evaluated if evaluated else 0.,
+                "clear_pixels": int(values["clear"]),
+                "nodata_pixels": int(values["nodata"]),
+            }
+
         summaries = []
         for i, scene in enumerate(scenes):
             item = dict(index=i + 1, id=scene.scene_id, sensor=scene.sensor,
                 level=scene.level, acquired=scene.acquired,
                 quality_mask=str(Path(scene.quality).resolve()) if scene.quality else None,
+                spectral_cloud_mask=str(Path(scene.spectral_cloud).resolve()) if scene.spectral_cloud else None,
+                spectral_cloud_method=scene.spectral_cloud_method,
                 saturation_mask=str(Path(scene.saturation).resolve()) if scene.saturation else None,
                 **_statistics(scene_counts[i], aoi_pixels))
             quality = quality_summary(i, scene)
             if quality is not None:
                 item["quality_statistics"] = quality
+            spectral = spectral_cloud_summary(i, scene)
+            if spectral is not None:
+                item["spectral_cloud_statistics"] = spectral
             summaries.append(item)
         statistics = _statistics(counts, aoi_pixels)
         complete = statistics["usable_percent"] + 1e-9 >= coverage_threshold
@@ -258,12 +291,14 @@ def audit_imagery(scenes, destination, *, aoi, band_order=None, target_crs=None,
             mosaic_recommended=bool(len(contributors) > 1 and counts[2] > scene_counts[:, 2].max()),
             coverage_method="target_grid_pixel_count",
             quality_statistics_scope="per_scene_common_band_footprint_on_target_grid",
+            spectral_cloud_statistics_scope="per_scene_common_band_footprint_on_target_grid",
             gap_classes={"0": "usable", "1": "outside_footprint", "2": "missing_data",
                          "3": "quality_rejection", "255": "outside_aoi"},
             notes=["All selected bands must be present in the same scene for a pixel to count.",
                    "Percentages use AOI pixels on the target grid; they are not fractional polygon areas.",
                    "Recommendations do not change the selected sources or authorize mixing dates.",
-                   "Quality statistics are reported per scene on its common selected-band footprint; scene counts are not additive where scenes overlap."])
+                   "Quality statistics are reported per scene on its common selected-band footprint; scene counts are not additive where scenes overlap.",
+                   "When available, Sentinel spectral fallback statistics are reported separately from SCL so official and supplemental cloud detections remain distinguishable."])
         if not aoi_pixels:
             report["notes"].append("The AOI contains no target-grid pixel under the selected boundary rule; choose a finer grid or all_touched=True.")
         save_json(report, work / "report.json")
