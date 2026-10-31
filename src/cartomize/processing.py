@@ -124,6 +124,10 @@ def _catalog():
             resampling=resampling,mask_clouds=mask_clouds,mask_saturation=mask_saturation,
             allow_mixed_dates=allow_mixed_dates,all_touched=all_touched,max_pixels=max_pixels,
             coverage_threshold=coverage_threshold,progress=progress,cancel=cancel).manifest
+    def preprocessing_assessment(sources,*,mask_clouds=True,mask_saturation=True):
+        from .preprocessing_plan import assess_preprocessing
+        return assess_preprocessing(discover_scenes(sources),
+            mask_clouds=mask_clouds, mask_saturation=mask_saturation)
     def imagery_preprocessing(sources,destination,*,aoi,band_order=None,target_crs=None,
                               resolution=None,overlap='first',resampling='nearest',
                               mask_clouds=True,mask_saturation=True,allow_mixed_dates=False,
@@ -141,6 +145,7 @@ def _catalog():
             percentiles=percentiles,gamma=gamma,catalog=catalog,progress=progress,cancel=cancel).manifest
     add('prepare','Prétraitement multispectral',preparation,'raster','prepare')
     add('imagery.audit','Diagnostic de couverture des images',imagery_audit,'document','prepare')
+    add('imagery.plan','Plan automatique N1-N5',preprocessing_assessment,'document','prepare')
     add('imagery.preprocess','Prétraitement automatique avec contrôle de couverture',imagery_preprocessing,'document','prepare')
     add('hydrology','Analyse hydrologique D8',hydrology,'raster','processing')
     add('routing','Plus court chemin',shortest_path,'vector','processing')
