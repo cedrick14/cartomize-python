@@ -1,0 +1,80 @@
+{
+  "schema": "cartomize.imagery.automatic.v1",
+  "version": "1.0",
+  "status": "partial",
+  "coverage_threshold": 95.0,
+  "threshold_met": true,
+  "allow_partial": false,
+  "usable_percent": 99.95294447674485,
+  "selected_scene_ids": [
+    "S2B_33MWR_20240720_0_L2A"
+  ],
+  "recommended_action": "single_scene",
+  "initial_usable_percent": 99.95294447674485,
+  "catalog": null,
+  "acquisitions": [],
+  "downloaded_bytes": 0,
+  "download_directory": null,
+  "products": [
+    {
+      "scenes": [
+        "S2B_33MWR_20240720_0_L2A"
+      ],
+      "multiband": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/products/scene_001/multibande.tif",
+      "bands": {
+        "1": {
+          "name": "blue",
+          "path": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/products/scene_001/bandes/01_blue.tif"
+        },
+        "2": {
+          "name": "green",
+          "path": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/products/scene_001/bandes/02_green.tif"
+        },
+        "3": {
+          "name": "red",
+          "path": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/products/scene_001/bandes/03_red.tif"
+        },
+        "4": {
+          "name": "nir",
+          "path": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/products/scene_001/bandes/04_nir.tif"
+        }
+      },
+      "composition": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/products/scene_001/composition_coloree.tif",
+      "source_index": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/products/scene_001/multibande_source_index.tif",
+      "report": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/products/scene_001/multibande.json"
+    }
+  ],
+  "preparation": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/products/imagery.json",
+  "audit": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/diagnostic/report.json",
+  "coverage": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/diagnostic/coverage.tif",
+  "gaps": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/diagnostic/gaps.tif",
+  "mosaic": false,
+  "parameters": {
+    "band_order": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ],
+    "crs": "PROJCS[\"WGS 84 / UTM zone 33S\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",15],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",10000000],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH],AUTHORITY[\"EPSG\",\"32733\"]]",
+    "resolution_m": 10.0,
+    "width": 667,
+    "height": 664,
+    "transform": [
+      10.0,
+      0.0,
+      531060.0,
+      0.0,
+      -10.0,
+      9526920.0
+    ],
+    "resampling": "nearest",
+    "mask_clouds": true,
+    "mask_saturation": false,
+    "allow_mixed_dates": false,
+    "all_touched": false,
+    "coverage_threshold": 95.0,
+    "max_pixels": 250000000,
+    "aoi": null
+  }
+}
