@@ -169,6 +169,14 @@ class PreparationPage(Page):
         for label,value in [('Plus proche voisin','nearest'),('Bilinéaire','bilinear'),('Cubique','cubic'),('Moyenne','average')]:self.resampling.addItem(label,value)
         self.overlap = QComboBox()
         self.overlap.addItem('Première scène valide','first');self.overlap.addItem('Dernière scène valide','last')
+        self.atmosphere = QComboBox()
+        self.atmosphere.addItem("Automatique : SR prioritaire, DOS1 en secours", "auto")
+        self.atmosphere.addItem("Produit Level-2 / SR uniquement", "provider")
+        self.atmosphere.addItem("DOS1 local", "dos1")
+        self.atmosphere.setToolTip(
+            "Stratégie atmosphérique du mode automatique. Le mode Automatique privilégie "
+            "un produit de réflectance de surface officiel avant le fallback DOS1."
+        )
         self.saturation = QCheckBox('Masquer les\npixels saturés');self.saturation.setChecked(True)
         self.saturation.setToolTip('Appliquer le masque de saturation lorsqu’il est disponible.')
         self.clouds = QCheckBox("Appliquer les\nmasques QA/SCL")
@@ -176,7 +184,9 @@ class PreparationPage(Page):
         self.dates = QCheckBox("Autoriser le\nmélange des dates")
         self.dates.setToolTip("Autoriser une mosaïque multitemporelle ou des scènes dont la date d’acquisition est inconnue.")
         for label, control in [("Système de coordonnées cible", self.crs), ("Résolution (m)", self.resolution),
-                               ("Rééchantillonnage spectral", self.resampling), ("Recouvrement des scènes", self.overlap), ("Saturation", self.saturation), ("Masque de qualité", self.clouds), ("Dates d’acquisition", self.dates)]:
+                               ("Rééchantillonnage spectral", self.resampling), ("Recouvrement des scènes", self.overlap),
+                               ("Correction atmosphérique", self.atmosphere), ("Saturation", self.saturation),
+                               ("Masque de qualité", self.clouds), ("Dates d’acquisition", self.dates)]:
             self.form.addRow(label, control)
         self.output = PathField("directory")
         self.name = QLineEdit("pretraitement")
@@ -194,7 +204,7 @@ class PreparationPage(Page):
             if item is not None and isinstance(item.widget(), QLabel):
                 item.widget().setWordWrap(True)
         for choice in (self.rgb_red, self.rgb_green, self.rgb_blue,
-                       self.resampling, self.overlap):
+                       self.resampling, self.overlap, self.atmosphere):
             choice.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
             choice.setMinimumContentsLength(12)
             choice.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
@@ -207,6 +217,7 @@ class PreparationPage(Page):
         self.quality_masks.itemChanged.connect(self.mask_changed)
         self.preparation_mode.currentIndexChanged.connect(self.refresh_options)
         self.preparation_mode.currentIndexChanged.connect(self.invalidate_diagnostic)
+        self.atmosphere.currentIndexChanged.connect(self.invalidate_diagnostic)
         self.allow_partial.toggled.connect(self.refresh_options)
         self.catalog_enabled.toggled.connect(self.refresh_options)
         self.catalog_enabled.toggled.connect(self.refresh_bands)
@@ -395,6 +406,7 @@ class PreparationPage(Page):
         self.clip.setEnabled(not automatic)
         self.allow_partial.setEnabled(automatic)
         self.catalog_enabled.setEnabled(automatic)
+        self.atmosphere.setEnabled(automatic)
         for control in self._catalog_fields:
             control.setEnabled(automatic and self.catalog_enabled.isChecked())
             control.setVisible(self.catalog_enabled.isChecked())
@@ -675,7 +687,10 @@ class PreparationPage(Page):
         kwargs = dict(aoi=self.aoi.text() if automatic or self.clip.isChecked() else None,
             multiband=self.multiband.isChecked(), separate_bands=self.separate.isChecked(), composition=rgb,
             target_crs=self.crs.text().strip() or None, resolution=self.resolution.value() or None,
-            mask_clouds=self.clouds.isChecked(), mask_saturation=self.saturation.isChecked(), resampling=self.resampling.currentData(), overlap=self.overlap.currentData(), allow_mixed_dates=self.dates.isChecked())
+            mask_clouds=self.clouds.isChecked(), mask_saturation=self.saturation.isChecked(),
+            resampling=self.resampling.currentData(), overlap=self.overlap.currentData(),
+            allow_mixed_dates=self.dates.isChecked(),
+            atmospheric_method=self.atmosphere.currentData() if automatic else "auto")
         if not automatic:
             kwargs['mosaic'] = self.mosaic.isChecked()
             return lambda progress, cancel, stage: cm.process_imagery(scenes, destination,
