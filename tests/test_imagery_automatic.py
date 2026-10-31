@@ -412,8 +412,11 @@ def test_toa_scene_reports_atmospheric_blocker(write_raster, tmp_path):
     plan = cm.assess_preprocessing([scene])
     assert plan["ready"] is False
     assert "surface_reflectance_product_or_atmospheric_parameters" in plan["scenes"][0]["missing"]
-    with pytest.raises(ValueError, match="Correction atmosphérique requise"):
-        cm.preprocess_imagery([scene], tmp_path / "blocked", aoi=_zone())
+    with pytest.raises(ValueError, match="Prétraitement automatique bloqué"):
+        cm.preprocess_imagery(
+            [scene], tmp_path / "blocked", aoi=_zone(),
+            atmospheric_method="provider",
+        )
 
 
 def test_missing_quality_is_reported_before_cloud_masking(write_raster):
