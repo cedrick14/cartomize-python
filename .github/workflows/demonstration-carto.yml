@@ -34,6 +34,9 @@ jobs:
       - name: Download a real Sentinel-2 L2A subset
         run: python demonstration-carto/download_real_data.py
 
+      - name: Diagnose the downloaded real subset
+        run: python demonstration-carto/preflight_real_data.py
+
       - name: Execute the tutorial notebook
         env:
           MPLBACKEND: Agg
@@ -45,12 +48,14 @@ jobs:
         run: python demonstration-carto/verify_demo.py
 
       - name: Upload reproducibility package
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: demonstration-carto-real-sentinel
           path: |
             demonstration-carto/data
             demonstration-carto/results
+            demonstration-carto/preflight
             demonstration-carto/Tutoriel_Demonstration_Cartomize.ipynb
             demonstration-carto/README.md
             demonstration-carto/GUIDE_INTERFACE.md
