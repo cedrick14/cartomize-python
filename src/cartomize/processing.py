@@ -134,7 +134,7 @@ def _catalog():
                               all_touched=False,max_pixels=250_000_000,coverage_threshold=100.,
                               allow_partial=False,multiband=True,separate_bands=False,
                               composition=None,percentiles=(2,98),gamma=1.,catalog=None,
-                              progress=None,cancel=None):
+                              atmospheric_method='auto',progress=None,cancel=None):
         from .imagery_automatic import preprocess_imagery
         return preprocess_imagery(sources,destination,aoi=aoi,band_order=band_order,
             target_crs=target_crs,resolution=resolution,overlap=overlap,resampling=resampling,
@@ -142,7 +142,8 @@ def _catalog():
             allow_mixed_dates=allow_mixed_dates,all_touched=all_touched,max_pixels=max_pixels,
             coverage_threshold=coverage_threshold,allow_partial=allow_partial,
             multiband=multiband,separate_bands=separate_bands,composition=composition,
-            percentiles=percentiles,gamma=gamma,catalog=catalog,progress=progress,cancel=cancel).manifest
+            percentiles=percentiles,gamma=gamma,catalog=catalog,atmospheric_method=atmospheric_method,
+            progress=progress,cancel=cancel).manifest
     add('prepare','Prétraitement multispectral',preparation,'raster','prepare')
     add('imagery.audit','Diagnostic de couverture des images',imagery_audit,'document','prepare')
     add('imagery.plan','Plan automatique N1-N5',preprocessing_assessment,'document','prepare')
