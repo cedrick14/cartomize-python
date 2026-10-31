@@ -47,3 +47,8 @@ Le nom du nouveau wheel est inédit. PyPI interdit la réutilisation d’un nom 
 ## Publications antérieures
 
 Le [rapport de la construction 2026103001](https://github.com/cedrick14/cartomize-python/blob/21b83343c43e1c61f2b6158a72bbad4bd9f279bc/docs/PUBLICATION.md) conserve la preuve de publication de l’interface dynamique sur PyPI, ainsi que les limites de distribution vers piwheels. Les rapports antérieurs décrivent leurs constructions respectives.
+
+
+## Publication finale du wheel 2026103101
+
+Le dépôt principal inclut désormais le rendu vérifié des cartes du tutoriel Sentinel-2 dans les cellules Jupyter. La publication PyPI conserve la version publique `1.0` et ajoute le wheel de construction `2026103101` afin de distribuer le code corrigé sans changer le numéro de version. PyPI conserve la description déjà attachée à la release `1.0`.
