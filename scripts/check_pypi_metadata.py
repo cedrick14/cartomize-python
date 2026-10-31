@@ -120,11 +120,19 @@ def fetch_description(wheel: WheelMetadata, index: str, *, opener=None) -> str |
     return description
 
 
-def check_upload(directory: Path, index: str = "pypi", *, opener=None) -> dict:
-    """Reject a later upload that cannot apply the wheel's long description."""
+def check_upload(directory: Path, index: str = "pypi", *, opener=None,
+                 allow_existing_description_mismatch: bool = False) -> dict:
+    """Verify the index before upload.
+
+    By default, reject an additional file when the existing release description
+    differs. For the intentionally retained Cartomize 1.0 release, callers may
+    explicitly allow that mismatch: PyPI will keep the existing description
+    while accepting a uniquely named wheel.
+    """
     wheel = read_wheel_metadata(directory)
     stored = fetch_description(wheel, index, opener=opener)
-    if stored is not None and not descriptions_equal(stored, wheel.description):
+    mismatch = stored is not None and not descriptions_equal(stored, wheel.description)
+    if mismatch and not allow_existing_description_mismatch:
         label = INDEXES[index][0]
         raise MetadataCheckError(
             f"{label} already has {wheel.name} {wheel.version} with a different "
@@ -139,7 +147,11 @@ def check_upload(directory: Path, index: str = "pypi", *, opener=None) -> dict:
         "description_sha256": hashlib.sha256(
             wheel.description.encode("utf-8")
         ).hexdigest(),
-        "status": "release_not_found" if stored is None else "description_matches",
+        "status": (
+            "release_not_found" if stored is None
+            else "description_mismatch_allowed" if mismatch
+            else "description_matches"
+        ),
     }
 
 
@@ -147,9 +159,18 @@ def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("directory", type=Path, help="Directory containing the staged wheel")
     parser.add_argument("--index", choices=INDEXES, default="pypi")
+    parser.add_argument(
+        "--allow-existing-description-mismatch",
+        action="store_true",
+        help="Allow a uniquely named wheel to join an existing release whose description is retained by the index.",
+    )
     args = parser.parse_args(argv)
     try:
-        result = check_upload(args.directory, args.index)
+        result = check_upload(
+            args.directory,
+            args.index,
+            allow_existing_description_mismatch=args.allow_existing_description_mismatch,
+        )
     except MetadataCheckError as error:
         print(f"Metadata check failed: {error}", file=sys.stderr)
         return 1
