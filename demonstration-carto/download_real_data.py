@@ -17,7 +17,8 @@ from urllib.request import Request, urlopen
 
 import numpy as np
 import rasterio
-from rasterio.windows import Window, from_bounds
+from rasterio.enums import Resampling
+from rasterio.windows import Window, from_bounds, bounds as window_bounds
 from rasterio.warp import transform_bounds
 
 import cartomize as cm
@@ -151,6 +152,109 @@ def _scl_metrics(item: dict) -> dict:
     }
 
 
+def _calibrated_remote_window(item: dict, role: str, target_bounds, target_shape, *, nearest=False):
+    key, asset = _asset(item, role)
+    env, src = _read_remote(asset["href"])
+    try:
+        raw = from_bounds(*target_bounds, transform=src.transform)
+        col0 = max(0, math.floor(raw.col_off))
+        row0 = max(0, math.floor(raw.row_off))
+        col1 = min(src.width, math.ceil(raw.col_off + raw.width))
+        row1 = min(src.height, math.ceil(raw.row_off + raw.height))
+        if col1 <= col0 or row1 <= row0:
+            raise ValueError(f"Asset {role} does not cover the target window.")
+        window = Window(col0, row0, col1 - col0, row1 - row0)
+        arr = src.read(
+            1,
+            window=window,
+            out_shape=target_shape,
+            resampling=Resampling.nearest if nearest else Resampling.bilinear,
+        )
+        numeric = {}
+        raster_bands = asset.get("raster:bands") or []
+        if raster_bands and isinstance(raster_bands[0], dict):
+            numeric.update(raster_bands[0])
+        bands = asset.get("bands") or asset.get("eo:bands") or []
+        if bands and isinstance(bands[0], dict):
+            numeric.update(bands[0])
+        nodata = numeric.get("nodata", src.nodata)
+        valid = np.isfinite(arr)
+        if nodata is not None:
+            valid &= arr != nodata
+        if nearest:
+            return arr.astype("float64"), valid
+        scale = float(numeric.get("scale", numeric.get("raster:scale", 1.0)))
+        offset = float(numeric.get("offset", numeric.get("raster:offset", 0.0)))
+        if (
+            item.get("properties", {}).get("earthsearch:boa_offset_applied") is True
+            and not key.lower().endswith("-jp2")
+            and "tiff" in str(asset.get("type", "")).lower()
+        ):
+            offset = 0.0
+        return arr.astype("float64") * scale + offset, valid
+    finally:
+        src.close()
+        env.__exit__(None, None, None)
+
+
+def _hybrid_cloud_metrics(item: dict, scl_metrics: dict) -> dict:
+    """Evaluate SCL and the same spectral fallback used by Cartomize N4."""
+    _, blue_asset = _asset(item, "blue")
+    env, blue_src = _read_remote(blue_asset["href"])
+    try:
+        window = _window(blue_src)
+        target_bounds = window_bounds(window, blue_src.transform)
+        target_shape = (int(window.height), int(window.width))
+    finally:
+        blue_src.close()
+        env.__exit__(None, None, None)
+
+    data = {}
+    valid = None
+    for role in ("blue", "green", "red", "nir", "swir1"):
+        values, available = _calibrated_remote_window(
+            item, role, target_bounds, target_shape
+        )
+        data[role] = values
+        valid = available if valid is None else valid & available
+    scl, scl_observed = _calibrated_remote_window(
+        item, "scl", target_bounds, target_shape, nearest=True
+    )
+    valid &= scl_observed
+    scl_valid = np.isin(scl.astype("uint8"), tuple(VALID_SCL))
+
+    eps = 1e-6
+    blue, red, nir, swir = data["blue"], data["red"], data["nir"], data["swir1"]
+    visible = (blue + data["green"] + red) / 3.0
+    ndvi = (nir - red) / (nir + red + eps)
+    b2_b11 = blue / (swir + eps)
+    nir_b11 = nir / (swir + eps)
+    red_b11 = red / (swir + eps)
+    potential = (
+        valid
+        & (blue >= 0.15)
+        & (visible >= 0.15)
+        & (ndvi < 0.36)
+        & (b2_b11 >= 0.70)
+        & (b2_b11 <= 4.0)
+        & (nir_b11 >= 0.90)
+        & (red_b11 <= 6.0)
+    )
+    water_like = valid & (b2_b11 > 2.0) & (blue < 0.20) & (nir < red)
+    spectral_cloud = potential & ~water_like
+    hybrid_valid = valid & scl_valid & ~spectral_cloud
+    denominator = float(hybrid_valid.size)
+    hybrid_percent = 100.0 * float(hybrid_valid.sum()) / denominator if denominator else 0.0
+    spectral_percent = 100.0 * float(spectral_cloud.sum()) / float(valid.sum()) if valid.any() else 0.0
+    return {
+        **scl_metrics,
+        "spectral_cloud_percent": float(spectral_percent),
+        "hybrid_usable_percent": float(
+            scl_metrics["footprint_percent"] * hybrid_percent / 100.0
+        ),
+    }
+
+
 def _copy_window(item: dict, role: str, destination: Path) -> tuple[str, dict]:
     key, asset = _asset(item, role)
     env, src = _read_remote(asset["href"])
@@ -226,20 +330,49 @@ def main() -> None:
         raise RuntimeError("Aucune scène Sentinel-2 L2A compatible trouvée dans la période fixée.")
 
     tested = []
+    item_by_id = {}
     for cloud, item in sorted(candidates, key=lambda row: (row[0], row[1].get("id", "")))[:24]:
         metrics = _scl_metrics(item)
         tested.append({"id": item["id"], "cloud_cover": cloud, **metrics})
-    tested.sort(key=lambda row: (-row["usable_aoi_percent"], -row["footprint_percent"], row["cloud_cover"], row["id"]))
-    winner = tested[0]
-    if winner["usable_aoi_percent"] < MIN_AOI_USABLE:
+        item_by_id[item["id"]] = item
+
+    # Only scenes with meaningful AOI coverage are worth the more expensive
+    # spectral check. Evaluate the best SCL candidates with the same hybrid
+    # rule used later by Cartomize N4.
+    shortlist = [
+        row for row in tested
+        if row["footprint_percent"] >= 95.0 and row.get("observed_in_overlap_percent", 0) >= 95.0
+    ]
+    shortlist.sort(key=lambda row: (row["cloud_cover"], -row["usable_aoi_percent"], row["id"]))
+    hybrid_tested = []
+    for row in shortlist[:12]:
+        hybrid = _hybrid_cloud_metrics(item_by_id[row["id"]], row)
+        hybrid_tested.append(hybrid)
+    if not hybrid_tested:
+        raise RuntimeError("Aucune scène Sentinel-2 ne couvre suffisamment l'emprise pour le diagnostic hybride.")
+    hybrid_tested.sort(
+        key=lambda row: (-row["hybrid_usable_percent"], row["cloud_cover"], row["id"])
+    )
+    winner = hybrid_tested[0]
+    if winner["hybrid_usable_percent"] < MIN_AOI_USABLE:
         raise RuntimeError(
-            f"Meilleure scène : {winner['usable_aoi_percent']:.2f} % de l'emprise réellement utilisable "
-            f"(empreinte {winner['footprint_percent']:.2f} %, pixels observés "
-            f"{winner.get('observed_in_overlap_percent', 0):.2f} %, SCL utilisable "
-            f"{winner['scl_valid_in_overlap_percent']:.2f} %), sous le seuil de {MIN_AOI_USABLE:g} %. "
+            f"Meilleure scène après contrôle hybride : {winner['hybrid_usable_percent']:.2f} % utilisable "
+            f"(SCL {winner['usable_aoi_percent']:.2f} %, nuages spectraux supplémentaires "
+            f"{winner['spectral_cloud_percent']:.2f} %), sous le seuil de {MIN_AOI_USABLE:g} %. "
             "Changer la période ou l'emprise; ne pas relâcher le contrôle."
         )
-    selected = next(item for _, item in candidates if item["id"] == winner["id"])
+    selected = item_by_id[winner["id"]]
+    tested = sorted(
+        [
+            next((hybrid for hybrid in hybrid_tested if hybrid["id"] == row["id"]), row)
+            for row in tested
+        ],
+        key=lambda row: (
+            -row.get("hybrid_usable_percent", row["usable_aoi_percent"]),
+            row["cloud_cover"],
+            row["id"],
+        ),
+    )
 
     coords = [
         [AOI_BBOX_WGS84[0], AOI_BBOX_WGS84[1]],
@@ -343,6 +476,8 @@ def main() -> None:
         "aoi_observed_in_overlap_percent": winner["observed_in_overlap_percent"],
         "aoi_scl_valid_in_overlap_percent": winner["scl_valid_in_overlap_percent"],
         "aoi_scl_usable_percent_before_processing": winner["usable_aoi_percent"],
+        "aoi_hybrid_usable_percent_before_processing": winner["hybrid_usable_percent"],
+        "aoi_spectral_cloud_percent_before_processing": winner["spectral_cloud_percent"],
         "selection_candidates": tested,
         "source_assets": source_assets,
         "calibration_notes": list(scene.notes),
