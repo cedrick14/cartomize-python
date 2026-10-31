@@ -380,3 +380,10 @@ def test_sentinel_level1c_requires_radio_offset_for_modern_baseline(write_raster
     )
     with pytest.raises(ValueError, match="RADIO_ADD_OFFSET"):
         cm.discover_scenes(safe)
+
+
+def test_scene_requires_spectral_cloud_method(write_raster):
+    band = write_raster("spectral_contract_band.tif", np.ones((2, 2), dtype="float32"))
+    mask = write_raster("spectral_contract_mask.tif", np.ones((2, 2), dtype="uint8"), nodata=255)
+    with pytest.raises(ValueError, match="spectral_cloud_method"):
+        cm.Scene("bad", {"red": band}, sensor="sentinel-2", spectral_cloud=mask)
