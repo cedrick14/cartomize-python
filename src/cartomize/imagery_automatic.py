@@ -256,6 +256,7 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
     preprocessing_plan = assess_preprocessing(
         scenes, mask_clouds=mask_clouds, mask_saturation=mask_saturation
     ) if scenes else None
+    initial_preprocessing_plan = copy.deepcopy(preprocessing_plan) if preprocessing_plan is not None else None
     recovery_records = []
     if preprocessing_plan is not None and config is not None:
         needs_recovery = {
@@ -439,6 +440,7 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
             catalog=config, acquisitions=requests, downloaded_bytes=total_bytes,
             download_directory=str(work / "acquisitions") if (work / "acquisitions").exists() else None,
             products=[], preparation=None, audit=str(audit.manifest), coverage=str(audit.coverage), gaps=str(audit.gaps),
+            initial_preprocessing_plan=initial_preprocessing_plan,
             preprocessing_plan=preprocessing_plan, recovery=recovery_records)
         if not audit.report["usable_pixels"] or (not report["threshold_met"] and not allow_partial):
             _check_cancel(cancel)
@@ -472,9 +474,19 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
             mosaic=len(selected) > 1, products=list(prepared.products), preparation=str(prepared.manifest),
             audit=str(final_audit.manifest), coverage=str(final_audit.coverage), gaps=str(final_audit.gaps),
             parameters=final_audit.report["parameters"],
+            initial_preprocessing_plan=initial_preprocessing_plan,
             preprocessing_plan=assess_preprocessing(
                 selected, mask_clouds=mask_clouds, mask_saturation=mask_saturation),
             recovery=recovery_records,
+            executed_steps=[
+                "radiometric_calibration",
+                "quality_detection" if mask_clouds else "quality_detection_disabled",
+                "cloud_masking" if mask_clouds else "cloud_masking_disabled",
+                "grid_harmonization",
+                "scene_selection",
+                "mosaic" if len(selected) > 1 else "single_scene",
+                "aoi_clip",
+            ],
             quality_statistics=[dict(scene_id=scene["id"], **scene["quality_statistics"])
                                 for scene in final_audit.report.get("scenes", [])
                                 if scene.get("quality_statistics")])
