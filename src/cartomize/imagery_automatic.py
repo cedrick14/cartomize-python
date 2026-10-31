@@ -19,6 +19,7 @@ from .imagery_audit import ImageryAudit, audit_imagery
 from .imagery_pipeline import process_imagery
 from .scenes import Scene, discover_scenes
 from .preprocessing_plan import assess_preprocessing
+from .imagery_recovery import recover_scene
 from .storage import new_directory, read_json, relocate_products, save_json
 
 
@@ -255,17 +256,58 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
     preprocessing_plan = assess_preprocessing(
         scenes, mask_clouds=mask_clouds, mask_saturation=mask_saturation
     ) if scenes else None
-    if preprocessing_plan is not None:
-        atmospheric_blockers = [
+    recovery_records = []
+    if preprocessing_plan is not None and config is not None:
+        needs_recovery = {
             scene["scene_id"]
             for scene in preprocessing_plan["scenes"]
-            if any(level["status"] == "required_but_unavailable" for level in scene["levels"])
-        ]
-        if atmospheric_blockers:
-            names = ", ".join(atmospheric_blockers)
+            if any(level["status"] in {
+                "required_but_unavailable", "missing_inputs", "unavailable"
+            } for level in scene["levels"])
+        }
+        if needs_recovery:
+            search_geometry = mapping(zones.to_crs(4326).geometry.union_all())
+            recovered = []
+            recovery_root = Path(destination).expanduser().resolve().with_name(
+                Path(destination).expanduser().resolve().name + "_recovery"
+            )
+            for index, scene in enumerate(scenes):
+                if scene.scene_id not in needs_recovery:
+                    recovered.append(scene)
+                    continue
+                candidate, record = recover_scene(
+                    scene,
+                    recovery_root / f"scene_{index + 1:04d}",
+                    config=config,
+                    search_geometry=search_geometry,
+                    band_order=band_order or tuple(scene.bands),
+                    mask_clouds=mask_clouds,
+                    mask_saturation=mask_saturation,
+                    progress=None,
+                    cancel=cancel,
+                )
+                recovery_records.append(record)
+                recovered.append(candidate or scene)
+            scenes = recovered
+            preprocessing_plan = assess_preprocessing(
+                scenes, mask_clouds=mask_clouds, mask_saturation=mask_saturation
+            )
+    if preprocessing_plan is not None:
+        blockers = []
+        for scene in preprocessing_plan["scenes"]:
+            for level in scene["levels"]:
+                if level["status"] in {
+                    "insufficient_metadata", "required_but_unavailable",
+                    "missing_inputs", "unavailable"
+                }:
+                    blockers.append((scene["scene_id"], level["name"], level.get("missing", [])))
+        if blockers:
+            detail = "; ".join(
+                f"{scene}: {name} ({', '.join(missing) or 'entrée manquante'})"
+                for scene, name, missing in blockers
+            )
             raise ValueError(
-                "Correction atmosphérique requise mais non disponible pour : " + names
-                + ". Fournir un produit de réflectance de surface ou les paramètres nécessaires."
+                "Prétraitement automatique bloqué après récupération des entrées : " + detail
             )
     if not scenes and (not band_order or target_crs is None or resolution is None):
         raise ValueError("Sans scène locale, définir band_order, target_crs projeté et resolution.")
@@ -397,7 +439,7 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
             catalog=config, acquisitions=requests, downloaded_bytes=total_bytes,
             download_directory=str(work / "acquisitions") if (work / "acquisitions").exists() else None,
             products=[], preparation=None, audit=str(audit.manifest), coverage=str(audit.coverage), gaps=str(audit.gaps),
-            preprocessing_plan=preprocessing_plan)
+            preprocessing_plan=preprocessing_plan, recovery=recovery_records)
         if not audit.report["usable_pixels"] or (not report["threshold_met"] and not allow_partial):
             _check_cancel(cancel)
             raise ImageryCoverageError(audit, report).preserve(diagnostic_destination(destination), cancel=cancel)
@@ -432,6 +474,7 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
             parameters=final_audit.report["parameters"],
             preprocessing_plan=assess_preprocessing(
                 selected, mask_clouds=mask_clouds, mask_saturation=mask_saturation),
+            recovery=recovery_records,
             quality_statistics=[dict(scene_id=scene["id"], **scene["quality_statistics"])
                                 for scene in final_audit.report.get("scenes", [])
                                 if scene.get("quality_statistics")])
