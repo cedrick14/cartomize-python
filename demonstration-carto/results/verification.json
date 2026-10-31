@@ -17,5 +17,7 @@
     "indices_stats.csv"
   ],
   "classification_executed": false,
+  "executed_notebook_cells": 7,
+  "embedded_png_outputs": 4,
   "note": "Les indices et statistiques proviennent des rasters Sentinel-2 L2A réellement téléchargés et traités."
 }
