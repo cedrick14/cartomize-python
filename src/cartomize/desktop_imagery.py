@@ -689,14 +689,14 @@ class PreparationPage(Page):
             target_crs=self.crs.text().strip() or None, resolution=self.resolution.value() or None,
             mask_clouds=self.clouds.isChecked(), mask_saturation=self.saturation.isChecked(),
             resampling=self.resampling.currentData(), overlap=self.overlap.currentData(),
-            allow_mixed_dates=self.dates.isChecked(),
-            atmospheric_method=self.atmosphere.currentData() if automatic else "auto")
+            allow_mixed_dates=self.dates.isChecked())
         if not automatic:
             kwargs['mosaic'] = self.mosaic.isChecked()
             return lambda progress, cancel, stage: cm.process_imagery(scenes, destination,
                 progress=progress, cancel=cancel, stage=stage, **kwargs).manifest
         kwargs.update(coverage_threshold=self.coverage_threshold.value(), allow_partial=self.allow_partial.isChecked(),
-                      catalog=catalog, band_order=band_order)
+                      catalog=catalog, band_order=band_order,
+                      atmospheric_method=self.atmosphere.currentData())
         self.invalidate_diagnostic()
         self._pending_audit_generation = self._audit_generation
         return lambda progress, cancel, stage: cm.preprocess_imagery(scenes, destination,
