@@ -42,7 +42,7 @@ def _quality_valid(values, kind):
         valid &= (raw & 63) == 0
     elif kind == "sentinel_scl":
         # Keep dark areas, vegetation, bare soil, water and unclassified.
-        valid &= np.isin(raw, [2,4,5,6,7])
+        valid &= np.isin(raw, [2,4,5,6])
     elif kind == "saturation":
         valid &= raw == 0
     else:
@@ -52,8 +52,8 @@ def _quality_valid(values, kind):
 
 _QUALITY_CATEGORY_NAMES = {
     "sentinel_scl": (
-        "clear", "rejected", "cloud", "cloud_medium_probability",
-        "cloud_high_probability", "cirrus", "cloud_shadow", "snow",
+        "clear", "rejected", "cloud", "cloud_low_probability",
+        "cloud_medium_probability", "cloud_high_probability", "cirrus", "cloud_shadow", "snow",
         "saturated_or_defective", "quality_nodata",
     ),
     "landsat_qa": (
@@ -87,11 +87,13 @@ def _quality_categories(values, kind):
         "quality_nodata": ~observed,
     }
     if kind == "sentinel_scl":
+        low = observed & (raw == 7)
         medium = observed & (raw == 8)
         high = observed & (raw == 9)
         cirrus = observed & (raw == 10)
         result.update({
-            "cloud": medium | high | cirrus,
+            "cloud": low | medium | high | cirrus,
+            "cloud_low_probability": low,
             "cloud_medium_probability": medium,
             "cloud_high_probability": high,
             "cirrus": cirrus,
