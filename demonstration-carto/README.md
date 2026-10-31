@@ -58,3 +58,8 @@ python demonstration-carto/verify_demo.py
 ```
 
 Le workflow `.github/workflows/demonstration-carto.yml` exécute ces étapes sur GitHub et refuse de publier les résultats si les contrôles échouent.
+
+
+## Diagnostic hybride des nuages
+
+La démonstration exécute le masquage Sentinel-2 avec la couche SCL comme source de qualité principale. Lorsque B02, B03, B04, B08/B8A et B11 sont disponibles, Cartomize applique également un contrôle spectral de secours pour identifier des nuages visibles qui auraient été laissés dans des classes SCL non nuageuses. Le rapport conserve séparément les statistiques SCL, les détections spectrales supplémentaires et les pixels finalement rejetés.
