@@ -383,3 +383,45 @@ def test_invalid_policies_fail_before_creating_outputs(write_raster, tmp_path, k
     with pytest.raises(ValueError):
         cm.preprocess_imagery([_scene(write_raster, "full", width=4)], tmp_path / "invalid", aoi=_zone(), **kwargs)
     assert not (tmp_path / "invalid").exists()
+
+
+def test_four_level_preprocessing_assessment(write_raster, tmp_path):
+    landsat = _scene(write_raster, "landsat", width=4)
+    landsat = cm.Scene(
+        landsat.scene_id, landsat.bands, sensor="landsat-8", acquired=landsat.acquired,
+        level="C2-L2-SR", quality=landsat.quality, quality_kind=landsat.quality_kind,
+    )
+    plan = cm.assess_preprocessing([landsat])
+    scene = plan["scenes"][0]
+    assert plan["automatic"] is True
+    assert scene["ready"] is True
+    assert scene["levels"][0]["name"] == "radiometric_calibration"
+    assert scene["levels"][1]["status"] == "already_applied"
+    assert scene["levels"][2]["status"] == "ready"
+    assert scene["levels"][3]["action"] == "mask_before_resampling"
+
+
+def test_toa_scene_reports_atmospheric_blocker(write_raster, tmp_path):
+    path = write_raster("toa_red.tif", np.ones((2, 2), dtype="float32"))
+    quality = write_raster("toa_qa.tif", np.ones((2, 2), dtype="uint8"), nodata=None)
+    scene = cm.Scene(
+        "toa", {"red": cm.Band(path, unit="reflectance")},
+        sensor="sentinel-2", level="L1C-TOA",
+        quality=quality, quality_kind="valid_mask",
+    )
+    plan = cm.assess_preprocessing([scene])
+    assert plan["ready"] is False
+    assert "surface_reflectance_product_or_atmospheric_parameters" in plan["scenes"][0]["missing"]
+    with pytest.raises(ValueError, match="Correction atmosphérique requise"):
+        cm.preprocess_imagery([scene], tmp_path / "blocked", aoi=_zone())
+
+
+def test_missing_quality_is_reported_before_cloud_masking(write_raster):
+    source = _scene(write_raster, "noqa", width=4)
+    scene = cm.Scene(source.scene_id, source.bands, sensor=source.sensor, acquired=source.acquired,
+                     level="C2-L2-SR")
+    plan = cm.assess_preprocessing([scene])
+    cloud = plan["scenes"][0]["levels"][3]
+    assert cloud["status"] == "unavailable"
+    assert cloud["action"] == "add_quality_mask_then_restart_assessment"
+    assert "quality_mask" in plan["scenes"][0]["missing"]
