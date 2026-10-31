@@ -449,6 +449,9 @@ def test_exact_identity_recovery_for_missing_quality(write_raster, tmp_path, cat
         dict(name="B5", common_name="nir", scale=.0000275, offset=-.2, unit="reflectance", nodata=-9999),
     ]
     item["assets"]["qa_pixel"] = item["assets"].pop("valid")
+    qa_path = write_raster("recovery_qa_pixel.tif", np.full((2, 4), 64, dtype="uint16"), nodata=None)
+    qa_href = item["assets"]["qa_pixel"]["href"]
+    catalog_service["assets"][urlsplit(qa_href).path] = Path(qa_path).read_bytes()
     catalog_service["config"].update(
         collections=["landsat-c2-l2"], quality_asset="qa_pixel", quality_kind="landsat_qa"
     )
@@ -482,6 +485,9 @@ def test_recovery_rejects_ambiguous_catalog_match(write_raster, tmp_path, catalo
             dict(name="B5", common_name="nir", scale=.0000275, offset=-.2, unit="reflectance", nodata=-9999),
         ]
         item["assets"]["qa_pixel"] = item["assets"].pop("valid")
+        qa_path = write_raster(f"ambiguous_{suffix}_qa_pixel.tif", np.full((2, 4), 64, dtype="uint16"), nodata=None)
+        qa_href = item["assets"]["qa_pixel"]["href"]
+        catalog_service["assets"][urlsplit(qa_href).path] = Path(qa_path).read_bytes()
     catalog_service["config"].update(
         collections=["landsat-c2-l2"], quality_asset="qa_pixel", quality_kind="landsat_qa"
     )
