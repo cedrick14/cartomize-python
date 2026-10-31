@@ -244,16 +244,20 @@ def discover_scenes(inputs):
         match = _S2.match(p.name)
         if match:
             tile, acquired, code, resolution = match.groups()
-            metadata = _sentinel_metadata(p)
-            key = (str(metadata[0]), tile, acquired)
-            group = sentinel.setdefault(key, {"files":{}, "metadata":metadata})
-            code = code.upper(); candidate = (int(resolution), p)
-            previous = group["files"].get(code)
-            if previous and candidate[0] == previous[0] and candidate[1] != previous[1]:
-                raise ValueError(f"Duplicate Sentinel asset: {tile} {code} {resolution}m.")
-            if previous is None or candidate[0] < previous[0]:
-                group["files"][code] = candidate
-            continue
+            try:
+                metadata = _sentinel_metadata(p)
+            except ValueError:
+                metadata = None
+            if metadata is not None:
+                key = (str(metadata[0]), tile, acquired)
+                group = sentinel.setdefault(key, {"files":{}, "metadata":metadata})
+                code = code.upper(); candidate = (int(resolution), p)
+                previous = group["files"].get(code)
+                if previous and candidate[0] == previous[0] and candidate[1] != previous[1]:
+                    raise ValueError(f"Duplicate Sentinel asset: {tile} {code} {resolution}m.")
+                if previous is None or candidate[0] < previous[0]:
+                    group["files"][code] = candidate
+                continue
         match = _S2_L1.match(p.name)
         if match:
             tile, acquired, code, resolution = match.groups()
