@@ -108,19 +108,41 @@ def _read_remote(href: str):
     return env, src
 
 
-def _scl_usable(item: dict) -> float:
+def _scl_metrics(item: dict) -> dict:
+    """Measure footprint and SCL usability against the complete AOI.
+
+    Uncovered AOI area counts as unusable. This prevents choosing a clean tile
+    that touches only a small corner of the study window.
+    """
+    from shapely.geometry import box
+    from shapely.ops import transform as shapely_transform
+    from pyproj import Transformer
+
     _, asset = _asset(item, "scl")
     env, src = _read_remote(asset["href"])
     try:
+        transformer = Transformer.from_crs("EPSG:4326", src.crs, always_xy=True)
+        aoi = shapely_transform(transformer.transform, box(*AOI_BBOX_WGS84))
+        footprint = box(*src.bounds)
+        overlap = aoi.intersection(footprint)
+        footprint_percent = 0.0 if aoi.area <= 0 else 100.0 * overlap.area / aoi.area
+        if overlap.is_empty:
+            return {"footprint_percent": 0.0, "scl_valid_in_overlap_percent": 0.0, "usable_aoi_percent": 0.0}
         data = src.read(1, window=_window(src), masked=True)
     finally:
         src.close()
         env.__exit__(None, None, None)
-    mask = ~np.ma.getmaskarray(data)
-    if not mask.any():
-        return 0.0
-    valid = mask & np.isin(data.data, tuple(VALID_SCL))
-    return 100.0 * float(valid.sum()) / float(mask.sum())
+    observed = ~np.ma.getmaskarray(data)
+    if not observed.any():
+        valid_overlap = 0.0
+    else:
+        valid = observed & np.isin(data.data, tuple(VALID_SCL))
+        valid_overlap = 100.0 * float(valid.sum()) / float(observed.sum())
+    return {
+        "footprint_percent": float(footprint_percent),
+        "scl_valid_in_overlap_percent": float(valid_overlap),
+        "usable_aoi_percent": float(footprint_percent * valid_overlap / 100.0),
+    }
 
 
 def _copy_window(item: dict, role: str, destination: Path) -> tuple[str, dict]:
@@ -198,15 +220,17 @@ def main() -> None:
         raise RuntimeError("Aucune scène Sentinel-2 L2A compatible trouvée dans la période fixée.")
 
     tested = []
-    for cloud, item in sorted(candidates, key=lambda row: (row[0], row[1].get("id", "")))[:12]:
-        usable = _scl_usable(item)
-        tested.append({"id": item["id"], "cloud_cover": cloud, "aoi_scl_usable_percent": usable})
-    tested.sort(key=lambda row: (-row["aoi_scl_usable_percent"], row["cloud_cover"], row["id"]))
+    for cloud, item in sorted(candidates, key=lambda row: (row[0], row[1].get("id", "")))[:24]:
+        metrics = _scl_metrics(item)
+        tested.append({"id": item["id"], "cloud_cover": cloud, **metrics})
+    tested.sort(key=lambda row: (-row["usable_aoi_percent"], -row["footprint_percent"], row["cloud_cover"], row["id"]))
     winner = tested[0]
-    if winner["aoi_scl_usable_percent"] < MIN_AOI_USABLE:
+    if winner["usable_aoi_percent"] < MIN_AOI_USABLE:
         raise RuntimeError(
-            f"Meilleure scène : {winner['aoi_scl_usable_percent']:.2f} % de pixels SCL utilisables, "
-            f"sous le seuil de {MIN_AOI_USABLE:g} %. Changer la période, pas les résultats."
+            f"Meilleure scène : {winner['usable_aoi_percent']:.2f} % de l'emprise réellement utilisable "
+            f"(empreinte {winner['footprint_percent']:.2f} %, SCL valide dans le recouvrement "
+            f"{winner['scl_valid_in_overlap_percent']:.2f} %), sous le seuil de {MIN_AOI_USABLE:g} %. "
+            "Changer la période ou l'emprise; ne pas relâcher le contrôle."
         )
     selected = next(item for _, item in candidates if item["id"] == winner["id"])
 
@@ -307,7 +331,9 @@ def main() -> None:
         "platform": properties.get("platform"),
         "mgrs_tile": properties.get("s2:mgrs_tile"),
         "global_cloud_cover_percent": float(properties.get("eo:cloud_cover")),
-        "aoi_scl_usable_percent_before_processing": winner["aoi_scl_usable_percent"],
+        "aoi_footprint_percent_before_processing": winner["footprint_percent"],
+        "aoi_scl_valid_in_overlap_percent": winner["scl_valid_in_overlap_percent"],
+        "aoi_scl_usable_percent_before_processing": winner["usable_aoi_percent"],
         "selection_candidates": tested,
         "source_assets": source_assets,
         "calibration_notes": list(scene.notes),
