@@ -158,13 +158,20 @@ def assess_preprocessing(scenes, *, mask_clouds=True, mask_saturation=True):
         # Surface-reflectance L2 products are ready when QA/SCL requirements are met.
         scene_ready = not blockers
         overall_ready &= scene_ready
+        execution = {
+            "level": 5,
+            "name": "orchestration",
+            "status": "ready" if scene_ready else "blocked",
+            "action": "execute_pipeline" if scene_ready else "resolve_missing_inputs_then_restart",
+            "missing": sorted(set(blockers)),
+        }
         planned.append({
             "scene_id": scene.scene_id,
             "sensor": scene.sensor,
             "processing_level": scene.level,
             "acquired": scene.acquired,
             "ready": scene_ready,
-            "levels": levels,
+            "levels": [*levels, execution],
             "missing": sorted(set(blockers)),
         })
 
@@ -175,9 +182,17 @@ def assess_preprocessing(scenes, *, mask_clouds=True, mask_saturation=True):
         "mask_clouds": bool(mask_clouds),
         "mask_saturation": bool(mask_saturation),
         "scenes": planned,
+        "execution": {
+            "level": 5,
+            "name": "orchestration",
+            "status": "ready" if overall_ready else "blocked",
+            "action": "execute_pipeline" if overall_ready else "resolve_missing_inputs_then_restart",
+        },
         "policy": {
             "never_assume_atmospheric_correction": True,
+            "prefer_provider_surface_reflectance": True,
             "never_disable_cloud_mask_silently": True,
             "restart_after_missing_inputs_are_added": True,
+            "no_scientific_output_when_blocked": True,
         },
     }
