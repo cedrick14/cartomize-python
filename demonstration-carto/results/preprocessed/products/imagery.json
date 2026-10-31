@@ -1,0 +1,41 @@
+{
+  "schema": "cartomize.imagery.v1",
+  "mosaic": false,
+  "multiband": true,
+  "separate_bands": true,
+  "rgb_bands": [
+    "red",
+    "green",
+    "blue"
+  ],
+  "aoi": null,
+  "products": [
+    {
+      "scenes": [
+        "S2B_33MWR_20240720_0_L2A"
+      ],
+      "multiband": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/products/scene_001/multibande.tif",
+      "bands": {
+        "1": {
+          "name": "blue",
+          "path": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/products/scene_001/bandes/01_blue.tif"
+        },
+        "2": {
+          "name": "green",
+          "path": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/products/scene_001/bandes/02_green.tif"
+        },
+        "3": {
+          "name": "red",
+          "path": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/products/scene_001/bandes/03_red.tif"
+        },
+        "4": {
+          "name": "nir",
+          "path": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/products/scene_001/bandes/04_nir.tif"
+        }
+      },
+      "composition": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/products/scene_001/composition_coloree.tif",
+      "source_index": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/products/scene_001/multibande_source_index.tif",
+      "report": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/products/scene_001/multibande.json"
+    }
+  ]
+}

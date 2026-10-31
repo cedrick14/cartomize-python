@@ -1,0 +1,13 @@
+{
+  "status": "passed",
+  "scene": "S2B_33MWR_20240720_0_L2A",
+  "usable_percent": 99.95294447674485,
+  "checked_outputs": [
+    "multiband",
+    "indices",
+    "natural_color.png",
+    "indices.png",
+    "scl.png"
+  ],
+  "note": "Toutes les statistiques proviennent des rasters Sentinel-2 L2A téléchargés et traités pendant cette exécution."
+}
