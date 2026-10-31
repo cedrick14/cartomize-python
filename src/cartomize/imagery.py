@@ -42,7 +42,7 @@ def _quality_valid(values, kind):
         valid &= (raw & 63) == 0
     elif kind == "sentinel_scl":
         # Keep dark areas, vegetation, bare soil, water and unclassified.
-        valid &= np.isin(raw, [2,4,5,6])
+        valid &= np.isin(raw, [2,4,5,6,7])
     elif kind == "saturation":
         valid &= raw == 0
     else:
