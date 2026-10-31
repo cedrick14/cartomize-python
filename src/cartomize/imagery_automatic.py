@@ -18,6 +18,7 @@ from .imagery import _check_cancel, _plan_imagery
 from .imagery_audit import ImageryAudit, audit_imagery
 from .imagery_pipeline import process_imagery
 from .scenes import Scene, discover_scenes
+from .preprocessing_plan import assess_preprocessing
 from .storage import new_directory, read_json, relocate_products, save_json
 
 
@@ -251,6 +252,21 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
             scenes = discover_scenes(scenes)
     if not scenes and config is None:
         raise ValueError("Sélectionner des scènes ou configurer un catalogue STAC.")
+    preprocessing_plan = assess_preprocessing(
+        scenes, mask_clouds=mask_clouds, mask_saturation=mask_saturation
+    ) if scenes else None
+    if preprocessing_plan is not None:
+        atmospheric_blockers = [
+            scene["scene_id"]
+            for scene in preprocessing_plan["scenes"]
+            if any(level["status"] == "required_but_unavailable" for level in scene["levels"])
+        ]
+        if atmospheric_blockers:
+            names = ", ".join(atmospheric_blockers)
+            raise ValueError(
+                "Correction atmosphérique requise mais non disponible pour : " + names
+                + ". Fournir un produit de réflectance de surface ou les paramètres nécessaires."
+            )
     if not scenes and (not band_order or target_crs is None or resolution is None):
         raise ValueError("Sans scène locale, définir band_order, target_crs projeté et resolution.")
     if resolution is not None and (not math.isfinite(float(resolution)) or float(resolution) <= 0):
@@ -380,7 +396,8 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
             initial_usable_percent=initial_report["usable_percent"] if initial_report else 0.,
             catalog=config, acquisitions=requests, downloaded_bytes=total_bytes,
             download_directory=str(work / "acquisitions") if (work / "acquisitions").exists() else None,
-            products=[], preparation=None, audit=str(audit.manifest), coverage=str(audit.coverage), gaps=str(audit.gaps))
+            products=[], preparation=None, audit=str(audit.manifest), coverage=str(audit.coverage), gaps=str(audit.gaps),
+            preprocessing_plan=preprocessing_plan)
         if not audit.report["usable_pixels"] or (not report["threshold_met"] and not allow_partial):
             _check_cancel(cancel)
             raise ImageryCoverageError(audit, report).preserve(diagnostic_destination(destination), cancel=cancel)
@@ -413,6 +430,8 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
             mosaic=len(selected) > 1, products=list(prepared.products), preparation=str(prepared.manifest),
             audit=str(final_audit.manifest), coverage=str(final_audit.coverage), gaps=str(final_audit.gaps),
             parameters=final_audit.report["parameters"],
+            preprocessing_plan=assess_preprocessing(
+                selected, mask_clouds=mask_clouds, mask_saturation=mask_saturation),
             quality_statistics=[dict(scene_id=scene["id"], **scene["quality_statistics"])
                                 for scene in final_audit.report.get("scenes", [])
                                 if scene.get("quality_statistics")])
