@@ -235,7 +235,7 @@ class GeoCanvas(QGraphicsView):
         path=self.path; kind=self.kind; page=self.page; info=dict(self.info)
         bands=tuple(self.bands); palette=self.palette_name; limits=self.limits; resampling=self.resampling
         def read():
-            if kind=='raster': return render_raster(path,box,size,bands,palette,info['classes'] if len(bands)==1 else None,limits,resampling)
+            if kind=='raster': return render_raster(path,box,size,bands,palette,info['classes'] if len(bands)==1 else None,limits,resampling,info.get('automatic_nodata'))
             if kind=='vector': return render_vector(path,info,box,size)
             if kind=='pdf': return render_pdf(path,page,box,size)
             return render_image(path,box,size)
