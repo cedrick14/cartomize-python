@@ -26,7 +26,7 @@ ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data"
 STAC_ENDPOINT = "https://earth-search.aws.element84.com/v1"
 COLLECTION = "sentinel-2-l2a"
-DATE_RANGE = "2024-06-01/2024-09-30"
+DATE_RANGE = "2024-06-01T00:00:00Z/2024-09-30T23:59:59Z"
 
 # Fenêtre d'analyse de démonstration à Kinshasa.
 # Il ne s'agit PAS d'une limite administrative.
