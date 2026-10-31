@@ -70,12 +70,12 @@ jobs:
             demonstration-carto/SOURCES.md
 
       - name: Commit verified real data and executed results to the branch
-        if: github.event_name == 'push' && github.ref_name != 'main'
+        if: github.event_name == 'push'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add demonstration-carto/data demonstration-carto/results demonstration-carto/Tutoriel_Demonstration_Cartomize.ipynb
           if ! git diff --cached --quiet; then
-            git commit -m "Add verified real Sentinel-2 demonstration evidence [skip ci]"
+            git commit -m "Update verified real Sentinel-2 demonstration evidence [skip ci]"
             git push origin HEAD:${GITHUB_REF_NAME}
           fi
