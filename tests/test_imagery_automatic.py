@@ -618,3 +618,52 @@ def test_provider_only_blocks_toa_without_catalog(write_raster, tmp_path):
             [scene], tmp_path / "provider_only", aoi=_zone(),
             atmospheric_method="provider",
         )
+
+
+def test_sentinel_hybrid_cloud_fallback_masks_scl_false_negative(write_raster, tmp_path):
+    transform = from_origin(300000, 9500000, 10, 10)
+    shape = (4, 4)
+    clear = {
+        "blue": .08, "green": .10, "red": .14, "nir": .24, "swir1": .30,
+    }
+    cloud = {
+        "blue": .30, "green": .31, "red": .32, "nir": .36, "swir1": .20,
+    }
+    bands = {}
+    for name in ("blue", "green", "red", "nir", "swir1"):
+        values = np.full(shape, clear[name], dtype="float32")
+        values[1:3, 1:3] = cloud[name]
+        path = write_raster(f"hybrid_{name}.tif", values, transform=transform, nodata=-9999)
+        bands[name] = cm.Band(path, nodata=-9999, unit="reflectance")
+    # Deliberately wrong official classification: every pixel is SCL 5 (not vegetated).
+    scl = write_raster(
+        "hybrid_scl.tif", np.full(shape, 5, dtype="uint8"),
+        transform=transform, nodata=0,
+    )
+    scene = cm.Scene(
+        "T33MUP_20261031T100000_TEST",
+        bands, sensor="sentinel-2", acquired="2026-10-31", level="L2A-SR",
+        quality=scl, quality_kind="sentinel_scl",
+    )
+    zone = gpd.GeoDataFrame(
+        geometry=[box(300000, 9499960, 300040, 9500000)], crs=32733
+    )
+    result = cm.preprocess_imagery(
+        [scene], tmp_path / "hybrid_cloud", aoi=zone,
+        band_order=["blue", "green", "red", "nir"],
+        coverage_threshold=70, allow_partial=False,
+        mask_clouds=True, mask_saturation=False,
+    )
+    assert result.report["status"] == "partial"
+    supplemental = result.report["spectral_cloud_statistics"][0]
+    assert supplemental["method"] == "sentinel_spectral_fallback_v1"
+    assert supplemental["cloud_pixels"] == 4
+    assert supplemental["cloud_percent"] == pytest.approx(25.0)
+    official = result.report["quality_statistics"][0]
+    assert official["cloud_medium_probability_pixels"] == 0
+    assert official["cloud_high_probability_pixels"] == 0
+    assert result.report["usable_percent"] == pytest.approx(75.0)
+    with rasterio.open(_image(result)) as src:
+        mask = src.read_masks(1)
+        assert np.count_nonzero(mask) == 12
+        assert np.all(mask[1:3, 1:3] == 0)
