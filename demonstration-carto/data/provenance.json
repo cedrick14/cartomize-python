@@ -22,6 +22,35 @@
   "aoi_scl_usable_percent_before_processing": 99.99909818916383,
   "aoi_hybrid_usable_percent_before_processing": 99.99864525568539,
   "aoi_spectral_cloud_percent_before_processing": 0.0004515814381965644,
+  "before_diagnostic": {
+    "item_id": "S2B_33MWR_20250824_1_L2A",
+    "datetime": "2025-08-24T09:21:48.561000Z",
+    "platform": "sentinel-2b",
+    "global_cloud_cover_percent": 22.686391,
+    "aoi_scl_usable_percent": 2.0949065723973734,
+    "aoi_spectral_cloud_percent": 92.375047416051,
+    "aoi_hybrid_usable_percent": 1.025089864706201,
+    "decision": "rejected_below_quality_threshold",
+    "local_item": "before_diagnostic/source_item.json",
+    "source_assets": {
+      "blue": {
+        "key": "blue",
+        "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2B_33MWR_20250824_1_L2A/B02.tif"
+      },
+      "green": {
+        "key": "green",
+        "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2B_33MWR_20250824_1_L2A/B03.tif"
+      },
+      "red": {
+        "key": "red",
+        "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2B_33MWR_20250824_1_L2A/B04.tif"
+      },
+      "scl": {
+        "key": "scl",
+        "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2B_33MWR_20250824_1_L2A/SCL.tif"
+      }
+    }
+  },
   "selection_candidates": [
     {
       "id": "S2C_33MWR_20250819_0_L2A",
@@ -282,6 +311,26 @@
     "aoi.geojson": {
       "bytes": 860,
       "sha256": "5821f48a307f9559ff8c6271eb9c5bd8ecb9933c5a701d500f051d074a43d2ec"
+    },
+    "before_diagnostic/B02.tif": {
+      "bytes": 672582,
+      "sha256": "f44690a6a8a3a0f9f025b8ea953f5ca55a48efbaed4ed6c052a36cb96dad61a9"
+    },
+    "before_diagnostic/B03.tif": {
+      "bytes": 670320,
+      "sha256": "57d3e576cbb72add588350f2f6bb67229b96b4e0b06c0fa2281a9b32481d1f81"
+    },
+    "before_diagnostic/B04.tif": {
+      "bytes": 675842,
+      "sha256": "24b8833450b4d04d93475d710294d810c8ee6fc1f3ebb47fa0fdc2d285dc17a9"
+    },
+    "before_diagnostic/SCL.tif": {
+      "bytes": 8146,
+      "sha256": "070bc4810d707cce35f66e59cbe4f39e60f1f7cabfa87570e03a1a3c6f936f29"
+    },
+    "before_diagnostic/source_item.json": {
+      "bytes": 6300,
+      "sha256": "e9539c4b4f0dd266f7cad79540c68aa288ff8b0bcbdb5e31d08f8fabc38677af"
     },
     "scenes.json": {
       "bytes": 2237,

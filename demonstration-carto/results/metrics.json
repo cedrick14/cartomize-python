@@ -113,6 +113,42 @@
     ],
     "usable_percent_after_combined_masks": 99.99819017218249
   },
+  "before_after": {
+    "before": {
+      "item_id": "S2B_33MWR_20250824_1_L2A",
+      "datetime": "2025-08-24T09:21:48.561000Z",
+      "platform": "sentinel-2b",
+      "global_cloud_cover_percent": 22.686391,
+      "aoi_scl_usable_percent": 2.0949065723973734,
+      "aoi_spectral_cloud_percent": 92.375047416051,
+      "aoi_hybrid_usable_percent": 1.025089864706201,
+      "decision": "rejected_below_quality_threshold",
+      "local_item": "before_diagnostic/source_item.json",
+      "source_assets": {
+        "blue": {
+          "key": "blue",
+          "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2B_33MWR_20250824_1_L2A/B02.tif"
+        },
+        "green": {
+          "key": "green",
+          "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2B_33MWR_20250824_1_L2A/B03.tif"
+        },
+        "red": {
+          "key": "red",
+          "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2B_33MWR_20250824_1_L2A/B04.tif"
+        },
+        "scl": {
+          "key": "scl",
+          "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2B_33MWR_20250824_1_L2A/SCL.tif"
+        }
+      }
+    },
+    "after": {
+      "scene": "S2C_33MWR_20250819_0_L2A",
+      "usable_percent": 99.99819017218249
+    },
+    "figure": "before_after.png"
+  },
   "zonal_ndvi": [
     {
       "name": "Fenêtre de démonstration Kinshasa",
