@@ -3,7 +3,15 @@ name: Demonstration Carto - real Sentinel-2
 on:
   push:
     branches:
+      - main
       - feature/demonstration-carto-layout
+      - "fix/**"
+    paths:
+      - "demonstration-carto/**"
+      - ".github/workflows/demonstration-carto.yml"
+  pull_request:
+    branches:
+      - main
     paths:
       - "demonstration-carto/**"
       - ".github/workflows/demonstration-carto.yml"
@@ -62,11 +70,12 @@ jobs:
             demonstration-carto/SOURCES.md
 
       - name: Commit verified real data and executed results to the branch
+        if: github.event_name == 'push' && github.ref_name != 'main'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add demonstration-carto/data demonstration-carto/results demonstration-carto/Tutoriel_Demonstration_Cartomize.ipynb
           if ! git diff --cached --quiet; then
             git commit -m "Add verified real Sentinel-2 demonstration evidence [skip ci]"
-            git push origin HEAD:feature/demonstration-carto-layout
+            git push origin HEAD:${GITHUB_REF_NAME}
           fi
