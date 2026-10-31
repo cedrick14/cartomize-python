@@ -75,7 +75,7 @@ def sentinel_spectral_cloud_mask(scene, destination, *, cancel=None):
         readers = {name: _calibrated_reader(stack, scene.bands[name], reference) for name in names}
         profile = reference.profile.copy()
         profile.update(
-            driver="GTiff", count=1, dtype="uint8", nodata=0,
+            driver="GTiff", count=1, dtype="uint8", nodata=255,
             compress="lzw", tiled=True, blockxsize=256, blockysize=256,
             BIGTIFF="IF_SAFER",
         )
@@ -116,7 +116,9 @@ def sentinel_spectral_cloud_mask(scene, destination, *, cancel=None):
                 # Sen2Cor-like water safeguard: bright-blue water with NIR below red.
                 water_like = valid & (b2_b11 > 2.0) & (blue < 0.20) & (nir < red)
                 cloud = potential & ~water_like
-                mask = np.where(valid & ~cloud, 1, 0).astype("uint8")
+                mask = np.full(valid.shape, 255, dtype="uint8")
+                mask[valid & ~cloud] = 1
+                mask[cloud] = 0
                 dst.write(mask, 1, window=window)
                 observed_pixels += int(valid.sum())
                 cloud_pixels += int(cloud.sum())
@@ -124,7 +126,7 @@ def sentinel_spectral_cloud_mask(scene, destination, *, cancel=None):
             dst.update_tags(
                 CARTOMIZE_PRODUCT="sentinel_spectral_cloud_mask",
                 method=SENTINEL_SPECTRAL_METHOD,
-                semantics="1=valid,0=spectral_cloud_or_nodata",
+                semantics="1=valid,0=spectral_cloud,255=insufficient_spectral_data",
                 required_bands="blue,red,nir_or_nir_narrow,swir1",
             )
     return {
