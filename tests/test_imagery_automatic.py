@@ -656,7 +656,7 @@ def test_sentinel_hybrid_cloud_fallback_masks_scl_false_negative(write_raster, t
     )
     assert result.report["status"] == "partial"
     supplemental = result.report["spectral_cloud_statistics"][0]
-    assert supplemental["method"] == "sentinel_spectral_fallback_v1"
+    assert supplemental["method"] == "sentinel_spectral_fallback_v2"
     assert supplemental["cloud_pixels"] == 4
     assert supplemental["cloud_percent"] == pytest.approx(25.0)
     official = result.report["quality_statistics"][0]
