@@ -43,7 +43,12 @@ def _read_reflectance(vrt, band, window):
 
 
 def sentinel_spectral_cloud_candidates(blue, green, red, nir, swir1, valid):
-    """Return the shared high-confidence Sentinel-2 spectral cloud candidate mask."""
+    """Return the shared high-confidence Sentinel-2 spectral cloud candidate mask.
+
+    Visible and blue reflectance must both exceed 0.15 before ratio and
+    vegetation tests can classify a pixel as cloud. This deliberately avoids
+    rejecting common bright urban edges and shorelines.
+    """
     blue = np.asarray(blue, dtype="float64")
     green = np.asarray(green, dtype="float64")
     red = np.asarray(red, dtype="float64")
@@ -59,9 +64,11 @@ def sentinel_spectral_cloud_candidates(blue, green, red, nir, swir1, valid):
     nir_b11 = nir / (swir1 + eps)
     red_b11 = red / (swir1 + eps)
     nir_green = nir / (green + eps)
+    visible = (blue + green + red) / 3.0
     cloud = (
         valid
-        & (red > 0.07)
+        & (blue >= 0.15)
+        & (visible >= 0.15)
         & (ndvi < 0.40)
         & (nir_green < 2.50)
         & (b2_b11 > 0.80)
