@@ -18,6 +18,8 @@ from rasterio.windows import Window
 from matplotlib import colormaps
 from matplotlib.colors import to_rgba
 
+from .nodata import detect_background
+
 RASTERS = {'.tif', '.tiff', '.jp2', '.vrt', '.img'}
 VECTORS = {'.gpkg', '.shp', '.geojson', '.fgb'}
 IMAGES = {'.png', '.jpg', '.jpeg', '.bmp', '.webp'}
@@ -66,12 +68,15 @@ def raster_info(path, options=None):
         roles = [d.casefold() for d in descriptions]
         native = tuple(c.name for c in src.colorinterp[:3]) == ('red', 'green', 'blue')
         rgb = [1, 2, 3] if native else [roles.index(b) + 1 for b in ('red', 'green', 'blue')] if all(b in roles for b in ('red', 'green', 'blue')) else None
+        background = detect_background(path) if src.count == 1 and not native else None
         return dict(kind='raster', path=str(Path(path).resolve()), width=src.width, height=src.height,
                     count=src.count, descriptions=descriptions, dtypes=list(src.dtypes), nodata=src.nodata,
                     crs=src.crs.to_string() if src.crs else None, bounds=list(src.bounds),
                     transform=list(src.transform)[:6], resolution=list(src.res), units=list(src.units),
                     scales=list(src.scales), offsets=list(src.offsets), overviews=src.overviews(1),
-                    tags=tags, classes=classes, rgb=rgb, native_rgb=native)
+                    tags=tags, classes=classes, rgb=rgb, native_rgb=native,
+                    automatic_nodata=(background or {}).get('automatic_border_values', []),
+                    nodata_diagnostic=background)
 
 
 @lru_cache(maxsize=128)
@@ -87,13 +92,15 @@ def _ranges(file_id, bands):
 
 
 def render_raster(path, rect, shape, bands=(1,), palette='viridis', classes=None,
-                  limits=None, resampling='nearest'):
+                  limits=None, resampling='nearest', transparent_values=None):
     """Return an RGBA viewport and its native pixel rectangle, with bounded IO."""
     file_id = identity(path); bands = tuple(int(i) for i in bands)
     height, width = bounded_shape(shape[1], shape[0])
     classes = {float(k): v for k, v in (classes or {}).items()}
+    transparent_values = tuple(float(v) for v in (transparent_values or ()))
     key = (file_id, tuple(rect), height, width, bands, palette,
-           json.dumps(classes, sort_keys=True), tuple(tuple(v) for v in limits) if limits else None, resampling)
+           json.dumps(classes, sort_keys=True), tuple(tuple(v) for v in limits) if limits else None, resampling,
+           transparent_values)
     cached = _cache(key)
     if cached is not None: return cached
     with rasterio.open(path) as src:
@@ -106,6 +113,9 @@ def render_raster(path, rect, shape, bands=(1,), palette='viridis', classes=None
         data = np.ma.masked_invalid(src.read(list(bands), window=window,
             out_shape=(len(bands), height, width), masked=True, resampling=method))
         valid = ~np.any(np.ma.getmaskarray(data), axis=0)
+        if len(bands) == 1 and transparent_values:
+            raw_values = np.asarray(data.filled(np.nan)[0], dtype='float64')
+            valid &= ~np.isin(raw_values, transparent_values)
         native = len(bands) == 3 and src.dtypes[bands[0]-1] == 'uint8' and (
             src.tags().get('CARTOMIZE_PRODUCT') == 'display_rgba' or
             tuple(src.colorinterp[i-1].name for i in bands) == ('red', 'green', 'blue'))
