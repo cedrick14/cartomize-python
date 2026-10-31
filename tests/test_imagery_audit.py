@@ -117,6 +117,49 @@ def test_all_clouds_and_external_aoi_publish_empty_diagnoses(write_raster, tmp_p
         assert np.all(src.read(1) == (1 if outside else 3))
 
 
+
+@pytest.mark.parametrize(
+    "kind,quality,expected",
+    [
+        (
+            "sentinel_scl",
+            [4, 8, 9, 10, 3, 11, 1, 6],
+            dict(clear_pixels=2, rejected_pixels=6, cloud_pixels=3,
+                 cloud_medium_probability_pixels=1, cloud_high_probability_pixels=1,
+                 cirrus_pixels=1, cloud_shadow_pixels=1, snow_pixels=1,
+                 saturated_or_defective_pixels=1),
+        ),
+        (
+            "landsat_qa",
+            [64, 72, 80, 68, 66, 96],
+            dict(clear_pixels=1, rejected_pixels=5, cloud_pixels=3,
+                 dilated_cloud_pixels=1, cirrus_pixels=1, cloud_flag_pixels=1,
+                 cloud_shadow_pixels=1, snow_pixels=1, fill_pixels=0),
+        ),
+    ],
+)
+def test_sensor_quality_statistics_count_cloud_pixels(write_raster, tmp_path, kind, quality, expected):
+    transform = from_origin(300000, 9500000, 10, 10)
+    spectral = write_raster(f"{kind}_red.tif", np.ones((1, len(quality)), dtype="float32"),
+                            transform=transform)
+    mask = write_raster(f"{kind}_quality.tif", np.asarray([quality], dtype="uint16"),
+                        transform=transform, nodata=None)
+    scene = Scene(kind, {"red": spectral}, sensor="test", quality=mask, quality_kind=kind)
+    result = audit_imagery(
+        [scene],
+        tmp_path / f"audit_{kind}",
+        aoi=_aoi(right=300000 + 10 * len(quality)),
+    )
+    statistics = result.report["scenes"][0]["quality_statistics"]
+    assert statistics["kind"] == kind
+    assert statistics["evaluated_pixels"] == len(quality)
+    for key, value in expected.items():
+        assert statistics[key] == value
+    assert statistics["cloud_percent"] == pytest.approx(
+        100 * expected["cloud_pixels"] / len(quality)
+    )
+
+
 def test_aoi_holes_are_nodata_not_missing_scenes(write_raster, tmp_path):
     scene = _scene(write_raster, "A", np.ones((3, 3)))
     polygon = box(300000, 9499970, 300030, 9500000).difference(box(300010, 9499980, 300020, 9499990))
