@@ -6,6 +6,7 @@ import re
 import xml.etree.ElementTree as ET
 
 import numpy as np
+import rasterio
 
 from .sensor_profiles import (LANDSAT_OLI, LANDSAT_ETM_TM as LANDSAT_TM, SENTINEL2 as SENTINEL,
     parse_landsat_product_identifier, semantic_band_name, sensor_from_text,
@@ -252,6 +253,40 @@ def _loose_sentinel_asset(path):
     return level, metadata, tile, acquired, code.upper(), resolution
 
 
+def _raster_semantic_assets(path):
+    """Read safe semantic band roles from GDAL descriptions/tags.
+
+    This fallback never infers a numeric wavelength from an ambiguous band
+    number without sensor context. It is intended for renamed/custom rasters
+    that retain semantic metadata such as red, nir, swir1, etc.
+    """
+    path = Path(path)
+    try:
+        with rasterio.open(path) as src:
+            result = []
+            for index in src.indexes:
+                tags = src.tags(index)
+                candidates = [
+                    src.descriptions[index - 1],
+                    tags.get("semantic_name"),
+                    tags.get("common_name"),
+                    tags.get("eo:common_name"),
+                    tags.get("band_name"),
+                ]
+                role = next((semantic_band_name(value) for value in candidates if value), None)
+                if role is None and src.count == 1:
+                    role = semantic_band_name(path.stem)
+                if role is not None:
+                    result.append((role, Band(
+                        path, index=index, scale=src.scales[index - 1],
+                        offset=src.offsets[index - 1], nodata=src.nodata,
+                        unit=src.units[index - 1] or tags.get("unit") or "source units"
+                    )))
+            return result
+    except (OSError, rasterio.errors.RasterioError):
+        return []
+
+
 def discover_scenes(inputs):
     """Discover Landsat Collection 2 L1/L2 and Sentinel-2 L1C/L2A bands.
 
@@ -284,6 +319,7 @@ def discover_scenes(inputs):
         else:
             raise FileNotFoundError(p)
     landsat, landsat_l1, sentinel, sentinel_l1, unknown, thermal = {}, {}, {}, {}, [], []
+    custom_semantic = {}
     for p in sorted(paths):
         match = _LANDSAT.match(p.name)
         if match:
@@ -373,6 +409,17 @@ def discover_scenes(inputs):
                 raise ValueError(f"Duplicate Sentinel asset: {tile} {code}.")
             if previous is None or candidate[0] < previous[0]:
                 group["files"][code] = candidate
+            continue
+        semantic_assets = _raster_semantic_assets(p)
+        if semantic_assets:
+            group = custom_semantic.setdefault(str(p.parent), {})
+            for role, band in semantic_assets:
+                if role in group:
+                    raise ValueError(
+                        f"Bande sémantique dupliquée dans {p.parent}: {role}. "
+                        "Séparer les acquisitions ou fournir un manifeste scenes.json."
+                    )
+                group[role] = band
             continue
         if re.search(r"(?:^|_)(?:SR_)?B\d{1,2}[A-Z]?(?:_|\.)",p.name,re.I):
             unknown.append(p.name)
@@ -488,6 +535,14 @@ def discover_scenes(inputs):
             scenes.append(Scene(f"{tile}_{acquired}_{metadata.parent.name}",bands,sensor="sentinel-2",level="L2A-SR",
                                 acquired=f"{acquired[:4]}-{acquired[4:6]}-{acquired[6:8]}",
                                 quality=files.get("SCL",(None,None))[1],quality_kind="sentinel_scl"))
+    for directory, bands in custom_semantic.items():
+        if bands:
+            scene_name = Path(directory).name or "custom_scene"
+            scenes.append(Scene(
+                scene_name, bands, sensor="custom", level="custom",
+                notes=("Band roles recognized from raster descriptions/tags or descriptive filenames; "
+                       "sensor-specific calibration and QA semantics were not guessed.",)
+            ))
     if not scenes:
         raise ValueError("No supported spectral scenes found. Use explicit Scene/Band mappings for custom data.")
     ids = [s.scene_id for s in scenes]
