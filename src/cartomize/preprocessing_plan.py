@@ -6,7 +6,7 @@ from pathlib import Path
 from .scenes import Scene, discover_scenes
 
 
-_SURFACE_LEVELS = {"C2-L2-SR", "L2A-SR"}
+_SURFACE_LEVELS = {"C2-L2-SR", "L2A-SR", "DOS1-SR"}
 _TOA_LEVELS = {"L1C-TOA", "L1-TOA", "C2-L1"}
 
 
@@ -54,7 +54,7 @@ def _atmosphere(scene):
             "name": "atmospheric_correction",
             "status": "already_applied",
             "action": "none",
-            "method": "provider_surface_reflectance",
+            "method": "dos1_reflectance_approximation" if level == "DOS1-SR" else "provider_surface_reflectance",
             "missing": [],
         }
     if level in _TOA_LEVELS:
