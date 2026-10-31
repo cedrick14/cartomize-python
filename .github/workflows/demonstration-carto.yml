@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feature/demonstration-carto-layout
+      - feature/demo-automation-only
     paths:
       - "demonstration-carto/**"
       - ".github/workflows/demonstration-carto.yml"
