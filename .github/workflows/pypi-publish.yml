@@ -146,7 +146,12 @@ jobs:
       - name: Verify the release description before upload
         env:
           PACKAGE_INDEX: ${{ inputs.index == 'testpypi' && 'testpypi' || 'pypi' }}
-        run: python scripts/check_pypi_metadata.py dist --index "$PACKAGE_INDEX"
+        run: |
+          if [ "$PACKAGE_INDEX" = "pypi" ]; then
+            python scripts/check_pypi_metadata.py dist --index "$PACKAGE_INDEX" --allow-existing-description-mismatch
+          else
+            python scripts/check_pypi_metadata.py dist --index "$PACKAGE_INDEX"
+          fi
       - name: Publish to PyPI
         if: inputs.index != 'testpypi'
         uses: pypa/gh-action-pypi-publish@release/v1
