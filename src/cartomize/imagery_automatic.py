@@ -360,17 +360,6 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
                 "Prétraitement automatique bloqué après récupération des entrées : " + detail
                 + ". Fournir les métadonnées ou le quality mask (QA/SCL) requis."
             )
-    if scenes and mask_clouds:
-        spectral_root = Path(destination).expanduser().resolve().with_name(
-            Path(destination).expanduser().resolve().name + "_spectral_cloud"
-        )
-        scenes, spectral_cloud_reports = augment_sentinel_cloud_masks(
-            scenes, spectral_root, cancel=cancel, stage=stage
-        )
-        if any(item.get("status") == "applied" for item in spectral_cloud_reports):
-            preprocessing_plan = assess_preprocessing(
-                scenes, mask_clouds=mask_clouds, mask_saturation=mask_saturation
-            )
     if not scenes and (not band_order or target_crs is None or resolution is None):
         raise ValueError("Sans scène locale, définir band_order, target_crs projeté et resolution.")
     if resolution is not None and (not math.isfinite(float(resolution)) or float(resolution) <= 0):
@@ -399,6 +388,14 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
         progress(0, 10000)
     requests, initial_report, final_audit, total_bytes = [], None, None, 0
     with new_directory(destination) as work:
+        if scenes and mask_clouds:
+            scenes, spectral_cloud_reports = augment_sentinel_cloud_masks(
+                scenes, work / "spectral_cloud", cancel=cancel, stage=stage
+            )
+            if any(item.get("status") == "applied" for item in spectral_cloud_reports):
+                preprocessing_plan = assess_preprocessing(
+                    scenes, mask_clouds=mask_clouds, mask_saturation=mask_saturation
+                )
         rounds = work / "rounds"
         def examine(selected, name, start, end):
             announce("Contrôle des bandes, des masques et de la couverture utile")
