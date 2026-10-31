@@ -115,31 +115,37 @@
   },
   "before_after": {
     "before": {
-      "item_id": "S2B_33MWR_20250824_1_L2A",
-      "datetime": "2025-08-24T09:21:48.561000Z",
+      "item_id": "S2B_33MWR_20230904_0_L2A",
+      "datetime": "2023-09-04T09:21:51.272000Z",
       "platform": "sentinel-2b",
-      "global_cloud_cover_percent": 22.686391,
-      "aoi_scl_usable_percent": 2.0949065723973734,
-      "aoi_spectral_cloud_percent": 92.375047416051,
-      "aoi_hybrid_usable_percent": 1.025089864706201,
+      "global_cloud_cover_percent": 19.357236,
+      "aoi_scl_usable_percent": 9.537551403217659,
+      "aoi_spectral_cloud_percent": 45.134887375589315,
+      "aoi_hybrid_usable_percent": 8.907669659146329,
       "decision": "rejected_below_quality_threshold",
       "local_item": "before_diagnostic/source_item.json",
+      "preview_bbox_wgs84": [
+        15.255,
+        -4.365,
+        15.365,
+        -4.255
+      ],
       "source_assets": {
         "blue": {
           "key": "blue",
-          "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2B_33MWR_20250824_1_L2A/B02.tif"
+          "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2023/9/S2B_33MWR_20230904_0_L2A/B02.tif"
         },
         "green": {
           "key": "green",
-          "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2B_33MWR_20250824_1_L2A/B03.tif"
+          "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2023/9/S2B_33MWR_20230904_0_L2A/B03.tif"
         },
         "red": {
           "key": "red",
-          "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2B_33MWR_20250824_1_L2A/B04.tif"
+          "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2023/9/S2B_33MWR_20230904_0_L2A/B04.tif"
         },
         "scl": {
           "key": "scl",
-          "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2B_33MWR_20250824_1_L2A/SCL.tif"
+          "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2023/9/S2B_33MWR_20230904_0_L2A/SCL.tif"
         }
       }
     },
@@ -147,7 +153,8 @@
       "scene": "S2C_33MWR_20250819_0_L2A",
       "usable_percent": 99.99819017218249
     },
-    "figure": "before_after.png"
+    "figure": "before_after.png",
+    "scene_aoi_before": "scene_and_aoi_before.png"
   },
   "zonal_ndvi": [
     {

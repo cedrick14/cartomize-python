@@ -23,31 +23,37 @@
   "aoi_hybrid_usable_percent_before_processing": 99.99864525568539,
   "aoi_spectral_cloud_percent_before_processing": 0.0004515814381965644,
   "before_diagnostic": {
-    "item_id": "S2B_33MWR_20250824_1_L2A",
-    "datetime": "2025-08-24T09:21:48.561000Z",
+    "item_id": "S2B_33MWR_20230904_0_L2A",
+    "datetime": "2023-09-04T09:21:51.272000Z",
     "platform": "sentinel-2b",
-    "global_cloud_cover_percent": 22.686391,
-    "aoi_scl_usable_percent": 2.0949065723973734,
-    "aoi_spectral_cloud_percent": 92.375047416051,
-    "aoi_hybrid_usable_percent": 1.025089864706201,
+    "global_cloud_cover_percent": 19.357236,
+    "aoi_scl_usable_percent": 9.537551403217659,
+    "aoi_spectral_cloud_percent": 45.134887375589315,
+    "aoi_hybrid_usable_percent": 8.907669659146329,
     "decision": "rejected_below_quality_threshold",
     "local_item": "before_diagnostic/source_item.json",
+    "preview_bbox_wgs84": [
+      15.255,
+      -4.365,
+      15.365,
+      -4.255
+    ],
     "source_assets": {
       "blue": {
         "key": "blue",
-        "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2B_33MWR_20250824_1_L2A/B02.tif"
+        "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2023/9/S2B_33MWR_20230904_0_L2A/B02.tif"
       },
       "green": {
         "key": "green",
-        "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2B_33MWR_20250824_1_L2A/B03.tif"
+        "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2023/9/S2B_33MWR_20230904_0_L2A/B03.tif"
       },
       "red": {
         "key": "red",
-        "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2B_33MWR_20250824_1_L2A/B04.tif"
+        "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2023/9/S2B_33MWR_20230904_0_L2A/B04.tif"
       },
       "scl": {
         "key": "scl",
-        "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2B_33MWR_20250824_1_L2A/SCL.tif"
+        "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2023/9/S2B_33MWR_20230904_0_L2A/SCL.tif"
       }
     }
   },
@@ -133,24 +139,20 @@
       "hybrid_usable_percent": 98.08100467838369
     },
     {
-      "id": "S2A_33MWR_20240804_0_L2A",
-      "cloud_cover": 21.505696,
-      "footprint_percent": 99.99999999999999,
-      "observed_in_overlap_percent": 100.0,
-      "scl_valid_in_overlap_percent": 96.96450472548878,
-      "usable_aoi_percent": 96.96450472548877,
-      "spectral_cloud_percent": 0.3091074944455483,
-      "hybrid_usable_percent": 96.78541753219774
-    },
-    {
       "id": "S2B_33MWR_20230914_0_L2A",
       "cloud_cover": 19.808215,
       "footprint_percent": 99.99999999999999,
       "observed_in_overlap_percent": 100.0,
       "scl_valid_in_overlap_percent": 97.30538922155688,
-      "usable_aoi_percent": 97.30538922155687,
-      "spectral_cloud_percent": 1.8320658947634616,
-      "hybrid_usable_percent": 96.21416701287907
+      "usable_aoi_percent": 97.30538922155687
+    },
+    {
+      "id": "S2A_33MWR_20240804_0_L2A",
+      "cloud_cover": 21.505696,
+      "footprint_percent": 99.99999999999999,
+      "observed_in_overlap_percent": 100.0,
+      "scl_valid_in_overlap_percent": 96.96450472548878,
+      "usable_aoi_percent": 96.96450472548877
     },
     {
       "id": "S2B_33MWR_20230716_0_L2A",
@@ -178,9 +180,7 @@
       "footprint_percent": 99.99999999999999,
       "observed_in_overlap_percent": 100.0,
       "scl_valid_in_overlap_percent": 28.063451410432148,
-      "usable_aoi_percent": 28.063451410432144,
-      "spectral_cloud_percent": 45.290005599609835,
-      "hybrid_usable_percent": 26.10479398854789
+      "usable_aoi_percent": 28.063451410432144
     },
     {
       "id": "S2B_33MWR_20230904_1_L2A",
@@ -203,6 +203,14 @@
       "hybrid_usable_percent": 8.907669659146329
     },
     {
+      "id": "S2B_33MWR_20250824_1_L2A",
+      "cloud_cover": 22.686391,
+      "footprint_percent": 99.99999999999999,
+      "observed_in_overlap_percent": 100.0,
+      "scl_valid_in_overlap_percent": 2.094906572397374,
+      "usable_aoi_percent": 2.0949065723973734
+    },
+    {
       "id": "S2A_33MWR_20240807_0_L2A",
       "cloud_cover": 16.922849,
       "footprint_percent": 99.99999999999999,
@@ -217,16 +225,6 @@
       "observed_in_overlap_percent": 1.364439795108578,
       "scl_valid_in_overlap_percent": 1.364439795108578,
       "usable_aoi_percent": 1.3644397951085778
-    },
-    {
-      "id": "S2B_33MWR_20250824_1_L2A",
-      "cloud_cover": 22.686391,
-      "footprint_percent": 99.99999999999999,
-      "observed_in_overlap_percent": 100.0,
-      "scl_valid_in_overlap_percent": 2.094906572397374,
-      "usable_aoi_percent": 2.0949065723973734,
-      "spectral_cloud_percent": 92.375047416051,
-      "hybrid_usable_percent": 1.025089864706201
     },
     {
       "id": "S2B_33MWR_20240921_0_L2A",
@@ -313,24 +311,24 @@
       "sha256": "5821f48a307f9559ff8c6271eb9c5bd8ecb9933c5a701d500f051d074a43d2ec"
     },
     "before_diagnostic/B02.tif": {
-      "bytes": 672582,
-      "sha256": "f44690a6a8a3a0f9f025b8ea953f5ca55a48efbaed4ed6c052a36cb96dad61a9"
+      "bytes": 2541016,
+      "sha256": "e92381de572da8b20493a3847cafc5b1331cddf758f484ce01a5d1269caf830d"
     },
     "before_diagnostic/B03.tif": {
-      "bytes": 670320,
-      "sha256": "57d3e576cbb72add588350f2f6bb67229b96b4e0b06c0fa2281a9b32481d1f81"
+      "bytes": 2576254,
+      "sha256": "8e64a83a3eade146788111ff8078495798275eaf63ee61f254b4d3d49fa3ab98"
     },
     "before_diagnostic/B04.tif": {
-      "bytes": 675842,
-      "sha256": "24b8833450b4d04d93475d710294d810c8ee6fc1f3ebb47fa0fdc2d285dc17a9"
+      "bytes": 2625844,
+      "sha256": "30e709564f475347a59bb4566306f6b2895970ef5cfbe4fc4aadaf1648ee2bd8"
     },
     "before_diagnostic/SCL.tif": {
-      "bytes": 8146,
-      "sha256": "070bc4810d707cce35f66e59cbe4f39e60f1f7cabfa87570e03a1a3c6f936f29"
+      "bytes": 39494,
+      "sha256": "aab79db79822bef7ed2dd59fd6d21fef5c7149c4e99c191df8d8ddf6cb6fbdfd"
     },
     "before_diagnostic/source_item.json": {
-      "bytes": 6300,
-      "sha256": "e9539c4b4f0dd266f7cad79540c68aa288ff8b0bcbdb5e31d08f8fabc38677af"
+      "bytes": 6404,
+      "sha256": "cbd7bca0efc8d77f0f6c491bdec3feda31aa1c114a072679e5409007b431ad86"
     },
     "scenes.json": {
       "bytes": 2237,

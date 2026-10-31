@@ -5,16 +5,18 @@
   "checked_outputs": [
     "multiband",
     "indices",
+    "scene_and_aoi_before.png",
     "natural_color.png",
+    "before_after.png",
     "indices.png",
-    "cloud_diagnostic.png",
     "scl.png"
   ],
   "notebook_image_outputs": 1,
   "notebook_markdown_visuals": [
+    "scene_and_aoi_before.png",
     "natural_color.png",
-    "indices.png",
-    "cloud_diagnostic.png"
+    "before_after.png",
+    "indices.png"
   ],
-  "note": "Toutes les statistiques proviennent des rasters Sentinel-2 L2A téléchargés et traités pendant cette exécution."
+  "note": "Le tutoriel vérifie une scène candidate plus large que l'AOI, le journal du diagnostic automatique et le résultat final découpé."
 }
