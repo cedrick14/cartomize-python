@@ -498,7 +498,7 @@ def test_recovery_rejects_ambiguous_catalog_match(write_raster, tmp_path, catalo
         )
 
 
-def test_unknown_processing_level_blocks_automatic_pipeline(write_raster, tmp_path):
+def test_custom_reflectance_is_accepted_as_explicit_user_declaration(write_raster, tmp_path):
     path = write_raster("unknown_reflectance.tif", np.ones((2, 2), dtype="float32"))
     quality = write_raster("unknown_quality.tif", np.ones((2, 2), dtype="uint8"), nodata=None)
     scene = cm.Scene(
@@ -509,10 +509,10 @@ def test_unknown_processing_level_blocks_automatic_pipeline(write_raster, tmp_pa
     plan = cm.assess_preprocessing([scene])
     atmospheric = next(level for level in plan["scenes"][0]["levels"]
                        if level["name"] == "atmospheric_correction")
-    assert atmospheric["status"] == "undetermined"
-    assert plan["ready"] is False
-    with pytest.raises(ValueError, match="Prétraitement automatique bloqué"):
-        cm.preprocess_imagery([scene], tmp_path / "blocked_unknown", aoi=_zone())
+    assert atmospheric["status"] == "user_declared"
+    assert plan["ready"] is True
+    result = cm.preprocess_imagery([scene], tmp_path / "custom_declared", aoi=_zone())
+    assert result.report["status"] == "complete"
 
 
 def test_explicit_cloud_disable_allows_scene_without_quality(write_raster, tmp_path):
