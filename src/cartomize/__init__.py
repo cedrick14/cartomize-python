@@ -83,7 +83,8 @@ __all__ += ["ImageryAudit", "audit_imagery"]
 from .imagery_automatic import PreprocessedImagery, ImageryCoverageError, preprocess_imagery
 from .preprocessing_plan import assess_preprocessing
 from .imagery_recovery import recover_scene, identity_matches
-__all__ += ["PreprocessedImagery", "ImageryCoverageError", "preprocess_imagery", "assess_preprocessing", "recover_scene", "identity_matches"]
+from .atmospheric import dos1_scene
+__all__ += ["PreprocessedImagery", "ImageryCoverageError", "preprocess_imagery", "assess_preprocessing", "recover_scene", "identity_matches", "dos1_scene"]
 from .vector_workflows import (select_attributes, select_location, geometry_operation,
                                spatial_summary, join_attributes, latest_records)
 __all__ += ['select_attributes', 'select_location', 'geometry_operation',
