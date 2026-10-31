@@ -514,7 +514,12 @@ def test_custom_reflectance_is_accepted_as_explicit_user_declaration(write_raste
                        if level["name"] == "atmospheric_correction")
     assert atmospheric["status"] == "user_declared"
     assert plan["ready"] is True
-    result = cm.preprocess_imagery([scene], tmp_path / "custom_declared", aoi=_zone())
+    custom_zone = gpd.GeoDataFrame(
+        geometry=[box(300000, 9499980, 300020, 9500000)], crs=32733
+    )
+    result = cm.preprocess_imagery(
+        [scene], tmp_path / "custom_declared", aoi=custom_zone
+    )
     assert result.report["status"] == "complete"
 
 
