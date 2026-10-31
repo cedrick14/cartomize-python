@@ -59,6 +59,7 @@ def _asset(item: dict, role: str) -> tuple[str, dict]:
         "green": ("green", "B03"),
         "red": ("red", "B04"),
         "nir": ("nir", "B08"),
+        "swir1": ("swir16", "swir1", "B11"),
         "scl": ("scl", "SCL"),
     }[role]
     for key in preferred:
@@ -73,7 +74,7 @@ def _asset(item: dict, role: str) -> tuple[str, dict]:
         for band in asset.get("eo:bands", asset.get("bands", [])):
             common = str(band.get("common_name", band.get("eo:common_name", ""))).lower()
             name = str(band.get("name", "")).upper()
-            if common == role or (role == "blue" and name == "B02") or (role == "green" and name == "B03") or (role == "red" and name == "B04") or (role == "nir" and name == "B08"):
+            if common == role or (role == "blue" and name == "B02") or (role == "green" and name == "B03") or (role == "red" and name == "B04") or (role == "nir" and name == "B08") or (role == "swir1" and name == "B11"):
                 return key, asset
     raise KeyError(f"Asset {role} absent de {item.get('id')}")
 
@@ -210,7 +211,7 @@ def main() -> None:
     candidates = []
     for item in collection["features"]:
         try:
-            for role in ("blue", "green", "red", "nir", "scl"):
+            for role in ("blue", "green", "red", "nir", "swir1", "scl"):
                 _asset(item, role)
         except KeyError:
             continue
@@ -270,6 +271,7 @@ def main() -> None:
         "green": "B03.tif",
         "red": "B04.tif",
         "nir": "B08.tif",
+        "swir1": "B11.tif",
         "scl": "SCL.tif",
     }
     source_assets = {}
@@ -313,7 +315,7 @@ def main() -> None:
                     "unit": band.unit,
                 }
                 for name, band in scene.bands.items()
-                if name in {"blue", "green", "red", "nir"}
+                if name in {"blue", "green", "red", "nir", "swir1"}
             },
         }],
     }
