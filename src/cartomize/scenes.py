@@ -123,6 +123,14 @@ def _landsat_l1_metadata(directory, ident):
     return path, calibration, sun_elevation
 
 
+def _find_ancestor_file(path, name):
+    for parent in Path(path).parents:
+        candidate = parent / name
+        if candidate.is_file():
+            return candidate
+    return None
+
+
 def _sentinel_l1_metadata(path):
     for parent in path.parents:
         candidate = parent / "MTD_MSIL1C.xml"
@@ -244,11 +252,8 @@ def discover_scenes(inputs):
         match = _S2.match(p.name)
         if match:
             tile, acquired, code, resolution = match.groups()
-            try:
+            if _find_ancestor_file(p, "MTD_MSIL2A.xml") is not None:
                 metadata = _sentinel_metadata(p)
-            except ValueError:
-                metadata = None
-            if metadata is not None:
                 key = (str(metadata[0]), tile, acquired)
                 group = sentinel.setdefault(key, {"files":{}, "metadata":metadata})
                 code = code.upper(); candidate = (int(resolution), p)
@@ -261,11 +266,8 @@ def discover_scenes(inputs):
         match = _S2_L1.match(p.name)
         if match:
             tile, acquired, code, resolution = match.groups()
-            try:
+            if _find_ancestor_file(p, "MTD_MSIL1C.xml") is not None:
                 metadata = _sentinel_l1_metadata(p)
-            except ValueError:
-                metadata = None
-            if metadata is not None:
                 key = (str(metadata[0]), tile, acquired)
                 group = sentinel_l1.setdefault(key, {"files": {}, "metadata": metadata})
                 code = code.upper()
@@ -277,6 +279,11 @@ def discover_scenes(inputs):
                 if previous is None or candidate[0] < previous[0]:
                     group["files"][code] = candidate
                 continue
+            if _S2.match(p.name):
+                raise ValueError(
+                    f"Missing MTD_MSIL2A.xml or MTD_MSIL1C.xml for {p.name}. "
+                    "Keep the SAFE product metadata with the spectral bands."
+                )
         if re.search(r"(?:^|_)(?:SR_)?B\d{1,2}[A-Z]?(?:_|\.)",p.name,re.I):
             unknown.append(p.name)
     if unknown:
