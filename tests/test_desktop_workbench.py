@@ -170,3 +170,18 @@ def test_environment_and_all_tool_actions(window):
         assert window.stack.currentWidget().widget() is window.tool(key)
     workbench.show_environment()
     assert workbench.bottom_tabs.currentWidget() is window.environment_panel
+
+
+def test_workbench_logs_receive_processing_stages(window, application):
+    workbench = window._workbench
+    workbench.begin_processing('Prétraitement automatique N1→N5', focus_logs=True)
+    assert workbench.bottom_tabs.currentWidget() is workbench.logs
+    before = workbench.logs.toPlainText()
+    workbench.log_stage('N1 — Calibration radiométrique : prête')
+    workbench.log_stage('N2 — Correction atmosphérique : déjà appliquée')
+    application.processEvents()
+    content = workbench.logs.toPlainText()
+    assert len(content) > len(before)
+    assert 'Prétraitement automatique N1→N5' in content
+    assert 'N1 — Calibration radiométrique : prête' in content
+    assert 'N2 — Correction atmosphérique : déjà appliquée' in content

@@ -50,6 +50,75 @@ def _quality_valid(values, kind):
     return valid
 
 
+_QUALITY_CATEGORY_NAMES = {
+    "sentinel_scl": (
+        "clear", "rejected", "cloud", "cloud_low_probability",
+        "cloud_medium_probability", "cloud_high_probability", "cirrus", "cloud_shadow", "snow",
+        "saturated_or_defective", "quality_nodata",
+    ),
+    "landsat_qa": (
+        "clear", "rejected", "cloud", "dilated_cloud", "cirrus",
+        "cloud_flag", "cloud_shadow", "snow", "fill", "quality_nodata",
+    ),
+    "valid_mask": ("clear", "rejected", "quality_nodata"),
+}
+
+
+def _quality_category_names(kind):
+    try:
+        return _QUALITY_CATEGORY_NAMES[kind]
+    except KeyError as exc:
+        raise ValueError("Unknown quality mask type.") from exc
+
+
+def _quality_categories(values, kind):
+    """Return sensor-aware quality classes without modifying source data.
+
+    Sentinel-2 uses SCL classes. Landsat uses Collection 2 QA_PIXEL bits.
+    The cloud category is the union of cloud, cirrus and dilated-cloud
+    indicators available for the selected quality mask type.
+    """
+    observed = ~np.ma.getmaskarray(values) & np.isfinite(values.data)
+    raw = np.nan_to_num(values.filled(0), nan=0).astype("uint32")
+    clear = _quality_valid(values, kind)
+    result = {
+        "clear": clear,
+        "rejected": ~clear,
+        "quality_nodata": ~observed,
+    }
+    if kind == "sentinel_scl":
+        low = observed & (raw == 7)
+        medium = observed & (raw == 8)
+        high = observed & (raw == 9)
+        cirrus = observed & (raw == 10)
+        result.update({
+            "cloud": low | medium | high | cirrus,
+            "cloud_low_probability": low,
+            "cloud_medium_probability": medium,
+            "cloud_high_probability": high,
+            "cirrus": cirrus,
+            "cloud_shadow": observed & (raw == 3),
+            "snow": observed & (raw == 11),
+            "saturated_or_defective": observed & (raw == 1),
+        })
+    elif kind == "landsat_qa":
+        dilated = observed & ((raw & 2) != 0)
+        cirrus = observed & ((raw & 4) != 0)
+        cloud_flag = observed & ((raw & 8) != 0)
+        result.update({
+            "cloud": dilated | cirrus | cloud_flag,
+            "dilated_cloud": dilated,
+            "cirrus": cirrus,
+            "cloud_flag": cloud_flag,
+            "cloud_shadow": observed & ((raw & 16) != 0),
+            "snow": observed & ((raw & 32) != 0),
+            "fill": observed & ((raw & 1) != 0),
+        })
+    elif kind != "valid_mask":
+        raise ValueError("Unknown quality mask type.")
+    return {name: result[name] for name in _quality_category_names(kind)}
+
+
 def _check_cancel(cancel):
     if cancel is not None and cancel.is_set():
         from .algebra import ProcessingCancelled

@@ -270,3 +270,113 @@ def test_cli_discovery_preparation_and_composite(write_raster,tmp_path,capsys):
     with rasterio.open(output) as src:
         assert src.read(3)[0,0]==pytest.approx(10400*.0000275-.2)
     assert main(["composite",str(output),str(tmp_path/"display.tif")])==0
+
+
+def test_landsat_level1_discovery_uses_mtl_toa_reflectance(write_raster, tmp_path):
+    prefix = "LC08_L1TP_181063_20260817_20260820_02_T1"
+    transform = from_origin(300000, 9500000, 30, 30)
+    for band in (4, 5):
+        write_raster(f"{prefix}_B{band}.TIF", np.full((2, 2), 10000, dtype="uint16"),
+                     transform=transform, nodata=0)
+    write_raster(f"{prefix}_QA_PIXEL.TIF", np.full((2, 2), 64, dtype="uint16"),
+                 transform=transform, nodata=0)
+    write_raster(f"{prefix}_QA_RADSAT.TIF", np.zeros((2, 2), dtype="uint16"),
+                 transform=transform, nodata=65535)
+    (tmp_path / f"{prefix}_MTL.txt").write_text(
+        "\n".join([
+            "REFLECTANCE_MULT_BAND_4 = 0.00002",
+            "REFLECTANCE_ADD_BAND_4 = -0.1",
+            "REFLECTANCE_MULT_BAND_5 = 0.00002",
+            "REFLECTANCE_ADD_BAND_5 = -0.1",
+            "SUN_ELEVATION = 30.0",
+            "END",
+        ]),
+        encoding="utf-8",
+    )
+    scenes = cm.discover_scenes(tmp_path)
+    assert len(scenes) == 1
+    scene = scenes[0]
+    assert scene.level == "C2-L1"
+    assert scene.sensor == "landsat-8"
+    assert scene.quality_kind == "landsat_qa"
+    assert scene.quality.name.endswith("QA_PIXEL.TIF")
+    assert scene.saturation.name.endswith("QA_RADSAT.TIF")
+    assert set(scene.bands) == {"red", "nir"}
+    assert scene.bands["red"].unit == "toa_reflectance"
+    assert scene.bands["red"].scale == pytest.approx(0.00004)
+    assert scene.bands["red"].offset == pytest.approx(-0.2)
+    product = cm.prepare_imagery(
+        [scene], tmp_path / "toa.tif", mask_clouds=True, mask_saturation=True
+    )
+    with rasterio.open(product.path) as src:
+        values = src.read(masked=True)
+        assert values.count() >= 8
+        np.testing.assert_allclose(values.compressed(), 0.2, atol=1e-7)
+
+
+def test_landsat_level1_requires_complete_mtl_calibration(write_raster, tmp_path):
+    prefix = "LC08_L1TP_181063_20260817_20260820_02_T1"
+    write_raster(f"{prefix}_B4.TIF", np.ones((2, 2), dtype="uint16"), nodata=0)
+    (tmp_path / f"{prefix}_MTL.txt").write_text(
+        "REFLECTANCE_MULT_BAND_4 = 0.00002\nSUN_ELEVATION = 30\nEND\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="Incomplete reflectance calibration"):
+        cm.discover_scenes(tmp_path)
+
+
+def test_sentinel_level1c_discovery_uses_product_metadata(write_raster, tmp_path):
+    safe = tmp_path / "S2A_MSIL1C_20260817T091031_N0511_R050_T33MUP_20260817T120000.SAFE"
+    granule = safe / "GRANULE" / "L1C_T33MUP_A000001_20260817T091031" / "IMG_DATA"
+    granule.mkdir(parents=True)
+    metadata = safe / "MTD_MSIL1C.xml"
+    metadata.write_text(
+        """<root>
+        <PROCESSING_BASELINE>05.11</PROCESSING_BASELINE>
+        <QUANTIFICATION_VALUE>10000</QUANTIFICATION_VALUE>
+        <RADIO_ADD_OFFSET band_id="1">-1000</RADIO_ADD_OFFSET>
+        <RADIO_ADD_OFFSET band_id="2">-1000</RADIO_ADD_OFFSET>
+        <RADIO_ADD_OFFSET band_id="3">-1000</RADIO_ADD_OFFSET>
+        <RADIO_ADD_OFFSET band_id="7">-1000</RADIO_ADD_OFFSET>
+        </root>""",
+        encoding="utf-8",
+    )
+    transform = from_origin(300000, 9500000, 10, 10)
+    for code in ("B02", "B03", "B04", "B08"):
+        write_raster(
+            str(granule / f"T33MUP_20260817T091031_{code}.tif"),
+            np.full((2, 2), 3000, dtype="uint16"),
+            transform=transform, nodata=0,
+        )
+    scenes = cm.discover_scenes(safe)
+    assert len(scenes) == 1
+    scene = scenes[0]
+    assert scene.sensor == "sentinel-2"
+    assert scene.level == "L1C-TOA"
+    assert scene.quality is None
+    assert set(scene.bands) == {"blue", "green", "red", "nir"}
+    assert all(band.unit == "toa_reflectance" for band in scene.bands.values())
+    assert scene.bands["red"].scale == pytest.approx(.0001)
+    assert scene.bands["red"].offset == pytest.approx(-.1)
+    product = cm.prepare_imagery(
+        [scene], tmp_path / "s2_toa.tif", mask_clouds=False, mask_saturation=False
+    )
+    with rasterio.open(product.path) as src:
+        np.testing.assert_allclose(src.read(), .2, atol=1e-7)
+
+
+def test_sentinel_level1c_requires_radio_offset_for_modern_baseline(write_raster, tmp_path):
+    safe = tmp_path / "S2A_MSIL1C_20260817T091031_N0511_R050_T33MUP_20260817T120000.SAFE"
+    granule = safe / "GRANULE" / "L1C_T33MUP" / "IMG_DATA"
+    granule.mkdir(parents=True)
+    (safe / "MTD_MSIL1C.xml").write_text(
+        "<root><PROCESSING_BASELINE>05.11</PROCESSING_BASELINE>"
+        "<QUANTIFICATION_VALUE>10000</QUANTIFICATION_VALUE></root>",
+        encoding="utf-8",
+    )
+    write_raster(
+        str(granule / "T33MUP_20260817T091031_B04.tif"),
+        np.ones((2, 2), dtype="uint16"), nodata=0,
+    )
+    with pytest.raises(ValueError, match="RADIO_ADD_OFFSET"):
+        cm.discover_scenes(safe)

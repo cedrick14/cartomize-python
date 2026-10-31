@@ -131,8 +131,9 @@ class PreparationPage(Page):
         self.coverage_summary.setWordWrap(True)
         self.coverage_summary.setTextFormat(Qt.TextFormat.PlainText)
         self.form.addRow(self.coverage_summary)
-        self.coverage_scenes = QTableWidget(0, 4)
-        self.coverage_scenes.setHorizontalHeaderLabels(["Scène", "Emprise (%)", "Données (%)", "Utilisable (%)"])
+        self.coverage_scenes = QTableWidget(0, 6)
+        self.coverage_scenes.setHorizontalHeaderLabels(
+            ["Scène", "Emprise (%)", "Données (%)", "Utilisable (%)", "Nuages (%)", "Ombres (%)"])
         self.coverage_scenes.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
         self.coverage_scenes.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
         self.coverage_scenes.setMaximumHeight(165)
@@ -168,6 +169,14 @@ class PreparationPage(Page):
         for label,value in [('Plus proche voisin','nearest'),('Bilinéaire','bilinear'),('Cubique','cubic'),('Moyenne','average')]:self.resampling.addItem(label,value)
         self.overlap = QComboBox()
         self.overlap.addItem('Première scène valide','first');self.overlap.addItem('Dernière scène valide','last')
+        self.atmosphere = QComboBox()
+        self.atmosphere.addItem("Automatique : SR prioritaire, DOS1 en secours", "auto")
+        self.atmosphere.addItem("Produit Level-2 / SR uniquement", "provider")
+        self.atmosphere.addItem("DOS1 local", "dos1")
+        self.atmosphere.setToolTip(
+            "Stratégie atmosphérique du mode automatique. Le mode Automatique privilégie "
+            "un produit de réflectance de surface officiel avant le fallback DOS1."
+        )
         self.saturation = QCheckBox('Masquer les\npixels saturés');self.saturation.setChecked(True)
         self.saturation.setToolTip('Appliquer le masque de saturation lorsqu’il est disponible.')
         self.clouds = QCheckBox("Appliquer les\nmasques QA/SCL")
@@ -175,7 +184,9 @@ class PreparationPage(Page):
         self.dates = QCheckBox("Autoriser le\nmélange des dates")
         self.dates.setToolTip("Autoriser une mosaïque multitemporelle ou des scènes dont la date d’acquisition est inconnue.")
         for label, control in [("Système de coordonnées cible", self.crs), ("Résolution (m)", self.resolution),
-                               ("Rééchantillonnage spectral", self.resampling), ("Recouvrement des scènes", self.overlap), ("Saturation", self.saturation), ("Masque de qualité", self.clouds), ("Dates d’acquisition", self.dates)]:
+                               ("Rééchantillonnage spectral", self.resampling), ("Recouvrement des scènes", self.overlap),
+                               ("Correction atmosphérique", self.atmosphere), ("Saturation", self.saturation),
+                               ("Masque de qualité", self.clouds), ("Dates d’acquisition", self.dates)]:
             self.form.addRow(label, control)
         self.output = PathField("directory")
         self.name = QLineEdit("pretraitement")
@@ -193,7 +204,7 @@ class PreparationPage(Page):
             if item is not None and isinstance(item.widget(), QLabel):
                 item.widget().setWordWrap(True)
         for choice in (self.rgb_red, self.rgb_green, self.rgb_blue,
-                       self.resampling, self.overlap):
+                       self.resampling, self.overlap, self.atmosphere):
             choice.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
             choice.setMinimumContentsLength(12)
             choice.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
@@ -206,6 +217,7 @@ class PreparationPage(Page):
         self.quality_masks.itemChanged.connect(self.mask_changed)
         self.preparation_mode.currentIndexChanged.connect(self.refresh_options)
         self.preparation_mode.currentIndexChanged.connect(self.invalidate_diagnostic)
+        self.atmosphere.currentIndexChanged.connect(self.invalidate_diagnostic)
         self.allow_partial.toggled.connect(self.refresh_options)
         self.catalog_enabled.toggled.connect(self.refresh_options)
         self.catalog_enabled.toggled.connect(self.refresh_bands)
@@ -394,6 +406,7 @@ class PreparationPage(Page):
         self.clip.setEnabled(not automatic)
         self.allow_partial.setEnabled(automatic)
         self.catalog_enabled.setEnabled(automatic)
+        self.atmosphere.setEnabled(automatic)
         for control in self._catalog_fields:
             control.setEnabled(automatic and self.catalog_enabled.isChecked())
             control.setVisible(self.catalog_enabled.isChecked())
@@ -509,8 +522,11 @@ class PreparationPage(Page):
         for scene in record.get('scenes', []):
             row = self.coverage_scenes.rowCount()
             self.coverage_scenes.insertRow(row)
+            quality = scene.get('quality_statistics') or {}
             values = [str(scene['id'])] + [f"{scene.get(key, 0):.2f}".replace('.', ',')
                                           for key in ('footprint_percent', 'present_percent', 'usable_percent')]
+            for key in ('cloud_percent', 'cloud_shadow_percent'):
+                values.append(f"{quality[key]:.2f}".replace('.', ',') if key in quality else '—')
             for column, value in enumerate(values):
                 item = QTableWidgetItem(value)
                 item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
@@ -536,6 +552,25 @@ class PreparationPage(Page):
         decision = (f"Mosaïque automatique de {len(record.get('selected_scene_ids', []))} scènes."
                     if record.get('mosaic') else
                     "Une seule scène retenue ; aucune mosaïque nécessaire.")
+        plan = record.get('preprocessing_plan') or {}
+        plan_lines = []
+        for scene in plan.get('scenes', []):
+            statuses = []
+            for level in scene.get('levels', []):
+                number = level.get('level')
+                status = str(level.get('status', '')).replace('_', ' ')
+                if number:
+                    statuses.append(f"N{number} {status}")
+            if statuses:
+                plan_lines.append(f"{scene.get('scene_id', 'Scène')} : " + " · ".join(statuses))
+        plan_details = ("Plan automatique :\n" + "\n".join(plan_lines) + "\n") if plan_lines else ""
+        recovery = record.get('recovery') or []
+        recovered = [item for item in recovery if item.get('status') == 'recovered']
+        recovery_details = ""
+        if recovery:
+            recovery_details = (
+                f"Récupération automatique : {len(recovered)}/{len(recovery)} acquisition(s) résolue(s).\n"
+            )
         grid = record.get('parameters', {})
         grid_details = ""
         if grid.get('crs') and grid.get('resolution_m') is not None:
@@ -543,9 +578,10 @@ class PreparationPage(Page):
             crs_label = ':'.join(authority) if authority else 'projection personnalisée (voir le rapport)'
             grid_details = f"Grille commune : {crs_label} ; résolution {grid['resolution_m']:g} m.\n"
         self.coverage_summary.setText(f"{label}.\nCouverture utile : {percentage} % ; seuil : {threshold} %.\n"
-                                      f"{policy}\n{decision}\n{grid_details}Découpage à la zone d’étude réalisé.\n"
+                                      f"{policy}\n{decision}\n{recovery_details}{plan_details}{grid_details}"
+                                      "Découpage à la zone d’étude réalisé.\n"
                                       f"Scènes retenues : {selected}.\n"
-                                      "Diagnostic, cartes de lacunes et résultats disponibles dans le projet.")
+                                      "Diagnostic, plan N1–N5, cartes de lacunes et résultats disponibles dans le projet.")
         self.apply_audit_button.setEnabled(False)
         if partial:
             window = self.window()
@@ -638,9 +674,12 @@ class PreparationPage(Page):
             if not scenes and (not self.crs.text().strip() or not self.resolution.value()):
                 raise ValueError("Renseigner le système projeté cible et la résolution pour une recherche sans images locales.")
         missing_masks = [scene.scene_id for scene in scenes if scene.quality is None]
-        if self.clouds.isChecked() and missing_masks:
-            raise ValueError("Associer un masque de qualité aux scènes : " + ', '.join(missing_masks) +
-                             ". Sans masque disponible, désactiver explicitement l’application des masques QA/SCL.")
+        if self.clouds.isChecked() and missing_masks and not (automatic and catalog is not None):
+            raise ValueError(
+                "Associer un masque de qualité (quality mask QA/SCL) aux scènes : " + ', '.join(missing_masks)
+                + ". Configurer un catalogue pour une récupération automatique, "
+                  "ou désactiver explicitement le masque en mode expert."
+            )
         rgb = tuple(control.currentData() for control in (self.rgb_red, self.rgb_green, self.rgb_blue)) if self.colour.isChecked() else None
         if rgb and None in rgb:
             raise ValueError("Affecter une bande à chacun des trois canaux rouge, vert et bleu.")
@@ -648,13 +687,16 @@ class PreparationPage(Page):
         kwargs = dict(aoi=self.aoi.text() if automatic or self.clip.isChecked() else None,
             multiband=self.multiband.isChecked(), separate_bands=self.separate.isChecked(), composition=rgb,
             target_crs=self.crs.text().strip() or None, resolution=self.resolution.value() or None,
-            mask_clouds=self.clouds.isChecked(), mask_saturation=self.saturation.isChecked(), resampling=self.resampling.currentData(), overlap=self.overlap.currentData(), allow_mixed_dates=self.dates.isChecked())
+            mask_clouds=self.clouds.isChecked(), mask_saturation=self.saturation.isChecked(),
+            resampling=self.resampling.currentData(), overlap=self.overlap.currentData(),
+            allow_mixed_dates=self.dates.isChecked())
         if not automatic:
             kwargs['mosaic'] = self.mosaic.isChecked()
             return lambda progress, cancel, stage: cm.process_imagery(scenes, destination,
                 progress=progress, cancel=cancel, stage=stage, **kwargs).manifest
         kwargs.update(coverage_threshold=self.coverage_threshold.value(), allow_partial=self.allow_partial.isChecked(),
-                      catalog=catalog, band_order=band_order)
+                      catalog=catalog, band_order=band_order,
+                      atmospheric_method=self.atmosphere.currentData())
         self.invalidate_diagnostic()
         self._pending_audit_generation = self._audit_generation
         return lambda progress, cancel, stage: cm.preprocess_imagery(scenes, destination,

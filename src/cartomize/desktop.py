@@ -702,6 +702,13 @@ class CartomizeWindow(SessionControls,ProjectConnections,QMainWindow):
         self.cancel_event=threading.Event();self.worker=Worker(job,self.cancel_event,self,staged=execute_plan or self.pages[self.stack.currentIndex()].staged);self.thread=self.worker
         self.worker.progress.connect(self.show_progress);self.worker.stage.connect(self.status.setText);self.worker.succeeded.connect(self.completed)
         self.worker.stage.connect(self.workspace.activity.setText)
+        if hasattr(self, '_workbench'):
+            self.worker.stage.connect(self._workbench.log_stage)
+            automatic_imagery = key == 'prepare' and getattr(page, 'preparation_mode', None) is not None and page.preparation_mode.currentData() == 'automatic'
+            self._workbench.begin_processing(
+                'Prétraitement automatique N1→N5' if automatic_imagery else 'Traitement ' + key,
+                focus_logs=automatic_imagery,
+            )
         self.worker.failed.connect(self.failed);self.worker.cancelled.connect(self.cancelled)
         self.worker.diagnostic_ready.connect(self.show_failed_diagnostic)
         self.thread.finished.connect(self.cleaned);self.thread.finished.connect(self.thread.deleteLater)

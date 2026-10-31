@@ -90,8 +90,18 @@ def make_inputs(output):
 def settle(app, document):
     app.processEvents()
     QTest.qWait(120)
-    wait_for(lambda: document.canvas.last_render is not None
-             and not document.canvas._busy, "the raster rendering")
+    try:
+        wait_for(lambda: document.canvas.last_render is not None
+                 and not document.canvas._busy, "the raster rendering", seconds=15)
+    except RuntimeError:
+        # A dock/viewport transition may coalesce the initial zero-delay render
+        # request before Xvfb exposes the final viewport. Trigger one explicit
+        # refresh and wait for that generation instead of relying on timing.
+        document.canvas.refresh()
+        app.processEvents()
+        QTest.qWait(120)
+        wait_for(lambda: document.canvas.last_render is not None
+                 and not document.canvas._busy, "the refreshed raster rendering", seconds=30)
     app.processEvents()
 
 

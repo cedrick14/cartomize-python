@@ -383,3 +383,238 @@ def test_invalid_policies_fail_before_creating_outputs(write_raster, tmp_path, k
     with pytest.raises(ValueError):
         cm.preprocess_imagery([_scene(write_raster, "full", width=4)], tmp_path / "invalid", aoi=_zone(), **kwargs)
     assert not (tmp_path / "invalid").exists()
+
+
+def test_four_level_preprocessing_assessment(write_raster, tmp_path):
+    landsat = _scene(write_raster, "landsat", width=4)
+    landsat = cm.Scene(
+        landsat.scene_id, landsat.bands, sensor="landsat-8", acquired=landsat.acquired,
+        level="C2-L2-SR", quality=landsat.quality, quality_kind=landsat.quality_kind,
+    )
+    plan = cm.assess_preprocessing([landsat])
+    scene = plan["scenes"][0]
+    assert plan["automatic"] is True
+    assert scene["ready"] is True
+    assert scene["levels"][0]["name"] == "radiometric_calibration"
+    assert scene["levels"][1]["status"] == "already_applied"
+    assert scene["levels"][2]["status"] == "ready"
+    assert scene["levels"][3]["action"] == "mask_before_resampling"
+
+
+def test_toa_scene_reports_atmospheric_blocker(write_raster, tmp_path):
+    path = write_raster("toa_red.tif", np.ones((2, 2), dtype="float32"))
+    quality = write_raster("toa_qa.tif", np.ones((2, 2), dtype="uint8"), nodata=None)
+    scene = cm.Scene(
+        "toa", {"red": cm.Band(path, unit="reflectance")},
+        sensor="sentinel-2", level="L1C-TOA",
+        quality=quality, quality_kind="valid_mask",
+    )
+    plan = cm.assess_preprocessing([scene])
+    assert plan["ready"] is False
+    assert "surface_reflectance_product_or_atmospheric_parameters" in plan["scenes"][0]["missing"]
+    with pytest.raises(ValueError, match="Prétraitement automatique bloqué"):
+        cm.preprocess_imagery(
+            [scene], tmp_path / "blocked", aoi=_zone(),
+            atmospheric_method="provider",
+        )
+
+
+def test_missing_quality_is_reported_before_cloud_masking(write_raster):
+    source = _scene(write_raster, "noqa", width=4)
+    scene = cm.Scene(source.scene_id, source.bands, sensor=source.sensor, acquired=source.acquired,
+                     level="C2-L2-SR")
+    plan = cm.assess_preprocessing([scene])
+    cloud = plan["scenes"][0]["levels"][3]
+    assert cloud["status"] == "unavailable"
+    assert cloud["action"] == "add_quality_mask_then_restart_assessment"
+    assert "quality_mask" in plan["scenes"][0]["missing"]
+
+
+def test_exact_identity_recovery_for_missing_quality(write_raster, tmp_path, catalog_service):
+    local = _scene(write_raster, "local", width=4)
+    local = cm.Scene(
+        "LC08_L2SP_181063_20261026_20261031_02_T1",
+        local.bands, sensor="landsat-8", acquired="2026-10-26",
+        level="C2-L2-SR",
+    )
+    item = catalog_service["add"]("LC08_L2SP_181063_20261026_20261031_02_T1", left=300000, width=4)
+    item["properties"].update({
+        "platform": "landsat-8",
+        "landsat:collection_number": "02",
+        "landsat:processing_level": "L2SP",
+        "landsat:wrs_path": 181,
+        "landsat:wrs_row": 63,
+    })
+    item["collection"] = "landsat-c2-l2"
+    # Re-label assets as a known Landsat C2 L2 profile.
+    item["assets"]["spectrum"]["bands"] = [
+        dict(name="B4", common_name="red", scale=.0000275, offset=-.2, unit="reflectance", nodata=-9999),
+        dict(name="B5", common_name="nir", scale=.0000275, offset=-.2, unit="reflectance", nodata=-9999),
+    ]
+    item["assets"]["qa_pixel"] = item["assets"].pop("valid")
+    qa_path = write_raster("recovery_qa_pixel.tif", np.full((2, 4), 64, dtype="uint16"), nodata=None)
+    qa_href = item["assets"]["qa_pixel"]["href"]
+    catalog_service["assets"][urlsplit(qa_href).path] = Path(qa_path).read_bytes()
+    catalog_service["config"].update(
+        collections=["landsat-c2-l2"], quality_asset="qa_pixel", quality_kind="landsat_qa"
+    )
+    result = cm.preprocess_imagery(
+        [local], tmp_path / "recovered", aoi=_zone(), catalog=catalog_service["config"],
+        band_order=["red", "nir"]
+    )
+    assert result.report["status"] == "complete"
+    assert result.report["recovery"][0]["status"] == "recovered"
+    assert result.report["preprocessing_plan"]["ready"] is True
+
+
+def test_recovery_rejects_ambiguous_catalog_match(write_raster, tmp_path, catalog_service):
+    local = _scene(write_raster, "local", width=4)
+    local = cm.Scene(
+        "LC08_L2SP_181063_20261026_20261031_02_T1",
+        local.bands, sensor="landsat-8", acquired="2026-10-26", level="C2-L2-SR"
+    )
+    for suffix in ("A", "B"):
+        item = catalog_service["add"](f"LC08_L2SP_181063_20261026_{suffix}", left=300000, width=4)
+        item["properties"].update({
+            "platform": "landsat-8",
+            "landsat:collection_number": "02",
+            "landsat:processing_level": "L2SP",
+            "landsat:wrs_path": 181,
+            "landsat:wrs_row": 63,
+        })
+        item["collection"] = "landsat-c2-l2"
+        item["assets"]["spectrum"]["bands"] = [
+            dict(name="B4", common_name="red", scale=.0000275, offset=-.2, unit="reflectance", nodata=-9999),
+            dict(name="B5", common_name="nir", scale=.0000275, offset=-.2, unit="reflectance", nodata=-9999),
+        ]
+        item["assets"]["qa_pixel"] = item["assets"].pop("valid")
+        qa_path = write_raster(f"ambiguous_{suffix}_qa_pixel.tif", np.full((2, 4), 64, dtype="uint16"), nodata=None)
+        qa_href = item["assets"]["qa_pixel"]["href"]
+        catalog_service["assets"][urlsplit(qa_href).path] = Path(qa_path).read_bytes()
+    catalog_service["config"].update(
+        collections=["landsat-c2-l2"], quality_asset="qa_pixel", quality_kind="landsat_qa"
+    )
+    with pytest.raises(ValueError, match="Prétraitement automatique bloqué"):
+        cm.preprocess_imagery(
+            [local], tmp_path / "ambiguous", aoi=_zone(), catalog=catalog_service["config"],
+            band_order=["red", "nir"]
+        )
+
+
+def test_custom_reflectance_is_accepted_as_explicit_user_declaration(write_raster, tmp_path):
+    path = write_raster("unknown_reflectance.tif", np.ones((2, 2), dtype="float32"))
+    quality = write_raster("unknown_quality.tif", np.ones((2, 2), dtype="uint8"), nodata=None)
+    scene = cm.Scene(
+        "unknown", {"red": cm.Band(path, unit="reflectance")},
+        sensor="custom", level="custom",
+        quality=quality, quality_kind="valid_mask",
+    )
+    plan = cm.assess_preprocessing([scene])
+    atmospheric = next(level for level in plan["scenes"][0]["levels"]
+                       if level["name"] == "atmospheric_correction")
+    assert atmospheric["status"] == "user_declared"
+    assert plan["ready"] is True
+    custom_zone = gpd.GeoDataFrame(
+        geometry=[box(300000, 9499980, 300020, 9500000)], crs=32733
+    )
+    result = cm.preprocess_imagery(
+        [scene], tmp_path / "custom_declared", aoi=custom_zone
+    )
+    assert result.report["status"] == "complete"
+
+
+def test_explicit_cloud_disable_allows_scene_without_quality(write_raster, tmp_path):
+    source = _scene(write_raster, "explicit_noqa", width=4)
+    scene = cm.Scene(
+        source.scene_id, source.bands, sensor="landsat-8", acquired=source.acquired,
+        level="C2-L2-SR"
+    )
+    plan = cm.assess_preprocessing([scene], mask_clouds=False)
+    quality = next(level for level in plan["scenes"][0]["levels"]
+                   if level["name"] == "quality_detection")
+    assert quality["status"] == "disabled"
+    assert plan["ready"] is True
+    result = cm.preprocess_imagery(
+        [scene], tmp_path / "noqa_allowed", aoi=_zone(), mask_clouds=False
+    )
+    assert result.report["status"] == "complete"
+
+
+def test_dos1_fallback_converts_to_surface_reflectance(write_raster, tmp_path):
+    transform = from_origin(300000, 9500000, 10, 10)
+    raw = np.array([[1000, 2000, 3000, 4000]], dtype="float32")
+    path = write_raster("toa_red.tif", raw, transform=transform, nodata=-9999)
+    qa = write_raster("toa_qa.tif", np.full((1, 4), 64, dtype="uint16"),
+                      transform=transform, nodata=None)
+    scene = cm.Scene(
+        "LC08_L1TP_181063_20261026_20261031_02_T1",
+        {"red": cm.Band(path, scale=.0001, offset=0, nodata=-9999, unit="toa_reflectance")},
+        sensor="landsat-8", acquired="2026-10-26", level="C2-L1",
+        quality=qa, quality_kind="landsat_qa",
+    )
+    corrected = cm.dos1_scene(scene, dark_percentile=0, max_samples=100)
+    assert corrected.level == "DOS1-SR"
+    assert corrected.bands["red"].unit == "reflectance"
+    # Dark TOA reflectance is 0.1; DOS1 assumes 0.01 surface reflectance.
+    assert corrected.bands["red"].offset == pytest.approx(-0.09)
+    product = cm.prepare_imagery([corrected], tmp_path / "dos1.tif")
+    with rasterio.open(product.path) as src:
+        np.testing.assert_allclose(src.read(1), [[.01, .11, .21, .31]], atol=1e-6)
+
+
+def test_dos1_rejects_non_toa_units(write_raster):
+    path = write_raster("already_sr.tif", np.ones((2, 2), dtype="float32"))
+    scene = cm.Scene(
+        "sr", {"red": cm.Band(path, unit="reflectance")},
+        sensor="landsat-8", level="C2-L1",
+    )
+    with pytest.raises(ValueError, match="calibrated TOA reflectance"):
+        cm.dos1_scene(scene, max_samples=100)
+
+
+def test_automatic_atmosphere_uses_dos1_without_catalog(write_raster, tmp_path):
+    transform = from_origin(300000, 9500000, 10, 10)
+    red = write_raster("l1_red.tif", np.full((2, 4), 2000, dtype="float32"),
+                       transform=transform, nodata=-9999)
+    nir = write_raster("l1_nir.tif", np.full((2, 4), 4000, dtype="float32"),
+                       transform=transform, nodata=-9999)
+    qa = write_raster("l1_qa.tif", np.full((2, 4), 64, dtype="uint16"),
+                      transform=transform, nodata=None)
+    scene = cm.Scene(
+        "LC08_L1TP_181063_20261026_20261031_02_T1",
+        {
+            "red": cm.Band(red, scale=.0001, unit="toa_reflectance", nodata=-9999),
+            "nir": cm.Band(nir, scale=.0001, unit="toa_reflectance", nodata=-9999),
+        },
+        sensor="landsat-8", acquired="2026-10-26", level="C2-L1",
+        quality=qa, quality_kind="landsat_qa",
+    )
+    result = cm.preprocess_imagery(
+        [scene], tmp_path / "auto_dos1", aoi=_zone(),
+        atmospheric_method="auto",
+    )
+    assert result.report["status"] == "complete"
+    assert result.report["preprocessing_plan"]["ready"] is True
+    assert any(item.get("reason") == "dos1_local_fallback"
+               for item in result.report["recovery"])
+    plan_scene = result.report["preprocessing_plan"]["scenes"][0]
+    atmosphere = next(level for level in plan_scene["levels"]
+                      if level["name"] == "atmospheric_correction")
+    assert atmosphere["method"] == "dos1_reflectance_approximation"
+
+
+def test_provider_only_blocks_toa_without_catalog(write_raster, tmp_path):
+    source = _scene(write_raster, "toa_provider", width=4)
+    scene = cm.Scene(
+        "LC08_L1TP_181063_20261026_20261031_02_T1",
+        {name: cm.Band(band.path, scale=.001, offset=-.1, nodata=band.nodata,
+                       unit="toa_reflectance")
+         for name, band in source.bands.items()},
+        sensor="landsat-8", acquired=source.acquired, level="C2-L1",
+        quality=source.quality, quality_kind=source.quality_kind,
+    )
+    with pytest.raises(ValueError, match="Prétraitement automatique bloqué"):
+        cm.preprocess_imagery(
+            [scene], tmp_path / "provider_only", aoi=_zone(),
+            atmospheric_method="provider",
+        )

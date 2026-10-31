@@ -12,7 +12,8 @@ from rasterio.enums import ColorInterp, Resampling
 from rasterio.features import geometry_mask
 from rasterio.vrt import WarpedVRT
 
-from .imagery import _calibrate, _check_cancel, _plan_imagery
+from .imagery import (_calibrate, _check_cancel, _plan_imagery,
+                      _quality_categories, _quality_category_names)
 from .raster import _read
 from .scenes import Scene, discover_scenes
 from .storage import new_directory, save_json
@@ -102,6 +103,7 @@ def audit_imagery(scenes, destination, *, aoi, band_order=None, target_crs=None,
         progress(0, total)
     counts = np.zeros(3, dtype="int64")
     scene_counts = np.zeros((len(scenes), 3), dtype="int64")
+    quality_counts = [dict() for _ in scenes]
     aoi_pixels = 0
 
     with new_directory(destination) as work:
@@ -114,6 +116,14 @@ def audit_imagery(scenes, destination, *, aoi, band_order=None, target_crs=None,
                     dataset = stack.enter_context(rasterio.open(path))
                     return stack.enter_context(WarpedVRT(dataset, **warp_options))
 
+                def quality_reader(path):
+                    dataset = stack.enter_context(rasterio.open(path))
+                    return stack.enter_context(WarpedVRT(
+                        dataset, crs=plan["crs"], transform=plan["transform"],
+                        width=plan["width"], height=plan["height"],
+                        dtype="float64", nodata=np.nan, resampling=Resampling.nearest))
+
+                quality_readers = []
                 for scene_index, scene in enumerate(scenes):
                     bands = []
                     for band_index, name in enumerate(names):
@@ -139,6 +149,9 @@ def audit_imagery(scenes, destination, *, aoi, band_order=None, target_crs=None,
                         if progress:
                             progress(done, total)
                     readers.append(bands)
+                    quality_readers.append(
+                        (quality_reader(scene.quality), scene.quality_kind)
+                        if scene.quality is not None else None)
 
                 with rasterio.open(work / "coverage.tif", "w", **profile) as coverage, \
                      rasterio.open(work / "gaps.tif", "w", **{**profile, "count": 1}) as gaps:
@@ -160,6 +173,14 @@ def audit_imagery(scenes, destination, *, aoi, band_order=None, target_crs=None,
                                         cache[key] = ~np.ma.getmaskarray(_read(raster, 1, window=window))
                                     common[kind] &= cache[key]
                             scene_counts[scene_index] += common.sum(axis=(1, 2))
+                            quality = quality_readers[scene_index]
+                            if quality is not None:
+                                quality_values = _read(quality[0], 1, window=window)
+                                categories = _quality_categories(quality_values, quality[1])
+                                domain = common[0]
+                                summary = quality_counts[scene_index]
+                                for name, category in categories.items():
+                                    summary[name] = summary.get(name, 0) + int((domain & category).sum())
                             combined |= common
                         counts += combined.sum(axis=(1, 2))
                         encoded = np.where(inside[None, :, :], combined, 255).astype("uint8")
@@ -188,11 +209,28 @@ def audit_imagery(scenes, destination, *, aoi, band_order=None, target_crs=None,
                     gaps.write_colormap(1, {0: (40, 120, 70, 255), 1: (90, 90, 90, 255),
                         2: (210, 125, 35, 255), 3: (165, 65, 80, 255), 255: (0, 0, 0, 0)})
 
-        summaries = [dict(index=i + 1, id=scene.scene_id, sensor=scene.sensor,
-            level=scene.level, acquired=scene.acquired,
-            quality_mask=str(Path(scene.quality).resolve()) if scene.quality else None,
-            saturation_mask=str(Path(scene.saturation).resolve()) if scene.saturation else None,
-            **_statistics(scene_counts[i], aoi_pixels)) for i, scene in enumerate(scenes)]
+        def quality_summary(index, scene):
+            if scene.quality is None:
+                return None
+            denominator = int(scene_counts[index, 0])
+            result = {"kind": scene.quality_kind, "evaluated_pixels": denominator}
+            for name in _quality_category_names(scene.quality_kind):
+                value = int(quality_counts[index].get(name, 0))
+                result[f"{name}_pixels"] = value
+                result[f"{name}_percent"] = 100. * value / denominator if denominator else 0.
+            return result
+
+        summaries = []
+        for i, scene in enumerate(scenes):
+            item = dict(index=i + 1, id=scene.scene_id, sensor=scene.sensor,
+                level=scene.level, acquired=scene.acquired,
+                quality_mask=str(Path(scene.quality).resolve()) if scene.quality else None,
+                saturation_mask=str(Path(scene.saturation).resolve()) if scene.saturation else None,
+                **_statistics(scene_counts[i], aoi_pixels))
+            quality = quality_summary(i, scene)
+            if quality is not None:
+                item["quality_statistics"] = quality
+            summaries.append(item)
         statistics = _statistics(counts, aoi_pixels)
         complete = statistics["usable_percent"] + 1e-9 >= coverage_threshold
         eligible = [item for item in summaries if item["usable_percent"] + 1e-9 >= coverage_threshold]
@@ -219,11 +257,13 @@ def audit_imagery(scenes, destination, *, aoi, band_order=None, target_crs=None,
             recommended_action=action, recommended_scene_ids=recommended,
             mosaic_recommended=bool(len(contributors) > 1 and counts[2] > scene_counts[:, 2].max()),
             coverage_method="target_grid_pixel_count",
+            quality_statistics_scope="per_scene_common_band_footprint_on_target_grid",
             gap_classes={"0": "usable", "1": "outside_footprint", "2": "missing_data",
                          "3": "quality_rejection", "255": "outside_aoi"},
             notes=["All selected bands must be present in the same scene for a pixel to count.",
                    "Percentages use AOI pixels on the target grid; they are not fractional polygon areas.",
-                   "Recommendations do not change the selected sources or authorize mixing dates."])
+                   "Recommendations do not change the selected sources or authorize mixing dates.",
+                   "Quality statistics are reported per scene on its common selected-band footprint; scene counts are not additive where scenes overlap."])
         if not aoi_pixels:
             report["notes"].append("The AOI contains no target-grid pixel under the selected boundary rule; choose a finer grid or all_touched=True.")
         save_json(report, work / "report.json")

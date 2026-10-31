@@ -18,6 +18,9 @@ from .imagery import _check_cancel, _plan_imagery
 from .imagery_audit import ImageryAudit, audit_imagery
 from .imagery_pipeline import process_imagery
 from .scenes import Scene, discover_scenes
+from .preprocessing_plan import assess_preprocessing
+from .imagery_recovery import recover_scene
+from .atmospheric import dos1_scene
 from .storage import new_directory, read_json, relocate_products, save_json
 
 
@@ -203,7 +206,8 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
                       band_order=None, target_crs=None, resolution=None, overlap="first",
                       resampling="nearest", mask_clouds=True, mask_saturation=True,
                       allow_mixed_dates=False, all_touched=False, max_pixels=250_000_000,
-                      percentiles=(2, 98), gamma=1., progress=None, cancel=None, stage=None):
+                      percentiles=(2, 98), gamma=1., atmospheric_method="auto",
+                      progress=None, cancel=None, stage=None):
     """Audit, optionally replenish, select scenes, then prepare on a fixed grid.
 
     Production is blocked below ``coverage_threshold`` unless ``allow_partial``
@@ -231,12 +235,17 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
             raise ValueError(f"{name} doit être un booléen explicite.")
     if type(max_pixels) is not int or max_pixels < 1:
         raise ValueError("max_pixels doit être un entier positif.")
+    if atmospheric_method not in {"auto", "provider", "dos1"}:
+        raise ValueError("atmospheric_method must be auto, provider or dos1.")
     if overlap not in {"first", "last"}:
         raise ValueError("overlap doit être first ou last.")
     if resampling not in {"nearest", "bilinear", "cubic", "average"}:
         raise ValueError("Méthode de rééchantillonnage non prise en charge.")
     if not (multiband or separate_bands or composition is not None):
         raise ValueError("Choisir au moins un produit : multibande, bandes séparées ou composition.")
+    def announce_early(text):
+        if stage:
+            stage(text)
     config = _catalog_config(catalog)
     if aoi is None:
         raise ValueError("Une zone d’étude polygonale est requise en mode automatique.")
@@ -251,6 +260,102 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
             scenes = discover_scenes(scenes)
     if not scenes and config is None:
         raise ValueError("Sélectionner des scènes ou configurer un catalogue STAC.")
+    preprocessing_plan = assess_preprocessing(
+        scenes, mask_clouds=mask_clouds, mask_saturation=mask_saturation
+    ) if scenes else None
+    if preprocessing_plan is not None:
+        announce_early("N1 — Diagnostic radiométrique")
+        announce_early("N2 — Diagnostic atmosphérique")
+        announce_early("N3 — Contrôle qualité")
+        announce_early("N4 — Diagnostic nuages et pixels non utilisables")
+    initial_preprocessing_plan = copy.deepcopy(preprocessing_plan) if preprocessing_plan is not None else None
+    recovery_records = []
+    if preprocessing_plan is not None and config is not None and atmospheric_method in {"auto", "provider"}:
+        needs_recovery = {
+            scene["scene_id"]
+            for scene in preprocessing_plan["scenes"]
+            if any(level["status"] in {
+                "required_but_unavailable", "missing_inputs", "unavailable"
+            } for level in scene["levels"])
+        }
+        if needs_recovery:
+            search_geometry = mapping(zones.to_crs(4326).geometry.union_all())
+            recovered = []
+            recovery_root = Path(destination).expanduser().resolve().with_name(
+                Path(destination).expanduser().resolve().name + "_recovery"
+            )
+            for index, scene in enumerate(scenes):
+                if scene.scene_id not in needs_recovery:
+                    recovered.append(scene)
+                    continue
+                candidate, record = recover_scene(
+                    scene,
+                    recovery_root / f"scene_{index + 1:04d}",
+                    config=config,
+                    search_geometry=search_geometry,
+                    band_order=band_order or tuple(scene.bands),
+                    mask_clouds=mask_clouds,
+                    mask_saturation=mask_saturation,
+                    progress=None,
+                    cancel=cancel,
+                )
+                recovery_records.append(record)
+                recovered.append(candidate or scene)
+            scenes = recovered
+            preprocessing_plan = assess_preprocessing(
+                scenes, mask_clouds=mask_clouds, mask_saturation=mask_saturation
+            )
+    if preprocessing_plan is not None and atmospheric_method in {"auto", "dos1"}:
+        toa_ids = {
+            scene["scene_id"]
+            for scene in preprocessing_plan["scenes"]
+            if any(level["name"] == "atmospheric_correction"
+                   and level["status"] == "required_but_unavailable"
+                   for level in scene["levels"])
+        }
+        if toa_ids:
+            announce_early("N2 — Aucun Level-2/SR exact disponible ; évaluation du fallback DOS1")
+            corrected = []
+            for scene in scenes:
+                if scene.scene_id not in toa_ids:
+                    corrected.append(scene)
+                    continue
+                candidate = dos1_scene(
+                    scene, mask_clouds=mask_clouds, mask_saturation=mask_saturation,
+                    cancel=cancel,
+                )
+                recovery_records.append({
+                    "scene_id": scene.scene_id,
+                    "replacement_scene_id": candidate.scene_id,
+                    "status": "corrected",
+                    "reason": "dos1_local_fallback",
+                    "retained": True,
+                    "method": "dos1_reflectance_approximation",
+                })
+                corrected.append(candidate)
+            scenes = corrected
+            preprocessing_plan = assess_preprocessing(
+                scenes, mask_clouds=mask_clouds, mask_saturation=mask_saturation
+            )
+            announce_early("N2 — Fallback DOS1 appliqué aux scènes TOA compatibles")
+    if preprocessing_plan is not None:
+        blockers = []
+        for scene in preprocessing_plan["scenes"]:
+            for level in scene["levels"]:
+                if level["status"] in {
+                    "insufficient_metadata", "required_but_unavailable",
+                    "missing_inputs", "unavailable", "undetermined", "not_assessed"
+                }:
+                    blockers.append((scene["scene_id"], level["name"], level.get("missing", [])))
+        if blockers:
+            detail = "; ".join(
+                f"{scene}: {name} ({', '.join(missing) or 'entrée manquante'})"
+                for scene, name, missing in blockers
+            )
+            raise ValueError(
+                "Prétraitement automatique bloqué après récupération des entrées : " + detail
+                + ". Fournir les métadonnées ou le quality mask (QA/SCL) requis."
+            )
     if not scenes and (not band_order or target_crs is None or resolution is None):
         raise ValueError("Sans scène locale, définir band_order, target_crs projeté et resolution.")
     if resolution is not None and (not math.isfinite(float(resolution)) or float(resolution) <= 0):
@@ -269,8 +374,7 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
         plan = _plan_imagery(scenes, **{k: v for k, v in common.items() if k not in {"mask_saturation", "all_touched"}}, cancel=cancel)
         common.update(band_order=plan["names"], target_crs=plan["crs"], resolution=plan["resolution"])
     def announce(text):
-        if stage:
-            stage(text)
+        announce_early(text)
     def callback(start, end):
         def update(done, total):
             if progress:
@@ -380,7 +484,9 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
             initial_usable_percent=initial_report["usable_percent"] if initial_report else 0.,
             catalog=config, acquisitions=requests, downloaded_bytes=total_bytes,
             download_directory=str(work / "acquisitions") if (work / "acquisitions").exists() else None,
-            products=[], preparation=None, audit=str(audit.manifest), coverage=str(audit.coverage), gaps=str(audit.gaps))
+            products=[], preparation=None, audit=str(audit.manifest), coverage=str(audit.coverage), gaps=str(audit.gaps),
+            initial_preprocessing_plan=initial_preprocessing_plan,
+            preprocessing_plan=preprocessing_plan, recovery=recovery_records)
         if not audit.report["usable_pixels"] or (not report["threshold_met"] and not allow_partial):
             _check_cancel(cancel)
             raise ImageryCoverageError(audit, report).preserve(diagnostic_destination(destination), cancel=cancel)
@@ -396,7 +502,7 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
         if not final_audit.report["usable_pixels"] or (final_audit.report["usable_percent"] + 1e-9 < threshold and not allow_partial):
             report.update(usable_percent=final_audit.report["usable_percent"], threshold_met=False)
             raise ImageryCoverageError(final_audit, report).preserve(diagnostic_destination(destination), cancel=cancel)
-        announce("Préparation des scènes retenues" + (" et mosaïque" if len(selected) > 1 else ""))
+        announce("N5 — Préparation des scènes retenues" + (" et mosaïque" if len(selected) > 1 else ""))
         prepared = process_imagery(selected, work / "products", mosaic=len(selected) > 1,
             multiband=multiband, separate_bands=separate_bands, composition=composition,
             overlap=overlap, percentiles=percentiles, gamma=gamma,
@@ -412,7 +518,24 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
             threshold_met=actual + 1e-9 >= threshold, selected_scene_ids=[s.scene_id for s in selected],
             mosaic=len(selected) > 1, products=list(prepared.products), preparation=str(prepared.manifest),
             audit=str(final_audit.manifest), coverage=str(final_audit.coverage), gaps=str(final_audit.gaps),
-            parameters=final_audit.report["parameters"])
+            parameters=final_audit.report["parameters"],
+            initial_preprocessing_plan=initial_preprocessing_plan,
+            preprocessing_plan=assess_preprocessing(
+                selected, mask_clouds=mask_clouds, mask_saturation=mask_saturation),
+            recovery=recovery_records,
+            atmospheric_method=atmospheric_method,
+            executed_steps=[
+                "radiometric_calibration",
+                "quality_detection" if mask_clouds else "quality_detection_disabled",
+                "cloud_masking" if mask_clouds else "cloud_masking_disabled",
+                "grid_harmonization",
+                "scene_selection",
+                "mosaic" if len(selected) > 1 else "single_scene",
+                "aoi_clip",
+            ],
+            quality_statistics=[dict(scene_id=scene["id"], **scene["quality_statistics"])
+                                for scene in final_audit.report.get("scenes", [])
+                                if scene.get("quality_statistics")])
         shutil.rmtree(rounds, ignore_errors=True)
         save_json(report, work / "preprocessing.json")
         replace = relocate_products(work, destination)

@@ -124,13 +124,17 @@ def _catalog():
             resampling=resampling,mask_clouds=mask_clouds,mask_saturation=mask_saturation,
             allow_mixed_dates=allow_mixed_dates,all_touched=all_touched,max_pixels=max_pixels,
             coverage_threshold=coverage_threshold,progress=progress,cancel=cancel).manifest
+    def preprocessing_assessment(sources,*,mask_clouds=True,mask_saturation=True):
+        from .preprocessing_plan import assess_preprocessing
+        return assess_preprocessing(discover_scenes(sources),
+            mask_clouds=mask_clouds, mask_saturation=mask_saturation)
     def imagery_preprocessing(sources,destination,*,aoi,band_order=None,target_crs=None,
                               resolution=None,overlap='first',resampling='nearest',
                               mask_clouds=True,mask_saturation=True,allow_mixed_dates=False,
                               all_touched=False,max_pixels=250_000_000,coverage_threshold=100.,
                               allow_partial=False,multiband=True,separate_bands=False,
                               composition=None,percentiles=(2,98),gamma=1.,catalog=None,
-                              progress=None,cancel=None):
+                              atmospheric_method='auto',progress=None,cancel=None):
         from .imagery_automatic import preprocess_imagery
         return preprocess_imagery(sources,destination,aoi=aoi,band_order=band_order,
             target_crs=target_crs,resolution=resolution,overlap=overlap,resampling=resampling,
@@ -138,9 +142,11 @@ def _catalog():
             allow_mixed_dates=allow_mixed_dates,all_touched=all_touched,max_pixels=max_pixels,
             coverage_threshold=coverage_threshold,allow_partial=allow_partial,
             multiband=multiband,separate_bands=separate_bands,composition=composition,
-            percentiles=percentiles,gamma=gamma,catalog=catalog,progress=progress,cancel=cancel).manifest
+            percentiles=percentiles,gamma=gamma,catalog=catalog,atmospheric_method=atmospheric_method,
+            progress=progress,cancel=cancel).manifest
     add('prepare','Prétraitement multispectral',preparation,'raster','prepare')
     add('imagery.audit','Diagnostic de couverture des images',imagery_audit,'document','prepare')
+    add('imagery.plan','Plan automatique N1-N5',preprocessing_assessment,'document','prepare')
     add('imagery.preprocess','Prétraitement automatique avec contrôle de couverture',imagery_preprocessing,'document','prepare')
     add('hydrology','Analyse hydrologique D8',hydrology,'raster','processing')
     add('routing','Plus court chemin',shortest_path,'vector','processing')
