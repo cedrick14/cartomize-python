@@ -41,8 +41,9 @@ def _quality_valid(values, kind):
         # C2 fill, dilated cloud, cirrus (8/9), cloud, shadow and snow.
         valid &= (raw & 63) == 0
     elif kind == "sentinel_scl":
-        # Keep dark areas, vegetation, bare soil, water and unclassified.
-        valid &= np.isin(raw, [2,4,5,6,7])
+        # Keep only non-cloud surface classes. SCL 7 is treated as low-probability cloud/unclassified
+        # by the diagnostic and must not pass through the production mask.
+        valid &= np.isin(raw, [2,4,5,6])
     elif kind == "saturation":
         valid &= raw == 0
     else:
