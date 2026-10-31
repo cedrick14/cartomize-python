@@ -126,3 +126,20 @@ def test_classification_transfer_uses_scientific_product_and_settings(applicatio
     state=window.capture_session();window.restore_session(state)
     assert window.tool('assistant').group_column.text()=='site'
     window.close();application.processEvents()
+
+
+def test_atmospheric_strategy_control_defaults_to_auto(application):
+    window = CartomizeWindow()
+    try:
+        window.select_tool('prepare')
+        page = window.tool('prepare')
+        assert page.preparation_mode.currentData() == 'automatic'
+        assert page.atmosphere.currentData() == 'auto'
+        assert page.atmosphere.isEnabled()
+        page.atmosphere.setCurrentIndex(page.atmosphere.findData('provider'))
+        assert page.atmosphere.currentData() == 'provider'
+        page.preparation_mode.setCurrentIndex(page.preparation_mode.findData('expert'))
+        assert not page.atmosphere.isEnabled()
+    finally:
+        window.close()
+        application.processEvents()
