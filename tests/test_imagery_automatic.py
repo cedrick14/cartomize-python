@@ -425,3 +425,68 @@ def test_missing_quality_is_reported_before_cloud_masking(write_raster):
     assert cloud["status"] == "unavailable"
     assert cloud["action"] == "add_quality_mask_then_restart_assessment"
     assert "quality_mask" in plan["scenes"][0]["missing"]
+
+
+def test_exact_identity_recovery_for_missing_quality(write_raster, tmp_path, catalog_service):
+    local = _scene(write_raster, "local", width=4)
+    local = cm.Scene(
+        "LC08_L2SP_181063_20261026_20261031_02_T1",
+        local.bands, sensor="landsat-8", acquired="2026-10-26",
+        level="C2-L2-SR",
+    )
+    item = catalog_service["add"]("LC08_L2SP_181063_20261026_20261031_02_T1", left=300000, width=4)
+    item["properties"].update({
+        "platform": "landsat-8",
+        "landsat:collection_number": "02",
+        "landsat:processing_level": "L2SP",
+        "landsat:wrs_path": 181,
+        "landsat:wrs_row": 63,
+    })
+    item["collection"] = "landsat-c2-l2"
+    # Re-label assets as a known Landsat C2 L2 profile.
+    item["assets"]["spectrum"]["bands"] = [
+        dict(name="B4", common_name="red", scale=.0000275, offset=-.2, unit="reflectance", nodata=-9999),
+        dict(name="B5", common_name="nir", scale=.0000275, offset=-.2, unit="reflectance", nodata=-9999),
+    ]
+    item["assets"]["qa_pixel"] = item["assets"].pop("valid")
+    catalog_service["config"].update(
+        collections=["landsat-c2-l2"], quality_asset="qa_pixel", quality_kind="landsat_qa"
+    )
+    result = cm.preprocess_imagery(
+        [local], tmp_path / "recovered", aoi=_zone(), catalog=catalog_service["config"],
+        band_order=["red", "nir"]
+    )
+    assert result.report["status"] == "complete"
+    assert result.report["recovery"][0]["status"] == "recovered"
+    assert result.report["preprocessing_plan"]["ready"] is True
+
+
+def test_recovery_rejects_ambiguous_catalog_match(write_raster, tmp_path, catalog_service):
+    local = _scene(write_raster, "local", width=4)
+    local = cm.Scene(
+        "LC08_L2SP_181063_20261026_20261031_02_T1",
+        local.bands, sensor="landsat-8", acquired="2026-10-26", level="C2-L2-SR"
+    )
+    for suffix in ("A", "B"):
+        item = catalog_service["add"](f"LC08_L2SP_181063_20261026_{suffix}", left=300000, width=4)
+        item["properties"].update({
+            "platform": "landsat-8",
+            "landsat:collection_number": "02",
+            "landsat:processing_level": "L2SP",
+            "landsat:wrs_path": 181,
+            "landsat:wrs_row": 63,
+        })
+        item["collection"] = "landsat-c2-l2"
+        item["assets"]["spectrum"]["bands"] = [
+            dict(name="B4", common_name="red", scale=.0000275, offset=-.2, unit="reflectance", nodata=-9999),
+            dict(name="B5", common_name="nir", scale=.0000275, offset=-.2, unit="reflectance", nodata=-9999),
+        ]
+        item["assets"]["qa_pixel"] = item["assets"].pop("valid")
+    catalog_service["config"].update(
+        collections=["landsat-c2-l2"], quality_asset="qa_pixel", quality_kind="landsat_qa"
+    )
+    with pytest.raises(ValueError, match="Prétraitement automatique bloqué"):
+        cm.preprocess_imagery(
+            [local], tmp_path / "ambiguous", aoi=_zone(), catalog=catalog_service["config"],
+            band_order=["red", "nir"]
+        )
