@@ -131,8 +131,9 @@ class PreparationPage(Page):
         self.coverage_summary.setWordWrap(True)
         self.coverage_summary.setTextFormat(Qt.TextFormat.PlainText)
         self.form.addRow(self.coverage_summary)
-        self.coverage_scenes = QTableWidget(0, 4)
-        self.coverage_scenes.setHorizontalHeaderLabels(["Scène", "Emprise (%)", "Données (%)", "Utilisable (%)"])
+        self.coverage_scenes = QTableWidget(0, 6)
+        self.coverage_scenes.setHorizontalHeaderLabels(
+            ["Scène", "Emprise (%)", "Données (%)", "Utilisable (%)", "Nuages (%)", "Ombres (%)"])
         self.coverage_scenes.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
         self.coverage_scenes.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
         self.coverage_scenes.setMaximumHeight(165)
@@ -509,8 +510,11 @@ class PreparationPage(Page):
         for scene in record.get('scenes', []):
             row = self.coverage_scenes.rowCount()
             self.coverage_scenes.insertRow(row)
+            quality = scene.get('quality_statistics') or {}
             values = [str(scene['id'])] + [f"{scene.get(key, 0):.2f}".replace('.', ',')
                                           for key in ('footprint_percent', 'present_percent', 'usable_percent')]
+            for key in ('cloud_percent', 'cloud_shadow_percent'):
+                values.append(f"{quality[key]:.2f}".replace('.', ',') if key in quality else '—')
             for column, value in enumerate(values):
                 item = QTableWidgetItem(value)
                 item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
