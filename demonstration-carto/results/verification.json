@@ -9,5 +9,6 @@
     "indices.png",
     "scl.png"
   ],
+  "notebook_image_outputs": 3,
   "note": "Toutes les statistiques proviennent des rasters Sentinel-2 L2A téléchargés et traités pendant cette exécution."
 }
