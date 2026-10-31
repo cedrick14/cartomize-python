@@ -412,7 +412,10 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
             threshold_met=actual + 1e-9 >= threshold, selected_scene_ids=[s.scene_id for s in selected],
             mosaic=len(selected) > 1, products=list(prepared.products), preparation=str(prepared.manifest),
             audit=str(final_audit.manifest), coverage=str(final_audit.coverage), gaps=str(final_audit.gaps),
-            parameters=final_audit.report["parameters"])
+            parameters=final_audit.report["parameters"],
+            quality_statistics=[dict(scene_id=scene["id"], **scene["quality_statistics"])
+                                for scene in final_audit.report.get("scenes", [])
+                                if scene.get("quality_statistics")])
         shutil.rmtree(rounds, ignore_errors=True)
         save_json(report, work / "preprocessing.json")
         replace = relocate_products(work, destination)
