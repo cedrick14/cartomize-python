@@ -29,7 +29,9 @@ def main():
     required = [
         multiband, indices,
         RESULTS / "natural_color.png",
-        RESULTS / "indices_overview.png",
+        RESULTS / "ndvi.png",
+        RESULTS / "ndbi.png",
+        RESULTS / "evi.png",
         RESULTS / "indices_stats.csv",
     ]
     for path in required:
@@ -59,7 +61,7 @@ def main():
         "indices": EXPECTED,
         "checked_outputs": [
             "multiband", "natural_color.png", "indices.tif",
-            "indices_stats.csv", "indices_overview.png",
+            "ndvi.png", "ndbi.png", "evi.png", "indices_stats.csv",
         ],
         "classification_executed": False,
         "note": "Les indices et statistiques proviennent des rasters Sentinel-2 L2A réellement téléchargés et traités.",

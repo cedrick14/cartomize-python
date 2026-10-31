@@ -69,5 +69,5 @@ jobs:
           git add demonstration-carto/data demonstration-carto/results demonstration-carto/Tutoriel_Demonstration_Cartomize.ipynb
           if ! git diff --cached --quiet; then
             git commit -m "Add verified real Sentinel-2 demonstration evidence [skip ci]"
-            git push origin HEAD:feature/demonstration-carto-layout
+            git push origin HEAD:${GITHUB_REF_NAME}
           fi

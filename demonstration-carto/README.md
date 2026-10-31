@@ -51,7 +51,9 @@ Le dossier `results/` contient notamment :
 - le composite couleur ;
 - `indices.tif` ;
 - `indices_stats.csv` ;
-- `indices_overview.png` ;
+- `ndvi.png` ;
+- `ndbi.png` ;
+- `evi.png` ;
 - `metrics.json` ;
 - `verification.json`.
 
