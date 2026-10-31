@@ -12,7 +12,7 @@
   "products": [
     {
       "scenes": [
-        "S2C_33MWR_20250819_0_L2A"
+        "S2C_33MWR_20250620_0_L2A"
       ],
       "multiband": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/products/scene_001/multibande.tif",
       "bands": {

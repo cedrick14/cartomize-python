@@ -2,9 +2,9 @@
   "schema": "cartomize.scenes.v1",
   "scenes": [
     {
-      "scene_id": "S2C_33MWR_20250819_0_L2A",
+      "scene_id": "S2C_33MWR_20250620_0_L2A",
       "sensor": "sentinel-2",
-      "acquired": "2025-08-19",
+      "acquired": "2025-06-20",
       "level": "L2A-SR",
       "quality": "SCL.tif",
       "quality_kind": "sentinel_scl",

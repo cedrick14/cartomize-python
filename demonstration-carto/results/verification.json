@@ -1,21 +1,21 @@
 {
   "status": "passed",
-  "scene": "S2C_33MWR_20250819_0_L2A",
-  "usable_percent": 99.99819017218249,
+  "scene": "S2C_33MWR_20250620_0_L2A",
+  "usable_percent": 98.08113005648926,
   "checked_outputs": [
     "multiband",
     "indices",
-    "scene_and_aoi_before.png",
+    "kinshasa_scene_input.png",
     "natural_color.png",
-    "before_after.png",
+    "kinshasa_preprocessing_comparison.png",
     "indices.png",
     "scl.png"
   ],
   "notebook_image_outputs": 1,
   "notebook_markdown_visuals": [
-    "scene_and_aoi_before.png",
+    "kinshasa_scene_input.png",
     "natural_color.png",
-    "before_after.png",
+    "kinshasa_preprocessing_comparison.png",
     "indices.png"
   ],
   "note": "Le tutoriel vérifie une scène candidate plus large que l'AOI, le journal du diagnostic automatique et le résultat final découpé."

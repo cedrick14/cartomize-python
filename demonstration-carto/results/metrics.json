@@ -1,129 +1,142 @@
 {
   "schema": "cartomize.demonstration.metrics.v1",
   "scene": {
-    "id": "S2C_33MWR_20250819_0_L2A",
-    "datetime": "2025-08-19T09:22:06.156000Z",
+    "id": "S2C_33MWR_20250620_0_L2A",
+    "datetime": "2025-06-20T09:22:05.004000Z",
     "platform": "sentinel-2c",
     "mgrs_tile": null,
-    "global_cloud_cover_percent": 11.730018
+    "global_cloud_cover_percent": 1.766826
   },
   "preprocessing": {
     "status": "partial",
-    "usable_percent": 99.99819017218249,
+    "usable_percent": 98.08113005648926,
     "threshold_met": true,
     "selected_scene_ids": [
-      "S2C_33MWR_20250819_0_L2A"
+      "S2C_33MWR_20250620_0_L2A"
     ],
     "mosaic": false
   },
   "indices": {
     "NDVI": {
-      "count": 442023,
-      "min": -0.2355460375547409,
-      "max": 0.6399999856948853,
-      "mean": 0.016900940640961478,
-      "std": 0.15321709751096738,
-      "p05": -0.17625461518764496,
-      "p50": 0.05171043798327446,
-      "p95": 0.275929296016693
+      "count": 433549,
+      "min": -0.3380281627178192,
+      "max": 0.7912970185279846,
+      "mean": 0.025812360515353114,
+      "std": 0.22327657878868334,
+      "p05": -0.24393723905086517,
+      "p50": 0.05051816999912262,
+      "p95": 0.4582764685153957
     },
     "NDWI": {
-      "count": 442023,
-      "min": -0.6047649383544922,
-      "max": 0.22135822474956512,
-      "mean": -0.07179106629916708,
-      "std": 0.1550533591516746,
-      "p05": -0.3105298578739166,
-      "p50": -0.1166253387928009,
-      "p95": 0.13350126147270203
+      "count": 433549,
+      "min": -0.6954172253608704,
+      "max": 0.31524547934532166,
+      "mean": -0.06670921297338171,
+      "std": 0.20953994480081073,
+      "p05": -0.4336009621620178,
+      "p50": -0.10443035513162613,
+      "p95": 0.19694657623767853
     },
     "EVI": {
-      "count": 442023,
-      "min": -0.09128251671791077,
-      "max": 0.5703215599060059,
-      "mean": 0.023218094723317106,
-      "std": 0.08347053162998433,
-      "p05": -0.06962450593709946,
-      "p50": 0.02966855838894844,
-      "p95": 0.1730661928653716
+      "count": 433549,
+      "min": -0.2950396239757538,
+      "max": 0.7951585650444031,
+      "mean": 0.04452937967518445,
+      "std": 0.12546311487805867,
+      "p05": -0.07741904407739639,
+      "p50": 0.03125549107789993,
+      "p95": 0.31349610090255736
     }
   },
   "scl": [
     {
+      "code": 3,
+      "classe_SCL": "Cloud shadows",
+      "pixels": 694,
+      "percent": 0.6283556819107807,
+      "area_ha": 27.76
+    },
+    {
       "code": 4,
       "classe_SCL": "Vegetation",
-      "pixels": 25,
-      "percent": 0.02263529113511458,
-      "area_ha": 1.0
+      "pixels": 1310,
+      "percent": 1.186089255480004,
+      "area_ha": 52.4
     },
     {
       "code": 5,
       "classe_SCL": "Not vegetated",
-      "pixels": 69012,
-      "percent": 62.48426847266109,
-      "area_ha": 2760.48
+      "pixels": 66427,
+      "percent": 60.14377936929025,
+      "area_ha": 2657.08
     },
     {
       "code": 6,
       "classe_SCL": "Water",
-      "pixels": 41377,
-      "percent": 37.46321765190544,
-      "area_ha": 1655.08
+      "pixels": 41518,
+      "percent": 37.590880693907486,
+      "area_ha": 1660.72
     },
     {
       "code": 7,
       "classe_SCL": "Unclassified",
-      "pixels": 32,
-      "percent": 0.028973172652946664,
-      "area_ha": 1.28
+      "pixels": 7,
+      "percent": 0.006337881517832082,
+      "area_ha": 0.28
     },
     {
       "code": 8,
       "classe_SCL": "Cloud medium probability",
-      "pixels": 1,
-      "percent": 0.0009054116454045832,
-      "area_ha": 0.04
+      "pixels": 79,
+      "percent": 0.07152751998696207,
+      "area_ha": 3.16
+    },
+    {
+      "code": 9,
+      "classe_SCL": "Cloud high probability",
+      "pixels": 412,
+      "percent": 0.37302959790668827,
+      "area_ha": 16.48
     }
   ],
   "cloud_diagnostics": {
     "scl": [
       {
-        "scene": "S2C_33MWR_20250819_0_L2A",
+        "scene": "S2C_33MWR_20250620_0_L2A",
         "type_masque": "sentinel_scl",
-        "pixels_nuageux_SCL": 132,
-        "nuages_SCL_%": 0.029862158988849197,
-        "SCL7_faible_proba": 128,
-        "SCL8_moyenne_proba": 4,
-        "SCL9_haute_proba": 0,
+        "pixels_nuageux_SCL": 1992,
+        "nuages_SCL_%": 0.45064712655899697,
+        "SCL7_faible_proba": 28,
+        "SCL8_moyenne_proba": 316,
+        "SCL9_haute_proba": 1648,
         "cirrus": 0,
-        "ombres": 0,
+        "ombres": 2776,
         "neige": 0
       }
     ],
     "spectral_fallback": [
       {
-        "scene": "S2C_33MWR_20250819_0_L2A",
+        "scene": "S2C_33MWR_20250620_0_L2A",
         "methode": "sentinel_spectral_fallback_v1",
         "pixels_evalues": 442031,
-        "nuages_supplementaires": 4,
-        "nuages_supplementaires_%": 0.000904913908753006,
-        "pixels_clairs": 442027,
+        "nuages_supplementaires": 5557,
+        "nuages_supplementaires_%": 1.2571516477351137,
+        "pixels_clairs": 436474,
         "pixels_sans_diagnostic": 0
       }
     ],
-    "usable_percent_after_combined_masks": 99.99819017218249
+    "usable_percent_after_combined_masks": 98.08113005648926
   },
-  "before_after": {
-    "before": {
-      "item_id": "S2B_33MWR_20230904_0_L2A",
-      "datetime": "2023-09-04T09:21:51.272000Z",
-      "platform": "sentinel-2b",
-      "global_cloud_cover_percent": 19.357236,
-      "aoi_scl_usable_percent": 9.537551403217659,
-      "aoi_spectral_cloud_percent": 45.134887375589315,
-      "aoi_hybrid_usable_percent": 8.907669659146329,
-      "decision": "rejected_below_quality_threshold",
-      "local_item": "before_diagnostic/source_item.json",
+  "preprocessing_comparison": {
+    "input": {
+      "item_id": "S2C_33MWR_20250620_0_L2A",
+      "datetime": "2025-06-20T09:22:05.004000Z",
+      "platform": "sentinel-2c",
+      "global_cloud_cover_percent": 1.766826,
+      "aoi_scl_usable_percent": 98.93135415915157,
+      "aoi_spectral_cloud_percent": 1.2529127002763678,
+      "aoi_hybrid_usable_percent": 98.08100467838369,
+      "local_item": "input_scene/source_item.json",
       "preview_bbox_wgs84": [
         15.255,
         -4.365,
@@ -133,42 +146,42 @@
       "source_assets": {
         "blue": {
           "key": "blue",
-          "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2023/9/S2B_33MWR_20230904_0_L2A/B02.tif"
+          "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/6/S2C_33MWR_20250620_0_L2A/B02.tif"
         },
         "green": {
           "key": "green",
-          "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2023/9/S2B_33MWR_20230904_0_L2A/B03.tif"
+          "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/6/S2C_33MWR_20250620_0_L2A/B03.tif"
         },
         "red": {
           "key": "red",
-          "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2023/9/S2B_33MWR_20230904_0_L2A/B04.tif"
+          "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/6/S2C_33MWR_20250620_0_L2A/B04.tif"
         },
         "scl": {
           "key": "scl",
-          "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2023/9/S2B_33MWR_20230904_0_L2A/SCL.tif"
+          "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/6/S2C_33MWR_20250620_0_L2A/SCL.tif"
         }
       }
     },
-    "after": {
-      "scene": "S2C_33MWR_20250819_0_L2A",
-      "usable_percent": 99.99819017218249
+    "output": {
+      "scene": "S2C_33MWR_20250620_0_L2A",
+      "usable_percent": 98.08113005648926
     },
-    "figure": "before_after.png",
-    "scene_aoi_before": "scene_and_aoi_before.png"
+    "figure": "kinshasa_preprocessing_comparison.png",
+    "scene_aoi_input": "kinshasa_scene_input.png"
   },
   "zonal_ndvi": [
     {
       "name": "Fenêtre de démonstration Kinshasa",
       "scope": "emprise d'analyse; pas une limite administrative",
-      "ndvi_count": 442023,
-      "ndvi_min": -0.2355460375547409,
-      "ndvi_max": 0.6399999856948853,
-      "ndvi_mean": 0.016900940640961478,
-      "ndvi_sum": 7470.604484939715,
-      "ndvi_std": 0.15321709751096738,
+      "ndvi_count": 433549,
+      "ndvi_min": -0.3380281627178192,
+      "ndvi_max": 0.7912970185279846,
+      "ndvi_mean": 0.02581236051535311,
+      "ndvi_sum": 11190.923089070828,
+      "ndvi_std": 0.22327657878868334,
       "ndvi_zone_pixels": 442031,
       "ndvi_raster_pixels": 442031,
-      "ndvi_coverage_percent": 99.99819017218249
+      "ndvi_coverage_percent": 98.08113005648926
     }
   ],
   "products": {

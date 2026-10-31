@@ -36,15 +36,15 @@
   "footprint_percent": 100.0,
   "present_pixels": 442031,
   "present_percent": 100.0,
-  "usable_pixels": 442023,
-  "usable_percent": 99.99819017218249,
+  "usable_pixels": 433549,
+  "usable_percent": 98.08113005648926,
   "scenes": [
     {
       "index": 1,
-      "id": "S2C_33MWR_20250819_0_L2A",
+      "id": "S2C_33MWR_20250620_0_L2A",
       "sensor": "sentinel-2",
       "level": "L2A-SR",
-      "acquired": "2025-08-19",
+      "acquired": "2025-06-20",
       "quality_mask": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/data/SCL.tif",
       "spectral_cloud_mask": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/spectral_cloud/scene_0001_spectral_cloud.tif",
       "spectral_cloud_method": "sentinel_spectral_fallback_v1",
@@ -53,27 +53,27 @@
       "footprint_percent": 100.0,
       "present_pixels": 442031,
       "present_percent": 100.0,
-      "usable_pixels": 442023,
-      "usable_percent": 99.99819017218249,
+      "usable_pixels": 433549,
+      "usable_percent": 98.08113005648926,
       "quality_statistics": {
         "kind": "sentinel_scl",
         "evaluated_pixels": 442031,
-        "clear_pixels": 442027,
-        "clear_percent": 99.99909508609124,
-        "rejected_pixels": 4,
-        "rejected_percent": 0.000904913908753006,
-        "cloud_pixels": 132,
-        "cloud_percent": 0.029862158988849197,
-        "cloud_low_probability_pixels": 128,
-        "cloud_low_probability_percent": 0.028957245080096193,
-        "cloud_medium_probability_pixels": 4,
-        "cloud_medium_probability_percent": 0.000904913908753006,
-        "cloud_high_probability_pixels": 0,
-        "cloud_high_probability_percent": 0.0,
+        "clear_pixels": 437291,
+        "clear_percent": 98.92767701812768,
+        "rejected_pixels": 4740,
+        "rejected_percent": 1.0723229818723121,
+        "cloud_pixels": 1992,
+        "cloud_percent": 0.45064712655899697,
+        "cloud_low_probability_pixels": 28,
+        "cloud_low_probability_percent": 0.006334397361271042,
+        "cloud_medium_probability_pixels": 316,
+        "cloud_medium_probability_percent": 0.07148819879148748,
+        "cloud_high_probability_pixels": 1648,
+        "cloud_high_probability_percent": 0.3728245304062385,
         "cirrus_pixels": 0,
         "cirrus_percent": 0.0,
-        "cloud_shadow_pixels": 0,
-        "cloud_shadow_percent": 0.0,
+        "cloud_shadow_pixels": 2776,
+        "cloud_shadow_percent": 0.6280102526745862,
         "snow_pixels": 0,
         "snow_percent": 0.0,
         "saturated_or_defective_pixels": 0,
@@ -84,16 +84,16 @@
       "spectral_cloud_statistics": {
         "method": "sentinel_spectral_fallback_v1",
         "evaluated_pixels": 442031,
-        "cloud_pixels": 4,
-        "cloud_percent": 0.000904913908753006,
-        "clear_pixels": 442027,
+        "cloud_pixels": 5557,
+        "cloud_percent": 1.2571516477351137,
+        "clear_pixels": 436474,
         "nodata_pixels": 0
       }
     }
   ],
   "assets": [
     {
-      "scene": "S2C_33MWR_20250819_0_L2A",
+      "scene": "S2C_33MWR_20250620_0_L2A",
       "band": "blue",
       "path": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/data/B02.tif",
       "index": 1,
@@ -110,10 +110,10 @@
         537730.0,
         9526920.0
       ],
-      "size_bytes": 609706
+      "size_bytes": 669154
     },
     {
-      "scene": "S2C_33MWR_20250819_0_L2A",
+      "scene": "S2C_33MWR_20250620_0_L2A",
       "band": "green",
       "path": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/data/B03.tif",
       "index": 1,
@@ -130,10 +130,10 @@
         537730.0,
         9526920.0
       ],
-      "size_bytes": 599246
+      "size_bytes": 658104
     },
     {
-      "scene": "S2C_33MWR_20250819_0_L2A",
+      "scene": "S2C_33MWR_20250620_0_L2A",
       "band": "red",
       "path": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/data/B04.tif",
       "index": 1,
@@ -150,10 +150,10 @@
         537730.0,
         9526920.0
       ],
-      "size_bytes": 613804
+      "size_bytes": 664942
     },
     {
-      "scene": "S2C_33MWR_20250819_0_L2A",
+      "scene": "S2C_33MWR_20250620_0_L2A",
       "band": "nir",
       "path": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/data/B08.tif",
       "index": 1,
@@ -170,14 +170,14 @@
         537730.0,
         9526920.0
       ],
-      "size_bytes": 638890
+      "size_bytes": 680004
     }
   ],
   "coverage_status": "partial",
   "threshold_met": true,
   "recommended_action": "single_scene",
   "recommended_scene_ids": [
-    "S2C_33MWR_20250819_0_L2A"
+    "S2C_33MWR_20250620_0_L2A"
   ],
   "mosaic_recommended": false,
   "coverage_method": "target_grid_pixel_count",

@@ -11,27 +11,26 @@
     15.34,
     -4.28
   ],
-  "selected_item_id": "S2C_33MWR_20250819_0_L2A",
-  "selected_datetime": "2025-08-19T09:22:06.156000Z",
+  "selected_item_id": "S2C_33MWR_20250620_0_L2A",
+  "selected_datetime": "2025-06-20T09:22:05.004000Z",
   "platform": "sentinel-2c",
   "mgrs_tile": null,
-  "global_cloud_cover_percent": 11.730018,
+  "global_cloud_cover_percent": 1.766826,
   "aoi_footprint_percent_before_processing": 99.99999999999999,
   "aoi_observed_in_overlap_percent": 100.0,
-  "aoi_scl_valid_in_overlap_percent": 99.99909818916385,
-  "aoi_scl_usable_percent_before_processing": 99.99909818916383,
-  "aoi_hybrid_usable_percent_before_processing": 99.99864525568539,
-  "aoi_spectral_cloud_percent_before_processing": 0.0004515814381965644,
-  "before_diagnostic": {
-    "item_id": "S2B_33MWR_20230904_0_L2A",
-    "datetime": "2023-09-04T09:21:51.272000Z",
-    "platform": "sentinel-2b",
-    "global_cloud_cover_percent": 19.357236,
-    "aoi_scl_usable_percent": 9.537551403217659,
-    "aoi_spectral_cloud_percent": 45.134887375589315,
-    "aoi_hybrid_usable_percent": 8.907669659146329,
-    "decision": "rejected_below_quality_threshold",
-    "local_item": "before_diagnostic/source_item.json",
+  "aoi_scl_valid_in_overlap_percent": 98.93135415915158,
+  "aoi_scl_usable_percent_before_processing": 98.93135415915157,
+  "aoi_hybrid_usable_percent_before_processing": 98.08100467838369,
+  "aoi_spectral_cloud_percent_before_processing": 1.2529127002763678,
+  "input_scene": {
+    "item_id": "S2C_33MWR_20250620_0_L2A",
+    "datetime": "2025-06-20T09:22:05.004000Z",
+    "platform": "sentinel-2c",
+    "global_cloud_cover_percent": 1.766826,
+    "aoi_scl_usable_percent": 98.93135415915157,
+    "aoi_spectral_cloud_percent": 1.2529127002763678,
+    "aoi_hybrid_usable_percent": 98.08100467838369,
+    "local_item": "input_scene/source_item.json",
     "preview_bbox_wgs84": [
       15.255,
       -4.365,
@@ -41,19 +40,19 @@
     "source_assets": {
       "blue": {
         "key": "blue",
-        "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2023/9/S2B_33MWR_20230904_0_L2A/B02.tif"
+        "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/6/S2C_33MWR_20250620_0_L2A/B02.tif"
       },
       "green": {
         "key": "green",
-        "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2023/9/S2B_33MWR_20230904_0_L2A/B03.tif"
+        "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/6/S2C_33MWR_20250620_0_L2A/B03.tif"
       },
       "red": {
         "key": "red",
-        "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2023/9/S2B_33MWR_20230904_0_L2A/B04.tif"
+        "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/6/S2C_33MWR_20250620_0_L2A/B04.tif"
       },
       "scl": {
         "key": "scl",
-        "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2023/9/S2B_33MWR_20230904_0_L2A/SCL.tif"
+        "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/6/S2C_33MWR_20250620_0_L2A/SCL.tif"
       }
     }
   },
@@ -246,31 +245,31 @@
   "source_assets": {
     "blue": {
       "key": "blue",
-      "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2C_33MWR_20250819_0_L2A/B02.tif"
+      "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/6/S2C_33MWR_20250620_0_L2A/B02.tif"
     },
     "green": {
       "key": "green",
-      "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2C_33MWR_20250819_0_L2A/B03.tif"
+      "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/6/S2C_33MWR_20250620_0_L2A/B03.tif"
     },
     "red": {
       "key": "red",
-      "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2C_33MWR_20250819_0_L2A/B04.tif"
+      "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/6/S2C_33MWR_20250620_0_L2A/B04.tif"
     },
     "nir": {
       "key": "nir",
-      "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2C_33MWR_20250819_0_L2A/B08.tif"
+      "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/6/S2C_33MWR_20250620_0_L2A/B08.tif"
     },
     "swir1": {
       "key": "swir16",
-      "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2C_33MWR_20250819_0_L2A/B11.tif"
+      "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/6/S2C_33MWR_20250620_0_L2A/B11.tif"
     },
     "scl": {
       "key": "scl",
-      "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/8/S2C_33MWR_20250819_0_L2A/SCL.tif"
+      "href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/33/M/WR/2025/6/S2C_33MWR_20250620_0_L2A/SCL.tif"
     },
     "product_metadata": {
       "key": "product_metadata",
-      "href": "https://sentinel-s2-l2a.s3.amazonaws.com/tiles/33/M/WR/2025/8/19/0/product_metadata.xml",
+      "href": "https://sentinel-s2-l2a.s3.amazonaws.com/tiles/33/M/WR/2025/6/20/0/product_metadata.xml",
       "status": "remote_404_not_required_for_declared_stac_calibration"
     }
   },
@@ -283,60 +282,60 @@
   ],
   "files": {
     "B02.tif": {
-      "bytes": 609706,
-      "sha256": "3c06b7df51b4f912824353a4084e05dc0c608760c7278a5e2e79e67538d2b6d5"
+      "bytes": 669154,
+      "sha256": "8b2a47245efa969c703a2220a236bfbd95349fefbceea4e9511ce2cf12b00839"
     },
     "B03.tif": {
-      "bytes": 599246,
-      "sha256": "7cb23b894a925c01c8d66a9786150e0a53fe2b1a18fa0fa460bc382e37ce6013"
+      "bytes": 658104,
+      "sha256": "fbe7e2f8c844db58bee89e42f51f7f12fff8efbde317f4f5a731293982bf82d0"
     },
     "B04.tif": {
-      "bytes": 613804,
-      "sha256": "6c9842d4371d0a5cf04dfb4aa0b21eb8d06cf9e835c72e4d2810df411b8425bf"
+      "bytes": 664942,
+      "sha256": "3031dc1b95cc9d1f01ab5bc913f6009b0dbac492b5ef0732333cdf33ffb9dbf0"
     },
     "B08.tif": {
-      "bytes": 638890,
-      "sha256": "28e0990cf644a0daf53aff3f23ab3006a08b9ed82f2446cd5b05c5e858cb5487"
+      "bytes": 680004,
+      "sha256": "d2a2488dd92ddd72ad55d34d3144229850dc64e514cd91b1b7dcc1219b3fc44a"
     },
     "B11.tif": {
-      "bytes": 186670,
-      "sha256": "f2100330606efc642fab1617efa977157d67b52187ed62a4501ac62974167f4b"
+      "bytes": 188136,
+      "sha256": "284117fada3965db3376aa39b4222d1c3359b673f20d2f9fa1e075b371b3a421"
     },
     "SCL.tif": {
-      "bytes": 4460,
-      "sha256": "2226af2881adcbb5f70d61121acacd4ae0097373d01110e9d9da653f340fa12e"
+      "bytes": 5774,
+      "sha256": "494b1a3d05141a0eafe9cbc1c622614f2924d08dec4ac1fee870f69c82432d34"
     },
     "aoi.geojson": {
       "bytes": 860,
       "sha256": "5821f48a307f9559ff8c6271eb9c5bd8ecb9933c5a701d500f051d074a43d2ec"
     },
-    "before_diagnostic/B02.tif": {
-      "bytes": 2541016,
-      "sha256": "e92381de572da8b20493a3847cafc5b1331cddf758f484ce01a5d1269caf830d"
+    "input_scene/B02.tif": {
+      "bytes": 2269698,
+      "sha256": "5bb3fcaae65490224e203340d1a5cc12f6904c15527362c0996981f7cc655980"
     },
-    "before_diagnostic/B03.tif": {
-      "bytes": 2576254,
-      "sha256": "8e64a83a3eade146788111ff8078495798275eaf63ee61f254b4d3d49fa3ab98"
+    "input_scene/B03.tif": {
+      "bytes": 2244840,
+      "sha256": "4f5843cc211bee0f8cb0079e0c65da1c9d713ccfe22362a8065c104b5e976494"
     },
-    "before_diagnostic/B04.tif": {
-      "bytes": 2625844,
-      "sha256": "30e709564f475347a59bb4566306f6b2895970ef5cfbe4fc4aadaf1648ee2bd8"
+    "input_scene/B04.tif": {
+      "bytes": 2285870,
+      "sha256": "a00f918eef282093504e43289c06aa11979f40b4de016b7f103e46d21fed1251"
     },
-    "before_diagnostic/SCL.tif": {
-      "bytes": 39494,
-      "sha256": "aab79db79822bef7ed2dd59fd6d21fef5c7149c4e99c191df8d8ddf6cb6fbdfd"
+    "input_scene/SCL.tif": {
+      "bytes": 18570,
+      "sha256": "f06c0b818e861306e7abe4a680c53cfff0ae6f61eb0d4c10cfb4ee3f48588bfe"
     },
-    "before_diagnostic/source_item.json": {
-      "bytes": 6404,
-      "sha256": "cbd7bca0efc8d77f0f6c491bdec3feda31aa1c114a072679e5409007b431ad86"
+    "input_scene/source_item.json": {
+      "bytes": 6296,
+      "sha256": "8fbdb54254780ecd7e8d9b685a94773936d735adfd68c5ca19cc2955026f1fe5"
     },
     "scenes.json": {
       "bytes": 2237,
-      "sha256": "8c5108a9e02e8cb44898c753dbe9b8dab675151a836459aa169354b5ae3ce8fb"
+      "sha256": "19bb6d1e78e16b75d36873deef6fcf112c34792c825ce87fce8de37e81e5c1fc"
     },
     "source_item.json": {
-      "bytes": 7872,
-      "sha256": "3415e0091d3e1b4307d27c5434a577bbce2ae1b5798cf413ed31888e1e1d1bd8"
+      "bytes": 7871,
+      "sha256": "78e796a66cca16ec9733c0dcaaee391c3d79f775beadc0ebe25d6ec7f92c0d50"
     }
   },
   "aoi_note": "Fenêtre d'analyse définie pour la démonstration; elle n'est pas présentée comme une limite administrative."
