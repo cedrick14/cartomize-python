@@ -67,10 +67,59 @@ LANDSAT_TM = {"B1":"blue", "B2":"green", "B3":"red", "B4":"nir", "B5":"swir1", "
 SENTINEL = {"B01":"coastal", "B02":"blue", "B03":"green", "B04":"red", "B05":"rededge1", "B06":"rededge2", "B07":"rededge3", "B08":"nir", "B8A":"nir_narrow", "B09":"water_vapour", "B11":"swir1", "B12":"swir2"}
 _S2_BANDS = ["B01","B02","B03","B04","B05","B06","B07","B08","B8A","B09","B10","B11","B12"]
 _LANDSAT = re.compile(r"^(L[CET]\d{2}_L2(?:SP|SR)_\d{6}_(\d{8})_\d{8}_02_[A-Z0-9]+)_(?:SR_(B\d+)|(QA_PIXEL|QA_RADSAT))\.(?:tif|tiff)$", re.I)
+_LANDSAT_L1 = re.compile(r"^(L[CET]\d{2}_L1(?:TP|GT|GS)_\d{6}_(\d{8})_\d{8}_02_[A-Z0-9]+)_(?:(B\d+)|(QA_PIXEL|QA_RADSAT))\.(?:tif|tiff)$", re.I)
 _LANDSAT_THERMAL = re.compile(
     r"^((?:LC0[89]|LE07|LT0[45])_L2SP_\d{6}_\d{8}_\d{8}_02_[A-Z0-9]+)_"
     r"ST_(B6|B10|ATRAN|CDIST|DRAD|EMIS|EMSD|QA|TRAD|URAD)\.(?:tif|tiff)$", re.I)
 _S2 = re.compile(r"^(T\d{2}[A-Z]{3})_(\d{8}T\d{6})_(B\d{2}|B8A|SCL)_(10|20|60)m\.(?:jp2|tif|tiff)$", re.I)
+
+
+def _landsat_l1_metadata(directory, ident):
+    """Read Collection 2 Level-1 reflectance scaling and solar elevation."""
+    directory = Path(directory)
+    candidates = [
+        directory / f"{ident}_MTL.txt",
+        directory / f"{ident}_MTL.TXT",
+    ]
+    path = next((candidate for candidate in candidates if candidate.is_file()), None)
+    if path is None:
+        raise ValueError(
+            f"Missing Landsat Level-1 metadata for {ident}. Keep the MTL.txt file with the scene."
+        )
+    if path.stat().st_size > 10_000_000:
+        raise ValueError("Landsat metadata is unexpectedly large.")
+    values = {}
+    for line in path.read_text(encoding="utf-8", errors="strict").splitlines():
+        if "=" not in line:
+            continue
+        key, value = [part.strip() for part in line.split("=", 1)]
+        values[key] = value.strip('"')
+    try:
+        sun_elevation = float(values["SUN_ELEVATION"])
+    except (KeyError, ValueError) as exc:
+        raise ValueError(f"SUN_ELEVATION missing or invalid in {path}.") from exc
+    sine = np.sin(np.deg2rad(sun_elevation))
+    if not np.isfinite(sine) or sine <= 0:
+        raise ValueError(f"Invalid solar elevation in {path}: {sun_elevation}.")
+    calibration = {}
+    for band in range(1, 12):
+        mult = values.get(f"REFLECTANCE_MULT_BAND_{band}")
+        add = values.get(f"REFLECTANCE_ADD_BAND_{band}")
+        if mult is None and add is None:
+            continue
+        if mult is None or add is None:
+            raise ValueError(f"Incomplete reflectance calibration for Landsat band {band} in {path}.")
+        try:
+            scale = float(mult) / sine
+            offset = float(add) / sine
+        except ValueError as exc:
+            raise ValueError(f"Invalid reflectance calibration for Landsat band {band} in {path}.") from exc
+        if not np.isfinite([scale, offset]).all() or scale <= 0:
+            raise ValueError(f"Invalid reflectance scaling for Landsat band {band} in {path}.")
+        calibration[f"B{band}"] = (scale, offset)
+    if not calibration:
+        raise ValueError(f"No reflective-band scaling coefficients found in {path}.")
+    return path, calibration, sun_elevation
 
 
 def _sentinel_metadata(path):
@@ -101,7 +150,7 @@ def _sentinel_metadata(path):
 
 
 def discover_scenes(inputs):
-    """Discover standard Landsat Collection 2 L2 and Sentinel-2 L2A bands.
+    """Discover standard Landsat Collection 2 L1/L2 and Sentinel-2 L2A bands.
 
     inputs is a directory, a file, or a sequence. Metadata/QA companions are
     discovered only in the selected products. Unknown band-like filenames
@@ -131,7 +180,7 @@ def discover_scenes(inputs):
                 selected_files.add(p)
         else:
             raise FileNotFoundError(p)
-    landsat, sentinel, unknown, thermal = {}, {}, [], []
+    landsat, landsat_l1, sentinel, unknown, thermal = {}, {}, {}, [], []
     for p in sorted(paths):
         match = _LANDSAT.match(p.name)
         if match:
@@ -143,6 +192,16 @@ def discover_scenes(inputs):
                 if label in group["files"]:
                     raise ValueError(f"Duplicate Landsat asset: {ident} {label}.")
                 group["files"][label] = p
+            continue
+        match = _LANDSAT_L1.match(p.name)
+        if match:
+            ident, acquired, code, qa = match.groups()
+            key = (str(p.parent), ident)
+            group = landsat_l1.setdefault(key, {"files": {}, "date": acquired})
+            label = (code or qa).upper()
+            if label in group["files"]:
+                raise ValueError(f"Duplicate Landsat Level-1 asset: {ident} {label}.")
+            group["files"][label] = p
             continue
         match = _LANDSAT_THERMAL.match(p.name)
         if match:
@@ -181,6 +240,43 @@ def discover_scenes(inputs):
                 + path.name + ". Sélectionner les bandes de réflectance SR_B* avec leurs masques QA, "
                 "ou leur dossier de produit complet. Les fichiers ST_* ne sont pas traités.")
     scenes = list(explicit)
+    for (directory, ident), group in landsat_l1.items():
+        sensor_code = ident[2:4]
+        if sensor_code not in {"04","05","07","08","09"}:
+            raise ValueError(f"Unsupported Landsat sensor {sensor_code}.")
+        roles = LANDSAT_OLI if sensor_code in {"08","09"} else LANDSAT_TM
+        files = group["files"]
+        for quality in ("QA_PIXEL", "QA_RADSAT"):
+            if quality not in files:
+                candidates = [
+                    p for p in Path(directory).iterdir()
+                    if p.name.lower() in {
+                        f"{ident}_{quality}.tif".lower(),
+                        f"{ident}_{quality}.tiff".lower(),
+                    }
+                ]
+                if len(candidates) == 1:
+                    files[quality] = candidates[0]
+        metadata, calibration, sun_elevation = _landsat_l1_metadata(directory, ident)
+        bands = {}
+        for code, path in files.items():
+            if code not in roles:
+                continue
+            if code not in calibration:
+                raise ValueError(f"Missing Landsat Level-1 reflectance calibration for {code} in {metadata}.")
+            scale, offset = calibration[code]
+            bands[roles[code]] = Band(
+                path, scale=scale, offset=offset, nodata=0, unit="toa_reflectance"
+            )
+        if bands:
+            acquired = group["date"]
+            scenes.append(Scene(
+                ident, bands, sensor=f"landsat-{int(sensor_code)}",
+                acquired=f"{acquired[:4]}-{acquired[4:6]}-{acquired[6:8]}",
+                level="C2-L1", quality=files.get("QA_PIXEL"),
+                quality_kind="landsat_qa", saturation=files.get("QA_RADSAT"),
+                notes=(f"TOA reflectance derived from Landsat Level-1 MTL; SUN_ELEVATION={sun_elevation:g}.",)
+            ))
     for (directory, ident), group in landsat.items():
         sensor_code = ident[2:4]
         if sensor_code not in {"04","05","07","08","09"}:
