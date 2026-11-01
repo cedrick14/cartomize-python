@@ -285,10 +285,11 @@ def test_worker_publishes_distance_bounds_balances_and_exact_labels(application,
         page.rings_table_button.click()
         assert window.workspace.catalog.currentData() == products['table']
         viewer = page.open_rings_product('table')
-        for _ in range(100):
+        for _ in range(500):
             if len(viewer.frame) == len(table):
                 break
             QTest.qWait(20)
+        assert len(viewer.frame) == len(table), "Le tableau de résultats n'a pas fini de charger."
         assert viewer.frame.upper_m.tolist() == table.upper_m.tolist()
         page.rings_folder.setText('future')
         page.rings_distances.setText('20; 100')
