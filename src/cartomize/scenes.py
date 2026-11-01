@@ -6,6 +6,11 @@ import re
 import xml.etree.ElementTree as ET
 
 import numpy as np
+import rasterio
+
+from .sensor_profiles import (LANDSAT_OLI, LANDSAT_ETM_TM as LANDSAT_TM, SENTINEL2 as SENTINEL,
+    parse_landsat_product_identifier, semantic_band_name, sensor_from_text,
+    quality_asset_role, native_band_code)
 
 
 @dataclass(frozen=True)
@@ -68,9 +73,6 @@ class Scene:
         object.__setattr__(self, "bands", {k: v if isinstance(v, Band) else Band(v) for k, v in self.bands.items()})
 
 
-LANDSAT_OLI = {"B1":"coastal", "B2":"blue", "B3":"green", "B4":"red", "B5":"nir", "B6":"swir1", "B7":"swir2"}
-LANDSAT_TM = {"B1":"blue", "B2":"green", "B3":"red", "B4":"nir", "B5":"swir1", "B7":"swir2"}
-SENTINEL = {"B01":"coastal", "B02":"blue", "B03":"green", "B04":"red", "B05":"rededge1", "B06":"rededge2", "B07":"rededge3", "B08":"nir", "B8A":"nir_narrow", "B09":"water_vapour", "B11":"swir1", "B12":"swir2"}
 _S2_BANDS = ["B01","B02","B03","B04","B05","B06","B07","B08","B8A","B09","B10","B11","B12"]
 _LANDSAT = re.compile(r"^(L[CET]\d{2}_L2(?:SP|SR)_\d{6}_(\d{8})_\d{8}_02_[A-Z0-9]+)_(?:SR_(B\d+)|(QA_PIXEL|QA_RADSAT))\.(?:tif|tiff)$", re.I)
 _LANDSAT_L1 = re.compile(r"^(L[CET]\d{2}_L1(?:TP|GT|GS)_\d{6}_(\d{8})_\d{8}_02_[A-Z0-9]+)_(?:(B\d+)|(QA_PIXEL|QA_RADSAT))\.(?:tif|tiff)$", re.I)
@@ -194,6 +196,107 @@ def _sentinel_metadata(path):
     raise ValueError(f"Missing MTD_MSIL2A.xml for {path.name}. Keep the SAFE metadata or declare calibrated Band objects explicitly.")
 
 
+def _loose_landsat_asset(path):
+    """Recognize Landsat assets from product id + flexible band/QA suffixes."""
+    name = Path(path).name
+    product = parse_landsat_product_identifier(name)
+    if product is None:
+        return None
+    upper = re.sub(r"\.(?:TIF|TIFF|IMG|JP2|VRT)$", "", name, flags=re.I).upper()
+    suffix = upper[len(product["product_id"]):].lstrip("_-. ")
+    qa_role, _ = quality_asset_role(suffix, sensor=product["sensor"])
+    if qa_role == "quality":
+        return product, "QA_PIXEL"
+    if qa_role == "saturation":
+        return product, "QA_RADSAT"
+    # Accept only a direct band suffix, not arbitrary labels containing a
+    # band-like token (for example UNKNOWN_B2 or ST_B11).
+    compact = re.sub(r"[^A-Z0-9]", "", suffix.upper())
+    direct = re.fullmatch(r"(?:SR)?(?:BAND)?B?(?:0?[1-9]|1[0-2]|8A)", compact)
+    if not direct:
+        return None
+    code = native_band_code(suffix)
+    if code is None:
+        return None
+    # Level-2 optical reflectance should be SR_B*, while direct provider
+    # aliases such as B4/B04/BAND_4 remain accepted when the product id is intact.
+    return product, ("SR_" + code if product["level"].upper().startswith("L2") else code)
+
+
+def _loose_sentinel_asset(path):
+    """Recognize Sentinel-2 assets when SAFE metadata gives the sensor context."""
+    path = Path(path)
+    level = None
+    metadata = None
+    if _find_ancestor_file(path, "MTD_MSIL2A.xml") is not None:
+        level = "L2A"
+        metadata = _sentinel_metadata(path)
+    elif _find_ancestor_file(path, "MTD_MSIL1C.xml") is not None:
+        level = "L1C"
+        metadata = _sentinel_l1_metadata(path)
+    if metadata is None:
+        return None
+    role, kind = quality_asset_role(path.stem, sensor="sentinel-2")
+    if role == "quality" and kind == "sentinel_scl":
+        code = "SCL"
+    else:
+        code = native_band_code(path.stem)
+        if code is None:
+            semantic = semantic_band_name(path.stem, sensor="sentinel-2")
+            if semantic:
+                candidates = [k for k,v in SENTINEL.items() if v == semantic]
+                code = candidates[0] if len(candidates) == 1 else None
+    if code is None:
+        return None
+    text = path.stem.upper()
+    tile_match = re.search(r"(T\d{2}[A-Z]{3})", text)
+    date_match = re.search(r"(\d{8}T\d{6})", text)
+    tile = tile_match.group(1) if tile_match else "TILE"
+    acquired = date_match.group(1) if date_match else re.search(r"(\d{8}T\d{6})", metadata[0].as_posix().upper())
+    acquired = acquired.group(1) if hasattr(acquired, "group") else acquired or "19700101T000000"
+    res_match = re.search(r"(?:^|[_\-.])(10|20|60)M(?:$|[_\-.])", text)
+    resolution = int(res_match.group(1)) if res_match else 999
+    return level, metadata, tile, acquired, code.upper(), resolution
+
+
+def _raster_semantic_assets(path):
+    """Read safe semantic band roles from GDAL descriptions/tags.
+
+    This fallback never infers a numeric wavelength from an ambiguous band
+    number without sensor context. It is intended for renamed/custom rasters
+    that retain semantic metadata such as red, nir, swir1, etc.
+    """
+    path = Path(path)
+    try:
+        with rasterio.open(path) as src:
+            result = []
+            for index in src.indexes:
+                tags = src.tags(index)
+                candidates = [
+                    src.descriptions[index - 1],
+                    tags.get("semantic_name"),
+                    tags.get("common_name"),
+                    tags.get("eo:common_name"),
+                    tags.get("band_name"),
+                ]
+                role = next((semantic_band_name(value) for value in candidates if value), None)
+                if role is None and src.count == 1 and sensor_from_text(path.stem)[0] is None:
+                    # Filename-only semantic fallback is reserved for custom/renamed
+                    # rasters without an explicit satellite product identity. A
+                    # recognized Landsat/Sentinel product with an unknown suffix
+                    # must be rejected rather than guessed from a trailing B-code.
+                    role = semantic_band_name(path.stem)
+                if role is not None:
+                    result.append((role, Band(
+                        path, index=index, scale=src.scales[index - 1],
+                        offset=src.offsets[index - 1], nodata=src.nodata,
+                        unit=src.units[index - 1] or tags.get("unit") or "source units"
+                    )))
+            return result
+    except (OSError, rasterio.errors.RasterioError):
+        return []
+
+
 def discover_scenes(inputs):
     """Discover Landsat Collection 2 L1/L2 and Sentinel-2 L1C/L2A bands.
 
@@ -226,6 +329,7 @@ def discover_scenes(inputs):
         else:
             raise FileNotFoundError(p)
     landsat, landsat_l1, sentinel, sentinel_l1, unknown, thermal = {}, {}, {}, {}, [], []
+    custom_semantic = {}
     for p in sorted(paths):
         match = _LANDSAT.match(p.name)
         if match:
@@ -254,7 +358,9 @@ def discover_scenes(inputs):
             expected = "B10" if ident[2:4] in {"08", "09"} else "B6"
             if not code.upper().startswith("B") or code.upper() == expected:
                 thermal.append((p, ident))
-                continue
+            else:
+                unknown.append(p.name)
+            continue
         match = _S2.match(p.name)
         if match:
             tile, acquired, code, resolution = match.groups()
@@ -290,6 +396,43 @@ def discover_scenes(inputs):
                     f"Missing MTD_MSIL2A.xml or MTD_MSIL1C.xml for {p.name}. "
                     "Keep the SAFE product metadata with the spectral bands."
                 )
+        loose_landsat = _loose_landsat_asset(p)
+        if loose_landsat:
+            product, label = loose_landsat
+            ident = product["product_id"]
+            group_target = landsat if product["level"].upper().startswith("L2") else landsat_l1
+            key = (str(p.parent), ident)
+            group = group_target.setdefault(key, {"files": {}, "date": product["acquired"]})
+            if label.startswith("SR_"):
+                label = label[3:]
+            if label in group["files"] and group["files"][label] != p:
+                raise ValueError(f"Duplicate Landsat asset: {ident} {label}.")
+            group["files"][label] = p
+            continue
+        loose_sentinel = _loose_sentinel_asset(p)
+        if loose_sentinel:
+            level_name, metadata, tile, acquired, code, resolution = loose_sentinel
+            target = sentinel if level_name == "L2A" else sentinel_l1
+            key = (str(metadata[0]), tile, acquired)
+            group = target.setdefault(key, {"files": {}, "metadata": metadata})
+            candidate = (resolution, p)
+            previous = group["files"].get(code)
+            if previous and candidate[0] == previous[0] and candidate[1] != previous[1]:
+                raise ValueError(f"Duplicate Sentinel asset: {tile} {code}.")
+            if previous is None or candidate[0] < previous[0]:
+                group["files"][code] = candidate
+            continue
+        semantic_assets = _raster_semantic_assets(p)
+        if semantic_assets:
+            group = custom_semantic.setdefault(str(p.parent), {})
+            for role, band in semantic_assets:
+                if role in group:
+                    raise ValueError(
+                        f"Bande sémantique dupliquée dans {p.parent}: {role}. "
+                        "Séparer les acquisitions ou fournir un manifeste scenes.json."
+                    )
+                group[role] = band
+            continue
         if re.search(r"(?:^|_)(?:SR_)?B\d{1,2}[A-Z]?(?:_|\.)",p.name,re.I):
             unknown.append(p.name)
     if unknown:
@@ -404,6 +547,14 @@ def discover_scenes(inputs):
             scenes.append(Scene(f"{tile}_{acquired}_{metadata.parent.name}",bands,sensor="sentinel-2",level="L2A-SR",
                                 acquired=f"{acquired[:4]}-{acquired[4:6]}-{acquired[6:8]}",
                                 quality=files.get("SCL",(None,None))[1],quality_kind="sentinel_scl"))
+    for directory, bands in custom_semantic.items():
+        if bands:
+            scene_name = Path(directory).name or "custom_scene"
+            scenes.append(Scene(
+                scene_name, bands, sensor="custom", level="custom",
+                notes=("Band roles recognized from raster descriptions/tags or descriptive filenames; "
+                       "sensor-specific calibration and QA semantics were not guessed.",)
+            ))
     if not scenes:
         raise ValueError("No supported spectral scenes found. Use explicit Scene/Band mappings for custom data.")
     ids = [s.scene_id for s in scenes]

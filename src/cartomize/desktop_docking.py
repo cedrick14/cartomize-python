@@ -21,9 +21,9 @@ AREAS = (
 )
 
 
-def panel_icon(symbol, palette, ratio=1):
+def panel_icon(symbol, palette, ratio=1, *, button_text=False):
     """Small, theme-aware controls shared by docks and central result tabs."""
-    color = palette.windowText().color()
+    color = palette.buttonText().color() if button_text else palette.windowText().color()
     pixmap = QPixmap(round(18 * ratio), round(18 * ratio))
     pixmap.setDevicePixelRatio(ratio)
     pixmap.fill(Qt.GlobalColor.transparent)
@@ -240,7 +240,7 @@ class DockTitleBar(QWidget):
         key = (color.name(), symbol, self.devicePixelRatioF())
         if getattr(button, '_dock_icon_key', None) == key:
             return
-        button.setIcon(panel_icon(symbol, self.manager.window.palette(), self.devicePixelRatioF()))
+        button.setIcon(panel_icon(symbol, button.palette(), self.devicePixelRatioF(), button_text=True))
         button._dock_icon_key = key
 
     def sync(self, *_):

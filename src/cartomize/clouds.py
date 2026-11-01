@@ -13,7 +13,7 @@ from .imagery import _check_cancel
 from .scenes import Scene
 
 
-SENTINEL_SPECTRAL_METHOD = "sentinel_spectral_fallback_v1"
+SENTINEL_SPECTRAL_METHOD = "sentinel_spectral_fallback_v2"
 
 
 def _calibrated_reader(stack, band, reference):
@@ -43,11 +43,11 @@ def _read_reflectance(vrt, band, window):
 
 
 def sentinel_spectral_cloud_candidates(blue, green, red, nir, swir1, valid):
-    """Return the shared high-confidence Sentinel-2 spectral cloud candidate mask.
+    """Return the Sentinel-2 spectral cloud candidate mask used by N4.
 
-    Visible and blue reflectance must both exceed 0.15 before ratio and
-    vegetation tests can classify a pixel as cloud. This deliberately avoids
-    rejecting common bright urban edges and shorelines.
+    The primary branch remains conservative for opaque clouds. A second,
+    spectrally neutral branch recovers thin/moderate clouds that can remain
+    visible after SCL without broadly rejecting bright urban surfaces.
     """
     blue = np.asarray(blue, dtype="float64")
     green = np.asarray(green, dtype="float64")
@@ -65,7 +65,15 @@ def sentinel_spectral_cloud_candidates(blue, green, red, nir, swir1, valid):
     red_b11 = red / (swir1 + eps)
     nir_green = nir / (green + eps)
     visible = (blue + green + red) / 3.0
-    cloud = (
+    visible_spread = (
+        np.maximum(np.maximum(blue, green), red)
+        - np.minimum(np.minimum(blue, green), red)
+    )
+    whiteness = visible_spread / (visible + eps)
+
+    # Opaque / bright clouds: retain the conservative rule that protects
+    # common bright urban edges and shorelines.
+    opaque_cloud = (
         valid
         & (blue >= 0.15)
         & (visible >= 0.15)
@@ -76,6 +84,28 @@ def sentinel_spectral_cloud_candidates(blue, green, red, nir, swir1, valid):
         & (nir_b11 > 0.90)
         & (red_b11 < 6.0)
     )
+
+    # Thin / moderate-brightness clouds can remain visible after SCL while
+    # falling just below the opaque-cloud brightness gate. Recover only
+    # spectrally neutral, cloud-like pixels whose blue channel is at least as
+    # reflective as SWIR1. This broadens N4 without reverting to the older
+    # rule that over-selected bright urban surfaces.
+    thin_cloud = (
+        valid
+        & (blue >= 0.10)
+        & (green >= 0.09)
+        & (red >= 0.07)
+        & (visible >= 0.105)
+        & (whiteness <= 0.35)
+        & (ndvi < 0.35)
+        & (nir_green < 2.30)
+        & (b2_b11 > 1.00)
+        & (b2_b11 < (2.10 + blue))
+        & (nir_b11 > 0.90)
+        & (red_b11 < 5.0)
+    )
+
+    cloud = opaque_cloud | thin_cloud
     water_like = valid & (b2_b11 > 2.0) & (blue < 0.20) & (nir < red)
     return cloud & ~water_like
 
