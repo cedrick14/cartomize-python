@@ -209,11 +209,17 @@ def _loose_landsat_asset(path):
         return product, "QA_PIXEL"
     if qa_role == "saturation":
         return product, "QA_RADSAT"
+    # Accept only a direct band suffix, not arbitrary labels containing a
+    # band-like token (for example UNKNOWN_B2 or ST_B11).
+    compact = re.sub(r"[^A-Z0-9]", "", suffix.upper())
+    direct = re.fullmatch(r"(?:SR)?(?:BAND)?B?(?:0?[1-9]|1[0-2]|8A)", compact)
+    if not direct:
+        return None
     code = native_band_code(suffix)
     if code is None:
         return None
-    # Level-2 optical reflectance should be SR_B*, but tolerate separators,
-    # BAND_*, and provider-preserved code aliases when the product id is intact.
+    # Level-2 optical reflectance should be SR_B*, while direct provider
+    # aliases such as B4/B04/BAND_4 remain accepted when the product id is intact.
     return product, ("SR_" + code if product["level"].upper().startswith("L2") else code)
 
 
@@ -348,7 +354,9 @@ def discover_scenes(inputs):
             expected = "B10" if ident[2:4] in {"08", "09"} else "B6"
             if not code.upper().startswith("B") or code.upper() == expected:
                 thermal.append((p, ident))
-                continue
+            else:
+                unknown.append(p.name)
+            continue
         match = _S2.match(p.name)
         if match:
             tile, acquired, code, resolution = match.groups()
