@@ -66,23 +66,36 @@ def canonical_semantic_name(value):
 
 
 def native_band_code(value):
-    """Extract B1/B01/B8A from common native/alias spellings."""
+    """Extract an explicit native band code without mistaking product numbers for bands."""
     text = str(value).strip().upper()
     stem = re.sub(r"\.(?:TIF|TIFF|JP2|IMG|VRT)$", "", text)
-    # Prefer explicit SR/TOA/BAND tokens; the final alternative accepts B02.
+
+    # Prefer an explicit B-prefixed code anywhere in a filename. This avoids
+    # interpreting Collection 02, dates or path/row numbers as spectral bands.
     match = re.search(
-        r"(?:^|[_\-. ])(?:SR[_\-. ]*)?(?:BAND[_\-. ]*)?"
-        r"(B?0?[1-9]|B?1[0-2]|B?8A)(?=$|[_\-. ])",
+        r"(?:^|[_\-. ])(?:SR[_\-. ]*)?(B(?:0?[1-9]|1[0-2]|8A))(?=$|[_\-. ])",
         stem,
     )
-    if not match:
-        compact = re.fullmatch(r"(?:SR)?(?:BAND)?(B?0?[1-9]|B?1[0-2]|B?8A)", re.sub(r"[^A-Z0-9]", "", stem))
-        if not compact:
-            return None
-        token = compact.group(1)
-    else:
+    if match:
         token = match.group(1)
-    token = token if token.startswith("B") else "B" + token
+    else:
+        # Provider aliases such as BAND_4 / SR_BAND_4 are accepted only when
+        # BAND is explicit, or when the complete value is itself a band code.
+        match = re.search(
+            r"(?:^|[_\-. ])(?:SR[_\-. ]*)?BAND[_\-. ]*(0?[1-9]|1[0-2]|8A)(?=$|[_\-. ])",
+            stem,
+        )
+        if match:
+            token = "B" + match.group(1)
+        else:
+            compact = re.fullmatch(
+                r"(?:SR)?(?:BAND)?(B?0?[1-9]|B?1[0-2]|B?8A)",
+                re.sub(r"[^A-Z0-9]", "", stem),
+            )
+            if not compact:
+                return None
+            token = compact.group(1)
+            token = token if token.startswith("B") else "B" + token
     if token == "B08A":
         token = "B8A"
     return token
@@ -172,15 +185,19 @@ def sentinel_identity(value):
 
 def quality_asset_role(value, *, sensor=None):
     """Recognize quality companions only when their semantics are unambiguous."""
-    token = _flat(value)
+    stem = re.sub(r"\.(?:TIF|TIFF|JP2|IMG|VRT)$", "", str(value).strip(), flags=re.I)
+    token = _flat(stem)
     if sensor and str(sensor).startswith("landsat-"):
-        if token.endswith("qapixel") or token == "qapixel":
+        if token.endswith("qapixel"):
             return "quality", "landsat_qa"
-        if token.endswith("qaradsat") or token == "qaradsat":
+        if token.endswith("qaradsat"):
             return "saturation", "landsat_radsat"
     if sensor == "sentinel-2":
-        if token.endswith("scl") or token in {"sceneclassification", "sceneclassificationlayer", "sceneclassificationmap"}:
+        if (token == "scl" or re.fullmatch(r"scl(?:10|20|60)m?", token)
+                or token.endswith("sceneclassification")
+                or token.endswith("sceneclassificationlayer")
+                or token.endswith("sceneclassificationmap")):
             return "quality", "sentinel_scl"
-        if token.endswith("qa60") or token == "qa60":
+        if token.endswith("qa60"):
             return "quality", "sentinel_qa60"
     return None, None
