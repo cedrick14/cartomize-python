@@ -233,7 +233,7 @@ def _companion_key(item,names):
 
 
 def _mask_assets(item,quality_asset=None,quality_kind=None,saturation_asset=None):
-    family,_,_=_stac_profile(item)
+    family,sensor,_=_stac_profile(item)
     expected='landsat_qa' if family=='landsat' else 'sentinel_scl' if family=='sentinel' else None
     automatic=_companion_key(item,{'qa_pixel'}) if family=='landsat' else _companion_key(item,{'scl'}) if family=='sentinel' else None
     if automatic is None and family=='sentinel':automatic=_companion_key(item,{'scl-jp2'})
