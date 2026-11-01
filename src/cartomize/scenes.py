@@ -280,7 +280,11 @@ def _raster_semantic_assets(path):
                     tags.get("band_name"),
                 ]
                 role = next((semantic_band_name(value) for value in candidates if value), None)
-                if role is None and src.count == 1:
+                if role is None and src.count == 1 and sensor_from_text(path.stem)[0] is None:
+                    # Filename-only semantic fallback is reserved for custom/renamed
+                    # rasters without an explicit satellite product identity. A
+                    # recognized Landsat/Sentinel product with an unknown suffix
+                    # must be rejected rather than guessed from a trailing B-code.
                     role = semantic_band_name(path.stem)
                 if role is not None:
                     result.append((role, Band(
