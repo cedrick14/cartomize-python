@@ -119,6 +119,29 @@ def test_automatic_worker_selects_mosaic_and_registers_all_products(application,
         close(window, application)
 
 
+def test_automatic_result_exposes_clickable_transformation_timeline(application, write_raster, tmp_path):
+    window = CartomizeWindow()
+    try:
+        page, _ = configure(window, write_raster, tmp_path)
+        window.start()
+        wait(window)
+        record = json.loads(Path(window.output_path).read_text(encoding='utf-8'))
+        assert [step['key'] for step in record['transformations']] == [
+            'scene_selection', 'quality_masking', 'mosaic', 'composition', 'aoi_clip'
+        ]
+        assert not page.transformation_steps.isHidden()
+        assert page.transformation_steps.rowCount() == 5
+        # The automatic two-scene test requires a mosaic.
+        assert 'Mosaïque des scènes retenues' in page.transformation_steps.item(2, 1).text()
+        product_item = page.transformation_steps.item(0, 2)
+        path = product_item.data(Qt.ItemDataRole.UserRole)
+        assert path and Path(path).is_file()
+        page.open_transformation_result(product_item)
+        assert str(Path(path).resolve()) in window.workspace.records
+    finally:
+        close(window, application)
+
+
 def test_automatic_retains_one_sufficient_scene_and_clips_to_aoi(application, write_raster, tmp_path):
     window = CartomizeWindow()
     try:
