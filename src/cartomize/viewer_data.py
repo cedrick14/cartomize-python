@@ -114,7 +114,7 @@ def render_raster(path, rect, shape, bands=(1,), palette='viridis', classes=None
             out_shape=(len(bands), height, width), masked=True, resampling=method))
         valid = ~np.any(np.ma.getmaskarray(data), axis=0)
         if len(bands) == 1 and transparent_values:
-            raw_values = np.asarray(data.filled(np.nan)[0], dtype='float64')
+            raw_values = np.asarray(data.astype('float64').filled(np.nan)[0], dtype='float64')
             valid &= ~np.isin(raw_values, transparent_values)
         native = len(bands) == 3 and src.dtypes[bands[0]-1] == 'uint8' and (
             src.tags().get('CARTOMIZE_PRODUCT') == 'display_rgba' or
