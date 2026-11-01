@@ -23,7 +23,8 @@ def test_real_sentinel_preprocessing_matches_same_product_c1_reference(tmp_path)
     scenes=cm.load_scenes_manifest(FIXTURE/'scenes.json')
     zones=gpd.GeoDataFrame({'name':['Mayombe']},geometry=[box(*provenance['bounds'])],crs=provenance['crs'])
     result=cm.preprocess_imagery(scenes,tmp_path/'real_output',aoi=zones,
-                                band_order=['red','nir'],target_crs='EPSG:32733',resolution=10)
+                                band_order=['red','nir'],target_crs='EPSG:32733',resolution=10,
+                                allow_partial=True)
     assert result.report['status']=='partial'
     assert result.report['usable_percent']==pytest.approx(100*16040/16384)
     assert result.diagnostic.report['usable_pixels']==16040
