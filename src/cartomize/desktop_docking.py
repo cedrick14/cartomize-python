@@ -23,7 +23,7 @@ AREAS = (
 
 def panel_icon(symbol, palette, ratio=1):
     """Small, theme-aware controls shared by docks and central result tabs."""
-    color = palette.windowText().color()
+    color = palette.buttonText().color()
     pixmap = QPixmap(round(18 * ratio), round(18 * ratio))
     pixmap.setDevicePixelRatio(ratio)
     pixmap.fill(Qt.GlobalColor.transparent)
