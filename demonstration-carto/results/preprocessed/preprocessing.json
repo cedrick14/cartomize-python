@@ -5,12 +5,12 @@
   "coverage_threshold": 95.0,
   "threshold_met": true,
   "allow_partial": false,
-  "usable_percent": 98.08113005648926,
+  "usable_percent": 97.84969832432567,
   "selected_scene_ids": [
     "S2C_33MWR_20250620_0_L2A"
   ],
   "recommended_action": "single_scene",
-  "initial_usable_percent": 98.08113005648926,
+  "initial_usable_percent": 97.84969832432567,
   "catalog": null,
   "acquisitions": [],
   "downloaded_bytes": 0,
@@ -274,10 +274,10 @@
       "scene_id": "S2C_33MWR_20250620_0_L2A",
       "status": "applied",
       "path": "/home/runner/work/cartomize-python/cartomize-python/demonstration-carto/results/preprocessed/spectral_cloud/scene_0001_spectral_cloud.tif",
-      "method": "sentinel_spectral_fallback_v1",
+      "method": "sentinel_spectral_fallback_v2",
       "observed_pixels": 442888,
-      "cloud_pixels": 5561,
-      "cloud_percent": 1.2556221889055472
+      "cloud_pixels": 6793,
+      "cloud_percent": 1.533796354834631
     }
   ],
   "mosaic": false,
@@ -325,10 +325,10 @@
       "scene_id": "S2C_33MWR_20250620_0_L2A",
       "kind": "sentinel_scl",
       "evaluated_pixels": 442031,
-      "clear_pixels": 437291,
-      "clear_percent": 98.92767701812768,
-      "rejected_pixels": 4740,
-      "rejected_percent": 1.0723229818723121,
+      "clear_pixels": 437263,
+      "clear_percent": 98.92134262076641,
+      "rejected_pixels": 4768,
+      "rejected_percent": 1.0786573792335832,
       "cloud_pixels": 1992,
       "cloud_percent": 0.45064712655899697,
       "cloud_low_probability_pixels": 28,
@@ -352,11 +352,11 @@
   "spectral_cloud_statistics": [
     {
       "scene_id": "S2C_33MWR_20250620_0_L2A",
-      "method": "sentinel_spectral_fallback_v1",
+      "method": "sentinel_spectral_fallback_v2",
       "evaluated_pixels": 442031,
-      "cloud_pixels": 5557,
-      "cloud_percent": 1.2571516477351137,
-      "clear_pixels": 436474,
+      "cloud_pixels": 6789,
+      "cloud_percent": 1.5358651316310394,
+      "clear_pixels": 435242,
       "nodata_pixels": 0
     }
   ]

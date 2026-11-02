@@ -9,7 +9,7 @@
   },
   "preprocessing": {
     "status": "partial",
-    "usable_percent": 98.08113005648926,
+    "usable_percent": 97.84969832432567,
     "threshold_met": true,
     "selected_scene_ids": [
       "S2C_33MWR_20250620_0_L2A"
@@ -18,34 +18,34 @@
   },
   "indices": {
     "NDVI": {
-      "count": 433549,
+      "count": 432526,
       "min": -0.3380281627178192,
       "max": 0.7912970185279846,
-      "mean": 0.025812360515353114,
-      "std": 0.22327657878868334,
-      "p05": -0.24393723905086517,
-      "p50": 0.05051816999912262,
-      "p95": 0.4582764685153957
+      "mean": 0.02589408267670278,
+      "std": 0.22348946561504965,
+      "p05": -0.24400566518306732,
+      "p50": 0.05078597366809845,
+      "p95": 0.4586254954338074
     },
     "NDWI": {
-      "count": 433549,
+      "count": 432526,
       "min": -0.6954172253608704,
       "max": 0.31524547934532166,
-      "mean": -0.06670921297338171,
-      "std": 0.20953994480081073,
-      "p05": -0.4336009621620178,
-      "p50": -0.10443035513162613,
-      "p95": 0.19694657623767853
+      "mean": -0.06685859875390301,
+      "std": 0.2097195953175936,
+      "p05": -0.43379876017570496,
+      "p50": -0.10478905960917473,
+      "p95": 0.19698242843151093
     },
     "EVI": {
-      "count": 433549,
+      "count": 432526,
       "min": -0.2950396239757538,
       "max": 0.7951585650444031,
-      "mean": 0.04452937967518445,
-      "std": 0.12546311487805867,
-      "p05": -0.07741904407739639,
-      "p50": 0.03125549107789993,
-      "p95": 0.31349610090255736
+      "mean": 0.04464049129801532,
+      "std": 0.12555375448522296,
+      "p05": -0.07742378860712051,
+      "p50": 0.03142537549138069,
+      "p95": 0.3137240409851074
     }
   },
   "scl": [
@@ -117,15 +117,15 @@
     "spectral_fallback": [
       {
         "scene": "S2C_33MWR_20250620_0_L2A",
-        "methode": "sentinel_spectral_fallback_v1",
+        "methode": "sentinel_spectral_fallback_v2",
         "pixels_evalues": 442031,
-        "nuages_supplementaires": 5557,
-        "nuages_supplementaires_%": 1.2571516477351137,
-        "pixels_clairs": 436474,
+        "nuages_supplementaires": 6789,
+        "nuages_supplementaires_%": 1.5358651316310394,
+        "pixels_clairs": 435242,
         "pixels_sans_diagnostic": 0
       }
     ],
-    "usable_percent_after_combined_masks": 98.08113005648926
+    "usable_percent_after_combined_masks": 97.84969832432567
   },
   "preprocessing_comparison": {
     "input": {
@@ -134,8 +134,8 @@
       "platform": "sentinel-2c",
       "global_cloud_cover_percent": 1.766826,
       "aoi_scl_usable_percent": 98.93135415915157,
-      "aoi_spectral_cloud_percent": 1.2529127002763678,
-      "aoi_hybrid_usable_percent": 98.08100467838369,
+      "aoi_spectral_cloud_percent": 1.5405700764075794,
+      "aoi_hybrid_usable_percent": 97.84144072542041,
       "local_item": "input_scene/source_item.json",
       "preview_bbox_wgs84": [
         15.255,
@@ -164,7 +164,7 @@
     },
     "output": {
       "scene": "S2C_33MWR_20250620_0_L2A",
-      "usable_percent": 98.08113005648926
+      "usable_percent": 97.84969832432567
     },
     "figure": "kinshasa_preprocessing_comparison.png",
     "scene_aoi_input": "kinshasa_scene_input.png"
@@ -173,15 +173,15 @@
     {
       "name": "Fenêtre de démonstration Kinshasa",
       "scope": "emprise d'analyse; pas une limite administrative",
-      "ndvi_count": 433549,
+      "ndvi_count": 432526,
       "ndvi_min": -0.3380281627178192,
       "ndvi_max": 0.7912970185279846,
-      "ndvi_mean": 0.02581236051535311,
-      "ndvi_sum": 11190.923089070828,
-      "ndvi_std": 0.22327657878868334,
+      "ndvi_mean": 0.025894082676702783,
+      "ndvi_sum": 11199.864003823546,
+      "ndvi_std": 0.22348946561504965,
       "ndvi_zone_pixels": 442031,
       "ndvi_raster_pixels": 442031,
-      "ndvi_coverage_percent": 98.08113005648926
+      "ndvi_coverage_percent": 97.84969832432567
     }
   ],
   "products": {

@@ -20,16 +20,16 @@
   "aoi_observed_in_overlap_percent": 100.0,
   "aoi_scl_valid_in_overlap_percent": 98.93135415915158,
   "aoi_scl_usable_percent_before_processing": 98.93135415915157,
-  "aoi_hybrid_usable_percent_before_processing": 98.08100467838369,
-  "aoi_spectral_cloud_percent_before_processing": 1.2529127002763678,
+  "aoi_hybrid_usable_percent_before_processing": 97.84144072542041,
+  "aoi_spectral_cloud_percent_before_processing": 1.5405700764075794,
   "input_scene": {
     "item_id": "S2C_33MWR_20250620_0_L2A",
     "datetime": "2025-06-20T09:22:05.004000Z",
     "platform": "sentinel-2c",
     "global_cloud_cover_percent": 1.766826,
     "aoi_scl_usable_percent": 98.93135415915157,
-    "aoi_spectral_cloud_percent": 1.2529127002763678,
-    "aoi_hybrid_usable_percent": 98.08100467838369,
+    "aoi_spectral_cloud_percent": 1.5405700764075794,
+    "aoi_hybrid_usable_percent": 97.84144072542041,
     "local_item": "input_scene/source_item.json",
     "preview_bbox_wgs84": [
       15.255,
@@ -64,8 +64,8 @@
       "observed_in_overlap_percent": 100.0,
       "scl_valid_in_overlap_percent": 99.99909818916385,
       "usable_aoi_percent": 99.99909818916383,
-      "spectral_cloud_percent": 0.0004515814381965644,
-      "hybrid_usable_percent": 99.99864525568539
+      "spectral_cloud_percent": 0.007451093730243312,
+      "hybrid_usable_percent": 99.99164574339335
     },
     {
       "id": "S2B_33MWR_20230805_0_L2A",
@@ -74,8 +74,8 @@
       "observed_in_overlap_percent": 100.0,
       "scl_valid_in_overlap_percent": 99.98106197244066,
       "usable_aoi_percent": 99.98106197244064,
-      "spectral_cloud_percent": 0.008354256606636442,
-      "hybrid_usable_percent": 99.9726793229891
+      "spectral_cloud_percent": 0.04786763244883582,
+      "hybrid_usable_percent": 99.93723018009067
     },
     {
       "id": "S2B_33MWR_20240720_0_L2A",
@@ -84,28 +84,8 @@
       "observed_in_overlap_percent": 100.0,
       "scl_valid_in_overlap_percent": 99.95310583651973,
       "usable_aoi_percent": 99.95310583651971,
-      "spectral_cloud_percent": 0.03409439858384061,
-      "hybrid_usable_percent": 99.9191669225628
-    },
-    {
-      "id": "S2B_33MWR_20230726_0_L2A",
-      "cloud_cover": 9.730057,
-      "footprint_percent": 99.99999999999999,
-      "observed_in_overlap_percent": 100.0,
-      "scl_valid_in_overlap_percent": 99.95941851237285,
-      "usable_aoi_percent": 99.95941851237284,
-      "spectral_cloud_percent": 0.10499268438070121,
-      "hybrid_usable_percent": 99.86813822004659
-    },
-    {
-      "id": "S2A_33MWR_20250712_0_L2A",
-      "cloud_cover": 10.091956,
-      "footprint_percent": 99.99999999999999,
-      "observed_in_overlap_percent": 100.0,
-      "scl_valid_in_overlap_percent": 99.87194286126542,
-      "usable_aoi_percent": 99.87194286126541,
-      "spectral_cloud_percent": 0.06073770343743791,
-      "hybrid_usable_percent": 99.83720489153012
+      "spectral_cloud_percent": 0.046738678853344415,
+      "hybrid_usable_percent": 99.90878054948428
     },
     {
       "id": "S2A_33MWR_20240824_0_L2A",
@@ -114,18 +94,28 @@
       "observed_in_overlap_percent": 100.0,
       "scl_valid_in_overlap_percent": 99.87735372628238,
       "usable_aoi_percent": 99.87735372628237,
-      "spectral_cloud_percent": 0.05689926121276711,
-      "hybrid_usable_percent": 99.82862484420438
+      "spectral_cloud_percent": 0.07360777442604,
+      "hybrid_usable_percent": 99.81756109896857
     },
     {
-      "id": "S2B_33MWR_20240809_0_L2A",
-      "cloud_cover": 15.730922,
+      "id": "S2B_33MWR_20230726_0_L2A",
+      "cloud_cover": 9.730057,
       "footprint_percent": 99.99999999999999,
       "observed_in_overlap_percent": 100.0,
-      "scl_valid_in_overlap_percent": 98.96111391674482,
-      "usable_aoi_percent": 98.96111391674482,
-      "spectral_cloud_percent": 1.3956124347464822,
-      "hybrid_usable_percent": 98.15506403424793
+      "scl_valid_in_overlap_percent": 99.95941851237285,
+      "usable_aoi_percent": 99.95941851237284,
+      "spectral_cloud_percent": 0.22488755622188905,
+      "hybrid_usable_percent": 99.74937230180089
+    },
+    {
+      "id": "S2A_33MWR_20250712_0_L2A",
+      "cloud_cover": 10.091956,
+      "footprint_percent": 99.99999999999999,
+      "observed_in_overlap_percent": 100.0,
+      "scl_valid_in_overlap_percent": 99.87194286126542,
+      "usable_aoi_percent": 99.87194286126541,
+      "spectral_cloud_percent": 0.23753183649139287,
+      "hybrid_usable_percent": 99.67869980672313
     },
     {
       "id": "S2C_33MWR_20250620_0_L2A",
@@ -134,8 +124,18 @@
       "observed_in_overlap_percent": 100.0,
       "scl_valid_in_overlap_percent": 98.93135415915158,
       "usable_aoi_percent": 98.93135415915157,
-      "spectral_cloud_percent": 1.2529127002763678,
-      "hybrid_usable_percent": 98.08100467838369
+      "spectral_cloud_percent": 1.5405700764075794,
+      "hybrid_usable_percent": 97.84144072542041
+    },
+    {
+      "id": "S2B_33MWR_20240809_0_L2A",
+      "cloud_cover": 15.730922,
+      "footprint_percent": 99.99999999999999,
+      "observed_in_overlap_percent": 100.0,
+      "scl_valid_in_overlap_percent": 98.96111391674482,
+      "usable_aoi_percent": 98.96111391674482,
+      "spectral_cloud_percent": 1.8790303643359043,
+      "hybrid_usable_percent": 97.78521883636493
     },
     {
       "id": "S2B_33MWR_20230914_0_L2A",
@@ -160,8 +160,8 @@
       "observed_in_overlap_percent": 100.0,
       "scl_valid_in_overlap_percent": 61.03004833706082,
       "usable_aoi_percent": 61.030048337060805,
-      "spectral_cloud_percent": 0.0002257907190982822,
-      "hybrid_usable_percent": 61.00820071891764
+      "spectral_cloud_percent": 0.8415220100792977,
+      "hybrid_usable_percent": 60.56203825797944
     },
     {
       "id": "S2C_33MWR_20250918_0_L2A",
@@ -170,8 +170,8 @@
       "observed_in_overlap_percent": 100.0,
       "scl_valid_in_overlap_percent": 51.73688767044225,
       "usable_aoi_percent": 51.73688767044225,
-      "spectral_cloud_percent": 24.409331478838894,
-      "hybrid_usable_percent": 49.75772655840753
+      "spectral_cloud_percent": 25.532640306352846,
+      "hybrid_usable_percent": 49.01781037192247
     },
     {
       "id": "S2C_33MWR_20250829_0_L2A",
@@ -188,8 +188,8 @@
       "observed_in_overlap_percent": 100.0,
       "scl_valid_in_overlap_percent": 19.898456099848495,
       "usable_aoi_percent": 19.89845609984849,
-      "spectral_cloud_percent": 44.444419356586764,
-      "hybrid_usable_percent": 17.267571033760227
+      "spectral_cloud_percent": 44.63814779357309,
+      "hybrid_usable_percent": 17.12080706634634
     },
     {
       "id": "S2B_33MWR_20230904_0_L2A",
@@ -198,8 +198,8 @@
       "observed_in_overlap_percent": 100.0,
       "scl_valid_in_overlap_percent": 9.53755140321766,
       "usable_aoi_percent": 9.537551403217659,
-      "spectral_cloud_percent": 45.134887375589315,
-      "hybrid_usable_percent": 8.907669659146329
+      "spectral_cloud_percent": 45.30061776340745,
+      "hybrid_usable_percent": 8.786645833709649
     },
     {
       "id": "S2B_33MWR_20250824_1_L2A",
