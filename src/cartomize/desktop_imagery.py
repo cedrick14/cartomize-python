@@ -197,6 +197,20 @@ class PreparationPage(Page):
         self.summary = QLabel()
         self.summary.setWordWrap(True)
         self.form.addRow(self.summary)
+        self.transformation_steps = QTableWidget(0, 3)
+        self.transformation_steps.setHorizontalHeaderLabels(["Étape", "Décision", "Résultat"])
+        self.transformation_steps.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
+        self.transformation_steps.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
+        self.transformation_steps.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
+        self.transformation_steps.verticalHeader().hide()
+        self.transformation_steps.setMinimumHeight(140)
+        self.transformation_steps.setMaximumHeight(220)
+        self.transformation_steps.setToolTip(
+            "Chronologie réelle du prétraitement. Double-cliquer un résultat pour l’ouvrir dans la vue cartographique."
+        )
+        self.transformation_steps.itemDoubleClicked.connect(self.open_transformation_result)
+        self.transformation_steps.hide()
+        self.form.addRow("Transformations réalisées", self.transformation_steps)
         # Native/fallback fonts can be much wider than the current system font.
         # Keep full captions readable vertically instead of forcing the entire
         # parameter page beyond its viewport. Combo choices remain available in
@@ -449,6 +463,9 @@ class PreparationPage(Page):
         self.apply_audit_button.setEnabled(False)
         self.coverage_scenes.setRowCount(0)
         self.coverage_scenes.hide()
+        if hasattr(self, "transformation_steps"):
+            self.transformation_steps.setRowCount(0)
+            self.transformation_steps.hide()
         self.coverage_summary.setText("Sélection ou paramètres modifiés : lancer le diagnostic de couverture pour cette configuration.")
 
     def diagnose_coverage(self):
@@ -552,6 +569,44 @@ class PreparationPage(Page):
         self.coverage_scenes.setVisible(bool(record.get('scenes')))
         self.apply_audit_button.setEnabled(bool(record.get('recommended_scene_ids')))
 
+    def show_transformation_steps(self, record):
+        steps = record.get("transformations") or []
+        self.transformation_steps.setRowCount(0)
+        status_labels = {
+            "completed": "Réalisée",
+            "not_required": "Non requise",
+            "not_requested": "Non demandée",
+            "disabled": "Désactivée",
+        }
+        for step in sorted(steps, key=lambda item: item.get("order", 0)):
+            row = self.transformation_steps.rowCount()
+            self.transformation_steps.insertRow(row)
+            order = step.get("order", row + 1)
+            key = str(step.get("key", "")).replace("_", " ")
+            first = QTableWidgetItem(f"{order}. {key}".strip())
+            first.setFlags(first.flags() & ~Qt.ItemFlag.ItemIsEditable)
+            self.transformation_steps.setItem(row, 0, first)
+            decision = QTableWidgetItem(
+                f"{step.get('label', '')} — {status_labels.get(step.get('status'), step.get('status', ''))}"
+            )
+            decision.setFlags(decision.flags() & ~Qt.ItemFlag.ItemIsEditable)
+            self.transformation_steps.setItem(row, 1, decision)
+            product = step.get("product")
+            result = QTableWidgetItem(Path(product).name if product else "—")
+            result.setFlags(result.flags() & ~Qt.ItemFlag.ItemIsEditable)
+            if product and Path(product).is_file():
+                result.setData(Qt.ItemDataRole.UserRole, str(Path(product).resolve()))
+                result.setToolTip(str(Path(product).resolve()))
+            self.transformation_steps.setItem(row, 2, result)
+        self.transformation_steps.setVisible(bool(steps))
+
+    def open_transformation_result(self, item):
+        result = self.transformation_steps.item(item.row(), 2)
+        path = result.data(Qt.ItemDataRole.UserRole) if result is not None else None
+        window = self.window()
+        if path and hasattr(window, "workspace"):
+            window.workspace.open_result(path)
+
     def show_automatic_result(self, path, record):
         current = self._pending_audit_generation == self._audit_generation
         audit_path = record.get('audit')
@@ -600,6 +655,7 @@ class PreparationPage(Page):
                                       "Découpage à la zone d’étude réalisé.\n"
                                       f"Scènes retenues : {selected}.\n"
                                       "Diagnostic, plan N1–N5, cartes de lacunes et résultats disponibles dans le projet.")
+        self.show_transformation_steps(record)
         self.apply_audit_button.setEnabled(False)
         if partial:
             window = self.window()

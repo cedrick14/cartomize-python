@@ -527,6 +527,40 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
                 product_report["valid_pixels"] != final_audit.report["usable_pixels"]):
             raise RuntimeError("La couverture produite ne correspond pas au diagnostic ; aucun produit publié.")
         actual = final_audit.report["usable_percent"]
+        product = prepared.products[0] if prepared.products else {}
+        transformations = [
+            dict(
+                order=1, key="scene_selection",
+                label="Scène(s) retenue(s) et couverture utile",
+                status="completed",
+                product=str(final_audit.coverage),
+            ),
+            dict(
+                order=2, key="quality_masking",
+                label="Masquage qualité, nuages et lacunes",
+                status="completed" if mask_clouds else "disabled",
+                product=str(final_audit.gaps),
+            ),
+            dict(
+                order=3, key="mosaic",
+                label=("Mosaïque des scènes retenues" if len(selected) > 1
+                       else "Mosaïque non requise : une seule scène suffit"),
+                status="completed" if len(selected) > 1 else "not_required",
+                product=product.get("source_index"),
+            ),
+            dict(
+                order=4, key="composition",
+                label="Composition colorée",
+                status="completed" if product.get("composition") else "not_requested",
+                product=product.get("composition"),
+            ),
+            dict(
+                order=5, key="aoi_clip",
+                label="Produit final harmonisé et découpé à la zone d’étude",
+                status="completed",
+                product=product.get("multiband") or product.get("composition"),
+            ),
+        ]
         report.update(status="complete" if actual + 1e-9 >= 100 else "partial", usable_percent=actual,
             threshold_met=actual + 1e-9 >= threshold, selected_scene_ids=[s.scene_id for s in selected],
             mosaic=len(selected) > 1, products=list(prepared.products), preparation=str(prepared.manifest),
@@ -538,6 +572,7 @@ def preprocess_imagery(scenes, destination, *, aoi, coverage_threshold=100., all
             recovery=recovery_records,
             spectral_cloud_detection=spectral_cloud_reports,
             atmospheric_method=atmospheric_method,
+            transformations=transformations,
             executed_steps=[
                 "radiometric_calibration",
                 "quality_detection" if mask_clouds else "quality_detection_disabled",
